@@ -1,0 +1,51 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	
+	<modelVersion>4.0.0</modelVersion>
+	
+	<parent>
+		<artifactId>cloud</artifactId>
+		<groupId>org.openinfinity</groupId>
+		<version>1.0.0</version>
+	</parent>
+	
+	<groupId>org.openinfinity</groupId>
+	<artifactId>cloud-utils</artifactId>
+	<version>1.0.0</version>
+	
+	<dependencies>
+		<dependency>
+			<groupId>com.amazonaws</groupId>
+			<artifactId>aws-java-sdk</artifactId>
+			<version>1.2.0</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.codehaus.jackson</groupId>
+					<artifactId>jackson-mapper-asl</artifactId>
+				</exclusion>
+	
+				<exclusion>
+					<groupId>org.codehaus.jackson</groupId>
+					<artifactId>jackson-core-asl</artifactId>
+				</exclusion>
+				<!--	
+				<exclusion>
+					<groupId>commons-logging</groupId>
+					<artifactId>commons-logging</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.httpcomponents</groupId>
+					<artifactId>httpclient</artifactId>
+				</exclusion>
+-->        
+			</exclusions>
+		</dependency>  
+		<dependency>
+			<groupId>net.java.dev.jets3t</groupId>
+			<artifactId>jets3t</artifactId>
+			<version>0.9.0</version>
+		</dependency>
+	</dependencies>
+	
+</project>
+

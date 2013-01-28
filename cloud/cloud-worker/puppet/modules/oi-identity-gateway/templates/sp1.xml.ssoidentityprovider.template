@@ -1,0 +1,67 @@
+<EntityDescriptor
+    xmlns="urn:oasis:names:tc:SAML:2.0:metadata"
+    entityID="http://<%= spAddress %>:<%= spPort %>/saml/metadata/alias/defaultAlias">
+    <SPSSODescriptor
+        AuthnRequestsSigned="false"
+        WantAssertionsSigned="false"
+        protocolSupportEnumeration=
+            "urn:oasis:names:tc:SAML:2.0:protocol">
+        <SingleLogoutService
+            Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
+            Location="http://<%= idpIPAddress %>:<%= idpPort %>/openam/SPSIoRedirect/metaAlias/openinfinity/sp1"
+            ResponseLocation="http://<%= spAddress %>:<%= spPort %>/saml/SingleLogout/alias/defaultAlias"/>
+        <SingleLogoutService
+            Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
+            Location="http://<%= idpIPAddress %>:<%= idpPort %>/openam/SPSIoPOST/metaAlias/openinfinity/sp1"
+            ResponseLocation="http://<%= spAddress %>:<%= spPort %>/saml/SSO/SingleLogout/defaultAlias"/>
+        <SingleLogoutService
+            Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP"
+            Location="http://<%= spAddress %>:<%= spPort %>/saml/SingleLogout/alias/defaultAlias"/>
+        <ManageNameIDService
+            Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
+            Location="http://<%= idpIPAddress %>:<%= idpPort %>/openam/SPMniRedirect/metaAlias/openinfinity/sp1"
+            ResponseLocation="http://<%= idpIPAddress %>:<%= spPort %>/openam/SPMniRedirect/metaAlias/openinfinity/sp1"/>
+        <ManageNameIDService
+            Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
+            Location="http://<%= idpIPAddress %>:<%= idpPort %>/openam/SPMniPOST/metaAlias/openinfinity/sp1"
+            ResponseLocation="http://<%= idpIPAddress %>:<%= spPort %>/openam/SPMniPOST/metaAlias/openinfinity/sp1"/>
+        <ManageNameIDService
+            Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP"
+            Location="http://<%= idpIPAddress %>:<%= idpPort %>/openam/SPMniSoap/metaAlias/openinfinity/sp1"
+            ResponseLocation="http://<%= idpIPAddress %>:<%= idpPort %>/openam/SPMniSoap/metaAlias/openinfinity/sp1"/>
+        <NameIDFormat>
+            urn:oasis:names:tc:SAML:2.0:nameid-format:persistent
+        </NameIDFormat>
+        <NameIDFormat>
+            urn:oasis:names:tc:SAML:2.0:nameid-format:transient
+        </NameIDFormat>
+        <NameIDFormat>
+            urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress
+        </NameIDFormat>
+        <NameIDFormat>
+            urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified
+        </NameIDFormat>
+        <NameIDFormat>
+          urn:oasis:names:tc:SAML:1.1:nameid-format:WindowsDomainQualifiedName
+        </NameIDFormat>
+        <NameIDFormat>
+            urn:oasis:names:tc:SAML:2.0:nameid-format:kerberos
+        </NameIDFormat>
+        <NameIDFormat>
+            urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName
+        </NameIDFormat>
+        <AssertionConsumerService
+            isDefault="true"
+            index="0"
+            Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact"
+            Location="http://<%= spAddress %>:<%= spPort %>/saml/SSO/alias/defaultAlias"/>
+        <AssertionConsumerService
+            index="1"
+            Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
+            Location="http://<%= spAddress %>:<%= spPort %>/saml/SSO/alias/defaultAlias"/>
+        <AssertionConsumerService
+            index="2"
+            Binding="urn:oasis:names:tc:SAML:2.0:bindings:PAOS"
+            Location="http://<%= spAddress %>:<%= spPort %>/saml/SSO/alias/defaultAlias"/>
+    </SPSSODescriptor>
+</EntityDescriptor>

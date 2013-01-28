@@ -1,0 +1,17 @@
+hibernate.cache.provider_class=com.liferay.portal.dao.orm.hibernate.EhCacheProvider
+net.sf.ehcache.configurationResourceName=/ehcache/hibernate-clustered.xml
+ehcache.multi.vm.config.location=/ehcache/liferay-multi-vm-clustered.xml
+
+lucene.store.type=jdbc
+lucene.store.jdbc.auto.clean.up.enabled=true
+lucene.store.jdbc.auto.clean.up.interval=1440
+
+
+#default.regular.theme.id=tap
+#company.default.web.id=tieto.com
+#control.panel.layout.regular.theme.id=tap
+
+jdbc.default.driverClassName=com.mysql.jdbc.Driver
+jdbc.default.url=jdbc:mysql://<%= dbaddress %>/lportal?emulateLocators=true&useUnicode=true&characterEncoding=UTF-8&useFastDateParsing=false
+jdbc.default.username=liferay
+jdbc.default.password=toasliferay

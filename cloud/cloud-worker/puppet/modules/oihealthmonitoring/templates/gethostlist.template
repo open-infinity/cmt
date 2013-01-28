@@ -1,0 +1,18 @@
+#!/bin/bash
+
+## should be self descriptive, based on the group we are going to include
+## specific to the group monitoring features
+LOCALHOST_GROUP_DESRIPTION="liferay"
+
+. $TOAS_HEALTH_MONITORING_ROOT/bin/common.sh
+
+## list of known hosts, at least one is required. In case there are no hosts
+## in our group but us only tailing item representing us is required
+## In case we are not alone and were configured as 2nd, 3rd, n-th it makes
+## perfect sense to specify here at least IP of the first configured host
+## (plus our own of cause)
+
+## this record represents us DO NOT REMOVE OR MODIFY!
+echo "$MY_IP $(hostname -f) $LOCALHOST_GROUP_DESRIPTION"
+
+

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+
+#parse ($init)
+
+<html class="#language("lang.dir")" dir="#language("lang.dir")" lang="$w3c_language_id">
+
+<head>
+	<title>$the_title - $company_name</title>
+
+	<link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+	<link type="text/css" rel="stylesheet" href="$css_folder/openinfinity/t.css"></link>
+
+	<script type="text/javascript" src="$javascript_folder/jquery.min.js"></script>
+	<script type="text/javascript" src="$javascript_folder/jquery-ui.custom.min.js"></script>
+	<script type="text/javascript" src="$javascript_folder/underscore-min.js"></script>
+	<script type="text/javascript" src="$javascript_folder/backbone-min.js"></script>	
+	<script type="text/javascript" src="$javascript_folder/jquery.jeditable.mini.js"></script>	
+
+	
+	$theme.include($top_head_include)	
+
+</head>
+
+<body class="$css_class">
+
+$theme.include($body_top_include) 
+
+#if($is_signed_in)
+	#dockbar()
+#end
+
+<div id="container">
+
+	<div id="wrapper">
+		<a href="#main-content" id="skip-to-content">#language("skip-to-content")</a>
+
+		<header id="banner" role="banner">
+			<hgroup id="heading">
+				<h1 class="company-title">
+					<a class="logo" href="$company_url" title="#language("go-to") $company_name">
+						<span>$company_name</span>
+					</a>
+					<br />
+				</h1>
+
+				<h2 class="community-title">
+					<a href="$community_default_url" title="#language("go-to") $community_name">
+						<span>$community_name</span>
+					</a>
+				</h2>
+
+				<h3 class="page-title">
+					<span>$the_title</span>
+				</h3>
+			</hgroup>
+
+			#if(!$is_signed_in)
+				<a href="$sign_in_url" id="sign-in" rel="nofollow">$sign_in_text</a>
+			#end
+
+			#if ($update_available_url)
+				<div class="popup-alert-notice">
+					<a class="update-available" href="$update_available_url">#language("updates-are-available-for-liferay")</a>
+				</div>
+			#end
+
+			#if ($has_navigation)
+				#parse ("$full_templates_path/navigation.vm")
+			#end
+		</header>
+
+		<div id="content">
+		
+			<nav class="site-breadcrumbs" id="breadcrumbs">
+				<h1>
+					<span>#language("breadcrumbs")</span>
+				</h1>
+
+				#breadcrumbs()
+			</nav>
+
+			#if ($selectable)
+				$theme.include($content_include)
+			#else
+				$portletDisplay.recycle()
+
+				$portletDisplay.setTitle($the_title)
+
+				$theme.wrapPortlet("portlet.vm", $content_include)
+			#end
+		</div>
+
+	</div>
+
+</div>
+	
+	<footer id="footer" role="contentinfo">
+	<p class="powered-by">
+		 <a href="http://www.tieto.com" rel="external"><img src="/tap-theme/images/t.png" /></a>
+	</p>
+	</footer>
+
+</body>
+
+$theme.include($bottom_include)
+
+</html>

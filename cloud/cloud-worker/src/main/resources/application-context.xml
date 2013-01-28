@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.0.xsd
+        http://www.springframework.org/schema/util
+        http://www.springframework.org/schema/util/spring-util-3.0.xsd
+        http://www.springframework.org/schema/task
+        http://www.springframework.org/schema/task/spring-task-3.0.xsd
+        ">
+        
+  <!--  <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+  		<property name="locations" value=
+  		    "classpath:worker_jdbc.properties,
+  		     classpath:infrastructure.properties,
+  		     classpath:EucaCredentials.properties"/>
+	</bean> --> 
+    
+   <context:property-placeholder location="classpath:worker_jdbc.properties,classpath:infrastructure.properties"/>
+    
+    <context:component-scan base-package="org.openinfinity.cloud">
+    	<context:exclude-filter type="regex" expression="org.openinfinity.cloud.service.healthmonitoring.*.*"/>
+    </context:component-scan>
+ 
+	<task:annotation-driven executor="executorWithPool" scheduler="taskScheduler"/>
+	
+	<task:executor id="executorWithPool" pool-size="5-99" queue-capacity="10"/>
+	
+	<task:scheduler id="taskScheduler" pool-size="1"/>
+    
+    <bean id="cloudDataSource" destroy-method="close" class="org.apache.commons.dbcp.BasicDataSource">
+        <property name="driverClassName" value="${jdbc.driverClassName}"/>
+        <property name="url" value="${jdbc.url}"/>
+        <property name="username" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+        <property name="validationQuery" value="select 1" />
+        <property name="maxActive" value="8"/>
+        <property name="maxIdle" value="2"/>
+    </bean>  
+    
+   <!--  <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+		<property name="dataSource">
+			<ref bean="myDataSource" />
+		</property>
+	</bean>  -->   
+
+</beans>

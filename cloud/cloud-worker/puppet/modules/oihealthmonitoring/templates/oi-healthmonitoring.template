@@ -1,0 +1,59 @@
+#!/bin/bash
+# chkconfig: - 85 15
+# description: Open Infinity Health Monitoring init script
+# processname: oi-healthmonitoring
+# pidfile: /var/run/oi-healthmonitoring.pid
+# config:
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+# Source networking configuration.
+. /etc/sysconfig/network
+
+# TOAS variables
+. /etc/profile.d/toas.sh
+
+# Check that networking is up.
+
+[ ${NETWORKING} = "no" ] && exit 0
+
+JAVA_HOME=/etc/alternatives/jre/; export JAVA_HOME
+TOAS_OWNER=toas; export TOAS_OWNER
+
+# See how we were called.
+  case "$1" in
+    start)
+          # Start daemon.
+          echo -n "Starting TOAS health monitoring: "
+          su $TOAS_OWNER -c $TOAS_HEALTH_MONITORING_ROOT/bin/start.sh
+          RETVAL=$?
+          echo
+          [ $RETVAL = 0 ] && touch /var/lock/subsys/oi-healthmonitoring
+          ;;
+    stop)
+          # Stop daemons.
+          echo -n "Shutting down TOAS health monitoring: "
+          su $TOAS_OWNER -c $TOAS_HEALTH_MONITORING_ROOT/bin/stop.sh
+          sleep 10
+          RETVAL=$?
+          echo
+          [ $RETVAL = 0 ] && rm -f /var/lock/subsys/oi-healthmonitoring
+          ;;
+    restart)
+          $0 stop
+          $0 start
+          ;;
+    condrestart)
+         [ -e /var/lock/subsys/oi-healthmonitoring ] && $0 restart
+         ;;
+    status)
+          status oi-healthmonitoring
+          ;;
+    *)
+          echo "Usage: $0 {start|stop|restart|status}"
+          exit 1
+  esac
+
+exit 0
+

@@ -1,0 +1,17 @@
+#deploymentModel label.selectable {
+	background-color: #afafaf;
+	color: white;
+	padding: 3px 15px;
+	border-radius: 10px;
+}
+
+#deploymentModel label.selectable:hover {
+	background-color: #3cf;
+}
+
+#deploymentModel label.selected {
+	background-color: #2685A4;
+	color: white;
+	padding: 3px 15px;
+	border-radius: 10px;
+}

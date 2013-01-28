@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SubSchema i18nKey="x4000" inheritance="multiple" maintainPriority="no"
+           name="CustomRepo" supportsApplicableOrganization="no" validate="yes">
+    <AttributeSchema cosQualifier="default" isSearchable="no"
+                     name="RequiredValueValidator" syntax="string"
+                     type="validator">
+        <DefaultValues>
+            <Value>com.sun.identity.sm.RequiredValueValidator</Value>
+        </DefaultValues>
+    </AttributeSchema>
+    <AttributeSchema any="required" cosQualifier="default"
+                     i18nKey="x4001" isSearchable="no"
+                     name="sunIdRepoClass" syntax="string"
+                     type="single" validator="RequiredValueValidator">
+        <DefaultValues>
+            <Value>org.openinfinity.sso.openam.userdata.LiferayDatabaseRepo
+            </Value>
+        </DefaultValues>
+    </AttributeSchema>
+    <AttributeSchema cosQualifier="default" i18nKey="x4002" isSearchable="no"
+                     name="sunIdRepoAttributeMapping" syntax="string"
+                     type="list">
+        <DefaultValues>
+            <Value></Value>
+        </DefaultValues>
+    </AttributeSchema>
+    <AttributeSchema name="liferayDatabaseVersion"
+                     type="single_choice" i18nKey="Liferay Database Version">
+        <IsResourceNameAllowed/>
+        <ChoiceValues>
+            <ChoiceValue i18nKey="Older than 6.1">LESS_THAN_6_1</ChoiceValue>
+            <ChoiceValue i18nKey="6.1 or newer">6_1</ChoiceValue>
+        </ChoiceValues>
+        <DefaultValues>
+            <Value>6_1</Value>
+        </DefaultValues>
+    </AttributeSchema>
+    <AttributeSchema name="sun-opensso-database-UserAttrs"
+                     type="list"
+                     syntax="string"
+                     any="required"
+                     validator="RequiredValueValidator"
+                     i18nKey="a4100">
+        <DefaultValues>
+            <Value>userId</Value>
+            <Value>companyId</Value>
+            <Value>createDate</Value>
+            <Value>modifiedDate</Value>
+            <Value>screenName</Value>
+            <Value>emailAddress</Value>
+            <Value>facebookId</Value>
+            <Value>languageId</Value>
+            <Value>timeZoneId</Value>
+            <Value>firstName</Value>
+            <Value>lastName</Value>
+            <Value>middleName</Value>
+            <Value>password_</Value>
+        </DefaultValues>
+    </AttributeSchema>
+    <AttributeSchema name="sun-opensso-database-JDBCDriver"
+                     type="single"
+                     syntax="string"
+                     i18nKey="a4022">
+        <DefaultValues>
+            <Value>com.mysql.jdbc.Driver</Value>
+        </DefaultValues>
+    </AttributeSchema>
+    <AttributeSchema name="sun-opensso-database-JDBCUrl"
+                     type="single"
+                     syntax="string"
+                     i18nKey="a4022JdbcURL">
+        <DefaultValues>
+            <Value>jdbc:mysql://<%= dbAddress %>/lportal?useUnicode=true&amp;characterEncoding=UTF-8&amp;useFastDateParsing=false</Value>
+        </DefaultValues>
+    </AttributeSchema>
+    <AttributeSchema name="sun-opensso-database-JDBCDbuser"
+                     type="single"
+                     syntax="string"
+                     i18nKey="a4022JdbcUserName">
+        <DefaultValues>
+            <Value><%= dbUser %></Value>
+        </DefaultValues>
+    </AttributeSchema>
+    <AttributeSchema name="sun-opensso-database-JDBCDbpassword"
+                     type="single"
+                     syntax="string"
+                     i18nKey="a4022JdbcPassword">
+        <DefaultValues>
+            <Value><%= dbPassword %></Value>
+        </DefaultValues>
+    </AttributeSchema>
+    <AttributeSchema name="sun-opensso-database-UserIDAttr"
+                     type="single"
+                     syntax="string"
+                     any="required"
+                     validator="RequiredValueValidator"
+                     i18nKey="a4107">
+        <DefaultValues>
+            <Value>screenName</Value>
+        </DefaultValues>
+    </AttributeSchema>
+</SubSchema>
