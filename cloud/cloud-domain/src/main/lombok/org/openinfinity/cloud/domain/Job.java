@@ -101,8 +101,9 @@ public class Job {
 		this.services += "," + machineSize;
 	}
 	
-	public void addService(String service, String numberOfMachines, String machineSize, String esbVolumeSize) {
+	public void addService(String service, String numberOfMachines, String machineSize, String imageType, String ebsVolumeSize) {
 		addService(service, Integer.parseInt(numberOfMachines));
-		this.services += "," + machineSize + "," + esbVolumeSize;
+		this.services += "," + machineSize + "," + imageType + "," +ebsVolumeSize;
 	}
+	
 }

@@ -78,7 +78,6 @@ import com.liferay.portal.service.UserLocalServiceUtil;
 public class CloudAdminController {
 	
 	private static final Logger LOG = Logger.getLogger(CloudAdminController.class.getName());
-	private static final String MSG_KEY_SENDING_ERROR = "Error sending key to user";
 	private static final String MSG_INSTANCE_WRITING_ERROR = "Error writing instance data to HTTP response";
 	private static final String MSG_HTTP_REPLY_WRITING_ERROR = "Error while writing the http reply";
 	private static final int CLUSTER_CONFIGURATION_DEFAULT = 1;
@@ -369,22 +368,25 @@ public class CloudAdminController {
 								pm.get("zone"));
 			
 			// Parse the parameters and configure the job 
+			// TODO simplification needed: lot of repeating code.
+
 			if ("true".equals(pm.get("bigdata"))) {
 				job.addService(ClusterService.SERVICE_NAME[ClusterService.CLUSTER_TYPE_BIGDATA],
-						pm.get("bigdataclustersize"),
-						pm.get("bigdatamachinesize"),
-						pm.get("bigdataesbvolumesize"));
+					pm.get("bigdataclustersize"),
+					pm.get("bigdatamachinesize"),
+					pm.get("bigdataimagetype"),
+					pm.get("bigdataesbvolumesize"));
 				job.setExtraData("replicationSize: " + pm.get("bigdatareplclustersize"));
 			}
 			if ("true".equals(pm.get("nosql"))) {
 				job.addService(ClusterService.SERVICE_NAME[ClusterService.CLUSTER_TYPE_NOSQL], pm.get("nosqlclustersize"), pm.get("nosqlmachinesize"),
-						pm.get("nosqlesbvolumesize"));
+					pm.get("nosqlimagetype"), pm.get("nosqlesbvolumesize"));
 				job.setExtraData("replicationSize: " + pm.get("nosqlreplclustersize"));
 			}
 			
 			if ("true".equals(pm.get("rdbms"))) {
 				job.addService(ClusterService.SERVICE_NAME[ClusterService.CLUSTER_TYPE_DATABASE], pm.get("rdbmsclustersize"), pm.get("rdbmsmachinesize"),
-						pm.get("rdbmsesbvolumesize"));
+					pm.get("rdbmsimagetype"), pm.get("rdbmsesbvolumesize"));
 			}
 			
 			boolean withEcmService = "true".equals(pm.get("ecm"));
@@ -392,22 +394,22 @@ public class CloudAdminController {
 			if ("true".equals(pm.get("portal"))) {
 				// TODO create constants
 				job.addService(ClusterService.SERVICE_NAME[ClusterService.CLUSTER_TYPE_PORTAL],	pm.get("portalclustersize"), pm.get("portalmachinesize"),
-						pm.get("portalesbvolumesize"));
+					pm.get("portalimagetype"), pm.get("portalesbvolumesize"));
 				if (withIgService && !withEcmService) job.setExtraData(JobService.EXTRA_DATA_PORTAL_IG);
 				else if (withEcmService && withIgService) job.setExtraData(JobService.EXTRA_DATA_PORTAL_IG_ECM);
 				else job.setExtraData(JobService.EXTRA_DATA_PORTAL);
 			}
 			
 			if ("true".equals(pm.get("mq"))) job.addService(ClusterService.SERVICE_NAME[ClusterService.CLUSTER_TYPE_MULE_MQ], pm.get("mqclustersize"), pm.get("mqmachinesize"),
-					pm.get("mqesbvolumesize"));
+					pm.get("mqimagetype"), pm.get("mqesbvolumesize"));
 			if("true".equals(pm.get("bas"))) job.addService(ClusterService.SERVICE_NAME[ClusterService.CLUSTER_TYPE_BAS], pm.get("basclustersize"), pm.get("basmachinesize"),
-					pm.get("basesbvolumesize"));
+					pm.get("basimagetype"), pm.get("basesbvolumesize"));
 			if(withIgService) job.addService(ClusterService.SERVICE_NAME[ClusterService.CLUSTER_TYPE_IDENTITY_GATEWAY], pm.get("igclustersize"), pm.get("igmachinesize"),
-					pm.get("igesbvolumesize"));
+					pm.get("igimagetype"), pm.get("igesbvolumesize"));
 			if("true".equals(pm.get("ee"))) job.addService(ClusterService.SERVICE_NAME[ClusterService.CLUSTER_TYPE_EE], pm.get("eeclustersize"), pm.get("eemachinesize"),
-					pm.get("eeesbvolumesize"));
+					pm.get("eeimagetype"), pm.get("eeesbvolumesize"));
 			if(withEcmService) job.addService(ClusterService.SERVICE_NAME[ClusterService.CLUSTER_TYPE_ECM], pm.get("ecmclustersize"), pm.get("ecmmachinesize"),
-					pm.get("ecmesbvolumesize"));
+					pm.get("ecmimagetype"), pm.get("ecmesbvolumesize"));
 			jobService.addJob(job);
 			
 		} catch (Exception e) {
@@ -443,6 +445,7 @@ public class CloudAdminController {
 		}
 		return;
 	}
+	
 	@ResourceMapping("getClusterTypes")
 	public void getClusterTypes(ResourceRequest request, ResourceResponse response) throws Exception {
 		if (LiferayUtil.getUser(request, response) == null) return;

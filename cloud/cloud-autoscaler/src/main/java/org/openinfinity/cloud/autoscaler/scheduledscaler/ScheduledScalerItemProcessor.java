@@ -57,11 +57,13 @@ public class ScheduledScalerItemProcessor implements ItemProcessor<ScalingRule, 
 		Timestamp periodFrom = scalingRule.getPeriodFrom();
 		Timestamp periodTo = scalingRule.getPeriodTo();
 		long now = System.currentTimeMillis();	
-		//Timestamp windowStart = new Timestamp(now - 90000 );
-		//Timestamp windowEnd = new Timestamp(now + 60000); 
 		
-		Timestamp windowStart = new Timestamp(now - 1300 );
-		Timestamp windowEnd = new Timestamp(now + 1000); 
+		// TODO make a property for test / normal case
+		Timestamp windowStart = new Timestamp(now - 90000 );
+		Timestamp windowEnd = new Timestamp(now + 60000); 
+		
+		//Timestamp windowStart = new Timestamp(now - 1300 );
+		//Timestamp windowEnd = new Timestamp(now + 1000); 
 	
 		LOG.debug("periodFrom = " + periodFrom.toString());
 		LOG.debug("periodTo = " + periodTo.toString());

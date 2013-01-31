@@ -466,18 +466,13 @@ col.data {
 
 #addInstanceDialog .radioButton {display:inline-block;}
 
-
 #addInstanceDialog .togglePlatformSelectionRow{position:relative;}
 
 #addInstanceDialog .clusterTypeConigurationBody{position:relative;border: 1px solid #E9E9E9;}
 
+#addInstanceDialog .clusterSizeRow{position:relative;margin-top: 1.1em;}
 
-#addInstanceDialog .clusterSizeRow{position:relative;margin-top: .8em;}
-
-#addInstanceDialog .clusterSizeLabel{margin-top:0.3em;float:left;display: block;
-clear: left;}
-
-
+#addInstanceDialog .clusterSizeLabel{margin-top:0.3em;float:left;display: block; clear: left;}
 
 #addInstanceDialog .machineSizeRow{position:relative;margin-top:1.1em;}
 
@@ -489,11 +484,13 @@ clear: left;}
 
 #addInstanceDialog .replicationMachineSizeLabel{margin-top:.1em;float:left;}
 
-#addInstanceDialog .toggleEbsRow{position:relative;margin-top:.8em;display:block;clear:left;}
+#addInstanceDialog .toggleEbsRow{position:relative;margin-top:1.1em;display:block;clear:left;}
+
+#addInstanceDialog .imageTypeRow{position:relative;margin-top:1.1em;display:block;clear:left;}
 
 #addInstanceDialog .toggleEbsLabel{margin-top:.1em;float:left;}
 
-#addInstanceDialog .ebsSizeRow{position:relative;margin-top:.8em;display:block;clear:left;}
+#addInstanceDialog .ebsSizeRow{position:relative;margin-top:1.1em;display:block;clear:left;}
 
 #addInstanceDialog .ebsSizeLabel{margin-top:.3em;float:left;}
 

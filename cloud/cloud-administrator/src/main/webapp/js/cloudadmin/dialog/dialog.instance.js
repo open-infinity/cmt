@@ -102,6 +102,7 @@
 							grandpa.find(".clusterSizeRow .jq_slider").slider({ disabled: false});	
 							grandpa.find(".replicationClusterSizeRow  .jq_slider").slider({ disabled: false});	
 							grandpa.find(".machineSizeRow :radio").attr("disabled", false).button("refresh");
+							grandpa.find(".imageTypeRow :radio").attr("disabled", false).button("refresh");
 							grandpa.find(".toggleEbsRow :radio").attr("disabled", false).button("refresh");
 							if ($('#' + "toggleEbsRadioOn_" + grandpa.data('clusterConfiguration').name).attr('checked')){
 								grandpa.find(".ebsSizeRow").fadeTo(500, "1");	
@@ -132,7 +133,9 @@
 							grandpa.find(".configRow").fadeTo(500, ".5");
 							grandpa.find(".ebsSizeRow").fadeTo(500, ".5");	
 							grandpa.find(".machineSizeRow :radio").attr("disabled", true).button("refresh");
+							grandpa.find(".imageTypeRow :radio").attr("disabled", true).button("refresh");
 							grandpa.find(".toggleEbsRow :radio").attr("disabled", true).button("refresh");
+
 						}	
 						el.siblings().attr('checked',false).button("refresh");
 						el.attr('checked',true).button("refresh");			 
@@ -171,7 +174,7 @@
 			});
 		},
 		
-		// This fucntion is called when dialog is already created. It is called from instances page, 
+		// This function is called when dialog is already created. It is called from instances page, 
 		// from "create new instance" button.
 		// The function clears resets all dialog element values and styles to defaults,
 		// and finally opens the dialog
@@ -210,6 +213,7 @@
 			$("#cloudTypesSelectionAccordion").accordion("option", "active", false);		
 			$("#addInstanceDialog .radioButton input").attr('checked',false).button("refresh");
 			$('#addInstanceDialog .togglePlatformSelectionRow input[id*="togglePlatformRadioOff_"]').attr('checked',true).button("refresh");
+			$('#addInstanceDialog .imageTypeRow input[id*="imageTypeEphemeral_"]').attr('checked',true).button("refresh");
 			$('#addInstanceDialog .toggleEbsRow input[id*="toggleEbsRadioOff_"]').attr('checked',true).button("refresh");
 			$("#addInstanceDialog .machineSizeRow input:first-child").attr('checked',true).button("refresh");
 			dimElements();
@@ -240,21 +244,24 @@
 				}
 				for(var i = 0; i < clusters.length; i++){
 					if($('#' + "togglePlatformRadioOn_" + clusters[i].name).attr('checked')){
-						outData[clusters[i].name] 				  	= "true";
+						outData[clusters[i].name] = "true";
 						// TODO: There is a bug somewhere, values can't be read from slider correctly as documented in jQuery API docs, 
 						// workaround is used
-						//outData[clusters[i].name + "clustersize"] 	= $('#' + clusters[i].name + ' .clusterSizeRow .jq_slider').slider("value");
-						outData[clusters[i].name + "clustersize"] 	= $('#' + clusters[i].name + ' .clusterSizeRow .jq_slider').parent().next().text();
-	
-						outData[clusters[i].name + "machinesize"] 	= machineSize(clusters[i].name, 1);
-						// clusters with replication
+						// should be like this: 
+						// outData[clusters[i].name + "clustersize"] 	= $('#' + clusters[i].name + ' .clusterSizeRow .jq_slider').slider("value");
+						outData[clusters[i].name + "clustersize"] = $('#' + clusters[i].name + ' .clusterSizeRow .jq_slider').parent().next().text();
+						outData[clusters[i].name + "machinesize"] = machineSize(clusters[i].name, 1);
 						if (clusters[i].replicated == true){
-							outData[clusters[i].name + "replclustersize"] 	= $('#' + clusters[i].name + ' .replicationClusterSizeRow .jq_slider').parent().next().text();
-							outData[clusters[i].name + "replmachinesize"] 	= machineSize(clusters[i].name, 2);
+							outData[clusters[i].name + "replclustersize"] = $('#' + clusters[i].name + ' .replicationClusterSizeRow .jq_slider').parent().next().text();
+							outData[clusters[i].name + "replmachinesize"] = machineSize(clusters[i].name, 2);
 						}
-						
+						if($('#' + "imageTypeEphemeral_" + clusters[i].name).attr('checked')){
+							outData[clusters[i].name + "imagetype"] = "0";
+						}
+						else
+							outData[clusters[i].name + "imagetype"] = "1";
 						if($('#' + "toggleEbsRadioOn_" + clusters[i].name).attr('checked')){
-							outData[clusters[i].name + "esbvolumesize"] 	= $('#' + clusters[i].name + ' .ebsSizeRow .jq_slider').parent().next().text();
+							outData[clusters[i].name + "esbvolumesize"] = $('#' + clusters[i].name + ' .ebsSizeRow .jq_slider').parent().next().text();
 						}
 					} 
 				}

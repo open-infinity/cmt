@@ -108,7 +108,10 @@ public class PeriodicScalerItemProcessor implements ItemProcessor<Machine, Job> 
 
 		String rrdServerdnsName = rrdServers.get(machine.getClusterId()); 
 		// TODO: group name will change into clusterId
-		HealthStatusResponse status = healthMonitoringService.getHealthStatus(rrdServerdnsName, Request.SOURCE_GROUP,"cpu-0", 
+		//HealthStatusResponse status = healthMonitoringService.getHealthStatus(rrdServerdnsName, Request.SOURCE_GROUP,"cpu-0", 
+        //		metricNames, past, past);
+		
+		HealthStatusResponse status = healthMonitoringService.getHealthStatus("cluster_" + machine.getClusterId(), Request.SOURCE_GROUP,"cpu-0", 
         		metricNames, past, past);
 	
         List<SingleHealthStatus> metrics =  status.getMetrics();

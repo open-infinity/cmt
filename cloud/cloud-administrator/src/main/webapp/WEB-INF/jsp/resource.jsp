@@ -107,8 +107,17 @@ dialogRes.setResource({
 			</div>	
 			<div class="valueDisplay valueDisplayButtonSet"></div>
 		</div>
+		<div class="imageTypeRow configRow">			
+			<label class="toggleEbsLabel instanceCreationLabel">Image type</label>
+			<div class="radioButton">
+				<input type="radio" id="imageTypeEphemeral_" name="imageType_" checked="checked"/>
+				<label for="imageTypeEphemeral_"> Ephemeral </label>
+				<input type="radio" id="imageTypeEbs_" name="imageType_"/>
+				<label for="imageTypeEbs_"> EBS </label>
+			</div>
+		</div>
 		<div class="toggleEbsRow configRow">			
-			<label class="toggleEbsLabel instanceCreationLabel">EBS usage</label>
+			<label class="toggleEbsLabel instanceCreationLabel">EBS volume</label>
 			<div class="radioButton">
 				<input type="radio" id="toggleEbsRadioOn_" name="toggleEbsRadio_" />
 				<label for="toggleEbsRadioOn_"> On </label>
