@@ -89,7 +89,7 @@ public class MachineConfigurer implements Configurer {
 		while(!connectOK) {
 			x--;
 			Socket s = null;
-			if(m.getDnsName().startsWith("euca-0-0-0-0")) {
+			if(m.getDnsName().startsWith("euca-0-0-0-0") || m.getDnsName().startsWith("0.0.0.0")) {
 				LOG.info("Machine dnsname not yet set correctly by eucalyptus, waiting for a moment");
 				try {
 					Thread.sleep(3000);
@@ -188,8 +188,13 @@ public class MachineConfigurer implements Configurer {
 		} catch (Exception e) {
 			String message = e.getMessage();
 			LOG.error(threadName+": Error configuring machine: "+message);
-			machineService.updateMachineConfigure(m.getId(), MachineService.MACHINE_CONFIGURE_ERROR);
-			return;
+			if(message.startsWith("Auth fail")) {
+				needNewRun = true;
+			} else {
+			
+				machineService.updateMachineConfigure(m.getId(), MachineService.MACHINE_CONFIGURE_ERROR);
+				return;
+			}
 		}
 		if(needNewRun) {
 			LOG.info(threadName+": Machine "+m.getId()+" needs new configure run, updating configure info to database");

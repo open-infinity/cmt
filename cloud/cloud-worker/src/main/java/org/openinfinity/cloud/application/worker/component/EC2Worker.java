@@ -1101,7 +1101,7 @@ public class EC2Worker implements Worker {
 		}
 		LOG.info(threadName+": Starting the service create");
 	//	List<Cluster> clusterList = new ArrayList<Cluster>();
-		for(int i = 0; i < services.length; i = i+3) {
+		for(int i = 0; i < services.length; i = i+5) {
 			LOG.debug(threadName+": Creating service "+services[i]);
 	//		String lbAddresses = "";
 			String service = services[i];
@@ -1119,6 +1119,21 @@ public class EC2Worker implements Worker {
 				machineType = Integer.parseInt(services[i+2]);
 			} catch (NumberFormatException e) {
 				throw new WorkerException("Error parsing machine type in services for service "+service+": "+e.getMessage());
+			}
+			int ebsImageUsed = 0;
+			try {
+				ebsImageUsed = Integer.parseInt(services[i+3]);
+			} catch (NumberFormatException e ) {
+				throw new WorkerException("Error parsing ebs image use in services for service "+service+": "+e.getMessage());
+			}
+			int ebsDiscSize = 0;
+			String tmp = services[i+4];
+			if(tmp != null && (!tmp.equals("null"))) {
+				try {
+					ebsDiscSize = Integer.parseInt(tmp);
+				} catch (NumberFormatException e) {
+					throw new WorkerException("Error parsing ebs disc size in services for service "+service+": "+e.getMessage());
+				}
 			}
 			String serviceAvailable = PropertyManager.getProperty(PROPERTY_PREFIX+service+".available");
 			if(serviceAvailable == null || !serviceAvailable.equalsIgnoreCase("yes")) {
@@ -1213,6 +1228,7 @@ public class EC2Worker implements Worker {
 	
 	private boolean createCluster(Cluster cluster, String service, EC2Wrapper ec2, String zone, int cloud, String key, String secretKey, String image, String instanceType, String needsLoadBalancer) throws WorkerException {
 		String lbAddresses = "";
+		boolean hasLoadBalancer = false;
 		String threadName = Thread.currentThread().getName();
 		
 		String securityGroupName = "C"+Integer.toString(cluster.getId());
@@ -1248,6 +1264,7 @@ public class EC2Worker implements Worker {
 				instances.addAll(reservation.getInstances());
 			}
 			clusterService.updateCluster(cluster);
+			hasLoadBalancer = true;
 		}
 		
 		Reservation reservation = ec2.createInstance(image, cluster.getNumberOfMachines(), key, zone, instanceType, securityGroups);
@@ -1269,17 +1286,17 @@ public class EC2Worker implements Worker {
 			machine.setCloud(cloud);
 			
 			machine.setInstanceId(tempInstance.getInstanceId());
-			if(tempInstance.getInstanceType().equalsIgnoreCase("m1.small") && !loadBalancerMarked) {
+			if(tempInstance.getInstanceType().equalsIgnoreCase("m1.small") && !loadBalancerMarked && hasLoadBalancer) {
 				machine.setType("loadbalancer");
 				loadBalancerMarked = true;
 			} else {
 				machine.setType("clustermember");
 			}
-			int maxWait = 20;
+			int maxWait = 60;
 			while((tempInstance.getPrivateDnsName().equals("0.0.0.0") || tempInstance.getPrivateDnsName().startsWith("euca-0-0-0-0")) && maxWait > 0) {
 				LOG.info(threadName+": Could not get IP address yet, waiting for a moment");
 				try {
-					Thread.sleep(1000);
+					Thread.sleep(2000);
 				} catch (InterruptedException e) {
 					LOG.error(threadName+": Something interrupted my sleep: "+e.getMessage());
 				}
@@ -1288,7 +1305,7 @@ public class EC2Worker implements Worker {
 			}
 			LOG.info(threadName+": Private dns name: "+tempInstance.getPrivateDnsName());
 			LOG.info(threadName+": Private IP address: "+tempInstance.getPrivateIpAddress());
-			AuthorizationRoute ip = new AuthorizationRoute();
+		/*	AuthorizationRoute ip = new AuthorizationRoute();
 			if(tempInstance.getPrivateIpAddress() == null) {
 				ip.setCidrIp(tempInstance.getPrivateDnsName()+"/32");
 			} else {
@@ -1300,7 +1317,7 @@ public class EC2Worker implements Worker {
 			ip.setToPort(65535);
 			ip.setProtocol("tcp");
 			ip.setSecurityGroupName(cluster.getSecurityGroupName());
-			arService.addIP(ip); 
+			arService.addIP(ip); */
 			machine.setDnsName(tempInstance.getPublicDnsName());
 			machine.setPrivateDnsName(tempInstance.getPrivateDnsName());
 			machine.setState(tempInstance.getState().getName());

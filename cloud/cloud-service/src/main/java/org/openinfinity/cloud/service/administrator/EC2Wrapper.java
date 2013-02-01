@@ -30,16 +30,21 @@ import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.services.ec2.AmazonEC2;
 import com.amazonaws.services.ec2.AmazonEC2Client;
 import com.amazonaws.services.ec2.model.AssociateAddressRequest;
+import com.amazonaws.services.ec2.model.AttachVolumeRequest;
 import com.amazonaws.services.ec2.model.AuthorizeSecurityGroupIngressRequest;
 import com.amazonaws.services.ec2.model.CreateKeyPairRequest;
 import com.amazonaws.services.ec2.model.CreateKeyPairResult;
 import com.amazonaws.services.ec2.model.CreateSecurityGroupRequest;
 import com.amazonaws.services.ec2.model.CreateSecurityGroupResult;
 import com.amazonaws.services.ec2.model.CreateTagsRequest;
+import com.amazonaws.services.ec2.model.CreateVolumeRequest;
+import com.amazonaws.services.ec2.model.CreateVolumeResult;
 import com.amazonaws.services.ec2.model.DeleteKeyPairRequest;
 import com.amazonaws.services.ec2.model.DeleteSecurityGroupRequest;
 import com.amazonaws.services.ec2.model.DescribeInstancesRequest;
 import com.amazonaws.services.ec2.model.DescribeInstancesResult;
+import com.amazonaws.services.ec2.model.DescribeVolumesRequest;
+import com.amazonaws.services.ec2.model.DescribeVolumesResult;
 import com.amazonaws.services.ec2.model.DisassociateAddressRequest;
 import com.amazonaws.services.ec2.model.Instance;
 import com.amazonaws.services.ec2.model.KeyPair;
@@ -507,6 +512,53 @@ public class EC2Wrapper {
 		} catch (Exception e) {
 			String message = e.getMessage();
 			LOG.error("Error deleting keypair: "+message);
+			ExceptionUtil.throwSystemException(message, e);
+		}
+	}
+	
+	public String createVolume(Integer size, String zone) {
+		CreateVolumeResult result = null;
+		try {
+			CreateVolumeRequest request = new CreateVolumeRequest(size, zone);
+			result = ec2.createVolume(request);
+		} catch (Exception e) {
+			String message = e.getMessage();
+			LOG.error("Error creating Volume: "+message);
+			ExceptionUtil.throwSystemException(message, e);
+		}
+		if(result != null) {
+			return result.getVolume().getVolumeId();
+		} else {
+			return null;
+		}
+	}
+	
+	public String getVolumeState(String volumeId) {
+		DescribeVolumesResult result = null;
+		List<String> volumeList = new ArrayList<String>();
+		volumeList.add(volumeId);
+		try {
+			DescribeVolumesRequest request = new DescribeVolumesRequest(volumeList);
+			result = ec2.describeVolumes(request);
+		} catch (Exception e) {
+			String message = e.getMessage();
+			LOG.error("Error getting Volume status: "+message);
+			ExceptionUtil.throwSystemException(message, e);
+		}
+		if(result != null) {
+			return result.getVolumes().get(0).getState();
+		} else {
+			return null;
+		}
+	}
+	
+	public void attachVolume(String volumeId, String instanceId, String deviceName) {
+		try {
+			AttachVolumeRequest request = new AttachVolumeRequest(volumeId, instanceId, deviceName);
+			ec2.attachVolume(request);
+		} catch (Exception e) {
+			String message = e.getMessage();
+			LOG.error("Error attaching volume to instance: "+message);
 			ExceptionUtil.throwSystemException(message, e);
 		}
 	}
