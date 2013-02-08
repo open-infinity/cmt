@@ -40,4 +40,6 @@ public interface ClusterTypeService {
 	  			"Cores: 16, RAM: 16GB, Disk: 1000GB"};
 
 	Collection<ClusterType> getAvailableClusterTypes(int configurationId);
+	
+	Collection<ClusterType> getAvailableClusterTypes(List<String> userOrganizations);
 }

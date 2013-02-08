@@ -17,7 +17,7 @@
 		<select id="cloudSelect" class="instanceConfigurationSelect">
 			<option selected></option>
 			<%-- <option value="amazon">Amazon</option> --%>
-			<option value="eucalyptus">Eucalyptus</option>
+			<%-- <option value="eucalyptus">Eucalyptus</option>--%>
 		</select>
 		<label for="zoneName" class="subtitleLabel"><fmt:message key="cloud.instancedialog.title.zone" /></label>
 		<select id="zoneSelect" class="instanceConfigurationSelect"></select>

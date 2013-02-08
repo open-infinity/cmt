@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -31,11 +32,15 @@ import javax.portlet.ResourceResponse;
 
 import org.apache.log4j.Logger;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.openinfinity.cloud.domain.AvailabilityZone;
+import org.openinfinity.cloud.domain.CloudProvider;
 import org.openinfinity.cloud.domain.Cluster;
 import org.openinfinity.cloud.domain.ClusterType;
 import org.openinfinity.cloud.domain.Instance;
 import org.openinfinity.cloud.domain.Job;
 import org.openinfinity.cloud.domain.Key;
+import org.openinfinity.cloud.service.administrator.AvailabilityZoneService;
+import org.openinfinity.cloud.service.administrator.CloudProviderService;
 import org.openinfinity.cloud.service.administrator.ClusterService;
 import org.openinfinity.cloud.service.administrator.ClusterTypeService;
 import org.openinfinity.cloud.service.administrator.InstanceService;
@@ -44,9 +49,9 @@ import org.openinfinity.cloud.service.administrator.KeyService;
 import org.openinfinity.cloud.util.AdminException;
 import org.openinfinity.cloud.util.AdminGeneral;
 import org.openinfinity.cloud.util.LiferayUtil;
-import org.openinfinity.cloud.util.serialization.SerializerUtil;
-import org.openinfinity.cloud.util.serialization.JsonDataWrapper;
 import org.openinfinity.cloud.util.collection.ListUtil;
+import org.openinfinity.cloud.util.serialization.JsonDataWrapper;
+import org.openinfinity.cloud.util.serialization.SerializerUtil;
 import org.openinfinity.core.util.ExceptionUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -69,6 +74,7 @@ import com.liferay.portal.service.UserLocalServiceUtil;
  * @author Ossi Hämäläinen
  * @author Juha-Matti Sironen
  * @author Vedran Bartonicek 
+ * @author Timo Tapanainen
  * @version 1.0.0 Initial version
  * @since 1.0.0
  */
@@ -95,12 +101,20 @@ public class CloudAdminController {
 	private ClusterTypeService clusterTypeService;
 	
 	@Autowired
+	@Qualifier("cloudProviderService")
+	private CloudProviderService cloudService;
+	
+	@Autowired
 	@Qualifier("keyService")
 	private KeyService keyService;
 	
 	@Autowired
 	@Qualifier("jobService")
 	private JobService jobService;
+	
+	@Autowired
+	@Qualifier("availabilityZoneService")
+	private AvailabilityZoneService zoneService;
 	
 	@Value("${zonelist}")
 	private List<String> eucaZones;
@@ -244,22 +258,25 @@ public class CloudAdminController {
 		}
 	}
 	
+	@ResourceMapping("getCloudProviders")
+	public void getCloudProviders(ResourceRequest request, ResourceResponse response) throws Exception {
+		LOG.debug("getCloudProviders()");
+		if (LiferayUtil.getUser(request, response) == null) return;
+		Collection<CloudProvider> providers = cloudService.getCloudProviders();
+		try {
+			SerializerUtil.jsonSerialize(response.getWriter(), providers);
+		} catch (Exception e) {
+			LOG.error("Could not send json coded list of the cloud providers");
+			response.setProperty(ResourceResponse.HTTP_STATUS_CODE, "421");
+			response.getWriter().write("Error locating cloud providers.");
+		}
+	}
 	
 	@ResourceMapping("getCloudZones")
-	public void getCloudZones(ResourceRequest request, ResourceResponse response, @RequestParam("cloud")String cloud) throws Exception {
+	public void getCloudZones(ResourceRequest request, ResourceResponse response, @RequestParam("cloud") int cloudId) throws Exception {
 		LOG.debug("getCloudZones()");
 		if (LiferayUtil.getUser(request, response) == null) return;
-		HashMap<String,String> zones = new HashMap<String,String>();
-		if(cloud != null && cloud.toLowerCase().equals("amazon")) {
-			// TODO fix this hardcoded stuff
-			zones.put("eu-west-1a", "eu-west-1a");
-			zones.put("eu-west-1b", "eu-west-1b");
-			zones.put("eu-west-1c", "eu-west-1c");
-		} else if(cloud != null && cloud.toLowerCase().equals("eucalyptus")) {
-			for(String zone : eucaZones) {
-				zones.put(zone, zone);
-			}
-		}
+		Collection<AvailabilityZone> zones = zoneService.getAvailabilityZones(cloudId);		
 		try {
 			SerializerUtil.jsonSerialize(response.getWriter(), zones);
 		} catch (Exception e) {
@@ -352,12 +369,10 @@ public class CloudAdminController {
 			instance.setUserId((int)user.getUserId());
 			instance.setZone(pm.get("zone"));
 			long[] orgIds = user.getOrganizationIds();
-			if(orgIds.length > 0) instance.setOrganizationid(orgIds[0]);
+			if (orgIds.length > 0) 
+				instance.setOrganizationid(orgIds[0]);
 			
-			if (pm.get("cloudtype").equals("amazon"))	instance.setCloudType(InstanceService.CLOUD_TYPE_AMAZON);
-			else if (pm.get("cloudtype").equals("eucalyptus")) instance.setCloudType(InstanceService.CLOUD_TYPE_EUCALYPTUS);
-			//else plop
-			
+			instance.setCloudType(Integer.parseInt(pm.get("cloudtype")));
 			instance.setStatus("Starting");
 			instanceService.addInstance(instance);			
 			
@@ -448,7 +463,11 @@ public class CloudAdminController {
 	
 	@ResourceMapping("getClusterTypes")
 	public void getClusterTypes(ResourceRequest request, ResourceResponse response) throws Exception {
-		if (LiferayUtil.getUser(request, response) == null) return;
+		User user = LiferayUtil.getUser(request);
+		if (user == null) return;
+		List<Organization> userOrganizations = OrganizationLocalServiceUtil.getUserOrganizations(user.getUserId());
+	//	Long[] orgIds = .getOrganizationIds();
+		
 		Collection<ClusterType> clusterTypeList = clusterTypeService.getAvailableClusterTypes(CLUSTER_CONFIGURATION_DEFAULT);
 		if(clusterTypeList !=  null) SerializerUtil.jsonSerialize(response.getWriter(), clusterTypeList);
 		else return;
@@ -458,5 +477,12 @@ public class CloudAdminController {
 	public void getMachineTypes(ResourceRequest request, ResourceResponse response) throws Exception {
 		if (LiferayUtil.getUser(request, response) == null) return;
 		SerializerUtil.jsonSerialize(response.getWriter(), ClusterTypeService.MACHINE_TYPES);
+	}
+	
+	private List<String> getOrganizationNames(List<Organization> orgs) {
+		List<String> orgNames = new LinkedList<String>();
+		for (Organization org : orgs)
+			orgNames.add(org.getName());
+		return orgNames;
 	}
 }

@@ -16,9 +16,9 @@
 package org.openinfinity.cloud.service.administrator;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.openinfinity.cloud.domain.ClusterType;
-import org.openinfinity.cloud.domain.repository.administrator.ClusterRepository;
 import org.openinfinity.cloud.domain.repository.administrator.ClusterTypeRepository;
 import org.openinfinity.core.annotation.Log;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +33,11 @@ public class ClusterTypeServiceImpl implements ClusterTypeService {
 	
 	@Log
 	public Collection<ClusterType> getAvailableClusterTypes(int configurationId) {
+		return clusterTypeRepository.getAvailableClusterTypes(configurationId);
+	}
+	
+	@Log
+	public Collection<ClusterType> getAvailableClusterTypes(List<String> userOrganizations>) {
 		return clusterTypeRepository.getAvailableClusterTypes(configurationId);
 	}
 }

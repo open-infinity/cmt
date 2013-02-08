@@ -12,9 +12,11 @@
 		// and defines event handling
 		initInstanceCreationDialog: function() {
 			$.when(
+				$.ajax({dataType: "json", url: portletURL.url.instance.getCloudProvidersURL}),
 				$.ajax({dataType: "json", url: portletURL.url.instance.getClusterTypesURL}),
 				$.ajax({dataType: "json", url: portletURL.url.instance.getMachineTypesURL}))
-				.done(function(resultClusterTypes, resultMachineTypes){
+				.done(function(resultCloudProviders, resultClusterTypes, resultMachineTypes) {
+					cloudProviders = cloudadmin.resource.cloudProviders = resultCloudProviders[0];
 					clusters = cloudadmin.resource.clusterTypes = resultClusterTypes[0]; 
 					cloudadmin.resource.machineTypes = resultMachineTypes[0]; 
 					
@@ -22,7 +24,13 @@
 					o.dialog = $("#addInstanceDialog");
 					o.accordion = $("#cloudTypesSelectionAccordion");
 					
-					// The main creation loop. Reads all available cluster/platform types and create accordion segment for each
+					// populates cloud provider options
+					var cloudSelect = o.dialog.find("#cloudSelect");
+					$.each(cloudProviders, function(index, provider) {
+						cloudSelect.append("<option value='" + provider.id + "'>" + provider.name + "</option>");
+					});
+					
+					// The main creation loop of platforms. Reads all available cluster/platform types and create accordion segment for each
 					for(var i = 0; i < clusters.length; i++){
 						var header = $("#clusterConfigurationTemplate .clusterTypeConfigurationHeader").clone();
 						var body = $("#clusterConfigurationTemplate .clusterTypeConfigurationBody").clone();	
@@ -70,13 +78,17 @@
 	
 					// Events
 					$("#cloudSelect").change(function() {
-						var cloud = $('#cloudSelect option:selected').val();
-						var url = portletURL.url.instance.getCloudZonesURL+"&cloud="+cloud+"&rnd="+Math.random();
+						var cloudId = $('#cloudSelect option:selected').val();
+						if (!cloudId) { // empty selection was made
+							$("#zoneSelect").html('<option selected></option>');
+							return;
+						} 
+						var url = portletURL.url.instance.getCloudZonesURL+"&cloud="+cloudId+"&rnd="+Math.random();
 						var options = '';
 					
 						$.getJSON(url, function(data) {
-							$.each(data, function(key,val) {
-								options += '<option value="'+key+'">'+val+'</option>';
+							$.each(data, function(index, zone) {
+								options += '<option value="'+zone.name+'">'+zone.name+'</option>';
 							});
 							$("#zoneSelect").html(options);
 						});

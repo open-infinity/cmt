@@ -32,7 +32,7 @@ CREATE TABLE `DEPLOYMENT` (
   `NAME` varchar(255) NOT NULL,
   `cur_timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 
@@ -89,7 +89,7 @@ CREATE TABLE `elastic_ip_tbl` (
   `user_id` int(11) DEFAULT NULL,
   `organization_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 
@@ -195,7 +195,7 @@ CREATE TABLE `user_authorized_ip_tbl` (
   `from_port` int(11) DEFAULT NULL,
   `to_port` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -228,7 +228,7 @@ CREATE TABLE `scaling_rule_tbl` (
   `size_original` int(11) DEFAULT NULL,
   `job_id` int(11) NOT NULL,
   PRIMARY KEY (`cluster_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `cluster_type_tbl`;
 	
@@ -243,4 +243,4 @@ CREATE TABLE `cluster_type_tbl` (
   `max_machines` int(11) DEFAULT NULL,
   `min_repl_machines` int(11) DEFAULT NULL,
   `max_repl_machines` int(11) DEFAULT NULL,  PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;

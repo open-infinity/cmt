@@ -21,7 +21,8 @@ portletURL.initialize({
 	    errorResponseURL : 				'<portlet:resourceURL id="errorResponse"/>',
 	    getInstanceKeyURL : 			'<portlet:resourceURL id="getInstanceKey"/>',
 	    getClusterTypesURL : 			'<portlet:resourceURL id="getClusterTypes"/>',
-	    getMachineTypesURL : 			'<portlet:resourceURL id="getMachineTypes"/>'
+	    getMachineTypesURL : 			'<portlet:resourceURL id="getMachineTypes"/>',
+	    getCloudProvidersURL : 			'<portlet:resourceURL id="getCloudProviders"/>'
     },
     cluster: {
     	availableClustersURL : 			'<portlet:resourceURL id="availableClusters"/>',    	
