@@ -100,8 +100,9 @@
 							//el.parents(".togglePlatformSelectionRow").next().find(".sliderMask").css("display", "none").prev().fadeTo(1500, "1");
 							var grandpa = toggleGrandunclesClass(el, "select", 0);
 							var dependency = grandpa.data('clusterConfiguration').dependency;				
-							if  (dependency != -1){
-								var depenentPlatformContainer = $("#" +  cloudadmin.resource.clusterTypes[dependency].name);
+							if  (dependency != -1) {
+								var requiredClusterType = findClusterTypeById(dependency);
+								var depenentPlatformContainer = $("#" +  requiredClusterType.name);
 								var dependentTogglePlatformOnRadio = depenentPlatformContainer.find('input[id*="togglePlatformRadioOn_"]');
 								dependentTogglePlatformOnRadio.attr('checked',true).button("refresh");
 								// make dependency selected
@@ -126,7 +127,8 @@
 							var dependency = grandpa.data('clusterConfiguration').dependency;
 							var myId = grandpa.data('clusterConfiguration').id;
 							if  (dependency != -1){
-								var depenentPlatformContainer = $("#" +  cloudadmin.resource.clusterTypes[dependency].name);
+								var requiredClusterType = findClusterTypeById(dependency);
+								var dependentPlatformContainer = $("#" +  requiredClusterType.name);
 								// check if some other platform also depends on "dependent platform"
 								var found = false;
 								for(var i = 0; i < clusters.length; i++){
@@ -150,7 +152,15 @@
 
 						}	
 						el.siblings().attr('checked',false).button("refresh");
-						el.attr('checked',true).button("refresh");			 
+						el.attr('checked',true).button("refresh");		
+						
+						function findClusterTypeById(clusterId) {
+							var matchedTypes = $.grep(cloudadmin.resource.clusterTypes, function(obj) {
+								return obj.id == clusterId;	
+							});
+							if (matchedTypes.length != 0)
+								return matchedTypes[0];
+						}
 					 });
 					
 					$("#addInstanceDialog .toggleEbsRow :radio").change(function(e) {

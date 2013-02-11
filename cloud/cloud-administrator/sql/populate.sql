@@ -6,10 +6,10 @@ insert into cluster_type_tbl (configuration_id, name, title, dependency, replica
 values(1, 'bas', 'BAS Platform', -1, false, 1, 12, null, null);
 	
 insert into cluster_type_tbl (configuration_id, name, title, dependency, replicated, min_machines, max_machines, min_repl_machines, max_repl_machines ) 
-values(1, 'portal', 'Portal Platform', 4, false, 1, 12, null, null);
+values(1, 'portal', 'Portal Platform', 5, false, 1, 12, null, null);
 
 insert into cluster_type_tbl (configuration_id, name, title, dependency, replicated, min_machines, max_machines, min_repl_machines, max_repl_machines ) 
-values(1, 'mq', 'Service Platform', 4, false, 1, 12, null, null);
+values(1, 'mq', 'Service Platform', 5, false, 1, 12, null, null);
 
 insert into cluster_type_tbl (configuration_id, name, title, dependency, replicated, min_machines, max_machines, min_repl_machines, max_repl_machines ) 
 values(1, 'rdbms', 'Relational Database Management', -1, false, 1, 1, null, null);

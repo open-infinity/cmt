@@ -465,10 +465,9 @@ public class CloudAdminController {
 	public void getClusterTypes(ResourceRequest request, ResourceResponse response) throws Exception {
 		User user = LiferayUtil.getUser(request);
 		if (user == null) return;
-		List<Organization> userOrganizations = OrganizationLocalServiceUtil.getUserOrganizations(user.getUserId());
-	//	Long[] orgIds = .getOrganizationIds();
-		
-		Collection<ClusterType> clusterTypeList = clusterTypeService.getAvailableClusterTypes(CLUSTER_CONFIGURATION_DEFAULT);
+		List<String> userOrgNames = getOrganizationNames(user);
+		LOG.info("user organizations: " + userOrgNames);
+		Collection<ClusterType> clusterTypeList = clusterTypeService.getAvailableClusterTypes(userOrgNames);
 		if(clusterTypeList !=  null) SerializerUtil.jsonSerialize(response.getWriter(), clusterTypeList);
 		else return;
 	}
@@ -479,10 +478,15 @@ public class CloudAdminController {
 		SerializerUtil.jsonSerialize(response.getWriter(), ClusterTypeService.MACHINE_TYPES);
 	}
 	
-	private List<String> getOrganizationNames(List<Organization> orgs) {
+	private List<String> getOrganizationNames(User user) throws Exception {
+		List<Organization> userOrganizations = user.getOrganizations();
+		List<Organization> subOrganizations = OrganizationLocalServiceUtil.getSuborganizations(userOrganizations);
+		
 		List<String> orgNames = new LinkedList<String>();
-		for (Organization org : orgs)
+		for (Organization org : userOrganizations)
 			orgNames.add(org.getName());
+		for (Organization subOrg : subOrganizations)
+			orgNames.add(subOrg.getName());
 		return orgNames;
 	}
 }

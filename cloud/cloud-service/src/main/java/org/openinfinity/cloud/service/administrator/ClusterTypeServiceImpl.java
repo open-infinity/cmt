@@ -32,12 +32,7 @@ public class ClusterTypeServiceImpl implements ClusterTypeService {
 	ClusterTypeRepository clusterTypeRepository;
 	
 	@Log
-	public Collection<ClusterType> getAvailableClusterTypes(int configurationId) {
-		return clusterTypeRepository.getAvailableClusterTypes(configurationId);
-	}
-	
-	@Log
-	public Collection<ClusterType> getAvailableClusterTypes(List<String> userOrganizations>) {
-		return clusterTypeRepository.getAvailableClusterTypes(configurationId);
+	public Collection<ClusterType> getAvailableClusterTypes(List<String> userOrganizations) {
+		return clusterTypeRepository.getAvailableClusterTypes(userOrganizations);
 	}
 }

@@ -35,7 +35,7 @@ DROP TABLE IF EXISTS `acl_cluster_type_tbl`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `acl_cluster_type_tbl` (
-  `org_id` int(11) NOT NULL,
+  `org_name` varchar(50) NOT NULL,
   `cluster_id` int(11) NOT NULL,
   PRIMARY KEY (`org_id`, `cluster_id`),
   CONSTRAINT fk_auth_cluster_type FOREIGN KEY (cluster_id) REFERENCES cluster_type_tbl(id)
