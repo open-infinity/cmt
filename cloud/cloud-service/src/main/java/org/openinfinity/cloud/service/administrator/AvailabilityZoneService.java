@@ -16,9 +16,10 @@
 
 package org.openinfinity.cloud.service.administrator;
 
-import java.util.Collection;
-
 import org.openinfinity.cloud.domain.AvailabilityZone;
+
+import java.util.Collection;
+import java.util.List;
 
 /**
  * ClusterType service interface provides access to cluster types and their configuration 
@@ -29,9 +30,7 @@ import org.openinfinity.cloud.domain.AvailabilityZone;
  */
 
 public interface AvailabilityZoneService {
-		
-	Collection<AvailabilityZone> getAvailabilityZones(String cloudName);
 	
-	Collection<AvailabilityZone> getAvailabilityZones(int cloudId);
+	Collection<AvailabilityZone> getAvailabilityZones(int cloudId, List<String> userOrgNames);
 
 }

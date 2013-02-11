@@ -261,8 +261,10 @@ public class CloudAdminController {
 	@ResourceMapping("getCloudProviders")
 	public void getCloudProviders(ResourceRequest request, ResourceResponse response) throws Exception {
 		LOG.debug("getCloudProviders()");
-		if (LiferayUtil.getUser(request, response) == null) return;
-		Collection<CloudProvider> providers = cloudService.getCloudProviders();
+        User user = LiferayUtil.getUser(request, response);
+		if (user == null) return;
+        List<String> userOrgNames = getOrganizationNames(user);
+		Collection<CloudProvider> providers = cloudService.getCloudProviders(userOrgNames);
 		try {
 			SerializerUtil.jsonSerialize(response.getWriter(), providers);
 		} catch (Exception e) {
@@ -275,8 +277,10 @@ public class CloudAdminController {
 	@ResourceMapping("getCloudZones")
 	public void getCloudZones(ResourceRequest request, ResourceResponse response, @RequestParam("cloud") int cloudId) throws Exception {
 		LOG.debug("getCloudZones()");
-		if (LiferayUtil.getUser(request, response) == null) return;
-		Collection<AvailabilityZone> zones = zoneService.getAvailabilityZones(cloudId);		
+        User user = LiferayUtil.getUser(request, response);
+        if (user == null) return;
+        List<String> userOrgNames = getOrganizationNames(user);
+        Collection<AvailabilityZone> zones = zoneService.getAvailabilityZones(cloudId, userOrgNames);
 		try {
 			SerializerUtil.jsonSerialize(response.getWriter(), zones);
 		} catch (Exception e) {
@@ -463,7 +467,7 @@ public class CloudAdminController {
 	
 	@ResourceMapping("getClusterTypes")
 	public void getClusterTypes(ResourceRequest request, ResourceResponse response) throws Exception {
-		User user = LiferayUtil.getUser(request);
+		User user = LiferayUtil.getUser(request, response);
 		if (user == null) return;
 		List<String> userOrgNames = getOrganizationNames(user);
 		LOG.info("user organizations: " + userOrgNames);

@@ -32,9 +32,8 @@ public interface CloudProviderRepository {
 	
 	/**
 	 * 
-	 * @param organizations 
 	 * @return cloud providers that organizations have access
 	 */
-	List<CloudProvider> getCloudProviders();
+	List<CloudProvider> getCloudProviders(List<String> userOrgNames);
 	
 }

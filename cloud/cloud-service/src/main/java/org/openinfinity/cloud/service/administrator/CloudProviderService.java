@@ -18,6 +18,7 @@
 package org.openinfinity.cloud.service.administrator;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.openinfinity.cloud.domain.CloudProvider;
 
@@ -29,6 +30,6 @@ import org.openinfinity.cloud.domain.CloudProvider;
  */
 public interface CloudProviderService {
 		
-	Collection<CloudProvider> getCloudProviders();
+	Collection<CloudProvider> getCloudProviders(List<String> userOrgNames);
 	
 }

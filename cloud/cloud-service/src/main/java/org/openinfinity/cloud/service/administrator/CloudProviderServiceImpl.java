@@ -18,10 +18,12 @@ package org.openinfinity.cloud.service.administrator;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 import org.openinfinity.cloud.domain.CloudProvider;
 import org.openinfinity.cloud.domain.repository.administrator.CloudProviderRepository;
 import org.openinfinity.core.annotation.Log;
+import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -40,8 +42,8 @@ public class CloudProviderServiceImpl implements CloudProviderService {
 	CloudProviderRepository cloudRepository;
 			
 	@Log
-	public Collection<CloudProvider> getCloudProviders() {
-		return Collections.unmodifiableCollection(cloudRepository.getCloudProviders());
+	public Collection<CloudProvider> getCloudProviders(List<String> userOrgNames) {
+		return Collections.unmodifiableCollection(cloudRepository.getCloudProviders(userOrgNames));
 	}
 	
 }

@@ -30,8 +30,6 @@ import org.openinfinity.cloud.domain.AvailabilityZone;
 
 public interface AvailabilityZoneRepository {
 
-	List<AvailabilityZone> getAvailabilityZones(int cloudId);
-		
-	List<AvailabilityZone> getAvailabilityZones(String cloudName);
+	List<AvailabilityZone> getAvailabilityZones(int cloudId, List<String> userOrgNames);
 
 }
