@@ -32,7 +32,5 @@ import org.openinfinity.cloud.domain.ClusterType;
 
 public interface ClusterTypeRepository {
 	
-//	Collection<ClusterType> getAvailableClusterTypes(int configurationId);
-//	
 	Collection<ClusterType> getAvailableClusterTypes(List<String> userOrganizations);
 }

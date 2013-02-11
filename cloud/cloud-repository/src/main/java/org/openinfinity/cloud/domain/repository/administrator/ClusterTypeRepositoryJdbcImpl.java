@@ -26,6 +26,7 @@ import org.openinfinity.core.annotation.AuditTrail;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.Assert;
@@ -53,16 +54,13 @@ class ClusterTypeRepositoryJdbcImpl implements ClusterTypeRepository{
 		this.jdbcTemplate = new NamedParameterJdbcTemplate(ds);
 		this.dataSource = ds;
 	}
-	
-//	@AuditTrail
-//	public Collection<ClusterType> getAvailableClusterTypes(int configurationId){
-//		return jdbcTemplate.query("select * from cluster_type_tbl where configuration_id = ? order by id", new Object[] { configurationId }, clusterTypeRowMapper);
-//	}
-	
+		
 	@AuditTrail
 	public Collection<ClusterType> getAvailableClusterTypes(List<String> userOrganizations) {
+		MapSqlParameterSource parameters = new MapSqlParameterSource();
+		parameters.addValue("orgNames", userOrganizations);
 		return jdbcTemplate.query("select cluster.* from cluster_type_tbl as cluster, acl_cluster_type_tbl as acl " +
-				"where acl.org_name in (:orgNames) and acl.cluster_id = cluster.id order by cluster.id", new Object[] { configurationId }, clusterTypeRowMapper);
+				"where acl.org_name in (:orgNames) and acl.cluster_id = cluster.id order by cluster.id", parameters, clusterTypeRowMapper);
 	}
 	
 }
