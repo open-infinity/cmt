@@ -15,5 +15,11 @@ public class JobPlatformParameter {
 	private String key;
 	private String value;
 
-
+	// Constructors
+	public JobPlatformParameter (){};
+	
+	public JobPlatformParameter (String aKey, String aValue){
+		key = aKey;
+		value = aValue;
+	}
 }

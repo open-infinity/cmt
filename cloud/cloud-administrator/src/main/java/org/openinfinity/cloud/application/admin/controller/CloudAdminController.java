@@ -38,6 +38,7 @@ import org.openinfinity.cloud.domain.Cluster;
 import org.openinfinity.cloud.domain.ClusterType;
 import org.openinfinity.cloud.domain.Instance;
 import org.openinfinity.cloud.domain.Job;
+import org.openinfinity.cloud.domain.JobPlatformParameter;
 import org.openinfinity.cloud.domain.Key;
 import org.openinfinity.cloud.service.administrator.*;
 import org.openinfinity.cloud.util.AdminException;
@@ -422,11 +423,21 @@ public class CloudAdminController {
 			if ("true".equals(pm.get("yamq"))) {
 				job.addService(ClusterService.SERVICE_NAME[ClusterService.CLUSTER_TYPE_YA_SERVICE],	pm.get("yamqclustersize"), pm.get("yamqmachinesize"),
 					pm.get("yamqimagetype"), pm.get("yamqesbvolumesize"));
+				if (pm.get("yamqdatasourceurl").length() > 0) {
+					job.addParameter(new JobPlatformParameter("service.datasource.url", pm.get("yamqdatasourceurl")));
+					job.addParameter(new JobPlatformParameter("service.datasource.user", pm.get("yamqdatasourceuser")));
+					job.addParameter(new JobPlatformParameter("service.datasource.password", pm.get("yamqdatasourcepassword")));
+				}			
 			}			
 
 			if ("true".equals(pm.get("yaportal"))) {
 				job.addService(ClusterService.SERVICE_NAME[ClusterService.CLUSTER_TYPE_YA_PORTAL],	pm.get("yaportalclustersize"), pm.get("yaportalmachinesize"),
 					pm.get("yaportalimagetype"), pm.get("yaportalesbvolumesize"));
+				if (pm.get("yaportaldatasourceurl").length() > 0) {
+					job.addParameter(new JobPlatformParameter("portal.datasource.url", pm.get("yaportaldatasourceurl")));
+					job.addParameter(new JobPlatformParameter("portal.datasource.user", pm.get("yaportaldatasourceuser")));
+					job.addParameter(new JobPlatformParameter("portal.datasource.password", pm.get("yaportaldatasourcepassword")));
+				}
 			}
 			
 			boolean withEcmService = "true".equals(pm.get("ecm"));
