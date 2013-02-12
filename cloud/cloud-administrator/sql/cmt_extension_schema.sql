@@ -80,3 +80,15 @@ CREATE TABLE `acl_machine_type_tbl` (
   PRIMARY KEY (`org_name`, `machine_type_id`),
   CONSTRAINT fk_acl_machine_type FOREIGN KEY (machine_type_id) REFERENCES machine_type_tbl(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `job_platform_parameter_tbl`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `job_platform_parameter_tbl` (
+  `id` int(11) AUTO_INCREMENT,
+  `job_id` int(11),
+  `pkey` varchar(255) NOT NULL,
+  `pvalue` varchar(1000),
+  PRIMARY KEY (`id`),
+  CONSTRAINT fk_job_plaform FOREIGN KEY (job_id) REFERENCES job_tbl(job_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
