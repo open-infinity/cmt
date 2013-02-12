@@ -39,13 +39,7 @@ import org.openinfinity.cloud.domain.ClusterType;
 import org.openinfinity.cloud.domain.Instance;
 import org.openinfinity.cloud.domain.Job;
 import org.openinfinity.cloud.domain.Key;
-import org.openinfinity.cloud.service.administrator.AvailabilityZoneService;
-import org.openinfinity.cloud.service.administrator.CloudProviderService;
-import org.openinfinity.cloud.service.administrator.ClusterService;
-import org.openinfinity.cloud.service.administrator.ClusterTypeService;
-import org.openinfinity.cloud.service.administrator.InstanceService;
-import org.openinfinity.cloud.service.administrator.JobService;
-import org.openinfinity.cloud.service.administrator.KeyService;
+import org.openinfinity.cloud.service.administrator.*;
 import org.openinfinity.cloud.util.AdminException;
 import org.openinfinity.cloud.util.AdminGeneral;
 import org.openinfinity.cloud.util.LiferayUtil;
@@ -99,8 +93,12 @@ public class CloudAdminController {
 	@Autowired
 	@Qualifier("clusterTypeService")
 	private ClusterTypeService clusterTypeService;
-	
-	@Autowired
+
+    @Autowired
+    @Qualifier("machineTypeService")
+    private MachineTypeService machineTypeService;
+
+    @Autowired
 	@Qualifier("cloudProviderService")
 	private CloudProviderService cloudService;
 	
@@ -421,6 +419,16 @@ public class CloudAdminController {
 					pm.get("rdbmsimagetype"), pm.get("rdbmsesbvolumesize"));
 			}
 			
+			if ("true".equals(pm.get("yamq"))) {
+				job.addService(ClusterService.SERVICE_NAME[ClusterService.CLUSTER_TYPE_YA_SERVICE],	pm.get("yamqclustersize"), pm.get("yamqmachinesize"),
+					pm.get("yamqimagetype"), pm.get("yamqesbvolumesize"));
+			}			
+
+			if ("true".equals(pm.get("yaportal"))) {
+				job.addService(ClusterService.SERVICE_NAME[ClusterService.CLUSTER_TYPE_YA_PORTAL],	pm.get("yaportalclustersize"), pm.get("yaportalmachinesize"),
+					pm.get("yaportalimagetype"), pm.get("yaportalesbvolumesize"));
+			}
+			
 			boolean withEcmService = "true".equals(pm.get("ecm"));
 			boolean withIgService = "true".equals(pm.get("ig"));
 			if ("true".equals(pm.get("portal"))) {
@@ -491,8 +499,10 @@ public class CloudAdminController {
 	
 	@ResourceMapping("getMachineTypes")
 	public void getMachineTypes(ResourceRequest request, ResourceResponse response) throws Exception {
-		if (LiferayUtil.getUser(request, response) == null) return;
-		SerializerUtil.jsonSerialize(response.getWriter(), ClusterTypeService.MACHINE_TYPES);
+        User user = LiferayUtil.getUser(request, response);
+        if (user == null) return;
+        List<String> userOrgNames = getOrganizationNames(user);
+        SerializerUtil.jsonSerialize(response.getWriter(), machineTypeService.getMachineTypes(userOrgNames));
 	}
 	
 	private List<String> getOrganizationNames(User user) throws Exception {

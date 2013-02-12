@@ -33,11 +33,9 @@ import java.sql.SQLException;
 import java.util.List;
 
 /**
- * Jdbc implementation of Cluster repository interface
+ * Jdbc implementation of Availability zone repository interface
  * 
- * @author Ossi Hämäläinen
- * @author Ilkka Leinonen
- * @author Juha-Matti Sironen
+ * @author Timo Tapanainen
  * @version 1.0.0 Initial version
  * @since 1.0.0
  */

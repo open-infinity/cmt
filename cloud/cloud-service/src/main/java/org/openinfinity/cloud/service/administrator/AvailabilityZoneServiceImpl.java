@@ -25,6 +25,13 @@ import org.springframework.stereotype.Service;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * Availability zone service implementation
+ *
+ * @author Timo Tapanainen
+ * @version 1.0.0 Initial version
+ * @since 1.0.0
+ */
 @Service("availabilityZoneService")
 public class AvailabilityZoneServiceImpl implements AvailabilityZoneService {
 	

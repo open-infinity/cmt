@@ -16,9 +16,9 @@
 				$.ajax({dataType: "json", url: portletURL.url.instance.getClusterTypesURL}),
 				$.ajax({dataType: "json", url: portletURL.url.instance.getMachineTypesURL}))
 				.done(function(resultCloudProviders, resultClusterTypes, resultMachineTypes) {
-					cloudProviders = cloudadmin.resource.cloudProviders = resultCloudProviders[0];
-					clusters = cloudadmin.resource.clusterTypes = resultClusterTypes[0]; 
-					cloudadmin.resource.machineTypes = resultMachineTypes[0]; 
+					var cloudProviders = cloudadmin.resource.cloudProviders = resultCloudProviders[0];
+					var clusters = cloudadmin.resource.clusterTypes = resultClusterTypes[0];
+					var machines = cloudadmin.resource.machineTypes = resultMachineTypes[0];
 					
 					var o = new Object();
 					o.dialog = $("#addInstanceDialog");
@@ -117,10 +117,16 @@
 							grandpa.find(".machineSizeRow :radio").attr("disabled", false).button("refresh");
 							grandpa.find(".imageTypeRow :radio").attr("disabled", false).button("refresh");
 							grandpa.find(".toggleEbsRow :radio").attr("disabled", false).button("refresh");
+							grandpa.find(".toggleDatasourceRow :radio").attr("disabled", false).button("refresh");
 							if ($('#' + "toggleEbsRadioOn_" + grandpa.data('clusterConfiguration').name).attr('checked')){
 								grandpa.find(".ebsSizeRow").fadeTo(500, "1");	
 								grandpa.find(".jq_slider").slider({ disabled: false });	
 							}
+							if ($('#' + "toggleDatasourceRadioOn_" + grandpa.data('clusterConfiguration').name).attr('checked')){
+								grandpa.find(".datasourceRow").fadeTo(500, "1");
+								grandpa.find(".datasourceRow :text").attr("disabled", false);
+								grandpa.find(".datasourceRow :password").attr("disabled", false);								
+							}							
 						}
 						else if (el.attr("id").indexOf("togglePlatformRadioOff") !=  -1) {
 							var grandpa = toggleGrandunclesClass(el, "unselect", 0);
@@ -146,11 +152,14 @@
 							grandpa.find(".jq_slider").slider({ disabled: true});		
 							grandpa.find(".configRow").fadeTo(500, ".5");
 							grandpa.find(".ebsSizeRow").fadeTo(500, ".5");	
+							grandpa.find(".datasourceRow").fadeTo(500, ".5");							
 							grandpa.find(".machineSizeRow :radio").attr("disabled", true).button("refresh");
 							grandpa.find(".imageTypeRow :radio").attr("disabled", true).button("refresh");
 							grandpa.find(".toggleEbsRow :radio").attr("disabled", true).button("refresh");
-
-						}	
+							grandpa.find(".toggleDatasourceRow :radio").attr("disabled", true).button("refresh");
+							grandpa.find(".datasourceRow :text").attr("disabled", true);
+							grandpa.find(".datasourceRow :password").attr("disabled", true);
+						}
 						el.siblings().attr('checked',false).button("refresh");
 						el.attr('checked',true).button("refresh");		
 						
@@ -177,7 +186,24 @@
 							jqSlider.slider({ disabled: false});		
 						}
 					});
-					
+
+					$("#addInstanceDialog .toggleDatasourceRow :radio").change(function(e) {
+						var el = $(this);
+						var datasourceRow = el.parent().parent().next();
+	
+						if (el.attr("id").indexOf("toggleDatasourceRadioOff") !=  -1) {
+							datasourceRow.fadeTo(500, ".5");							
+							datasourceRow.find(":text").attr("disabled", true);
+							datasourceRow.find(":password").attr("disabled", true);
+							
+						}
+						else{
+							datasourceRow.fadeTo(500, "1");
+							datasourceRow.find(":text").attr("disabled", false);
+							datasourceRow.find(":password").attr("disabled", false);
+						}
+					});
+										
 					$("#addInstanceDialog .machineSizeRow :radio").change(function(e) {
 						$(this).parent().next().text(cloudadmin.resource.machineTypes[$(this).attr("value")]);
 					});	
@@ -237,6 +263,7 @@
 			$('#addInstanceDialog .togglePlatformSelectionRow input[id*="togglePlatformRadioOff_"]').attr('checked',true).button("refresh");
 			$('#addInstanceDialog .imageTypeRow input[id*="imageTypeEphemeral_"]').attr('checked',true).button("refresh");
 			$('#addInstanceDialog .toggleEbsRow input[id*="toggleEbsRadioOff_"]').attr('checked',true).button("refresh");
+			$('#addInstanceDialog .toggleDatasourceRow input[id*="toggleDatasourceRadioOff_"]').attr('checked',true).button("refresh");			
 			$("#addInstanceDialog .machineSizeRow input:first-child").attr('checked',true).button("refresh");
 			dimElements();
 			$(".addInstanceDialogError").hide();
@@ -316,7 +343,7 @@
 			this.instanceDeleteButtons[dialogRes.resource.dialog.cancel] = function() {
 				$(this).trigger("instancetable.refresh").dialog("close");
 			};
-		},						
+		}
 	});
 		
 	cloudadmin.dialog.initAddInstanceDialogButtons();
@@ -359,6 +386,7 @@
 		$("#addInstanceDialog .clusterSizeRow").css("opacity", ".5");
 		$("#addInstanceDialog .configRow").css("opacity", ".5");	
 		$("#addInstanceDialog .ebsSizeRow").css("opacity", ".5");			
+		$("#addInstanceDialog .datasourceRow").css("opacity", ".5");			
 	}
 	
 })(jQuery);

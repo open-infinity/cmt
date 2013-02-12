@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  *
- * @author Ossi H√§m√§l√§inen
+ * @author Ossi H‰m‰l‰inen
  * @author Juha-Matti Sironen
  * @author Ilkka Leinonen
  * @author Vedran Bartonicek
@@ -27,7 +27,7 @@
 
 	turkoosi - color: #00AFF0;
 	tummempi - #0081b0  
-	vihre√§   - #9EE619  #D4E7B1   #A2F20D
+	vihre‰   - #9EE619  #D4E7B1   #A2F20D
 	
 */
 
@@ -493,6 +493,11 @@ col.data {
 #addInstanceDialog .ebsSizeRow{position:relative;margin-top:1.1em;display:block;clear:left;}
 
 #addInstanceDialog .ebsSizeLabel{margin-top:.3em;float:left;}
+
+#addInstanceDialog .toggleDatasourceRow{position:relative;margin-top:1.1em;display:block;clear:left;}
+
+#addInstanceDialog .datasourceRow{position:relative;margin-top:1.1em;display:block;clear:left;}
+
 
 #addInstanceDialog  .sliderMask{
 	position: relative;
