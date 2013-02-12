@@ -16,25 +16,26 @@
 
 package org.openinfinity.cloud.domain.repository.administrator;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.List;
-
-import javax.sql.DataSource;
-
 import org.apache.log4j.Logger;
 import org.openinfinity.cloud.domain.CloudProvider;
 import org.openinfinity.core.annotation.AuditTrail;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.Assert;
 
+import javax.sql.DataSource;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+
 /**
- * Jdbc implementation of Cluster repository interface
- * 
+ * Jdbc implementation of Cloud provider repository interface
+ *
+ * @author Timo Tapanainen
  * @version 1.0.0 Initial version
  * @since 1.0.0
  */
@@ -43,25 +44,27 @@ import org.springframework.util.Assert;
 public class CloudProviderRepositoryJdbcImpl implements CloudProviderRepository {
 	
 	private static final Logger LOG = Logger.getLogger(CloudProviderRepositoryJdbcImpl.class.getName());
-	
-	private JdbcTemplate jdbcTemplate;
-	
-	private DataSource dataSource;
+
+    private NamedParameterJdbcTemplate jdbcTemplate;
+
+    private DataSource dataSource;
 
 	@Autowired
 	public CloudProviderRepositoryJdbcImpl(@Qualifier("cloudDataSource") DataSource ds) {
 		Assert.notNull(ds, "Please define datasource for cluster repository.");
-		this.jdbcTemplate = new JdbcTemplate(ds);
+        this.jdbcTemplate = new NamedParameterJdbcTemplate(ds);
 		this.dataSource = ds;
 	}
 
 	@AuditTrail
-	public List<CloudProvider> getCloudProviders() {
-		List<CloudProvider> clouds = this.jdbcTemplate.query("select * from cloud_provider_tbl", new CloudProviderWrapper());
+	public List<CloudProvider> getCloudProviders(List<String> userOrgNames) {
+        MapSqlParameterSource parameters = new MapSqlParameterSource();
+        parameters.addValue("orgNames", userOrgNames);
+        List<CloudProvider> clouds = this.jdbcTemplate.query("select cloud.* from cloud_provider_tbl as cloud, acl_cloud_provider_tbl as acl where acl.org_name in (:orgNames) and acl.cloud_id = cloud.id order by cloud.id", parameters, new CloudProviderWrapper());
 		return clouds;
 	}
-	
-	private static final class CloudProviderWrapper implements RowMapper<CloudProvider> {
+
+    private static final class CloudProviderWrapper implements RowMapper<CloudProvider> {
 		public CloudProvider mapRow(ResultSet rs, int rowNumber) throws SQLException {
 			CloudProvider cloud = new CloudProvider();
 			cloud.setId(rs.getInt("id"));

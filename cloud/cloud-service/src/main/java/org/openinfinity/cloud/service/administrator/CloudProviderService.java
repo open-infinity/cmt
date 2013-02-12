@@ -18,17 +18,19 @@
 package org.openinfinity.cloud.service.administrator;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.openinfinity.cloud.domain.CloudProvider;
 
 /**
- * Cluster service interface for building clusters inside a cloud environment.
- * 
+ * Cloud provider service interface for getting info about configured cloud providers
+ *
+ * @author Timo Tapanainen
  * @version 1.0.0 Initial version
  * @since 1.0.0
  */
 public interface CloudProviderService {
 		
-	Collection<CloudProvider> getCloudProviders();
+	Collection<CloudProvider> getCloudProviders(List<String> userOrgNames);
 	
 }

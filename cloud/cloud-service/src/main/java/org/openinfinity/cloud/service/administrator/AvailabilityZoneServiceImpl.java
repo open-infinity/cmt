@@ -15,8 +15,6 @@
  */
 package org.openinfinity.cloud.service.administrator;
 
-import java.util.Collection;
-
 import org.openinfinity.cloud.domain.AvailabilityZone;
 import org.openinfinity.cloud.domain.repository.administrator.AvailabilityZoneRepository;
 import org.openinfinity.core.annotation.Log;
@@ -24,6 +22,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
+import java.util.List;
+
+/**
+ * Availability zone service implementation
+ *
+ * @author Timo Tapanainen
+ * @version 1.0.0 Initial version
+ * @since 1.0.0
+ */
 @Service("availabilityZoneService")
 public class AvailabilityZoneServiceImpl implements AvailabilityZoneService {
 	
@@ -31,14 +39,9 @@ public class AvailabilityZoneServiceImpl implements AvailabilityZoneService {
 	@Qualifier("zoneRepository")
 	AvailabilityZoneRepository zoneRepository;
 	
-	
+
 	@Log
-	public Collection<AvailabilityZone> getAvailabilityZones(String cloudName) {
-		return zoneRepository.getAvailabilityZones(cloudName);
-	}
-	
-	@Log
-	public Collection<AvailabilityZone> getAvailabilityZones(int cloudId) {
-		return zoneRepository.getAvailabilityZones(cloudId);
+	public Collection<AvailabilityZone> getAvailabilityZones(int cloudId, List<String> userOrgNames) {
+		return zoneRepository.getAvailabilityZones(cloudId, userOrgNames);
 	}
 }

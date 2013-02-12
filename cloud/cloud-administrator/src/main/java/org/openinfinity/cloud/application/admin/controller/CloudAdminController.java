@@ -39,13 +39,7 @@ import org.openinfinity.cloud.domain.ClusterType;
 import org.openinfinity.cloud.domain.Instance;
 import org.openinfinity.cloud.domain.Job;
 import org.openinfinity.cloud.domain.Key;
-import org.openinfinity.cloud.service.administrator.AvailabilityZoneService;
-import org.openinfinity.cloud.service.administrator.CloudProviderService;
-import org.openinfinity.cloud.service.administrator.ClusterService;
-import org.openinfinity.cloud.service.administrator.ClusterTypeService;
-import org.openinfinity.cloud.service.administrator.InstanceService;
-import org.openinfinity.cloud.service.administrator.JobService;
-import org.openinfinity.cloud.service.administrator.KeyService;
+import org.openinfinity.cloud.service.administrator.*;
 import org.openinfinity.cloud.util.AdminException;
 import org.openinfinity.cloud.util.AdminGeneral;
 import org.openinfinity.cloud.util.LiferayUtil;
@@ -99,8 +93,12 @@ public class CloudAdminController {
 	@Autowired
 	@Qualifier("clusterTypeService")
 	private ClusterTypeService clusterTypeService;
-	
-	@Autowired
+
+    @Autowired
+    @Qualifier("machineTypeService")
+    private MachineTypeService machineTypeService;
+
+    @Autowired
 	@Qualifier("cloudProviderService")
 	private CloudProviderService cloudService;
 	
@@ -261,8 +259,10 @@ public class CloudAdminController {
 	@ResourceMapping("getCloudProviders")
 	public void getCloudProviders(ResourceRequest request, ResourceResponse response) throws Exception {
 		LOG.debug("getCloudProviders()");
-		if (LiferayUtil.getUser(request, response) == null) return;
-		Collection<CloudProvider> providers = cloudService.getCloudProviders();
+        User user = LiferayUtil.getUser(request, response);
+		if (user == null) return;
+        List<String> userOrgNames = getOrganizationNames(user);
+		Collection<CloudProvider> providers = cloudService.getCloudProviders(userOrgNames);
 		try {
 			SerializerUtil.jsonSerialize(response.getWriter(), providers);
 		} catch (Exception e) {
@@ -275,8 +275,10 @@ public class CloudAdminController {
 	@ResourceMapping("getCloudZones")
 	public void getCloudZones(ResourceRequest request, ResourceResponse response, @RequestParam("cloud") int cloudId) throws Exception {
 		LOG.debug("getCloudZones()");
-		if (LiferayUtil.getUser(request, response) == null) return;
-		Collection<AvailabilityZone> zones = zoneService.getAvailabilityZones(cloudId);		
+        User user = LiferayUtil.getUser(request, response);
+        if (user == null) return;
+        List<String> userOrgNames = getOrganizationNames(user);
+        Collection<AvailabilityZone> zones = zoneService.getAvailabilityZones(cloudId, userOrgNames);
 		try {
 			SerializerUtil.jsonSerialize(response.getWriter(), zones);
 		} catch (Exception e) {
@@ -473,7 +475,7 @@ public class CloudAdminController {
 	
 	@ResourceMapping("getClusterTypes")
 	public void getClusterTypes(ResourceRequest request, ResourceResponse response) throws Exception {
-		User user = LiferayUtil.getUser(request);
+		User user = LiferayUtil.getUser(request, response);
 		if (user == null) return;
 		List<String> userOrgNames = getOrganizationNames(user);
 		LOG.info("user organizations: " + userOrgNames);
@@ -484,8 +486,10 @@ public class CloudAdminController {
 	
 	@ResourceMapping("getMachineTypes")
 	public void getMachineTypes(ResourceRequest request, ResourceResponse response) throws Exception {
-		if (LiferayUtil.getUser(request, response) == null) return;
-		SerializerUtil.jsonSerialize(response.getWriter(), ClusterTypeService.MACHINE_TYPES);
+        User user = LiferayUtil.getUser(request, response);
+        if (user == null) return;
+        List<String> userOrgNames = getOrganizationNames(user);
+        SerializerUtil.jsonSerialize(response.getWriter(), machineTypeService.getMachineTypes(userOrgNames));
 	}
 	
 	private List<String> getOrganizationNames(User user) throws Exception {

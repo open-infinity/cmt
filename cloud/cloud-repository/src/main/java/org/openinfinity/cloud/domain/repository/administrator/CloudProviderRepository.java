@@ -23,7 +23,8 @@ import org.openinfinity.cloud.domain.CloudProvider;
 
 /**
  * Interface for Cloud provider repository
- 
+ *
+ * @author Timo Tapanainen
  * @version 1.0.0 Initial version
  * @since 1.0.0
  */
@@ -32,9 +33,8 @@ public interface CloudProviderRepository {
 	
 	/**
 	 * 
-	 * @param organizations 
 	 * @return cloud providers that organizations have access
 	 */
-	List<CloudProvider> getCloudProviders();
+	List<CloudProvider> getCloudProviders(List<String> userOrgNames);
 	
 }

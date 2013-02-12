@@ -14,22 +14,24 @@
  * limitations under the License.
  */
 
-package org.openinfinity.cloud.service.administrator;
+package org.openinfinity.cloud.domain.repository.administrator;
 
-import org.openinfinity.cloud.domain.AvailabilityZone;
+import org.openinfinity.cloud.domain.ClusterType;
+import org.openinfinity.cloud.domain.MachineType;
 
 import java.util.Collection;
 import java.util.List;
 
+
 /**
- * Availability zone service interface provides access to availability zones
+ * Machine type repository interface
  * 
  * @author Timo Tapanainen
  * @version 1.0.0 Initial version
  * @since 1.0.0
  */
-public interface AvailabilityZoneService {
-	
-	Collection<AvailabilityZone> getAvailabilityZones(int cloudId, List<String> userOrgNames);
 
+public interface MachineTypeRepository {
+	
+	Collection<MachineType> getMachineTypes(List<String> userOrganizations);
 }

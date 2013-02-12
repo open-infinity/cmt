@@ -16,20 +16,21 @@
 
 package org.openinfinity.cloud.service.administrator;
 
-import org.openinfinity.cloud.domain.AvailabilityZone;
+import org.openinfinity.cloud.domain.ClusterType;
+import org.openinfinity.cloud.domain.MachineType;
 
 import java.util.Collection;
 import java.util.List;
 
 /**
- * Availability zone service interface provides access to availability zones
+ * MachineTypeService provides access to machine type specs.
  * 
  * @author Timo Tapanainen
  * @version 1.0.0 Initial version
  * @since 1.0.0
  */
-public interface AvailabilityZoneService {
-	
-	Collection<AvailabilityZone> getAvailabilityZones(int cloudId, List<String> userOrgNames);
 
+public interface MachineTypeService {
+	
+	Collection<MachineType> getMachineTypes(List<String> userOrganizations);
 }
