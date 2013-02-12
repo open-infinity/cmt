@@ -404,6 +404,16 @@ public class CloudAdminController {
 					pm.get("rdbmsimagetype"), pm.get("rdbmsesbvolumesize"));
 			}
 			
+			if ("true".equals(pm.get("yamq"))) {
+				job.addService(ClusterService.SERVICE_NAME[ClusterService.CLUSTER_TYPE_YA_SERVICE],	pm.get("yamqclustersize"), pm.get("yamqmachinesize"),
+					pm.get("yamqimagetype"), pm.get("yamqesbvolumesize"));
+			}			
+
+			if ("true".equals(pm.get("yaportal"))) {
+				job.addService(ClusterService.SERVICE_NAME[ClusterService.CLUSTER_TYPE_YA_PORTAL],	pm.get("yaportalclustersize"), pm.get("yaportalmachinesize"),
+					pm.get("yaportalimagetype"), pm.get("yaportalesbvolumesize"));
+			}
+			
 			boolean withEcmService = "true".equals(pm.get("ecm"));
 			boolean withIgService = "true".equals(pm.get("ig"));
 			if ("true".equals(pm.get("portal"))) {
