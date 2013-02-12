@@ -271,8 +271,9 @@
 			$('#addInstanceDialog .togglePlatformSelectionRow input[id*="togglePlatformRadioOff_"]').attr('checked',true).button("refresh");
 			$('#addInstanceDialog .imageTypeRow input[id*="imageTypeEphemeral_"]').attr('checked',true).button("refresh");
 			$('#addInstanceDialog .toggleEbsRow input[id*="toggleEbsRadioOff_"]').attr('checked',true).button("refresh");
-			$('#addInstanceDialog .toggleDatasourceRow input[id*="toggleDatasourceRadioOff_"]').attr('checked',true).button("refresh");			
 			$("#addInstanceDialog .machineSizeRow input:first-child").attr('checked',true).button("refresh");
+			$('#addInstanceDialog .toggleDatasourceRow input[id*="toggleDatasourceRadioOff_"]').attr('checked',true).button("refresh");			
+			$('#addInstanceDialog .datasourceRow input').val('');
 			dimElements();
 			$(".addInstanceDialogError").hide();
 			$("#addInstanceDialog").dialog("open");
@@ -322,6 +323,9 @@
 							outData[clusters[i].name + "esbvolumesize"] = $('#' + clusters[i].name + ' .ebsSizeRow .jq_slider').parent().next().text();
 						}
 						if($('#' + "toggleDatasourceRadioOn_" + clusters[i].name).attr('checked')){
+							if (!validateField($('#' + "newDatasourceUrlText_" + clusters[i].name))) return;
+							if (!validateField($('#' + "newDatasourceUserNameText_" + clusters[i].name))) return;
+							if (!validateField($('#' + "newDatasourcePasswordText_" + clusters[i].name))) return;
 							outData[clusters[i].name + "datasourceurl"] = $('#' + "newDatasourceUrlText_" + clusters[i].name).val();
 							outData[clusters[i].name + "datasourceuser"] = $('#' + "newDatasourceUserNameText_" + clusters[i].name).val();
 							outData[clusters[i].name + "datasourcepassword"] = $('#' + "newDatasourcePasswordText_" + clusters[i].name).val();
