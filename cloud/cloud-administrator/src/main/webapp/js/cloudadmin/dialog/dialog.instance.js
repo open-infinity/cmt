@@ -55,6 +55,14 @@
 						    var label = $(this).next("label");
 						    label.attr('for', label.attr('for') + clusters[i].name);
 						});
+						body.find('[type="text"]').each(function () {
+						    $(this).attr('id', $(this).attr('id') + clusters[i].name);
+						    $(this).attr('name', $(this).attr('name') + clusters[i].name);
+						});
+						body.find('[type="password"]').each(function () {
+						    $(this).attr('id', $(this).attr('id') + clusters[i].name);
+						    $(this).attr('name', $(this).attr('name') + clusters[i].name);
+						});						
 						body.data('clusterConfiguration', cloudadmin.resource.clusterTypes[i]);
 						o.accordion.append(header);
 						o.accordion.append(body);				
@@ -290,6 +298,7 @@
 					outData[clusters[i].name + "machinesize"] 	= 0;
 					outData[clusters[i].name + "esb"] 		  	= "false";
 					outData[clusters[i].name + "volumesize"]  	= 0;
+					outData[clusters[i].name + "datasourceurl"] = "";
 				}
 				for(var i = 0; i < clusters.length; i++){
 					if($('#' + "togglePlatformRadioOn_" + clusters[i].name).attr('checked')){
@@ -312,6 +321,11 @@
 						if($('#' + "toggleEbsRadioOn_" + clusters[i].name).attr('checked')){
 							outData[clusters[i].name + "esbvolumesize"] = $('#' + clusters[i].name + ' .ebsSizeRow .jq_slider').parent().next().text();
 						}
+						if($('#' + "toggleDatasourceRadioOn_" + clusters[i].name).attr('checked')){
+							outData[clusters[i].name + "datasourceurl"] = $('#' + "newDatasourceUrlText_" + clusters[i].name).val();
+							outData[clusters[i].name + "datasourceuser"] = $('#' + "newDatasourceUserNameText_" + clusters[i].name).val();
+							outData[clusters[i].name + "datasourcepassword"] = $('#' + "newDatasourcePasswordText_" + clusters[i].name).val();
+						}						
 					} 
 				}
 				$.ajax({
