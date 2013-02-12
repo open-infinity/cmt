@@ -293,10 +293,22 @@ public class CloudAdminController {
 	@ResourceMapping("getAvailableServices")
 	public void getAvailableServices(ResourceRequest request, ResourceResponse response, @RequestParam("id") int instanceId) throws Exception {
 		LOG.debug("getAvailableServices()");
-		if (LiferayUtil.getUser(request, response) == null) return;
-		Instance instance = instanceService.getInstance(instanceId);
 		
+		User user = LiferayUtil.getUser(request, response);
+		if (user == null) return;
+
+		Instance instance = instanceService.getInstance(instanceId);
 		Collection<Cluster> clusterList = clusterService.getClusters(instance.getInstanceId());
+		
+		List<String> userOrgNames = getOrganizationNames(user);
+		LOG.info("user organizations: " + userOrgNames);
+		Collection<ClusterType> clusterTypeList = clusterTypeService.getAvailableClusterTypes(userOrgNames);
+		HashMap<Integer,String> serviceMap = new HashMap<Integer,String>();
+		for (ClusterType clusterType : clusterTypeList){
+			serviceMap.put(clusterType.getId(), clusterType.getTitle());
+		}
+
+		/*12.2.2013 PK: reading configuration from database
 		HashMap<Integer,String> serviceMap = new HashMap<Integer,String>();
 		serviceMap.put(ClusterService.CLUSTER_TYPE_PORTAL, ClusterService.CLUSTER_TYPE_NAME[ClusterService.CLUSTER_TYPE_PORTAL]);
 		serviceMap.put(ClusterService.CLUSTER_TYPE_BIGDATA, ClusterService.CLUSTER_TYPE_NAME[ClusterService.CLUSTER_TYPE_BIGDATA]);
@@ -307,6 +319,7 @@ public class CloudAdminController {
 		serviceMap.put(ClusterService.CLUSTER_TYPE_IDENTITY_GATEWAY, ClusterService.CLUSTER_TYPE_NAME[ClusterService.CLUSTER_TYPE_IDENTITY_GATEWAY]);
 		serviceMap.put(ClusterService.CLUSTER_TYPE_EE, ClusterService.CLUSTER_TYPE_NAME[ClusterService.CLUSTER_TYPE_EE]);
 		serviceMap.put(ClusterService.CLUSTER_TYPE_ECM, ClusterService.CLUSTER_TYPE_NAME[ClusterService.CLUSTER_TYPE_ECM]);
+		*/
 
 		Iterator<Cluster> i = clusterList.iterator();	
 		while(i.hasNext()) {
