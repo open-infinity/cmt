@@ -16,9 +16,9 @@
 				$.ajax({dataType: "json", url: portletURL.url.instance.getClusterTypesURL}),
 				$.ajax({dataType: "json", url: portletURL.url.instance.getMachineTypesURL}))
 				.done(function(resultCloudProviders, resultClusterTypes, resultMachineTypes) {
-					cloudProviders = cloudadmin.resource.cloudProviders = resultCloudProviders[0];
-					clusters = cloudadmin.resource.clusterTypes = resultClusterTypes[0]; 
-					cloudadmin.resource.machineTypes = resultMachineTypes[0]; 
+					var cloudProviders = cloudadmin.resource.cloudProviders = resultCloudProviders[0];
+					var clusters = cloudadmin.resource.clusterTypes = resultClusterTypes[0];
+					var machines = cloudadmin.resource.machineTypes = resultMachineTypes[0];
 					
 					var o = new Object();
 					o.dialog = $("#addInstanceDialog");
@@ -316,7 +316,7 @@
 			this.instanceDeleteButtons[dialogRes.resource.dialog.cancel] = function() {
 				$(this).trigger("instancetable.refresh").dialog("close");
 			};
-		},						
+		}
 	});
 		
 	cloudadmin.dialog.initAddInstanceDialogButtons();

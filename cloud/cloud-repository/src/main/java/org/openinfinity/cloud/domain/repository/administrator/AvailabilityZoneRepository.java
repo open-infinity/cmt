@@ -23,7 +23,8 @@ import org.openinfinity.cloud.domain.AvailabilityZone;
 
 /**
  * AvailabilityZone repository interface
- * 
+ *
+ * @author Timo Tapanainen*
  * @version 1.0.0 Initial version
  * @since 1.0.0
  */

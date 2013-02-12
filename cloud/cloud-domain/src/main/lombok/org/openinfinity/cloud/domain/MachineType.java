@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 the original author or authors.
+ * Copyright (c) 2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,22 +14,31 @@
  * limitations under the License.
  */
 
-package org.openinfinity.cloud.service.administrator;
+package org.openinfinity.cloud.domain;
 
-import org.openinfinity.cloud.domain.AvailabilityZone;
+import java.io.Serializable;
+import java.lang.String;
 
-import java.util.Collection;
-import java.util.List;
+import org.openinfinity.core.annotation.NotScript;
+
+import lombok.Data;
 
 /**
- * Availability zone service interface provides access to availability zones
- * 
+ * Machine type specification.
+ *
  * @author Timo Tapanainen
  * @version 1.0.0 Initial version
  * @since 1.0.0
  */
-public interface AvailabilityZoneService {
-	
-	Collection<AvailabilityZone> getAvailabilityZones(int cloudId, List<String> userOrgNames);
 
+@Data
+public class MachineType implements Serializable {
+	
+	@NotScript
+	private int id;
+	@NotScript
+	private String name;
+	@NotScript
+	private String specification;
+		
 }
