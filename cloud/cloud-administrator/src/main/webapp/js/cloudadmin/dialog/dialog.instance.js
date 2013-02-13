@@ -80,7 +80,8 @@
 					
 					// Initialize other widgets 
 					$("#addInstanceDialog .radioButton").buttonset();
-					$("#addInstanceDialog .valueDisplayButtonSet").text(cloudadmin.resource.machineTypes[0].specification);
+                    if (cloudadmin.resource.machineTypes.length > 0)
+					    $("#addInstanceDialog .valueDisplayButtonSet").text(cloudadmin.resource.machineTypes[0].specification);
 	
 					o.accordion.accordion({collapsible: true, autoHeight:false, heightStyle: "content", active:false});
 					o.dialog.dialog({		

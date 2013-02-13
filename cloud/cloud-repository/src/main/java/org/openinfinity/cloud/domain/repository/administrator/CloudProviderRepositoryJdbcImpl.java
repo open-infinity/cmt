@@ -60,7 +60,7 @@ public class CloudProviderRepositoryJdbcImpl implements CloudProviderRepository 
 	public List<CloudProvider> getCloudProviders(List<String> userOrgNames) {
         MapSqlParameterSource parameters = new MapSqlParameterSource();
         parameters.addValue("orgNames", userOrgNames);
-        List<CloudProvider> clouds = this.jdbcTemplate.query("select cloud.* from cloud_provider_tbl as cloud, acl_cloud_provider_tbl as acl where acl.org_name in (:orgNames) and acl.cloud_id = cloud.id order by cloud.id", parameters, new CloudProviderWrapper());
+        List<CloudProvider> clouds = this.jdbcTemplate.query("select distinct cloud.* from cloud_provider_tbl as cloud, acl_cloud_provider_tbl as acl where acl.org_name in (:orgNames) and acl.cloud_id = cloud.id order by cloud.id", parameters, new CloudProviderWrapper());
 		return clouds;
 	}
 

@@ -59,7 +59,7 @@ class ClusterTypeRepositoryJdbcImpl implements ClusterTypeRepository{
 	public Collection<ClusterType> getAvailableClusterTypes(List<String> userOrganizations) {
 		MapSqlParameterSource parameters = new MapSqlParameterSource();
 		parameters.addValue("orgNames", userOrganizations);
-		return jdbcTemplate.query("select cluster.* from cluster_type_tbl as cluster, acl_cluster_type_tbl as acl " +
+		return jdbcTemplate.query("select distinct cluster.* from cluster_type_tbl as cluster, acl_cluster_type_tbl as acl " +
 				"where acl.org_name in (:orgNames) and acl.cluster_id = cluster.id order by cluster.id", parameters, clusterTypeRowMapper);
 	}
 	

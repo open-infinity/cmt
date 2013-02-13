@@ -59,7 +59,7 @@ class MachineTypeRepositoryJdbcImpl implements MachineTypeRepository{
 	public Collection<MachineType> getMachineTypes(List<String> userOrganizations) {
 		MapSqlParameterSource parameters = new MapSqlParameterSource();
 		parameters.addValue("orgNames", userOrganizations);
-		return jdbcTemplate.query("select machine.* from machine_type_tbl as machine, acl_machine_type_tbl as acl " +
+		return jdbcTemplate.query("select distinct machine.* from machine_type_tbl as machine, acl_machine_type_tbl as acl " +
 				"where acl.org_name in (:orgNames) and acl.machine_type_id = machine.id order by machine.id", parameters, new MachineTypeWrapper());
 	}
 
