@@ -122,9 +122,12 @@ dialogRes.setResource({
 				<div class="jq_slider ui_disabled"></div> 
 			</div> 	
 			<div class="valueDisplay valueDisplaySlider"></div>
-		</div>
-		
-		<!-- External datasource fields  -->
+		</div>		
+	</div>
+</div>
+
+<div id="datasourceTemplate" class="template">
+	<div class="datasourceBody">
 		<div class="toggleDatasourceRow configRow">			
 			<label class="toggleDatasourceLabel instanceCreationLabel">External datasource</label>
 			<div class="radioButton">
@@ -149,7 +152,7 @@ dialogRes.setResource({
 			</div>				
 		</div>
 	</div>
-</div>	
+</div>
 
 <div id="machineTypeTemplate" class="template">
     <input type="radio" id="machineSizeRadio" name="machineSizeRadio_" value=""/>
