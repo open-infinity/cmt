@@ -122,7 +122,31 @@ dialogRes.setResource({
 				<div class="jq_slider ui_disabled"></div> 
 			</div> 	
 			<div class="valueDisplay valueDisplaySlider"></div>
+		</div>
+		
+		<!-- External datasource fields  -->
+		<div class="toggleDatasourceRow configRow">			
+			<label class="toggleDatasourceLabel instanceCreationLabel">External datasource</label>
+			<div class="radioButton">
+				<input type="radio" id="toggleDatasourceRadioOn_" name="toggleDatasourceRadio_" />
+				<label for="toggleDatasourceRadioOn_"> On </label>
+				<input type="radio" id="toggleDatasourceRadioOff_" name="toggleDatasourceRadio_" checked="checked"/>
+				<label for="toggleDatasourceRadioOff_"> Off </label>
 			</div>
+		</div>
+		<div class="datasourceRow">
+			<label class="datasourceTitle instanceCreationLabel">URL</label>
+			<div class="inputRow">				
+				<input type="text" class="urlInput" id="newDatasourceUrlText_"  name="newDatasourceUrlText_" size="25" />
+			</div>
+			<label class="datasourceTitle instanceCreationLabel">User name</label>
+			<div class="inputRow">				
+				<input type="text" class="userNameInput" id="newDatasourceUserNameText_"  name="newDatasourceUserNameText_"  size="10"/>
+			</div>
+			<label class="datasourceTitle instanceCreationLabel">Password</label>
+			<div class="inputRow">				
+				<input type="password" class="passwordInput" id="newDatasourcePasswordText_"  name="newDatasourcePasswordText_" size="10"/>
+			</div>				
 		</div>
 	</div>
 </div>	

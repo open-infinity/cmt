@@ -38,6 +38,7 @@ import org.openinfinity.cloud.domain.Cluster;
 import org.openinfinity.cloud.domain.ClusterType;
 import org.openinfinity.cloud.domain.Instance;
 import org.openinfinity.cloud.domain.Job;
+import org.openinfinity.cloud.domain.JobPlatformParameter;
 import org.openinfinity.cloud.domain.Key;
 import org.openinfinity.cloud.service.administrator.*;
 import org.openinfinity.cloud.util.AdminException;
@@ -291,10 +292,22 @@ public class CloudAdminController {
 	@ResourceMapping("getAvailableServices")
 	public void getAvailableServices(ResourceRequest request, ResourceResponse response, @RequestParam("id") int instanceId) throws Exception {
 		LOG.debug("getAvailableServices()");
-		if (LiferayUtil.getUser(request, response) == null) return;
-		Instance instance = instanceService.getInstance(instanceId);
 		
+		User user = LiferayUtil.getUser(request, response);
+		if (user == null) return;
+
+		Instance instance = instanceService.getInstance(instanceId);
 		Collection<Cluster> clusterList = clusterService.getClusters(instance.getInstanceId());
+		
+		List<String> userOrgNames = getOrganizationNames(user);
+		LOG.info("user organizations: " + userOrgNames);
+		Collection<ClusterType> clusterTypeList = clusterTypeService.getAvailableClusterTypes(userOrgNames);
+		HashMap<Integer,String> serviceMap = new HashMap<Integer,String>();
+		for (ClusterType clusterType : clusterTypeList){
+			serviceMap.put(clusterType.getId(), clusterType.getTitle());
+		}
+
+		/*12.2.2013 PK: reading configuration from database
 		HashMap<Integer,String> serviceMap = new HashMap<Integer,String>();
 		serviceMap.put(ClusterService.CLUSTER_TYPE_PORTAL, ClusterService.CLUSTER_TYPE_NAME[ClusterService.CLUSTER_TYPE_PORTAL]);
 		serviceMap.put(ClusterService.CLUSTER_TYPE_BIGDATA, ClusterService.CLUSTER_TYPE_NAME[ClusterService.CLUSTER_TYPE_BIGDATA]);
@@ -305,6 +318,7 @@ public class CloudAdminController {
 		serviceMap.put(ClusterService.CLUSTER_TYPE_IDENTITY_GATEWAY, ClusterService.CLUSTER_TYPE_NAME[ClusterService.CLUSTER_TYPE_IDENTITY_GATEWAY]);
 		serviceMap.put(ClusterService.CLUSTER_TYPE_EE, ClusterService.CLUSTER_TYPE_NAME[ClusterService.CLUSTER_TYPE_EE]);
 		serviceMap.put(ClusterService.CLUSTER_TYPE_ECM, ClusterService.CLUSTER_TYPE_NAME[ClusterService.CLUSTER_TYPE_ECM]);
+		*/
 
 		Iterator<Cluster> i = clusterList.iterator();	
 		while(i.hasNext()) {
@@ -404,6 +418,26 @@ public class CloudAdminController {
 			if ("true".equals(pm.get("rdbms"))) {
 				job.addService(ClusterService.SERVICE_NAME[ClusterService.CLUSTER_TYPE_DATABASE], pm.get("rdbmsclustersize"), pm.get("rdbmsmachinesize"),
 					pm.get("rdbmsimagetype"), pm.get("rdbmsesbvolumesize"));
+			}
+			
+			if ("true".equals(pm.get("yamq"))) {
+				job.addService(ClusterService.SERVICE_NAME[ClusterService.CLUSTER_TYPE_YA_SERVICE],	pm.get("yamqclustersize"), pm.get("yamqmachinesize"),
+					pm.get("yamqimagetype"), pm.get("yamqesbvolumesize"));
+				if (pm.get("yamqdatasourceurl").length() > 0) {
+					job.addParameter(new JobPlatformParameter("service.datasource.url", pm.get("yamqdatasourceurl")));
+					job.addParameter(new JobPlatformParameter("service.datasource.user", pm.get("yamqdatasourceuser")));
+					job.addParameter(new JobPlatformParameter("service.datasource.password", pm.get("yamqdatasourcepassword")));
+				}			
+			}			
+
+			if ("true".equals(pm.get("yaportal"))) {
+				job.addService(ClusterService.SERVICE_NAME[ClusterService.CLUSTER_TYPE_YA_PORTAL],	pm.get("yaportalclustersize"), pm.get("yaportalmachinesize"),
+					pm.get("yaportalimagetype"), pm.get("yaportalesbvolumesize"));
+				if (pm.get("yaportaldatasourceurl").length() > 0) {
+					job.addParameter(new JobPlatformParameter("portal.datasource.url", pm.get("yaportaldatasourceurl")));
+					job.addParameter(new JobPlatformParameter("portal.datasource.user", pm.get("yaportaldatasourceuser")));
+					job.addParameter(new JobPlatformParameter("portal.datasource.password", pm.get("yaportaldatasourcepassword")));
+				}
 			}
 			
 			boolean withEcmService = "true".equals(pm.get("ecm"));
