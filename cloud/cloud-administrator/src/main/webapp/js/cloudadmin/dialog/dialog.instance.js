@@ -18,7 +18,7 @@
 				.done(function(resultCloudProviders, resultClusterTypes, resultMachineTypes) {
 					var cloudProviders = cloudadmin.resource.cloudProviders = resultCloudProviders[0];
 					var clusters = cloudadmin.resource.clusterTypes = resultClusterTypes[0];
-					var machines = cloudadmin.resource.machineTypes = resultMachineTypes[0];
+					var machineTypes = cloudadmin.resource.machineTypes = resultMachineTypes[0];
 					
 					var o = new Object();
 					o.dialog = $("#addInstanceDialog");
@@ -49,13 +49,23 @@
 							body.find(".machineSizeRow").after(replicationMachineSizeRow).after(replicationClusterSizeRow);
 						}				
 						header.find(".clusterTypeTitle").html(clusters[i].title);
+
+                        // insert machine types into body before element ids and names are adjusted below
+                        var machineTypeInjectLocation$ = body.find('.machineSizeRow .radioButton');
+                        for (var mt = 0; mt < machineTypes.length; ++mt) {
+                            var machineTypeInstanceId = 'machineSizeRadio' + machineTypes[mt].name + '_';
+                            $('#machineTypeTemplate').children('[type="radio"]').clone().attr({id: machineTypeInstanceId, value: machineTypes[mt].id}).appendTo(machineTypeInjectLocation$);
+                            $('#machineTypeTemplate').children('label').clone().attr({'for': machineTypeInstanceId}).html(machineTypes[mt].name).appendTo(machineTypeInjectLocation$);
+                        }
+                        // prepares element ids and names
 						body.attr('id', clusters[i].name).find('[type="radio"]').each(function () {
 						    $(this).attr('id', $(this).attr('id') + clusters[i].name);
 						    $(this).attr('name', $(this).attr('name') + clusters[i].name);
 						    var label = $(this).next("label");
 						    label.attr('for', label.attr('for') + clusters[i].name);
 						});
-						body.data('clusterConfiguration', cloudadmin.resource.clusterTypes[i]);
+
+                        body.data('clusterConfiguration', cloudadmin.resource.clusterTypes[i]);
 						o.accordion.append(header);
 						o.accordion.append(body);				
 					} 
@@ -63,7 +73,7 @@
 					
 					// Initialize other widgets 
 					$("#addInstanceDialog .radioButton").buttonset();
-					$("#addInstanceDialog .valueDisplayButtonSet").text(cloudadmin.resource.machineTypes[0]);
+					$("#addInstanceDialog .valueDisplayButtonSet").text(cloudadmin.resource.machineTypes[0].specification);
 	
 					o.accordion.accordion({collapsible: true, autoHeight:false, heightStyle: "content", active:false});
 					o.dialog.dialog({		
@@ -179,7 +189,7 @@
 					});
 					
 					$("#addInstanceDialog .machineSizeRow :radio").change(function(e) {
-						$(this).parent().next().text(cloudadmin.resource.machineTypes[$(this).attr("value")]);
+						$(this).parent().next().text(cloudadmin.resource.machineTypes[$(this).attr("value")].specification);
 					});	
 							
 					 // Helper functions

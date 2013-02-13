@@ -95,17 +95,7 @@ dialogRes.setResource({
 		<div class="machineSizeRow configRow ordinaryMachine">
 			<label class="machineSizeLabel instanceCreationLabel">Machine size </label>
 			<div class="radioButton">
-				<input type="radio" id="machineSizeRadioSmall_" name="machineSizeRadio_" checked="checked" value="0"/>
-				<label for="machineSizeRadioSmall_">Small</label>
-				<input type="radio" id="machineSizeRadioMedium_" name="machineSizeRadio_" value="1"/>
-				<label for="machineSizeRadioMedium_">Medium</label>
-				<input type="radio" id="machineSizeRadioLarge_" name="machineSizeRadio_" value="2"/>
-				<label for="machineSizeRadioLarge_">Large</label>
-				<input type="radio" id="machineSizeRadioXLarge_" name="machineSizeRadio_" value="3"/>
-				<label for="machineSizeRadioXLarge_">XLarge</label>
-				<input type="radio" id="machineSizeRadioXXLarge_" name="machineSizeRadio_" value="4"/>
-				<label for="machineSizeRadioXXLarge_">XXLarge</label>
-			</div>	
+			</div>
 			<div class="valueDisplay valueDisplayButtonSet"></div>
 		</div>
 		<div class="imageTypeRow configRow">			
@@ -136,7 +126,11 @@ dialogRes.setResource({
 		</div>
 	</div>
 </div>	
-		
+
+<div id="machineTypeTemplate" class="template">
+    <input type="radio" id="machineSizeRadio" name="machineSizeRadio_" value=""/>
+    <label for="machineSizeRadio"></label>
+</div>
 <%-- Cluster template --%>
 <ul id="clusterTemplate" class="template">
 	<li class="newlist ui-corner-all">
@@ -291,3 +285,14 @@ dialogRes.setResource({
 		</div>	
 	</div>
 </div>
+
+<!--<input type="radio" id="machineSizeRadioSmall_" name="machineSizeRadio_" checked="checked" value="0"/>
+<label for="machineSizeRadioSmall_">Small</label>
+<input type="radio" id="machineSizeRadioMedium_" name="machineSizeRadio_" value="1"/>
+<label for="machineSizeRadioMedium_">Medium</label>
+<input type="radio" id="machineSizeRadioLarge_" name="machineSizeRadio_" value="2"/>
+<label for="machineSizeRadioLarge_">Large</label>
+<input type="radio" id="machineSizeRadioXLarge_" name="machineSizeRadio_" value="3"/>
+<label for="machineSizeRadioXLarge_">XLarge</label>
+<input type="radio" id="machineSizeRadioXXLarge_" name="machineSizeRadio_" value="4"/>
+<label for="machineSizeRadioXXLarge_">XXLarge</label>-->
