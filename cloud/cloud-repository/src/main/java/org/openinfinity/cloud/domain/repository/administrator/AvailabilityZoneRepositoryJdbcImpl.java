@@ -61,7 +61,7 @@ public class AvailabilityZoneRepositoryJdbcImpl implements AvailabilityZoneRepos
         MapSqlParameterSource parameters = new MapSqlParameterSource();
         parameters.addValue("orgNames", userOrgNames);
         parameters.addValue("cloudId", cloudId);
-        List<AvailabilityZone> zones = this.jdbcTemplate.query("select zone.* from availability_zone_tbl as zone, acl_availability_zone_tbl as acl where acl.org_name in (:orgNames) and acl.zone_id = zone.id and zone.cloud_id = :cloudId order by zone.id", parameters, new ZoneWrapper());
+        List<AvailabilityZone> zones = this.jdbcTemplate.query("select distinct zone.* from availability_zone_tbl as zone, acl_availability_zone_tbl as acl where acl.org_name in (:orgNames) and acl.zone_id = zone.id and zone.cloud_id = :cloudId order by zone.id", parameters, new ZoneWrapper());
 		return zones;
 	}
 
