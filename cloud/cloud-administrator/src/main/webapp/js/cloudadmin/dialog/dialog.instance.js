@@ -50,6 +50,21 @@
 						}				
 						header.find(".clusterTypeTitle").html(clusters[i].title);
 
+                        // insert data source fields into body
+						console.log("cluster " + clusters[i].name);
+                        if ("yamq" == clusters[i].name || "yaportal" == clusters[i].name) {
+    						console.log("add datasource " +clusters[i].name);                        	
+                        	var datasource = $('#datasourceTemplate .datasourceBody').clone();
+                        	datasource.find('[type="text"]').each(function () {
+    						    $(this).attr('id', $(this).attr('id') + clusters[i].name);
+    						    $(this).attr('name', $(this).attr('name') + clusters[i].name);
+    						});
+                        	datasource.find('[type="password"]').each(function () {
+    						    $(this).attr('id', $(this).attr('id') + clusters[i].name);
+    						    $(this).attr('name', $(this).attr('name') + clusters[i].name);
+    						});
+                            body.find('.ebsSizeRow').after(datasource);    						
+                        }
                         // insert machine types into body before element ids and names are adjusted below
                         var machineTypeInjectLocation$ = body.find('.machineSizeRow .radioButton');
                         for (var mt = 0; mt < machineTypes.length; ++mt) {
@@ -64,14 +79,6 @@
 						    var label = $(this).next("label");
 						    label.attr('for', label.attr('for') + clusters[i].name);
 						});
-						body.find('[type="text"]').each(function () {
-						    $(this).attr('id', $(this).attr('id') + clusters[i].name);
-						    $(this).attr('name', $(this).attr('name') + clusters[i].name);
-						});
-						body.find('[type="password"]').each(function () {
-						    $(this).attr('id', $(this).attr('id') + clusters[i].name);
-						    $(this).attr('name', $(this).attr('name') + clusters[i].name);
-						});						
 						body.data('clusterConfiguration', cloudadmin.resource.clusterTypes[i]);
 						o.accordion.append(header);
 						o.accordion.append(body);				
