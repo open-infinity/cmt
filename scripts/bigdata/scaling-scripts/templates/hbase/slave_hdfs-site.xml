@@ -1,0 +1,13 @@
+@role:slave /etc/hadoop/conf/hdfs-site.xml
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+    <configuration>
+    <property>
+        <name>dfs.data.dir</name>
+        <value>/data/1/dfs/dn,/data/2/dfs/dn,/data/3/dfs/dn</value>
+    </property>
+    <property>
+        <name>dfs.datanode.max.xcievers</name>
+        <value>4096</value>
+    </property>	
+</configuration>

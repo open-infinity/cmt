@@ -1,0 +1,60 @@
+@role:config /etc/rc.d/init.d/mongos
+#!/bin/bash
+
+. /etc/rc.d/init.d/functions
+
+PIDFILE="/var/lib/mongo/mongos.pid"
+OPTIONS=" --port 27017 --configdb [[CONFIG_SERVERS_SEPARATED_BY_COMMA]] --fork --pidfilepath $PIDFILE --logpath /var/log/mongo/mongos.log  --logappend"
+mongos=/usr/bin/mongos
+
+MONGO_USER=mongod
+MONGO_GROUP=mongod
+
+start()
+{
+  #echo "daemon --user \"$MONGO_USER\" $mongos $OPTIONS" 
+  echo -n $"Starting mongos: "
+  daemon --user "$MONGO_USER" $mongos $OPTIONS
+  RETVAL=$?
+  echo
+  [ $RETVAL -eq 0 ] && touch /var/lock/subsys/mongos
+}
+
+stop()
+{
+  echo -n $"Stopping mongos: "
+  killproc -p $PIDFILE -t30 -TERM /usr/bin/mongos
+  RETVAL=$?
+  echo
+  [ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/mongos
+}
+
+restart () {
+	stop
+	start
+}
+
+ulimit -n 12000
+RETVAL=0
+
+case "$1" in
+  start)
+    start
+    ;;
+  stop)
+    stop
+    ;;
+  restart|reload|force-reload)
+    restart
+    ;;
+  status)
+    status $mongos
+    RETVAL=$?
+    ;;
+  *)
+    echo "Usage: $0 {start|stop|status|restart|reload|force-reload}"
+    RETVAL=1
+esac
+
+exit $RETVAL
+

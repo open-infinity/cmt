@@ -1,0 +1,2 @@
+@role:hmaster /etc/hadoop/conf/slaves
+[[SLAVE_HOSTNAMES_BY_LINE]]

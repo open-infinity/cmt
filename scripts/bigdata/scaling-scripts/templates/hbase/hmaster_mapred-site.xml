@@ -1,0 +1,18 @@
+@role:hmaster /etc/hadoop/conf/mapred-site.xml
+@role:slave /etc/hadoop/conf/mapred-site.xml
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<configuration>
+    <property>
+        <name>mapred.job.tracker</name>
+        <value>[[HMASTER_HOST]]:8021</value>
+    </property>    
+    <property>
+        <name>mapred.system.dir</name>
+        <value>/mapred/system/</value>
+    </property>
+    <property>
+        <name>mapred.local.dir</name>
+        <value>/data/1/mapred/local,/data/2/mapred/local,/data/3/mapred/local</value>
+    </property>
+</configuration>

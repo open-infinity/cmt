@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+
+
+  
+
+
+
+
+
+
+
+
+
+
+<!--[if lt IE 7 ]> <html lang="en" class="no-js ie6"> <![endif]-->
+<!--[if IE 7 ]>    <html lang="en" class="no-js ie7"> <![endif]-->
+<!--[if IE 8 ]>    <html lang="en" class="no-js ie8"> <![endif]-->
+<!--[if IE 9 ]>    <html lang="en" class="no-js ie9"> <![endif]-->
+<!--[if (gt IE 9)|!(IE)]>--> <html lang="en" class="no-js"> <!--<![endif]-->
+  <head>
+    <meta content="text/html; charset=UTF-8" http-equiv="content-type"/>
+    <title>
+  Open Infinity / CORE /
+  [r21]
+  /trunk/snapshot/open-infinity-core/LICENSE-2.0.txt
+</title>
+    
+
+<script src="https://a.fsdn.com/allura/nf/1334869289/_ew_/theme/sftheme/js/sftheme/modernizr.custom.90514.js"></script>
+
+<script src="https://a.fsdn.com/allura/nf/1334869289/_ew_/theme/sftheme/js/sftheme/jquery-1.5.1.js"></script>
+<!--[if lt IE 7 ]>
+  <script src="https://a.fsdn.com/allura/nf/1334869289/_ew_/theme/sftheme/js/sftheme/dd_belatedpng.js"></script>
+  <script> DD_belatedPNG.fix('img, .png_bg'); //fix any <img> or .png_bg background-images </script>
+<![endif]-->
+<link href='//fonts.googleapis.com/css?family=Ubuntu:regular' rel='stylesheet' type='text/css'>
+<style type="text/css">
+    @font-face {
+        font-family: "Pictos";
+        src: url('https://a.fsdn.com/allura/nf/1334869289/_ew_/theme/sftheme/css/fonts/sftheme/pictos-web.eot');
+        src: local("☺"), url('https://a.fsdn.com/allura/nf/1334869289/_ew_/theme/sftheme/css/fonts/sftheme/pictos-web.woff') format('woff'), url('https://a.fsdn.com/allura/nf/1334869289/_ew_/theme/sftheme/css/fonts/sftheme/pictos-web.ttf') format('truetype'), url('https://a.fsdn.com/allura/nf/1334869289/_ew_/theme/sftheme/css/fonts/sftheme/pictos-web.svg') format('svg');
+    }
+</style>
+    <script type="text/javascript">
+            /*jslint onevar: false, nomen: false, evil: true, css: true, plusplus: false, white: false, forin: true, on: true, immed: false */
+            /*global confirm, alert, unescape, window, jQuery, $, net, COMSCORE */
+    </script>
+    
+      <!-- ew:head_css -->
+
+    
+      <link rel="stylesheet"
+                type="text/css"
+                href="https://a.fsdn.com/allura/nf/1334869289/_ew_/_slim/css?href=allura%2Fcss%2Fforge%2Fhilite.css"
+                >
+    
+      <link rel="stylesheet"
+                type="text/css"
+                href="https://a.fsdn.com/allura/nf/1334869289/_ew_/theme/sftheme/css/forge.css"
+                >
+    
+      
+<!-- /ew:head_css -->
+
+    
+    
+    
+      <!-- ew:head_js -->
+
+    
+      
+<!-- /ew:head_js -->
+
+    
+    
+
+    
+    
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="/p/openinfinity/code-0/feed.rss"/>
+    <link rel="alternate" type="application/atom+xml" title="Atom" href="/p/openinfinity/code-0/feed.atom"/>
+
+      <style>.XqWqdUacalesAJrjhHCJg { display:none }</style>
+
+    
+    
+
+    
+
+
+<script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-32013-6']);
+    _gaq.push(['_setCustomVar', 1, 'Page Type', 'SVN', 3]);
+    
+    _gaq.push(['_setCustomVar', 2, 'userid', '3806837', 1]);
+    _gaq.push(['_setCustomVar', 3, 'Project', 'openinfinity', 3]);
+    _gaq.push(['_setCustomVar', 4, 'Topic', '', 3]);
+    _gaq.push(['_trackPageview']);
+    _gaq.push(['_trackPageLoadTime']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' === document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+</script>
+  </head>
+
+  <body id="forge">
+    
+      <!-- ew:body_top_js -->
+
+    
+      
+<!-- /ew:body_top_js -->
+
+    
+    
+<header id="site-header">
+    <div class="wrapper">
+        <a href="/" class="logo">
+            <span>SourceForge</span>
+        </a>
+        
+        <form method="get" action="/directory/">
+            <input type="text" id="words" name="q" placeholder="Find Open Source Software">
+        </form>
+        
+        <!--Switch to {language}-->
+        <nav id="nav-site">
+            <a href="/directory/" title="Browse our software.">Browse</a>
+            <a href="/blog/" title="Read the latest news from the SF HQ.">Blog</a>
+            <a href="/support" title="Contact us for help and feedback.">Support</a>
+            <a href="http://jobs.sourceforge.net/" onClick="_gaq.push(['_trackEvent', 'GlobalNavbarClick', 'Jobs']);">Jobs</a>
+            
+            <a href="http://geek.net/events/" onClick="_gaq.push(['_trackEvent', 'GlobalNavbarClick', 'Resources']);">Resources</a>
+        </nav>
+        <nav id="nav-account">
+            
+            <a href="/users/tsiitone">tsiitone</a>
+            <a href="/account/">Account</a>
+            <a href="/auth/logout">Log Out</a>
+            
+        </nav>
+        
+    </div>
+</header>
+    
+    <section id="page-body" class=" neighborhood-Projects project-openinfinity mountpoint-code-0">
+		<div class="grid-24">
+        
+        
+
+  
+  <a href="/p/openinfinity/">
+    
+      <img src="/p/openinfinity//icon" class="project_icon" alt="Project Logo">
+    
+	<h1 class="project_title">
+      
+        Open Infinity
+      
+	</h1>
+	</a>
+
+        
+      </div>
+      <div id="top_nav" class="">
+        
+        
+  
+    <a href="/p/openinfinity/wiki/" class="ui-icon-tool-wiki">
+      Wiki
+      
+        
+      
+    </a>
+	
+    <a href="/projects/openinfinity/files/" class="ui-icon-tool-downloads">
+      Downloads
+      
+        
+      
+    </a>
+	
+    <a href="/p/openinfinity/tickets/" class="ui-icon-tool-tickets">
+      Tickets
+      
+        
+      
+    </a>
+	
+    <a href="/p/openinfinity/discussion/" class="ui-icon-tool-discussion">
+      Discussion
+      
+        
+      
+    </a>
+	
+    <a href="/p/openinfinity/blog/" class="ui-icon-tool-blog">
+      Blog
+      
+        
+      
+    </a>
+	
+    <a href="/p/openinfinity/code-0/" class="ui-icon-tool-svn">
+      Core
+      
+        
+          <span class="diamond"></span>
+        
+      
+    </a>
+	
+    <a href="/p/openinfinity/archetypes/" class="ui-icon-tool-svn">
+      Archetypes
+      
+        
+      
+    </a>
+	
+    <a href="/p/openinfinity/platforms/" class="ui-icon-tool-svn">
+      Platforms
+      
+        
+      
+    </a>
+	
+    <a href="/p/openinfinity/features/" class="ui-icon-tool-svn">
+      Features
+      
+        
+      
+    </a>
+	
+	<div style="clear:both"></div>
+
+        
+      </div>
+      <div id="content_base">
+			  
+			    
+          
+
+
+<div id="sidebar">
+  
+    <div>&nbsp;</div>
+  
+    
+    
+      
+        
+    
+      <ul class="sidebarmenu">
+      
+    
+    <li>
+      <a href="/p/openinfinity/code-0/commit_browser"><b data-icon="o" class="ico ico-folder"></b> <span>Browse Commits</span></a>
+    </li>
+  
+      
+    
+    
+      </ul>
+      
+    
+    
+</div>
+          
+          
+			  
+			  
+          
+        
+        <div class="grid-20 pad">
+          <h2 class="dark title">
+<a href="/p/openinfinity/code-0/21/">[r21]</a>:
+
+  
+  
+    <a href="./../../">trunk</a> /
+    
+  
+    <a href="./../">snapshot</a> /
+    
+  
+    <a href="./">open-infinity-core</a> /
+    
+  
+ LICENSE-2.0.txt
+
+            <!-- actions -->
+            <small>
+            
+<a href="/p/openinfinity/code-0/21/log/">
+  <b data-icon="N" class="ico ico-history" title="History"> </b> History
+</a>
+
+            </small>
+            <!-- /actions -->
+          </h2>
+		
+          <div>
+            
+  
+  
+    <div id="access_urls" class="btn-bar grid-19">
+      <div class="btn-set duo">
+        
+        <a href="#" class="btn" data-url="svn checkout svn://svn.code.sf.net/p/openinfinity/code-0/trunk openinfinity-code-0" title="Read Only">
+          RO
+        </a>
+        <a href="#" class="btn" data-url="svn checkout http://svn.code.sf.net/p/openinfinity/code-0/trunk openinfinity-code-0" title="HTTP">
+          HTTP
+        </a>
+        
+      </div>
+      <span></span>
+      <input id="access_url" readonly type="text"
+             class="selectText"
+             value=""/>
+    </div>
+    <hr>
+  
+
+  
+
+  
+
+  
+  
+  
+    <p><a href="?format=raw">Download this file</a></p>
+    <div class="clip grid-19">
+      <h3><span class="ico-l"><b data-icon="n" class="ico ico-table"></b> LICENSE-2.0.txt</span></h3>
+      <div class="codehilite"><pre><span class="lineno">  1</span>                                  Apache License
+<span class="lineno">  2</span>                            Version 2.0, January 2004
+<span class="lineno">  3</span>                         http://www.apache.org/licenses/
+<span class="lineno">  4</span> 
+<span class="lineno">  5</span>    TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+<span class="lineno">  6</span> 
+<span class="lineno">  7</span>    1. Definitions.
+<span class="lineno">  8</span> 
+<span class="lineno">  9</span>       &quot;License&quot; shall mean the terms and conditions for use, reproduction,
+<span class="lineno"> 10</span>       and distribution as defined by Sections 1 through 9 of this document.
+<span class="lineno"> 11</span> 
+<span class="lineno"> 12</span>       &quot;Licensor&quot; shall mean the copyright owner or entity authorized by
+<span class="lineno"> 13</span>       the copyright owner that is granting the License.
+<span class="lineno"> 14</span> 
+<span class="lineno"> 15</span>       &quot;Legal Entity&quot; shall mean the union of the acting entity and all
+<span class="lineno"> 16</span>       other entities that control, are controlled by, or are under common
+<span class="lineno"> 17</span>       control with that entity. For the purposes of this definition,
+<span class="lineno"> 18</span>       &quot;control&quot; means (i) the power, direct or indirect, to cause the
+<span class="lineno"> 19</span>       direction or management of such entity, whether by contract or
+<span class="lineno"> 20</span>       otherwise, or (ii) ownership of fifty percent (50%) or more of the
+<span class="lineno"> 21</span>       outstanding shares, or (iii) beneficial ownership of such entity.
+<span class="lineno"> 22</span> 
+<span class="lineno"> 23</span>       &quot;You&quot; (or &quot;Your&quot;) shall mean an individual or Legal Entity
+<span class="lineno"> 24</span>       exercising permissions granted by this License.
+<span class="lineno"> 25</span> 
+<span class="lineno"> 26</span>       &quot;Source&quot; form shall mean the preferred form for making modifications,
+<span class="lineno"> 27</span>       including but not limited to software source code, documentation
+<span class="lineno"> 28</span>       source, and configuration files.
+<span class="lineno"> 29</span> 
+<span class="lineno"> 30</span>       &quot;Object&quot; form shall mean any form resulting from mechanical
+<span class="lineno"> 31</span>       transformation or translation of a Source form, including but
+<span class="lineno"> 32</span>       not limited to compiled object code, generated documentation,
+<span class="lineno"> 33</span>       and conversions to other media types.
+<span class="lineno"> 34</span> 
+<span class="lineno"> 35</span>       &quot;Work&quot; shall mean the work of authorship, whether in Source or
+<span class="lineno"> 36</span>       Object form, made available under the License, as indicated by a
+<span class="lineno"> 37</span>       copyright notice that is included in or attached to the work
+<span class="lineno"> 38</span>       (an example is provided in the Appendix below).
+<span class="lineno"> 39</span> 
+<span class="lineno"> 40</span>       &quot;Derivative Works&quot; shall mean any work, whether in Source or Object
+<span class="lineno"> 41</span>       form, that is based on (or derived from) the Work and for which the
+<span class="lineno"> 42</span>       editorial revisions, annotations, elaborations, or other modifications
+<span class="lineno"> 43</span>       represent, as a whole, an original work of authorship. For the purposes
+<span class="lineno"> 44</span>       of this License, Derivative Works shall not include works that remain
+<span class="lineno"> 45</span>       separable from, or merely link (or bind by name) to the interfaces of,
+<span class="lineno"> 46</span>       the Work and Derivative Works thereof.
+<span class="lineno"> 47</span> 
+<span class="lineno"> 48</span>       &quot;Contribution&quot; shall mean any work of authorship, including
+<span class="lineno"> 49</span>       the original version of the Work and any modifications or additions
+<span class="lineno"> 50</span>       to that Work or Derivative Works thereof, that is intentionally
+<span class="lineno"> 51</span>       submitted to Licensor for inclusion in the Work by the copyright owner
+<span class="lineno"> 52</span>       or by an individual or Legal Entity authorized to submit on behalf of
+<span class="lineno"> 53</span>       the copyright owner. For the purposes of this definition, &quot;submitted&quot;
+<span class="lineno"> 54</span>       means any form of electronic, verbal, or written communication sent
+<span class="lineno"> 55</span>       to the Licensor or its representatives, including but not limited to
+<span class="lineno"> 56</span>       communication on electronic mailing lists, source code control systems,
+<span class="lineno"> 57</span>       and issue tracking systems that are managed by, or on behalf of, the
+<span class="lineno"> 58</span>       Licensor for the purpose of discussing and improving the Work, but
+<span class="lineno"> 59</span>       excluding communication that is conspicuously marked or otherwise
+<span class="lineno"> 60</span>       designated in writing by the copyright owner as &quot;Not a Contribution.&quot;
+<span class="lineno"> 61</span> 
+<span class="lineno"> 62</span>       &quot;Contributor&quot; shall mean Licensor and any individual or Legal Entity
+<span class="lineno"> 63</span>       on behalf of whom a Contribution has been received by Licensor and
+<span class="lineno"> 64</span>       subsequently incorporated within the Work.
+<span class="lineno"> 65</span> 
+<span class="lineno"> 66</span>    2. Grant of Copyright License. Subject to the terms and conditions of
+<span class="lineno"> 67</span>       this License, each Contributor hereby grants to You a perpetual,
+<span class="lineno"> 68</span>       worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+<span class="lineno"> 69</span>       copyright license to reproduce, prepare Derivative Works of,
+<span class="lineno"> 70</span>       publicly display, publicly perform, sublicense, and distribute the
+<span class="lineno"> 71</span>       Work and such Derivative Works in Source or Object form.
+<span class="lineno"> 72</span> 
+<span class="lineno"> 73</span>    3. Grant of Patent License. Subject to the terms and conditions of
+<span class="lineno"> 74</span>       this License, each Contributor hereby grants to You a perpetual,
+<span class="lineno"> 75</span>       worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+<span class="lineno"> 76</span>       (except as stated in this section) patent license to make, have made,
+<span class="lineno"> 77</span>       use, offer to sell, sell, import, and otherwise transfer the Work,
+<span class="lineno"> 78</span>       where such license applies only to those patent claims licensable
+<span class="lineno"> 79</span>       by such Contributor that are necessarily infringed by their
+<span class="lineno"> 80</span>       Contribution(s) alone or by combination of their Contribution(s)
+<span class="lineno"> 81</span>       with the Work to which such Contribution(s) was submitted. If You
+<span class="lineno"> 82</span>       institute patent litigation against any entity (including a
+<span class="lineno"> 83</span>       cross-claim or counterclaim in a lawsuit) alleging that the Work
+<span class="lineno"> 84</span>       or a Contribution incorporated within the Work constitutes direct
+<span class="lineno"> 85</span>       or contributory patent infringement, then any patent licenses
+<span class="lineno"> 86</span>       granted to You under this License for that Work shall terminate
+<span class="lineno"> 87</span>       as of the date such litigation is filed.
+<span class="lineno"> 88</span> 
+<span class="lineno"> 89</span>    4. Redistribution. You may reproduce and distribute copies of the
+<span class="lineno"> 90</span>       Work or Derivative Works thereof in any medium, with or without
+<span class="lineno"> 91</span>       modifications, and in Source or Object form, provided that You
+<span class="lineno"> 92</span>       meet the following conditions:
+<span class="lineno"> 93</span> 
+<span class="lineno"> 94</span>       (a) You must give any other recipients of the Work or
+<span class="lineno"> 95</span>           Derivative Works a copy of this License; and
+<span class="lineno"> 96</span> 
+<span class="lineno"> 97</span>       (b) You must cause any modified files to carry prominent notices
+<span class="lineno"> 98</span>           stating that You changed the files; and
+<span class="lineno"> 99</span> 
+<span class="lineno">100</span>       (c) You must retain, in the Source form of any Derivative Works
+<span class="lineno">101</span>           that You distribute, all copyright, patent, trademark, and
+<span class="lineno">102</span>           attribution notices from the Source form of the Work,
+<span class="lineno">103</span>           excluding those notices that do not pertain to any part of
+<span class="lineno">104</span>           the Derivative Works; and
+<span class="lineno">105</span> 
+<span class="lineno">106</span>       (d) If the Work includes a &quot;NOTICE&quot; text file as part of its
+<span class="lineno">107</span>           distribution, then any Derivative Works that You distribute must
+<span class="lineno">108</span>           include a readable copy of the attribution notices contained
+<span class="lineno">109</span>           within such NOTICE file, excluding those notices that do not
+<span class="lineno">110</span>           pertain to any part of the Derivative Works, in at least one
+<span class="lineno">111</span>           of the following places: within a NOTICE text file distributed
+<span class="lineno">112</span>           as part of the Derivative Works; within the Source form or
+<span class="lineno">113</span>           documentation, if provided along with the Derivative Works; or,
+<span class="lineno">114</span>           within a display generated by the Derivative Works, if and
+<span class="lineno">115</span>           wherever such third-party notices normally appear. The contents
+<span class="lineno">116</span>           of the NOTICE file are for informational purposes only and
+<span class="lineno">117</span>           do not modify the License. You may add Your own attribution
+<span class="lineno">118</span>           notices within Derivative Works that You distribute, alongside
+<span class="lineno">119</span>           or as an addendum to the NOTICE text from the Work, provided
+<span class="lineno">120</span>           that such additional attribution notices cannot be construed
+<span class="lineno">121</span>           as modifying the License.
+<span class="lineno">122</span> 
+<span class="lineno">123</span>       You may add Your own copyright statement to Your modifications and
+<span class="lineno">124</span>       may provide additional or different license terms and conditions
+<span class="lineno">125</span>       for use, reproduction, or distribution of Your modifications, or
+<span class="lineno">126</span>       for any such Derivative Works as a whole, provided Your use,
+<span class="lineno">127</span>       reproduction, and distribution of the Work otherwise complies with
+<span class="lineno">128</span>       the conditions stated in this License.
+<span class="lineno">129</span> 
+<span class="lineno">130</span>    5. Submission of Contributions. Unless You explicitly state otherwise,
+<span class="lineno">131</span>       any Contribution intentionally submitted for inclusion in the Work
+<span class="lineno">132</span>       by You to the Licensor shall be under the terms and conditions of
+<span class="lineno">133</span>       this License, without any additional terms or conditions.
+<span class="lineno">134</span>       Notwithstanding the above, nothing herein shall supersede or modify
+<span class="lineno">135</span>       the terms of any separate license agreement you may have executed
+<span class="lineno">136</span>       with Licensor regarding such Contributions.
+<span class="lineno">137</span> 
+<span class="lineno">138</span>    6. Trademarks. This License does not grant permission to use the trade
+<span class="lineno">139</span>       names, trademarks, service marks, or product names of the Licensor,
+<span class="lineno">140</span>       except as required for reasonable and customary use in describing the
+<span class="lineno">141</span>       origin of the Work and reproducing the content of the NOTICE file.
+<span class="lineno">142</span> 
+<span class="lineno">143</span>    7. Disclaimer of Warranty. Unless required by applicable law or
+<span class="lineno">144</span>       agreed to in writing, Licensor provides the Work (and each
+<span class="lineno">145</span>       Contributor provides its Contributions) on an &quot;AS IS&quot; BASIS,
+<span class="lineno">146</span>       WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+<span class="lineno">147</span>       implied, including, without limitation, any warranties or conditions
+<span class="lineno">148</span>       of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
+<span class="lineno">149</span>       PARTICULAR PURPOSE. You are solely responsible for determining the
+<span class="lineno">150</span>       appropriateness of using or redistributing the Work and assume any
+<span class="lineno">151</span>       risks associated with Your exercise of permissions under this License.
+<span class="lineno">152</span> 
+<span class="lineno">153</span>    8. Limitation of Liability. In no event and under no legal theory,
+<span class="lineno">154</span>       whether in tort (including negligence), contract, or otherwise,
+<span class="lineno">155</span>       unless required by applicable law (such as deliberate and grossly
+<span class="lineno">156</span>       negligent acts) or agreed to in writing, shall any Contributor be
+<span class="lineno">157</span>       liable to You for damages, including any direct, indirect, special,
+<span class="lineno">158</span>       incidental, or consequential damages of any character arising as a
+<span class="lineno">159</span>       result of this License or out of the use or inability to use the
+<span class="lineno">160</span>       Work (including but not limited to damages for loss of goodwill,
+<span class="lineno">161</span>       work stoppage, computer failure or malfunction, or any and all
+<span class="lineno">162</span>       other commercial damages or losses), even if such Contributor
+<span class="lineno">163</span>       has been advised of the possibility of such damages.
+<span class="lineno">164</span> 
+<span class="lineno">165</span>    9. Accepting Warranty or Additional Liability. While redistributing
+<span class="lineno">166</span>       the Work or Derivative Works thereof, You may choose to offer,
+<span class="lineno">167</span>       and charge a fee for, acceptance of support, warranty, indemnity,
+<span class="lineno">168</span>       or other liability obligations and/or rights consistent with this
+<span class="lineno">169</span>       License. However, in accepting such obligations, You may act only
+<span class="lineno">170</span>       on Your own behalf and on Your sole responsibility, not on behalf
+<span class="lineno">171</span>       of any other Contributor, and only if You agree to indemnify,
+<span class="lineno">172</span>       defend, and hold each Contributor harmless for any liability
+<span class="lineno">173</span>       incurred by, or claims asserted against, such Contributor by reason
+<span class="lineno">174</span>       of your accepting any such warranty or additional liability.
+<span class="lineno">175</span> 
+<span class="lineno">176</span>    END OF TERMS AND CONDITIONS
+<span class="lineno">177</span> 
+<span class="lineno">178</span>    APPENDIX: How to apply the Apache License to your work.
+<span class="lineno">179</span> 
+<span class="lineno">180</span>       To apply the Apache License to your work, attach the following
+<span class="lineno">181</span>       boilerplate notice, with the fields enclosed by brackets &quot;[]&quot;
+<span class="lineno">182</span>       replaced with your own identifying information. (Don&#39;t include
+<span class="lineno">183</span>       the brackets!)  The text should be enclosed in the appropriate
+<span class="lineno">184</span>       comment syntax for the file format. We also recommend that a
+<span class="lineno">185</span>       file or class name and description of purpose be included on the
+<span class="lineno">186</span>       same &quot;printed page&quot; as the copyright notice for easier
+<span class="lineno">187</span>       identification within third-party archives.
+<span class="lineno">188</span> 
+<span class="lineno">189</span>    Copyright [yyyy] [name of copyright owner]
+<span class="lineno">190</span> 
+<span class="lineno">191</span>    Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+<span class="lineno">192</span>    you may not use this file except in compliance with the License.
+<span class="lineno">193</span>    You may obtain a copy of the License at
+<span class="lineno">194</span> 
+<span class="lineno">195</span>        http://www.apache.org/licenses/LICENSE-2.0
+<span class="lineno">196</span> 
+<span class="lineno">197</span>    Unless required by applicable law or agreed to in writing, software
+<span class="lineno">198</span>    distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+<span class="lineno">199</span>    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+<span class="lineno">200</span>    See the License for the specific language governing permissions and
+<span class="lineno">201</span>    limitations under the License.
+</pre></div>
+
+    </div>
+  
+
+          </div>
+			
+          
+        </div>
+      </div>
+    </section>
+      
+<footer id="site-footer">
+    <nav>
+        <a href="http://twitter.com/sfnet_ops">Status</a>
+        <a href="http://geek.net/terms-of-use">Terms</a>
+        <a href="http://geek.net/privacy-statement">Privacy</a>
+        <a href="http://geek.net/advertise/">Advertise</a>
+        <a href="/about">About</a>
+        <a href="http://html5center.sourceforge.net/blog/">HTML5 Center</a>
+        <a href="http://sourceforge.jp/">SourceForge.JP</a>
+    </nav>
+    <div id="copyright">
+        &copy; 2012 <a href="http://geek.net" title="Network which provides and promotes Open Source software downloads, development, discussion and news.">Geeknet, Inc.</a>
+    </div>
+</footer>
+    <div id="messages">
+        
+    </div>
+    
+      <!-- ew:body_js -->
+
+    
+      <script type="text/javascript" src="https://a.fsdn.com/allura/nf/1334869289/_ew_/_slim/js?href=allura%2Fjs%2Fjquery-base.js%3Ballura%2Fjs%2Fjquery.notify.js%3Ballura%2Fjs%2Fsylvester.js%3Ballura%2Fjs%2Fpb.transformie.min.js%3Ballura%2Fjs%2Fallura-base.js"></script>
+    
+      
+<!-- /ew:body_js -->
+
+    
+    
+      <!-- ew:body_js_tail -->
+
+    
+      
+<!-- /ew:body_js_tail -->
+
+    
+    
+<script type="text/javascript">(function() {
+  $('#access_urls .btn').click(function(evt){
+    evt.preventDefault();
+    var parent = $(this).parents('.btn-bar');
+    $(parent).find('input').val($(this).attr('data-url'));
+    $(parent).find('span').text($(this).attr('title')+' access');
+    $(this).parent().children('.btn').removeClass('active');
+    $(this).addClass('active');
+  });
+  $('#access_urls .btn').first().click();
+}());
+</script>
+
+    
+      
+    
+    
+   
+    
+  </body>
+</html>

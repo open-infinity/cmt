@@ -1,0 +1,17 @@
+@role:hmaster /etc/hadoop/conf/core-site.xml
+@role:slave /etc/hadoop/conf/core-site.xml
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+
+<configuration>
+  <property>
+    <name>fs.default.name</name>
+    <value>hdfs://[[HMASTER_HOST]]:8020</value>
+  </property>
+
+  <property>
+     <name>hadoop.tmp.dir</name>
+	 <value>/app/hadoop/tmp</value>
+  </property>
+
+</configuration>

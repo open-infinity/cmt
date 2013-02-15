@@ -1,0 +1,2 @@
+@role:hmaster /etc/hbase/conf/regionservers
+[[REGIONSERVERS_HOSTNAMES_BY_LINE]]
