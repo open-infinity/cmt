@@ -288,7 +288,12 @@
 			$('#addInstanceDialog .togglePlatformSelectionRow input[id*="togglePlatformRadioOff_"]').attr('checked',true).button("refresh");
 			$('#addInstanceDialog .imageTypeRow input[id*="imageTypeEphemeral_"]').attr('checked',true).button("refresh");
 			$('#addInstanceDialog .toggleEbsRow input[id*="toggleEbsRadioOff_"]').attr('checked',true).button("refresh");
-			$("#addInstanceDialog .machineSizeRow input:first-child").attr('checked',true).button("refresh");
+            if (cloudadmin.resource.machineTypes.length > 0) { // select first machine type and reset label if there are any machine types
+                $("#addInstanceDialog .valueDisplayButtonSet").text(cloudadmin.resource.machineTypes[0].specification);
+                $("#addInstanceDialog .machineSizeRow input:first-child").attr('checked',true).button("refresh");
+            }
+            // reset cloud selection, fire also change event to update zone selection
+            $("#cloudSelect option").eq(0).attr("selected", "selected").trigger("change");
 			$('#addInstanceDialog .toggleDatasourceRow input[id*="toggleDatasourceRadioOff_"]').attr('checked',true).button("refresh");			
 			$('#addInstanceDialog .datasourceRow input').val('');
 			dimElements();
