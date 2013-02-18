@@ -126,6 +126,20 @@ dialogRes.setResource({
 	</div>
 </div>
 
+<div id="liveInstanceTemplate" class="template">
+	<div class="liveInstanceBody">
+		<div class="toggleLiveInstanceRow configRow">
+			<label class="toggleLiveInstanceLabel instanceCreationLabel">Live instance</label>
+			<div class="radioButton">
+				<input type="radio" id="toggleLiveInstanceRadioOn_" name="toggleLiveInstanceRadio_" />
+				<label for="toggleLiveInstanceRadioOn_"> On </label>
+				<input type="radio" id="toggleLiveInstanceRadioOff_" name="toggleLiveInstanceRadio_" checked="checked"/>
+				<label for="toggleLiveInstanceRadioOff_"> Off </label>
+			</div>
+		</div>
+	</div>
+</div>
+
 <div id="datasourceTemplate" class="template">
 	<div class="datasourceBody">
 		<div class="toggleDatasourceRow configRow">			

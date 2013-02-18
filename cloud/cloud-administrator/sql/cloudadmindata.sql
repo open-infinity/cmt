@@ -235,7 +235,7 @@ DROP TABLE IF EXISTS `cluster_type_tbl`;
 CREATE TABLE `cluster_type_tbl` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `configuration_id` int(11) DEFAULT NULL,
-  `name` varchar(10) DEFAULT NULL,
+  `name` varchar(20) NOT NULL,
   `title` varchar(50) DEFAULT NULL,
   `dependency` int(11) DEFAULT -1,
   `replicated` boolean DEFAULT false,
