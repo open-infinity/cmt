@@ -15,6 +15,12 @@
   </properties>
   
   <build>
+    <resources>
+		<resource>
+			<directory>src/main/resources</directory>
+			<filtering>true</filtering>
+		</resource>
+	</resources>
   	<plugins>
   		<plugin>
 			<groupId>org.apache.maven.plugins</groupId>
@@ -22,7 +28,51 @@
 			<version>2.2</version>
 		</plugin>
   	</plugins>
+  	<extensions>
+        <!-- maven wagon supports use of scp/sftp to transfer files -->
+            <extension>
+                <groupId>org.apache.maven.wagon</groupId>
+                <artifactId>wagon-ssh</artifactId>
+                <version>1.0</version>
+            </extension>
+    </extensions>
   </build>
+  <profiles>
+          <profile>
+            <!-- deploy to toaspiv2 server (debug mode) -->
+            <id>cmt-deploy</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>wagon-maven-plugin</artifactId>
+                        <version>1.0-beta-4</version>
+                        <executions>
+                            <execution>
+                                <id>upload-war</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>upload</goal>
+                                </goals>
+                                <configuration>
+                                    <fromDir>target</fromDir>
+                                    <includes>*.war</includes>
+                                    <!-- Specify following parameters in 
+                                        user settings.xml -->
+                                    <url>${liferay.server.url}</url>
+                                    <toDir>${liferay.server.dir}</toDir>
+                                    <serverId>${liferay.server.id}</serverId>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>  
+  </profiles>
   <dependencies>
   	<dependency>
 		<groupId>org.springframework</groupId>

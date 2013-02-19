@@ -498,6 +498,8 @@ col.data {
 
 #addInstanceDialog .ebsSizeLabel{margin-top:.3em;float:left;}
 
+#addInstanceDialog .toggleLiveInstanceRow{position:relative;margin-top:1.1em;display:block;clear:left;}
+
 #addInstanceDialog .toggleDatasourceRow{position:relative;margin-top:1.1em;display:block;clear:left;}
 
 #addInstanceDialog .datasourceRow{position:relative;margin-top:1.1em;display:block;clear:left;}

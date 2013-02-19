@@ -65,16 +65,16 @@ public interface ClusterService {
 	static final String[] CLUSTER_TYPE_NAME = {"Portal Platform", "Service Platform", "Analytics Platform",
 	   										   "Big Data Repository", "Database Platform", "BAS Platform",
 											   "NoSQL Platform", "Identity Gateway Platform", "EE Platform", "Enterprise Content Management Platform",
-											   "YA Portal Platform", "YA Service Platform"};
+											   "JBoss Portal Platform", "JBoss Service Platform"};
 	
 	static final String[] SERVICE_NAME = {"portal_platform", "service_platform", "analytics_platform",
 										  "bigdata_platform", "database_platform", "bas_platform", 
 										  "nosql_platform", "ig_platform", "ee_platform", "ecm_platform",
-										  "ya_portal_platform", "ya_service_platform"};
+										  "jboss_portal_platform", "jboss_service_platform"};
 	
 	static final String[] CLUSTER_PUBLISH_STATUS_NAME = {"", "Private", "Unpublished"};
 	
-	static final String[] CLUSTER_TYPE_MACHINE_NAME = {"portal", "service", "analytics", "bigdata", "db", "bas", "nosql", "ig", "ee", "ecm", "yaportal", "yaservice"};
+	static final String[] CLUSTER_TYPE_MACHINE_NAME = {"portal", "service", "analytics", "bigdata", "db", "bas", "nosql", "ig", "ee", "ecm", "jbossportal", "jbossservice"};
 	
 	Collection<Cluster> getClusters();
 	

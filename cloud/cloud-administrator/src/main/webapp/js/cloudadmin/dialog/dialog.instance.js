@@ -50,42 +50,44 @@
 						}				
 						header.find(".clusterTypeTitle").html(clusters[i].title);
 
-                        // insert data source fields into body
-						console.log("cluster " + clusters[i].name);
-                        if ("yamq" == clusters[i].name || "yaportal" == clusters[i].name) {
-    						console.log("add datasource " +clusters[i].name);                        	
-                        	var datasource = $('#datasourceTemplate .datasourceBody').clone();
-                        	datasource.find('[type="text"]').each(function () {
-    						    $(this).attr('id', $(this).attr('id') + clusters[i].name);
-    						    $(this).attr('name', $(this).attr('name') + clusters[i].name);
-    						});
-                        	datasource.find('[type="password"]').each(function () {
-    						    $(this).attr('id', $(this).attr('id') + clusters[i].name);
-    						    $(this).attr('name', $(this).attr('name') + clusters[i].name);
-    						});
-                            body.find('.ebsSizeRow').after(datasource);    						
-                        }
-                        // insert machine types into body before element ids and names are adjusted below
-                        var machineTypeInjectLocation$ = body.find('.machineSizeRow .radioButton');
-                        for (var mt = 0; mt < machineTypes.length; ++mt) {
-                            var machineTypeInstanceId = 'machineSizeRadio' + machineTypes[mt].name + '_';
-                            $('#machineTypeTemplate').children('[type="radio"]').clone().attr({id: machineTypeInstanceId, value: machineTypes[mt].id}).appendTo(machineTypeInjectLocation$);
-                            $('#machineTypeTemplate').children('label').clone().attr({'for': machineTypeInstanceId}).html(machineTypes[mt].name).appendTo(machineTypeInjectLocation$);
-                        }
+						// insert data source fields into body
+						if ("jbossservice" == clusters[i].name || "jbossportal" == clusters[i].name) {
+							var datasource = $('#datasourceTemplate .datasourceBody').clone();
+							datasource.find('[type="text"]').each(function () {
+								$(this).attr('id', $(this).attr('id') + clusters[i].name);
+								$(this).attr('name', $(this).attr('name') + clusters[i].name);
+							});
+							datasource.find('[type="password"]').each(function () {
+								$(this).attr('id', $(this).attr('id') + clusters[i].name);
+								$(this).attr('name', $(this).attr('name') + clusters[i].name);
+							});
+							body.find('.ebsSizeRow').after(datasource);
+						}
+						// insert staging (liveInstance) fields into body
+						if ("jbossportal" == clusters[i].name) {
+							var datasource = $('#liveInstanceTemplate .liveInstanceBody').clone();
+							body.find('.ebsSizeRow').after(datasource);
+						}
 
                         // insert solr toggle button if platform is jboss portal
-                        if ("yaportal" == clusters[i].name) {
-                            console.log("adding solr button for platform " + clusters[i].name);
+                        if ("jbossportal" == clusters[i].name) {
                             var solrToggle = $("#solrToggleTemplate .toggleSolrRow").clone();
                             body.find('.ebsSizeRow').after(solrToggle);
                         }
 
-                        // prepares element ids and names
+                        // insert machine types into body before element ids and names are adjusted below
+						var machineTypeInjectLocation$ = body.find('.machineSizeRow .radioButton');
+						for (var mt = 0; mt < machineTypes.length; ++mt) {
+							var machineTypeInstanceId = 'machineSizeRadio' + machineTypes[mt].name + '_';
+							$('#machineTypeTemplate').children('[type="radio"]').clone().attr({id: machineTypeInstanceId, value: machineTypes[mt].id}).appendTo(machineTypeInjectLocation$);
+							$('#machineTypeTemplate').children('label').clone().attr({'for': machineTypeInstanceId}).html(machineTypes[mt].name).appendTo(machineTypeInjectLocation$);
+						}
+						// prepares element ids and names
 						body.attr('id', clusters[i].name).find('[type="radio"]').each(function () {
-						    $(this).attr('id', $(this).attr('id') + clusters[i].name);
-						    $(this).attr('name', $(this).attr('name') + clusters[i].name);
-						    var label = $(this).next("label");
-						    label.attr('for', label.attr('for') + clusters[i].name);
+							$(this).attr('id', $(this).attr('id') + clusters[i].name);
+							$(this).attr('name', $(this).attr('name') + clusters[i].name);
+							var label = $(this).next("label");
+							label.attr('for', label.attr('for') + clusters[i].name);
 						});
 						body.data('clusterConfiguration', cloudadmin.resource.clusterTypes[i]);
 						o.accordion.append(header);
@@ -151,6 +153,8 @@
 							grandpa.find(".imageTypeRow :radio").attr("disabled", false).button("refresh");
 							grandpa.find(".toggleEbsRow :radio").attr("disabled", false).button("refresh");
 							grandpa.find(".toggleDatasourceRow :radio").attr("disabled", false).button("refresh");
+							grandpa.find(".toggleLiveInstanceRow :radio").attr("disabled", false).button("refresh");
+							grandpa.find(".toggleSolrRow :radio").attr("disabled", false).button("refresh");
 							if ($('#' + "toggleEbsRadioOn_" + grandpa.data('clusterConfiguration').name).attr('checked')){
 								grandpa.find(".ebsSizeRow").fadeTo(500, "1");	
 								grandpa.find(".jq_slider").slider({ disabled: false });	
@@ -190,6 +194,8 @@
 							grandpa.find(".imageTypeRow :radio").attr("disabled", true).button("refresh");
 							grandpa.find(".toggleEbsRow :radio").attr("disabled", true).button("refresh");
 							grandpa.find(".toggleDatasourceRow :radio").attr("disabled", true).button("refresh");
+							grandpa.find(".toggleLiveInstanceRow :radio").attr("disabled", true).button("refresh");
+							grandpa.find(".toggleSolrRow :radio").attr("disabled", true).button("refresh");
 							grandpa.find(".datasourceRow :text").attr("disabled", true);
 							grandpa.find(".datasourceRow :password").attr("disabled", true);
 						}
@@ -304,6 +310,7 @@
             // reset cloud selection, fire also change event to update zone selection
             $("#cloudSelect option").eq(0).attr("selected", "selected").trigger("change");
 			$('#addInstanceDialog .toggleDatasourceRow input[id*="toggleDatasourceRadioOff_"]').attr('checked',true).button("refresh");			
+			$('#addInstanceDialog .toggleLiveInstanceRow input[id*="toggleLiveInstanceRadioOff_"]').attr('checked',true).button("refresh");			
 			$('#addInstanceDialog .datasourceRow input').val('');
 			dimElements();
 			$(".addInstanceDialogError").hide();
@@ -354,17 +361,24 @@
 						if($('#' + "toggleEbsRadioOn_" + clusters[i].name).attr('checked')){
 							outData[clusters[i].name + "esbvolumesize"] = $('#' + clusters[i].name + ' .ebsSizeRow .jq_slider').parent().next().text();
 						}
-                        if($('#' + "toggleSolrRadioOn_" + clusters[i].name).attr('checked')){
+						if($('#' + "toggleLiveInstanceRadioOn_" + clusters[i].name).attr('checked')){
+							outData[clusters[i].name + "liveinstance"] = "true";
+						}
+						else {
+							outData[clusters[i].name + "liveinstance"] = "false";
+						}
+						if($('#' + "toggleSolrRadioOn_" + clusters[i].name).attr('checked')){
                             outData[clusters[i].name + "solr"] = "true";
                         }
-                        if($('#' + "toggleDatasourceRadioOn_" + clusters[i].name).attr('checked')){
+
+						if($('#' + "toggleDatasourceRadioOn_" + clusters[i].name).attr('checked')){
 							if (!validateField($('#' + "newDatasourceUrlText_" + clusters[i].name))) return;
 							if (!validateField($('#' + "newDatasourceUserNameText_" + clusters[i].name))) return;
 							if (!validateField($('#' + "newDatasourcePasswordText_" + clusters[i].name))) return;
 							outData[clusters[i].name + "datasourceurl"] = $('#' + "newDatasourceUrlText_" + clusters[i].name).val();
 							outData[clusters[i].name + "datasourceuser"] = $('#' + "newDatasourceUserNameText_" + clusters[i].name).val();
 							outData[clusters[i].name + "datasourcepassword"] = $('#' + "newDatasourcePasswordText_" + clusters[i].name).val();
-						}						
+						}
 					} 
 				}
 				$.ajax({
@@ -376,13 +390,12 @@
 				$("#cloudTypesSelectionAccordion").accordion("option", "active", false);
 				$(this).trigger("instancetable.refresh").dialog("close");
 			};
-					
+
 			this.instanceAddButtons[dialogRes.resource.dialog.cancel] = function() {
 				$("#cloudTypesSelectionAccordion").accordion("option", "active", false);
 				$(this).trigger("instancetable.refresh").dialog("close");
-	
 			};
-		},		
+		},
 	
 		// Delete instance-button
 		initInstanceDeleteButtons: function() {
