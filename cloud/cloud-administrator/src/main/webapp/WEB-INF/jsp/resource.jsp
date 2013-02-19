@@ -154,10 +154,25 @@ dialogRes.setResource({
 	</div>
 </div>
 
+<%-- template for SOLR toggle button --%>
+<div id="solrToggleTemplate" class="template">
+    <div id="" class="toggleSolrRow configRow">
+        <label class="toggleSolrLabel instanceCreationLabel">Solr</label>
+        <div class="radioButton">
+            <input type="radio" id="toggleSolrRadioOn_" name="toggleSolrRadio_" />
+            <label for="toggleSolrRadioOn_"> On </label>
+            <input type="radio" id="toggleSolrRadioOff_" name="toggleSolrRadio_" checked="checked"/>
+            <label for="toggleSolrRadioOff_"> Off </label>
+        </div>
+    </div>
+</div>
+
+<%-- template for single machine type button --%>
 <div id="machineTypeTemplate" class="template">
     <input type="radio" id="machineSizeRadio" name="machineSizeRadio_" value=""/>
     <label for="machineSizeRadio"></label>
 </div>
+
 <%-- Cluster template --%>
 <ul id="clusterTemplate" class="template">
 	<li class="newlist ui-corner-all">
@@ -313,13 +328,3 @@ dialogRes.setResource({
 	</div>
 </div>
 
-<!--<input type="radio" id="machineSizeRadioSmall_" name="machineSizeRadio_" checked="checked" value="0"/>
-<label for="machineSizeRadioSmall_">Small</label>
-<input type="radio" id="machineSizeRadioMedium_" name="machineSizeRadio_" value="1"/>
-<label for="machineSizeRadioMedium_">Medium</label>
-<input type="radio" id="machineSizeRadioLarge_" name="machineSizeRadio_" value="2"/>
-<label for="machineSizeRadioLarge_">Large</label>
-<input type="radio" id="machineSizeRadioXLarge_" name="machineSizeRadio_" value="3"/>
-<label for="machineSizeRadioXLarge_">XLarge</label>
-<input type="radio" id="machineSizeRadioXXLarge_" name="machineSizeRadio_" value="4"/>
-<label for="machineSizeRadioXXLarge_">XXLarge</label>-->

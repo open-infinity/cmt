@@ -72,6 +72,14 @@
                             $('#machineTypeTemplate').children('[type="radio"]').clone().attr({id: machineTypeInstanceId, value: machineTypes[mt].id}).appendTo(machineTypeInjectLocation$);
                             $('#machineTypeTemplate').children('label').clone().attr({'for': machineTypeInstanceId}).html(machineTypes[mt].name).appendTo(machineTypeInjectLocation$);
                         }
+
+                        // insert solr toggle button if platform is jboss portal
+                        if ("yaportal" == clusters[i].name) {
+                            console.log("adding solr button for platform " + clusters[i].name);
+                            var solrToggle = $("#solrToggleTemplate .toggleSolrRow").clone();
+                            body.find('.ebsSizeRow').after(solrToggle);
+                        }
+
                         // prepares element ids and names
 						body.attr('id', clusters[i].name).find('[type="radio"]').each(function () {
 						    $(this).attr('id', $(this).attr('id') + clusters[i].name);
@@ -288,6 +296,7 @@
 			$('#addInstanceDialog .togglePlatformSelectionRow input[id*="togglePlatformRadioOff_"]').attr('checked',true).button("refresh");
 			$('#addInstanceDialog .imageTypeRow input[id*="imageTypeEphemeral_"]').attr('checked',true).button("refresh");
 			$('#addInstanceDialog .toggleEbsRow input[id*="toggleEbsRadioOff_"]').attr('checked',true).button("refresh");
+            $('#addInstanceDialog .toggleSolrRow input[id*="toggleSolrRadioOff_"]').attr('checked',true).button("refresh");
             if (cloudadmin.resource.machineTypes.length > 0) { // select first machine type and reset label if there are any machine types
                 $("#addInstanceDialog .valueDisplayButtonSet").text(cloudadmin.resource.machineTypes[0].specification);
                 $("#addInstanceDialog .machineSizeRow input:first-child").attr('checked',true).button("refresh");
@@ -321,6 +330,7 @@
 					outData[clusters[i].name + "machinesize"] 	= 0;
 					outData[clusters[i].name + "esb"] 		  	= "false";
 					outData[clusters[i].name + "volumesize"]  	= 0;
+                    outData[clusters[i].name + "solr"]          = "false";
 					outData[clusters[i].name + "datasourceurl"] = "";
 				}
 				for(var i = 0; i < clusters.length; i++){
@@ -344,7 +354,10 @@
 						if($('#' + "toggleEbsRadioOn_" + clusters[i].name).attr('checked')){
 							outData[clusters[i].name + "esbvolumesize"] = $('#' + clusters[i].name + ' .ebsSizeRow .jq_slider').parent().next().text();
 						}
-						if($('#' + "toggleDatasourceRadioOn_" + clusters[i].name).attr('checked')){
+                        if($('#' + "toggleSolrRadioOn_" + clusters[i].name).attr('checked')){
+                            outData[clusters[i].name + "solr"] = "true";
+                        }
+                        if($('#' + "toggleDatasourceRadioOn_" + clusters[i].name).attr('checked')){
 							if (!validateField($('#' + "newDatasourceUrlText_" + clusters[i].name))) return;
 							if (!validateField($('#' + "newDatasourceUserNameText_" + clusters[i].name))) return;
 							if (!validateField($('#' + "newDatasourcePasswordText_" + clusters[i].name))) return;

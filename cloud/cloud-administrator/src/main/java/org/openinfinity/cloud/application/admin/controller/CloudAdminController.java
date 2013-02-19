@@ -438,6 +438,9 @@ public class CloudAdminController {
 					job.addParameter(new JobPlatformParameter("portal.datasource.user", pm.get("yaportaldatasourceuser")));
 					job.addParameter(new JobPlatformParameter("portal.datasource.password", pm.get("yaportaldatasourcepassword")));
 				}
+                if ("true".equals(pm.get("yaportalsolr"))) {
+                    job.addParameter(new JobPlatformParameter("portal.solr", "true"));
+                }
 			}
 			
 			boolean withEcmService = "true".equals(pm.get("ecm"));
