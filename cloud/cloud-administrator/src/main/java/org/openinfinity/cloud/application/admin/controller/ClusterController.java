@@ -18,11 +18,8 @@ package org.openinfinity.cloud.application.admin.controller;
 
 import java.io.IOException;
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.HashMap;
@@ -47,9 +44,9 @@ import org.openinfinity.cloud.service.administrator.JobService;
 import org.openinfinity.cloud.service.administrator.MachineService;
 import org.openinfinity.cloud.service.scaling.ScalingRuleService;
 import org.openinfinity.cloud.util.AdminGeneral;
+import org.openinfinity.cloud.util.LiferayService;
 import org.openinfinity.cloud.util.serialization.JsonDataWrapper;
 import org.openinfinity.cloud.util.serialization.SerializerUtil;
-import org.openinfinity.cloud.util.LiferayUtil;
 import org.openinfinity.core.util.ExceptionUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -57,12 +54,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.portlet.bind.annotation.ResourceMapping;
 
 import com.amazonaws.auth.AWSCredentials;
-import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.model.User;
 
 /**
@@ -78,8 +72,12 @@ import com.liferay.portal.model.User;
 @RequestMapping(value = "VIEW")
 public class ClusterController {
 	private static final Logger LOG = Logger.getLogger(ClusterController.class.getName());
-	
-	@Autowired
+
+    @Autowired
+    @Qualifier("liferayService")
+    private LiferayService liferayService;
+
+    @Autowired
 	@Qualifier("clusterService")
 	private ClusterService clusterService;
 	
@@ -122,13 +120,13 @@ public class ClusterController {
 	
 	@ResourceMapping("getElasticIPList")
 	public void getElasticIPList(ResourceRequest request, ResourceResponse response) throws IOException {
-		if (LiferayUtil.getUser(request, response) == null) return;
+		if (liferayService.getUser(request, response) == null) return;
 		SerializerUtil.jsonSerialize(response.getWriter(), arService.getElasticIPList());		
 	}
 	
 	@ResourceMapping("getElasticIPForCluster")
 	public void getElasticIPList(ResourceRequest request, ResourceResponse response, @RequestParam("clusterId") int clusterId) throws Exception {
-		if (LiferayUtil.getUser(request, response) == null) return;		
+		if (liferayService.getUser(request, response) == null) return;
 		Machine lb = clusterService.getClustersLoadBalancer(clusterId);
 		if(lb == null) 
 			response.setProperty(ResourceResponse.HTTP_STATUS_CODE, AdminGeneral.HTTP_ERROR_CODE_SERVER_ERROR);
@@ -148,7 +146,7 @@ public class ClusterController {
 		
 	@ResourceMapping("setElasticIP")
 	public void setElasticIP(ResourceRequest request, ResourceResponse response, @RequestParam("clusterId") int clusterId, @RequestParam("ipId") int ipId) {
-		User user = LiferayUtil.getUser(request, response);
+		User user = liferayService.getUser(request, response);
 		if (user == null) return;
 		try {
 			Cluster c = clusterService.getCluster(clusterId);
@@ -179,7 +177,7 @@ public class ClusterController {
 	
 	@ResourceMapping("removeElasticIP")
 	void removeElasticIP(ResourceRequest request, ResourceResponse response, @RequestParam("clusterId") int clusterId) throws IOException {
-		if (LiferayUtil.getUser(request, response) == null) return;
+		if (liferayService.getUser(request, response) == null) return;
 		try{
 			Cluster c = clusterService.getCluster(clusterId);	
 			Instance tapInstance = instanceService.getInstance(c.getInstanceId());
@@ -204,7 +202,7 @@ public class ClusterController {
 	public void getUserAuthorizedIPsForCluster(ResourceRequest request, ResourceResponse response, 
 		@RequestParam("clusterId") String clusterIdString) throws RuntimeException, Exception {
 		
-		if (LiferayUtil.getUser(request, response) == null) return;
+		if (liferayService.getUser(request, response) == null) return;
 		int clusterId = Integer.parseInt(clusterIdString);
 		arService.getUserAuthorizedIPsForCluster(clusterId);
 		SerializerUtil.jsonSerialize(response.getWriter(), arService.getUserAuthorizedIPsForCluster(clusterId));			
@@ -219,7 +217,7 @@ public class ClusterController {
 			@RequestParam("portTo") int portTo,
 			@RequestParam("protocol") String protocol){		
 		try{
-			if (LiferayUtil.getUser(request, response) == null) return;
+			if (liferayService.getUser(request, response) == null) return;
 			Cluster c = clusterService.getCluster(clusterId);
 			Instance tapInstance = instanceService.getInstance(c.getInstanceId());
 			
@@ -247,7 +245,7 @@ public class ClusterController {
 		@RequestParam("portTo") int toPort,
 		@RequestParam("protocol") String protocol) throws RuntimeException, Exception {
 		try{
-			if (LiferayUtil.getUser(request, response) == null) return;
+			if (liferayService.getUser(request, response) == null) return;
 			String securityGroupName = clusterService.getCluster(clusterId).getSecurityGroupName();
 			
 			Cluster c = clusterService.getCluster(clusterId);
@@ -274,7 +272,7 @@ public class ClusterController {
 	
 	@ResourceMapping("updatePublished")
 	public void updatePublished(ResourceRequest request, ResourceResponse response, @RequestParam("clusterId") int clusterId, @RequestParam("pubId") int pubId) throws Exception {
-		if (LiferayUtil.getUser(request, response) == null) return;
+		if (liferayService.getUser(request, response) == null) return;
 		LOG.info("Updating cluster ("+clusterId+") to publish status: "+pubId);
 		Cluster cluster = clusterService.getCluster(clusterId);
 		if(cluster == null) {
@@ -312,7 +310,7 @@ public class ClusterController {
 		@RequestParam("scheduledScaling") boolean scheduledScalingOn) {
 		
 		try {
-			if (LiferayUtil.getUser(request, response) == null) return;
+			if (liferayService.getUser(request, response) == null) return;
 			Cluster cluster = clusterService.getCluster(clusterId);
 			Instance instance = instanceService.getInstance(cluster.getInstanceId());
 			
@@ -383,7 +381,7 @@ public class ClusterController {
 	
 	@ResourceMapping("getClusterInfo")
 	public void getClusterInfo(ResourceRequest request, ResourceResponse response, @RequestParam("clusterId") int clusterId) throws Exception {
-		if (LiferayUtil.getUser(request, response) == null) return;
+		if (liferayService.getUser(request, response) == null) return;
 		LOG.info("Getting cluster information, clusterId: "+clusterId);
 		Cluster cluster = clusterService.getCluster(clusterId);
 		TreeMap<String,String> clusterData = new TreeMap<String,String>();
@@ -398,7 +396,7 @@ public class ClusterController {
 	
 	@ResourceMapping("getClusterStatus")
 	public void getClusterStatus(ResourceRequest request, ResourceResponse response, @RequestParam("clusterId") int clusterId) throws Exception {
-		if (LiferayUtil.getUser(request, response) == null) return;
+		if (liferayService.getUser(request, response) == null) return;
 		Cluster cluster = clusterService.getCluster(clusterId);
 		if(cluster == null) {
 			return;
@@ -435,7 +433,7 @@ public class ClusterController {
 	
 	@ResourceMapping("deleteCluster")
 	public void deleteCluster(ResourceRequest request, ResourceResponse response, @RequestParam("clusterId")int clusterId) throws Exception {
-		if (LiferayUtil.getUser(request, response) == null) ExceptionUtil.throwBusinessViolationException("User not logged in");
+		if (liferayService.getUser(request, response) == null) ExceptionUtil.throwBusinessViolationException("User not logged in");
 		Cluster cluster = clusterService.getCluster(clusterId);
 		if (cluster == null) ExceptionUtil.throwApplicationException("Cluster with id " + clusterId + " not found in DB");
 		int instanceId = cluster.getInstanceId();
@@ -446,7 +444,7 @@ public class ClusterController {
 
 	@ResourceMapping("getClusterScalingRule")
 	public void getClusterScalingRule(ResourceRequest request, ResourceResponse response, @RequestParam("clusterId") int clusterId) throws Exception {
-		if (LiferayUtil.getUser(request, response) == null) return;
+		if (liferayService.getUser(request, response) == null) return;
 		
 		Cluster cluster = clusterService.getCluster(clusterId);
 		if (cluster == null) ExceptionUtil.throwApplicationException("Cluster with cluster_id: " + clusterId + "not found in DB");

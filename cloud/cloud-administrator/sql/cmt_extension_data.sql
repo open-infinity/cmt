@@ -3,9 +3,9 @@
 insert into cloud_provider_tbl (id, name) values(0, 'Amazon');
 insert into cloud_provider_tbl (id, name) values(1, 'Eucalyptus');
 
-insert into availability_zone_tbl (id, cloud_id, name) value(1, 0, "aws-cluster01");
-insert into availability_zone_tbl (id, cloud_id, name) value(2, 0, "aws-cluster01");
-insert into availability_zone_tbl (id, cloud_id, name) value(3, 1, "dev-cluster01");
+insert into availability_zone_tbl (id, cloud_id, name) values(1, 0, "aws-cluster01");
+insert into availability_zone_tbl (id, cloud_id, name) values(2, 0, "aws-cluster01");
+insert into availability_zone_tbl (id, cloud_id, name) values(3, 1, "dev-cluster01");
 
 insert into machine_type_tbl values (0, "Small", "Cores: 1, RAM: 1GB, Disk: 10GB");
 insert into machine_type_tbl values (1, "Medium", "Cores: 2, RAM: 2GB, Disk: 10GB");

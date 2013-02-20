@@ -43,7 +43,7 @@ import org.openinfinity.cloud.domain.Key;
 import org.openinfinity.cloud.service.administrator.*;
 import org.openinfinity.cloud.util.AdminException;
 import org.openinfinity.cloud.util.AdminGeneral;
-import org.openinfinity.cloud.util.LiferayUtil;
+import org.openinfinity.cloud.util.LiferayService;
 import org.openinfinity.cloud.util.collection.ListUtil;
 import org.openinfinity.cloud.util.serialization.JsonDataWrapper;
 import org.openinfinity.cloud.util.serialization.SerializerUtil;
@@ -82,6 +82,11 @@ public class CloudAdminController {
 	private static final String MSG_INSTANCE_WRITING_ERROR = "Error writing instance data to HTTP response";
 	private static final String MSG_HTTP_REPLY_WRITING_ERROR = "Error while writing the http reply";
 	private static final int CLUSTER_CONFIGURATION_DEFAULT = 1;
+
+    @Autowired
+    @Qualifier("liferayService")
+    private LiferayService liferayService;
+
 	
 	@Autowired
 	@Qualifier("instanceService")
@@ -115,12 +120,9 @@ public class CloudAdminController {
 	@Qualifier("availabilityZoneService")
 	private AvailabilityZoneService zoneService;
 	
-	@Value("${zonelist}")
-	private List<String> eucaZones;
-	
 	@RenderMapping
 	public String showView(RenderRequest request, RenderResponse response) {
-		User user = LiferayUtil.getUser(request);
+		User user = liferayService.getUser(request);
 		if(user == null) {
 			response.setProperty(ResourceResponse.HTTP_STATUS_CODE, AdminGeneral.HTTP_ERROR_CODE_USER_NOT_LOGGED_IN);
 			return "notlogged";
@@ -131,7 +133,7 @@ public class CloudAdminController {
 	@ResourceMapping("instanceList")
 	public void getInstanceList(ResourceRequest request, ResourceResponse response) throws Exception {
 		LOG.debug("getInstanceList()");
-		User user = LiferayUtil.getUser(request, response);
+		User user = liferayService.getUser(request, response);
 		if (user == null) return;
 		Collection<Instance> instanceList = instanceService.getInstances(user.getUserId());
 		SerializerUtil.jsonSerialize(response.getWriter(), instanceList);
@@ -141,7 +143,7 @@ public class CloudAdminController {
 	@ResourceMapping("instanceTable")
 	public void getInstanceTable(ResourceRequest request, ResourceResponse response, @RequestParam("page") int page, @RequestParam("rows") int rows) throws Exception {
 		LOG.debug("getInstanceTable()");
-		User user  = LiferayUtil.getUser(request, response);
+		User user  = liferayService.getUser(request, response);
 		if (user == null) return;
 		List<Organization> organizationList = null;
 		List<Organization> subOrganizationList = null;
@@ -215,7 +217,7 @@ public class CloudAdminController {
 	@ResourceMapping("getInstanceKey")
 	public void getInstanceKey(ResourceRequest request, ResourceResponse response, @RequestParam("id") int instanceId) throws IOException {
 		LOG.debug("getInstanceKey()");
-		User user = LiferayUtil.getUser(request, response);
+		User user = liferayService.getUser(request, response);
 		if (user == null) return;	
 		Instance instance = instanceService.getInstance(instanceId);
 		if(instance == null) {
@@ -244,7 +246,7 @@ public class CloudAdminController {
 	@ResourceMapping("instance")
 	public void getInstance(ResourceRequest request, ResourceResponse response, @RequestParam("id") int instanceId) throws Exception {
 		LOG.debug("getInstance()");
-		if (LiferayUtil.getUser(request, response) == null) return;
+		if (liferayService.getUser(request, response) == null) return;
 		Instance instance = instanceService.getInstance(instanceId);
 		LOG.info("Found instance : "+instance.getName() + " Id: "+instance.getInstanceId());	
 		ObjectMapper mapper = new ObjectMapper();
@@ -260,9 +262,9 @@ public class CloudAdminController {
 	@ResourceMapping("getCloudProviders")
 	public void getCloudProviders(ResourceRequest request, ResourceResponse response) throws Exception {
 		LOG.debug("getCloudProviders()");
-        User user = LiferayUtil.getUser(request, response);
+        User user = liferayService.getUser(request, response);
 		if (user == null) return;
-        List<String> userOrgNames = getOrganizationNames(user);
+        List<String> userOrgNames = liferayService.getOrganizationNames(user);
 		Collection<CloudProvider> providers = cloudService.getCloudProviders(userOrgNames);
 		try {
 			SerializerUtil.jsonSerialize(response.getWriter(), providers);
@@ -276,9 +278,9 @@ public class CloudAdminController {
 	@ResourceMapping("getCloudZones")
 	public void getCloudZones(ResourceRequest request, ResourceResponse response, @RequestParam("cloud") int cloudId) throws Exception {
 		LOG.debug("getCloudZones()");
-        User user = LiferayUtil.getUser(request, response);
+        User user = liferayService.getUser(request, response);
         if (user == null) return;
-        List<String> userOrgNames = getOrganizationNames(user);
+        List<String> userOrgNames = liferayService.getOrganizationNames(user);
         Collection<AvailabilityZone> zones = zoneService.getAvailabilityZones(cloudId, userOrgNames);
 		try {
 			SerializerUtil.jsonSerialize(response.getWriter(), zones);
@@ -293,13 +295,13 @@ public class CloudAdminController {
 	public void getAvailableServices(ResourceRequest request, ResourceResponse response, @RequestParam("id") int instanceId) throws Exception {
 		LOG.debug("getAvailableServices()");
 		
-		User user = LiferayUtil.getUser(request, response);
+		User user = liferayService.getUser(request, response);
 		if (user == null) return;
 
 		Instance instance = instanceService.getInstance(instanceId);
 		Collection<Cluster> clusterList = clusterService.getClusters(instance.getInstanceId());
 		
-		List<String> userOrgNames = getOrganizationNames(user);
+		List<String> userOrgNames = liferayService.getOrganizationNames(user);
 		LOG.info("user organizations: " + userOrgNames);
 		Collection<ClusterType> clusterTypeList = clusterTypeService.getAvailableClusterTypes(userOrgNames);
 		HashMap<Integer,String> serviceMap = new HashMap<Integer,String>();
@@ -336,7 +338,7 @@ public class CloudAdminController {
 		@RequestParam("id") int instanceId) {
 		
 		try {
-			if (LiferayUtil.getUser(request, response) == null) 
+			if (liferayService.getUser(request, response) == null)
 				throw new AdminException("User not logged in");
 			
 			Instance instance = instanceService.getInstance(instanceId);
@@ -364,7 +366,7 @@ public class CloudAdminController {
 	public void deleteInstance(ResourceRequest request, ResourceResponse response, @RequestParam("id") int instanceId) throws Exception {
 		LOG.info("deleteInstance() for instance id: " + instanceId);
 
-		if (LiferayUtil.getUser(request, response) == null) return;	
+		if (liferayService.getUser(request, response) == null) return;
 		Instance instance = instanceService.getInstance(instanceId);
 		if(instance != null) {
 			instanceService.updateInstanceStatus(instanceId, "Deleting");		
@@ -378,7 +380,7 @@ public class CloudAdminController {
 		try{
 			LOG.error("addInstance " + pm);
 			
-			User user = LiferayUtil.getUser(request, response);
+			User user = liferayService.getUser(request, response);
 			if (user == null) throw new AdminException("User not logged in");
 			Instance instance = new Instance();
 			instance.setName(pm.get("instancename"));
@@ -482,7 +484,7 @@ public class CloudAdminController {
 	
 	@ResourceMapping("availableClusters")
 	public void instanceContent(ResourceRequest request, ResourceResponse response, @RequestParam("instanceId") int instanceId) throws Exception {
-		if (LiferayUtil.getUser(request, response) == null) return;
+		if (liferayService.getUser(request, response) == null) return;
 		Collection<Cluster> clusterList = clusterService.getClusters(instanceId);
 		if(clusterList !=  null) SerializerUtil.jsonSerialize(response.getWriter(), clusterList);
 		else return;
@@ -490,7 +492,7 @@ public class CloudAdminController {
 
 	@ResourceMapping("instanceStatus")
 	public void instanceStatus(ResourceRequest request, ResourceResponse response, @RequestParam("instanceId") int instanceId) throws Exception {
-		if (LiferayUtil.getUser(request, response) == null) return;
+		if (liferayService.getUser(request, response) == null) return;
 		try {
 			Instance instance = instanceService.getInstance(instanceId);	
 			if(instance != null) response.getWriter().write(instance.getStatus());
@@ -505,9 +507,9 @@ public class CloudAdminController {
 	
 	@ResourceMapping("getClusterTypes")
 	public void getClusterTypes(ResourceRequest request, ResourceResponse response) throws Exception {
-		User user = LiferayUtil.getUser(request, response);
+		User user = liferayService.getUser(request, response);
 		if (user == null) return;
-		List<String> userOrgNames = getOrganizationNames(user);
+		List<String> userOrgNames = liferayService.getOrganizationNames(user);
 		LOG.info("user organizations: " + userOrgNames);
 		Collection<ClusterType> clusterTypeList = clusterTypeService.getAvailableClusterTypes(userOrgNames);
 		if(clusterTypeList !=  null) SerializerUtil.jsonSerialize(response.getWriter(), clusterTypeList);
@@ -516,21 +518,11 @@ public class CloudAdminController {
 	
 	@ResourceMapping("getMachineTypes")
 	public void getMachineTypes(ResourceRequest request, ResourceResponse response) throws Exception {
-        User user = LiferayUtil.getUser(request, response);
+        User user = liferayService.getUser(request, response);
         if (user == null) return;
-        List<String> userOrgNames = getOrganizationNames(user);
+        List<String> userOrgNames = liferayService.getOrganizationNames(user);
         SerializerUtil.jsonSerialize(response.getWriter(), machineTypeService.getMachineTypes(userOrgNames));
 	}
 	
-	private List<String> getOrganizationNames(User user) throws Exception {
-		List<Organization> userOrganizations = user.getOrganizations();
-		List<Organization> subOrganizations = OrganizationLocalServiceUtil.getSuborganizations(userOrganizations);
-		
-		List<String> orgNames = new LinkedList<String>();
-		for (Organization org : userOrganizations)
-			orgNames.add(org.getName());
-		for (Organization subOrg : subOrganizations)
-			orgNames.add(subOrg.getName());
-		return orgNames;
-	}
+
 }
