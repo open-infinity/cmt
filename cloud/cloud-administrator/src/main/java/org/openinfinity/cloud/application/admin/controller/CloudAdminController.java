@@ -424,9 +424,9 @@ public class CloudAdminController {
 				job.addService(ClusterService.SERVICE_NAME[ClusterService.CLUSTER_TYPE_YA_SERVICE],	pm.get("jbossserviceclustersize"), pm.get("jbossservicemachinesize"),
 					pm.get("jbossserviceimagetype"), pm.get("jbossserviceesbvolumesize"));
 				if (pm.get("jbossservicedatasourceurl").length() > 0) {
-					job.addParameter(new JobPlatformParameter("service.datasource.url", pm.get("jbossservicedatasourceurl")));
-					job.addParameter(new JobPlatformParameter("service.datasource.user", pm.get("jbossservicedatasourceuser")));
-					job.addParameter(new JobPlatformParameter("service.datasource.password", pm.get("jbossservicedatasourcepassword")));
+					job.addParameter(new JobPlatformParameter("service_datasource_url", pm.get("jbossservicedatasourceurl")));
+					job.addParameter(new JobPlatformParameter("service_datasource_user", pm.get("jbossservicedatasourceuser")));
+					job.addParameter(new JobPlatformParameter("service_datasource_password", pm.get("jbossservicedatasourcepassword")));
 				}			
 			}			
 
@@ -434,15 +434,15 @@ public class CloudAdminController {
 				job.addService(ClusterService.SERVICE_NAME[ClusterService.CLUSTER_TYPE_YA_PORTAL],	pm.get("jbossportalclustersize"), pm.get("jbossportalmachinesize"),
 					pm.get("jbossportalimagetype"), pm.get("jbossportalesbvolumesize"));
 				if ("true".equals(pm.get("jbossportalliveinstance"))) {
-					job.addParameter(new JobPlatformParameter("portal.live", pm.get("jbossportalliveinstance")));
+					job.addParameter(new JobPlatformParameter("portal_live", pm.get("jbossportalliveinstance")));
 				}
 				if (pm.get("jbossportaldatasourceurl").length() > 0) {
-					job.addParameter(new JobPlatformParameter("portal.datasource.url", pm.get("jbossportaldatasourceurl")));
-					job.addParameter(new JobPlatformParameter("portal.datasource.user", pm.get("jbossportaldatasourceuser")));
-					job.addParameter(new JobPlatformParameter("portal.datasource.password", pm.get("jbossportaldatasourcepassword")));
+					job.addParameter(new JobPlatformParameter("portal_datasource_url", pm.get("jbossportaldatasourceurl")));
+					job.addParameter(new JobPlatformParameter("portal_datasource_user", pm.get("jbossportaldatasourceuser")));
+					job.addParameter(new JobPlatformParameter("portal_datasource_password", pm.get("jbossportaldatasourcepassword")));
 				}
                 if ("true".equals(pm.get("jbossportalsolr"))) {
-                    job.addParameter(new JobPlatformParameter("portal.solr", "true"));
+                    job.addParameter(new JobPlatformParameter("portal_solr", "true"));
                 }
 			}
 			
