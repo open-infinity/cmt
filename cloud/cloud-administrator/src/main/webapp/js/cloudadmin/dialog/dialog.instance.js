@@ -337,8 +337,7 @@
 					outData[clusters[i].name + "machinesize"] 	= 0;
 					outData[clusters[i].name + "esb"] 		  	= "false";
 					outData[clusters[i].name + "volumesize"]  	= 0;
-                    outData[clusters[i].name + "solr"]          = "false";
-					outData[clusters[i].name + "datasourceurl"] = "";
+                  	outData[clusters[i].name + "datasourceurl"] = "";
 				}
 				for(var i = 0; i < clusters.length; i++){
 					if($('#' + "togglePlatformRadioOn_" + clusters[i].name).attr('checked')){

@@ -1,27 +1,8 @@
--- MySQL dump 10.13  Distrib 5.1.61, for debian-linux-gnu (x86_64)
---
--- Host: localhost    Database: cloudadmindata
--- ------------------------------------------------------
--- Server version	5.1.61-0+squeeze1
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8 */;
-/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
-/*!40103 SET TIME_ZONE='+00:00' */;
-/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
-/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
-/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
-/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
-
---
--- Table structure for table `DEPLOYMENT`
---
-
+/*
+NOTE THAT THIS SCRIPT HAS H2 VERSION IN H2 -FOLDER WHICH SHOULD BE KEPT IN SYNC WITH THIS FILE.
+ */
 DROP TABLE IF EXISTS `DEPLOYMENT`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+
 CREATE TABLE `DEPLOYMENT` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `state` int(11) NOT NULL,
@@ -33,12 +14,9 @@ CREATE TABLE `DEPLOYMENT` (
   `cur_timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
 
 DROP TABLE IF EXISTS `authorized_ip_tbl`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+
 CREATE TABLE `authorized_ip_tbl` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `instance_id` int(11) DEFAULT NULL,
@@ -50,12 +28,9 @@ CREATE TABLE `authorized_ip_tbl` (
   `to_port` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
 
 DROP TABLE IF EXISTS `cluster_tbl`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+
 CREATE TABLE `cluster_tbl` (
   `cluster_id` int(11) NOT NULL AUTO_INCREMENT,
   `cluster_name` varchar(255) DEFAULT NULL,
@@ -73,11 +48,9 @@ CREATE TABLE `cluster_tbl` (
   `cluster_machine_type` tinyint(4) DEFAULT NULL,
   PRIMARY KEY (`cluster_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
 DROP TABLE IF EXISTS `elastic_ip_tbl`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+
 CREATE TABLE `elastic_ip_tbl` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `instance_id` int(11) DEFAULT NULL,
@@ -90,12 +63,9 @@ CREATE TABLE `elastic_ip_tbl` (
   `organization_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
 
 DROP TABLE IF EXISTS `instance_tbl`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+
 CREATE TABLE `instance_tbl` (
   `instance_id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) DEFAULT NULL,
@@ -107,16 +77,9 @@ CREATE TABLE `instance_tbl` (
   `instance_active` int(11) DEFAULT NULL,
   PRIMARY KEY (`instance_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
-
---
--- Table structure for table `job_tbl`
---
 
 DROP TABLE IF EXISTS `job_tbl`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+
 CREATE TABLE `job_tbl` (
   `job_id` int(11) NOT NULL AUTO_INCREMENT,
   `job_type` varchar(50) DEFAULT NULL,
@@ -131,15 +94,9 @@ CREATE TABLE `job_tbl` (
   `job_end_time` datetime DEFAULT NULL,
   PRIMARY KEY (`job_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `key_tbl`
---
 
 DROP TABLE IF EXISTS `key_tbl`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+
 CREATE TABLE `key_tbl` (
   `key_id` int(11) NOT NULL AUTO_INCREMENT,
   `instance_id` int(11) DEFAULT NULL,
@@ -148,15 +105,9 @@ CREATE TABLE `key_tbl` (
   `key_name` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`key_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `machine_tbl`
---
 
 DROP TABLE IF EXISTS `machine_tbl`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+
 CREATE TABLE `machine_tbl` (
   `machine_id` int(11) NOT NULL AUTO_INCREMENT,
   `machine_instance_id` varchar(50) DEFAULT NULL,
@@ -176,15 +127,9 @@ CREATE TABLE `machine_tbl` (
   `machine_cloud_type` int(11) DEFAULT NULL,
   PRIMARY KEY (`machine_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `user_authorized_ip_tbl`
---
 
 DROP TABLE IF EXISTS `user_authorized_ip_tbl`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+
 CREATE TABLE `user_authorized_ip_tbl` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `instance_id` int(11) DEFAULT NULL,
@@ -196,20 +141,6 @@ CREATE TABLE `user_authorized_ip_tbl` (
   `to_port` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-/*!40101 SET character_set_client = @saved_cs_client */;
-
-/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
-
-/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
-/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
-/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
-
--- Dump completed on 2012-05-10 14:01:55
 
 DROP TABLE IF EXISTS `scaling_rule_tbl`;
 	
@@ -244,3 +175,77 @@ CREATE TABLE `cluster_type_tbl` (
   `min_repl_machines` int(11) DEFAULT NULL,
   `max_repl_machines` int(11) DEFAULT NULL,  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `cloud_provider_tbl`;
+
+CREATE TABLE `cloud_provider_tbl` (
+  `id` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `availability_zone_tbl`;
+
+CREATE TABLE `availability_zone_tbl` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `cloud_id` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`),
+  CONSTRAINT fk_zone_cloud FOREIGN KEY (cloud_id) REFERENCES cloud_provider_tbl(id)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `machine_type_tbl`;
+
+CREATE TABLE `machine_type_tbl` (
+  `id` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `spec` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `acl_cluster_type_tbl`;
+
+CREATE TABLE `acl_cluster_type_tbl` (
+  `org_name` varchar(50) NOT NULL,
+  `cluster_id` int(11) NOT NULL,
+  PRIMARY KEY (`org_name`, `cluster_id`),
+  CONSTRAINT fk_acl_cluster_type FOREIGN KEY (cluster_id) REFERENCES cluster_type_tbl(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `acl_cloud_provider_tbl`;
+
+CREATE TABLE `acl_cloud_provider_tbl` (
+  `org_name` varchar(50) NOT NULL,
+  `cloud_id` int(11) NOT NULL,
+  PRIMARY KEY (`org_name`, `cloud_id`),
+  CONSTRAINT fk_acl_cloud_provider FOREIGN KEY (cloud_id) REFERENCES cloud_provider_tbl(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `acl_availability_zone_tbl`;
+
+CREATE TABLE `acl_availability_zone_tbl` (
+  `org_name` varchar(50) NOT NULL,
+  `zone_id` int(11) NOT NULL,
+  PRIMARY KEY (`org_name`, `zone_id`),
+  CONSTRAINT fk_acl_availability_zone FOREIGN KEY (zone_id) REFERENCES availability_zone_tbl(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `acl_machine_type_tbl`;
+
+CREATE TABLE `acl_machine_type_tbl` (
+  `org_name` varchar(50) NOT NULL,
+  `machine_type_id` int(11) NOT NULL,
+  PRIMARY KEY (`org_name`, `machine_type_id`),
+  CONSTRAINT fk_acl_machine_type FOREIGN KEY (machine_type_id) REFERENCES machine_type_tbl(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `job_platform_parameter_tbl`;
+
+CREATE TABLE `job_platform_parameter_tbl` (
+  `id` int(11) AUTO_INCREMENT,
+  `job_id` int(11),
+  `pkey` varchar(255) NOT NULL,
+  `pvalue` varchar(1000),
+  PRIMARY KEY (`id`),
+  CONSTRAINT fk_job_plaform FOREIGN KEY (job_id) REFERENCES job_tbl(job_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

@@ -1,3 +1,11 @@
+/*
+PATCHED FILE FOR H2 USE
+FOLLOWING PATCHES ARE REQUIRED:
+- REMOVE "ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8" STUFF
+- REMOVE "ON UPDATE CURRENT_TIMESTAMP" FROM LINES LIKE THIS: `cur_timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+ */
+DROP TABLE IF EXISTS `DEPLOYMENT`;
+
 CREATE TABLE `DEPLOYMENT` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `state` int(11) NOT NULL,
@@ -10,6 +18,8 @@ CREATE TABLE `DEPLOYMENT` (
   PRIMARY KEY (`id`)
 );
 
+DROP TABLE IF EXISTS `authorized_ip_tbl`;
+
 CREATE TABLE `authorized_ip_tbl` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `instance_id` int(11) DEFAULT NULL,
@@ -21,6 +31,8 @@ CREATE TABLE `authorized_ip_tbl` (
   `to_port` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
 );
+
+DROP TABLE IF EXISTS `cluster_tbl`;
 
 CREATE TABLE `cluster_tbl` (
   `cluster_id` int(11) NOT NULL AUTO_INCREMENT,
@@ -40,6 +52,8 @@ CREATE TABLE `cluster_tbl` (
   PRIMARY KEY (`cluster_id`)
 );
 
+DROP TABLE IF EXISTS `elastic_ip_tbl`;
+
 CREATE TABLE `elastic_ip_tbl` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `instance_id` int(11) DEFAULT NULL,
@@ -53,6 +67,8 @@ CREATE TABLE `elastic_ip_tbl` (
   PRIMARY KEY (`id`)
 );
 
+DROP TABLE IF EXISTS `instance_tbl`;
+
 CREATE TABLE `instance_tbl` (
   `instance_id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) DEFAULT NULL,
@@ -65,6 +81,7 @@ CREATE TABLE `instance_tbl` (
   PRIMARY KEY (`instance_id`)
 );
 
+DROP TABLE IF EXISTS `job_tbl`;
 
 CREATE TABLE `job_tbl` (
   `job_id` int(11) NOT NULL AUTO_INCREMENT,
@@ -81,6 +98,8 @@ CREATE TABLE `job_tbl` (
   PRIMARY KEY (`job_id`)
 );
 
+DROP TABLE IF EXISTS `key_tbl`;
+
 CREATE TABLE `key_tbl` (
   `key_id` int(11) NOT NULL AUTO_INCREMENT,
   `instance_id` int(11) DEFAULT NULL,
@@ -89,6 +108,8 @@ CREATE TABLE `key_tbl` (
   `key_name` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`key_id`)
 );
+
+DROP TABLE IF EXISTS `machine_tbl`;
 
 CREATE TABLE `machine_tbl` (
   `machine_id` int(11) NOT NULL AUTO_INCREMENT,
@@ -110,6 +131,8 @@ CREATE TABLE `machine_tbl` (
   PRIMARY KEY (`machine_id`)
 );
 
+DROP TABLE IF EXISTS `user_authorized_ip_tbl`;
+
 CREATE TABLE `user_authorized_ip_tbl` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `instance_id` int(11) DEFAULT NULL,
@@ -122,6 +145,8 @@ CREATE TABLE `user_authorized_ip_tbl` (
   PRIMARY KEY (`id`)
 );
 
+DROP TABLE IF EXISTS `scaling_rule_tbl`;
+	
 CREATE TABLE `scaling_rule_tbl` (
   `cluster_id` int(11) NOT NULL,
   `periodic` boolean DEFAULT NULL,
@@ -139,6 +164,8 @@ CREATE TABLE `scaling_rule_tbl` (
   PRIMARY KEY (`cluster_id`)
 );
 
+DROP TABLE IF EXISTS `cluster_type_tbl`;
+	
 CREATE TABLE `cluster_type_tbl` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `configuration_id` int(11) DEFAULT NULL,
@@ -150,4 +177,78 @@ CREATE TABLE `cluster_type_tbl` (
   `max_machines` int(11) DEFAULT NULL,
   `min_repl_machines` int(11) DEFAULT NULL,
   `max_repl_machines` int(11) DEFAULT NULL,  PRIMARY KEY (`id`)
+);
+
+DROP TABLE IF EXISTS `cloud_provider_tbl`;
+
+CREATE TABLE `cloud_provider_tbl` (
+  `id` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`)
+);
+
+DROP TABLE IF EXISTS `availability_zone_tbl`;
+
+CREATE TABLE `availability_zone_tbl` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `cloud_id` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`),
+  CONSTRAINT fk_zone_cloud FOREIGN KEY (cloud_id) REFERENCES cloud_provider_tbl(id)
+);
+
+DROP TABLE IF EXISTS `machine_type_tbl`;
+
+CREATE TABLE `machine_type_tbl` (
+  `id` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `spec` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`)
+);
+
+DROP TABLE IF EXISTS `acl_cluster_type_tbl`;
+
+CREATE TABLE `acl_cluster_type_tbl` (
+  `org_name` varchar(50) NOT NULL,
+  `cluster_id` int(11) NOT NULL,
+  PRIMARY KEY (`org_name`, `cluster_id`),
+  CONSTRAINT fk_acl_cluster_type FOREIGN KEY (cluster_id) REFERENCES cluster_type_tbl(id)
+);
+
+DROP TABLE IF EXISTS `acl_cloud_provider_tbl`;
+
+CREATE TABLE `acl_cloud_provider_tbl` (
+  `org_name` varchar(50) NOT NULL,
+  `cloud_id` int(11) NOT NULL,
+  PRIMARY KEY (`org_name`, `cloud_id`),
+  CONSTRAINT fk_acl_cloud_provider FOREIGN KEY (cloud_id) REFERENCES cloud_provider_tbl(id)
+);
+
+DROP TABLE IF EXISTS `acl_availability_zone_tbl`;
+
+CREATE TABLE `acl_availability_zone_tbl` (
+  `org_name` varchar(50) NOT NULL,
+  `zone_id` int(11) NOT NULL,
+  PRIMARY KEY (`org_name`, `zone_id`),
+  CONSTRAINT fk_acl_availability_zone FOREIGN KEY (zone_id) REFERENCES availability_zone_tbl(id)
+);
+
+DROP TABLE IF EXISTS `acl_machine_type_tbl`;
+
+CREATE TABLE `acl_machine_type_tbl` (
+  `org_name` varchar(50) NOT NULL,
+  `machine_type_id` int(11) NOT NULL,
+  PRIMARY KEY (`org_name`, `machine_type_id`),
+  CONSTRAINT fk_acl_machine_type FOREIGN KEY (machine_type_id) REFERENCES machine_type_tbl(id)
+);
+
+DROP TABLE IF EXISTS `job_platform_parameter_tbl`;
+
+CREATE TABLE `job_platform_parameter_tbl` (
+  `id` int(11) AUTO_INCREMENT,
+  `job_id` int(11),
+  `pkey` varchar(255) NOT NULL,
+  `pvalue` varchar(1000),
+  PRIMARY KEY (`id`),
+  CONSTRAINT fk_job_plaform FOREIGN KEY (job_id) REFERENCES job_tbl(job_id)
 );

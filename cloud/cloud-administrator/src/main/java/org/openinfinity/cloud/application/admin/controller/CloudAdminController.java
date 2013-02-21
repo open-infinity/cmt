@@ -378,7 +378,7 @@ public class CloudAdminController {
 	@ResourceMapping("addInstance")
 	public void addInstance(ResourceRequest request, ResourceResponse response, @RequestParam Map<String, String> pm){
 		try{
-			LOG.error("addInstance " + pm);
+			LOG.info("addInstance " + pm);
 			
 			User user = liferayService.getUser(request, response);
 			if (user == null) throw new AdminException("User not logged in");
@@ -393,7 +393,7 @@ public class CloudAdminController {
 			instance.setCloudType(Integer.parseInt(pm.get("cloudtype")));
 			instance.setStatus("Starting");
 			instanceService.addInstance(instance);			
-			
+
 			Job job = new Job(	"create_instance", 
 								instance.getInstanceId(), 
 								instance.getCloudType(), 
@@ -472,7 +472,7 @@ public class CloudAdminController {
 			jobService.addJob(job);
 			
 		} catch (Exception e) {
-			LOG.error("Error setting up the instance: "+e.getMessage());
+			LOG.error("Error setting up the instance: "+e.getMessage(), e);
 			response.setProperty(ResourceResponse.HTTP_STATUS_CODE, "421");
 			try {
 				response.getWriter().write(e.getMessage());

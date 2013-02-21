@@ -14,31 +14,13 @@
 
     <context:property-override location="classpath:override.properties"/>
 
-    <!--
-    <context:property-placeholder location="classpath:override.properties,
-	     classpath*:infrastructure.properties,
-	     classpath*:EucaCredentials.properties,
-	     classpath*:infrastructure.properties" />-->
-    <!--
-    <jdbc:embedded-database id="cloudDataSource" type="H2">
-        <jdbc:script location="${sql.script.path}/cloudadmindata.sql"/>
-        <jdbc:script location="${sql.script.path}/cmt_extension_schema.sql"/>
-        <jdbc:script location="${sql.script.path}/populate.sql"/>
-        <jdbc:script location="${sql.script.path}/cmt_extension_data.sql"/>
-    </jdbc:embedded-database>
-    -->
-    <jdbc:initialize-database data-source="cloudDataSource" >
-        <!--
-        <jdbc:script location="file:${sql.script.path}/cloudadmindata.sql"/>
-        <jdbc:script location="file:${sql.script.path}/cmt_extension_schema.sql"/>
-        <jdbc:script location="file:${sql.script.path}/populate.sql"/>
-        <jdbc:script location="file:${sql.script.path}/cmt_extension_data.sql"/>
-        -->
-        <jdbc:script location="sql/cloudadmindata.sql"/>
-        <jdbc:script location="sql/cmt_extension_schema.sql"/>
-        <jdbc:script location="sql/populate.sql"/>
-        <jdbc:script location="sql/cmt_extension_data.sql"/>
-
+    <jdbc:initialize-database data-source="cloudDataSource">
+        <jdbc:script location="file:${sql.script.path}/H2/create_tables.sql"/>
+        <jdbc:script location="sql/H2/populate_tables.sql"/>
     </jdbc:initialize-database>
+
+    <bean id="testJdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <property name="dataSource" ref="cloudDataSource"/>
+    </bean>
 
 </beans>

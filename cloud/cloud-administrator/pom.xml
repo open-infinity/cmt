@@ -13,7 +13,7 @@
     <properties>
         <liferay.version>6.0.6</liferay.version>
         <springframework.version>3.1.1.RELEASE</springframework.version>
-        <sql.script.path>${basedir}/sql</sql.script.path>
+        <sql.script.path>${project.parent.basedir}/cloud-repository/src/test/resources/sql</sql.script.path>
     </properties>
 
     <build>

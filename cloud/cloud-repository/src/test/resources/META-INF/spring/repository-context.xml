@@ -19,9 +19,9 @@
       <property name="driverClassName" value="org.h2.Driver"/>
       <property name="url" value="jdbc:h2:mem:testdb;MODE=MySQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE" />
     </bean>
+
     <jdbc:initialize-database data-source="cloudDataSource">
-  		<jdbc:script location="classpath:sql/cloudadmindata.sql"/>
-  		<jdbc:script location="classpath:sql/cmt_extension_schema.sql"/>
+  		<jdbc:script location="classpath:sql/H2/create_tables.sql"/>
 	</jdbc:initialize-database>
     
 	<bean id="txManager"

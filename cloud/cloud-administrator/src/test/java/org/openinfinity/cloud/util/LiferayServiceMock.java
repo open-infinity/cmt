@@ -17,27 +17,18 @@ import java.util.List;
  */
 public class LiferayServiceMock implements LiferayService {
 
-
-    private String userName;
-    private String userOrg;
-    private List<String> orgs;
-    private long userId;
-
+    private List<String> userOrgs;
     private UserMock userMock;
 
     public LiferayServiceMock() {
     }
 
-    public void addUser(String userName, long userId, String userOrg, String... subOrgs) {
-        this.userName = userName;
-        this.userOrg = userOrg;
-        this.userId = userId;
-        orgs = new LinkedList<String>();
-        orgs.add(userOrg);
-        orgs.addAll(Arrays.asList(subOrgs));
+    public void mockUserWithOrganizations(String userOrg, String... subOrgs) {
+        userOrgs = new LinkedList<String>();
+        userOrgs.add(userOrg);
+        userOrgs.addAll(Arrays.asList(subOrgs));
 
         userMock = new UserMock();
-        userMock.setUserId(userId);
     }
 
     @Override
@@ -52,7 +43,7 @@ public class LiferayServiceMock implements LiferayService {
 
     @Override
     public List<String> getOrganizationNames(User user) {
-        return orgs;
+        return userOrgs;
     }
 
 

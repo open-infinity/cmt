@@ -19,13 +19,6 @@ import java.util.*;
  */
 public class UserMock implements User {
 
-    public Object clone() {
-        try {
-            return super.clone();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
 
     @Override
     public Date getBirthday() throws PortalException, SystemException {
@@ -713,4 +706,13 @@ public class UserMock implements User {
     @Override
     public void updateSocialParticipationEquity(double value) {
     }
+
+    public Object clone() {
+        try {
+            return super.clone();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }
