@@ -41,6 +41,9 @@ public class MachineRowMapper implements RowMapper<Machine> {
 		machine.setType(rs.getString("machine_type"));
 		machine.setConfigured(rs.getInt("machine_configured"));
 		machine.setCloud(rs.getInt("machine_cloud_type"));
+		machine.setEbsVolumeId(rs.getString("machine_extra_ebs_volume_id"));
+		machine.setEbsVolumeDevice(rs.getString("machine_extra_ebs_volume_device"));
+		machine.setEbsVolumeSize(rs.getInt("machine_extra_ebs_volume_size"));
 		return machine;
 	}
 }

@@ -41,10 +41,12 @@ import com.amazonaws.services.ec2.model.CreateVolumeRequest;
 import com.amazonaws.services.ec2.model.CreateVolumeResult;
 import com.amazonaws.services.ec2.model.DeleteKeyPairRequest;
 import com.amazonaws.services.ec2.model.DeleteSecurityGroupRequest;
+import com.amazonaws.services.ec2.model.DeleteVolumeRequest;
 import com.amazonaws.services.ec2.model.DescribeInstancesRequest;
 import com.amazonaws.services.ec2.model.DescribeInstancesResult;
 import com.amazonaws.services.ec2.model.DescribeVolumesRequest;
 import com.amazonaws.services.ec2.model.DescribeVolumesResult;
+import com.amazonaws.services.ec2.model.DetachVolumeRequest;
 import com.amazonaws.services.ec2.model.DisassociateAddressRequest;
 import com.amazonaws.services.ec2.model.Instance;
 import com.amazonaws.services.ec2.model.KeyPair;
@@ -559,6 +561,28 @@ public class EC2Wrapper {
 		} catch (Exception e) {
 			String message = e.getMessage();
 			LOG.error("Error attaching volume to instance: "+message);
+			ExceptionUtil.throwSystemException(message, e);
+		}
+	}
+	
+	public void deleteVolume(String volumeId) {
+		try {
+			DeleteVolumeRequest request = new DeleteVolumeRequest(volumeId);
+			ec2.deleteVolume(request);
+		} catch (Exception e) {
+			String message = e.getMessage();
+			LOG.error("Error deleting volume: "+message);
+			ExceptionUtil.throwSystemException(message, e);
+		}
+	}
+	
+	public void detachVolume(String volumeId) {
+		try {
+			DetachVolumeRequest request = new DetachVolumeRequest(volumeId);
+			ec2.detachVolume(request);
+		} catch (Exception e) {
+			String message = e.getMessage();
+			LOG.error("Error detaching volume: "+message);
 			ExceptionUtil.throwSystemException(message, e);
 		}
 	}

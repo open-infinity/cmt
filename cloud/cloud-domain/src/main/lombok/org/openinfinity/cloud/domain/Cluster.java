@@ -25,9 +25,8 @@ import lombok.Data;
 /**
  * Domain class is responsible for storing cluster specific information within cloud instance.
  *
- * @author Ilkka Leinonen
  * @author Ossi Hämäläinen
- * @author Juha-Matti Sironen
+ * @author Ilkka Leinonen
  * @version 1.0.0 Initial version
  * @since 1.0.0
  */
@@ -63,5 +62,8 @@ public class Cluster implements Serializable {
 	private String multicastAddress;
 	@NotScript
 	private int machineType;
-		
+	@NotScript
+	private int ebsImageUsed;
+	@NotScript
+	private int ebsVolumesUsed;
 }

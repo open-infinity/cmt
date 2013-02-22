@@ -282,6 +282,25 @@ public class EC2Worker implements Worker {
 					j = machines.iterator();
 					while(j.hasNext()) {
 						Machine machine = j.next();
+						String ebsVolumeId = machine.getEbsVolumeId();
+						if(ebsVolumeId != null) {
+							LOG.info(threadName+": We need to delete EBS volume too");
+							ec2.detachVolume(ebsVolumeId);
+							String volumeState = ec2.getVolumeState(ebsVolumeId);
+							int maxWaitCount = 60;
+							while(!volumeState.equalsIgnoreCase("available") && maxWaitCount > 0) {
+								LOG.info(threadName+": Waiting the volume "+ebsVolumeId+" to be detached");
+								try {
+									Thread.sleep(3000);
+								} catch (InterruptedException e) {
+									LOG.warn(threadName+": Someone just interrupted my sleep! "+e.getMessage());
+								}
+								maxWaitCount--;
+								volumeState = ec2.getVolumeState(ebsVolumeId);
+							}
+							LOG.info(threadName+": Deleting volume "+ebsVolumeId);
+							ec2.deleteVolume(machine.getEbsVolumeId());
+						}
 						ec2.terminateInstance(machine.getInstanceId());
 					}
 					try {
@@ -390,6 +409,25 @@ public class EC2Worker implements Worker {
 		j = machines.iterator();
 		while(j.hasNext()) {
 			Machine machine = j.next();
+			String ebsVolumeId = machine.getEbsVolumeId();
+			if(ebsVolumeId != null) {
+				LOG.info(threadName+": We need to delete EBS volume too");
+				ec2.detachVolume(ebsVolumeId);
+				String volumeState = ec2.getVolumeState(ebsVolumeId);
+				int maxWaitCount = 60;
+				while(!volumeState.equalsIgnoreCase("available") && maxWaitCount > 0) {
+					LOG.info(threadName+": Waiting the volume "+ebsVolumeId+" to be detached");
+					try {
+						Thread.sleep(3000);
+					} catch (InterruptedException e) {
+						LOG.warn(threadName+": Someone just interrupted my sleep! "+e.getMessage());
+					}
+					maxWaitCount--;
+					volumeState = ec2.getVolumeState(ebsVolumeId);
+				}
+				LOG.info(threadName+": Deleting volume "+ebsVolumeId);
+				ec2.deleteVolume(machine.getEbsVolumeId());
+			}
 			ec2.terminateInstance(machine.getInstanceId());
 		}
 		try {
@@ -442,7 +480,7 @@ public class EC2Worker implements Worker {
 		}
 		
 		LOG.debug(threadName+": Creating keypair");
-		String keyName = "TOASinstance" + Integer.toString(job.getInstanceId());
+		String keyName = "TOASdevInstance" + Integer.toString(job.getInstanceId());
 
 		Key key = null;
 		try {
@@ -542,7 +580,7 @@ public class EC2Worker implements Worker {
 				List<String> securityGroups = new ArrayList<String>();
 				securityGroups.add(cluster.getSecurityGroupName());
 				String instanceType = PropertyManager.getProperty(PROPERTY_PREFIX + service + ".instancetype."+cluster.getMachineType());
-				Reservation reservation = ec2.createInstance(imageId(job, service), needToStart, key.getName(), job.getZone(),
+				Reservation reservation = ec2.createInstance(imageId(job, service, cluster), needToStart, key.getName(), job.getZone(),
 						instanceType, securityGroups);
 				if (reservation == null) {
 					throw new WorkerException("Error creating virtual machines for service " + service);
@@ -658,14 +696,14 @@ public class EC2Worker implements Worker {
 		List<com.amazonaws.services.ec2.model.Instance> instances = new ArrayList<com.amazonaws.services.ec2.model.Instance>();
 		Reservation reservation = null; 
 		if (small > 0) {
-			reservation = ec2.createInstance(imageId(job, service), small, key.getName(), job.getZone(), "m1.small", securityGroups);
+			reservation = ec2.createInstance(imageId(job, service, cluster), small, key.getName(), job.getZone(), "m1.small", securityGroups);
 			if (reservation == null) {
 				throw new WorkerException("Error creating virtual machines for service " + service);
 			}
 			instances.addAll(reservation.getInstances());
 		}
 		if (large > 0) {
-			reservation = ec2.createInstance(imageId(job, service), large, key.getName(), job.getZone(), "m1.large", securityGroups);
+			reservation = ec2.createInstance(imageId(job, service, cluster), large, key.getName(), job.getZone(), "m1.large", securityGroups);
 			if (reservation == null) {
 				throw new WorkerException("Error creating virtual machines for service " + service);
 			}
@@ -783,7 +821,7 @@ public class EC2Worker implements Worker {
 		List<String> securityGroups = new ArrayList<String>();
 		securityGroups.add(cluster.getSecurityGroupName());
 		
-		String imageId = imageId(job, service);
+		String imageId = imageId(job, service, cluster);
 		Reservation reservation = ec2.createInstance(imageId, 1, key.getName(), job.getZone(), "m1.small", securityGroups);
 		if(reservation == null) {
 			ec2.deleteSecurityGroup(cluster.getSecurityGroupName());
@@ -1187,6 +1225,12 @@ public class EC2Worker implements Worker {
 			cluster.setNumberOfMachines(serviceCount);
 			cluster.setPublished(ClusterService.CLUSTER_STATUS_UNPUBLISHED);
 			cluster.setLive(0);
+			cluster.setEbsImageUsed(ebsImageUsed);
+			if(ebsDiscSize > 0) {
+				cluster.setEbsVolumesUsed(ebsDiscSize);
+			} else {
+				cluster.setEbsVolumesUsed(0);
+			}
 			clusterService.addCluster(cluster);
 			if (needsHazel != null && needsHazel.equalsIgnoreCase("yes")) {
 				MulticastAddress addr = new MulticastAddress();
@@ -1196,7 +1240,7 @@ public class EC2Worker implements Worker {
 				maService.addAddress(addr);
 			}
 			
-			if(createCluster(cluster, service, ec2, job.getZone(), job.getCloud(), key.getName(), key.getSecret_key(), imageId (job, service), instanceType, needsLoadBalancer) == true) {
+			if(createCluster(cluster, service, ec2, job.getZone(), job.getCloud(), key.getName(), key.getSecret_key(), imageId (job, service, cluster), instanceType, needsLoadBalancer) == true) {
 				cluster.setLive(1);
 				clusterService.updateCluster(cluster);
 				//clusterList.add(cluster);
@@ -1256,7 +1300,7 @@ public class EC2Worker implements Worker {
 				//cluster.setNumberOfMachines(cluster.getNumberOfMachines()+1);
 				
 				
-				Reservation reservation = ec2.createInstance(image, 1, key, zone, "m1.small", securityGroups);
+				Reservation reservation = ec2.createInstance(imageId(cloud, service, 0), 1, key, zone, "m1.small", securityGroups);
 				if(reservation == null) {
 					ec2.deleteSecurityGroup(cluster.getSecurityGroupName());
 					throw new WorkerException("Error creating virtual machines for service "+service);
@@ -1286,13 +1330,21 @@ public class EC2Worker implements Worker {
 			machine.setCloud(cloud);
 			
 			machine.setInstanceId(tempInstance.getInstanceId());
-			if(tempInstance.getInstanceType().equalsIgnoreCase("m1.small") && !loadBalancerMarked && hasLoadBalancer) {
+			LOG.debug(threadName+": Instance "+tempInstance.getInstanceId()+" root device type: "+tempInstance.getRootDeviceType());
+			if(tempInstance.getInstanceType().equalsIgnoreCase("m1.small") && !loadBalancerMarked && hasLoadBalancer && tempInstance.getRootDeviceType().equalsIgnoreCase("instance-store")) {
 				machine.setType("loadbalancer");
 				loadBalancerMarked = true;
+				cluster.setLbInstanceId(machine.getInstanceId());
+				clusterService.updateCluster(cluster);
 			} else {
 				machine.setType("clustermember");
+				if(cluster.getEbsVolumesUsed() > 0) {
+					String volumeId = ec2.createVolume(cluster.getEbsVolumesUsed(), zone);
+					machine.setEbsVolumeId(volumeId);
+					machine.setEbsVolumeSize(cluster.getEbsVolumesUsed());
+				}
 			}
-			int maxWait = 60;
+			int maxWait = 120;
 			while((tempInstance.getPrivateDnsName().equals("0.0.0.0") || tempInstance.getPrivateDnsName().startsWith("euca-0-0-0-0")) && maxWait > 0) {
 				LOG.info(threadName+": Could not get IP address yet, waiting for a moment");
 				try {
@@ -1325,6 +1377,7 @@ public class EC2Worker implements Worker {
 			machine.setUserName("root");
 			machine.setConfigured(0);
 			machine.setRunning(1);
+			
 			machineService.addMachine(machine);
 			machinesToTag.add(tempInstance.getInstanceId());
 		/*	if(tempInstance.getInstanceType().equalsIgnoreCase("m1.small")) {
@@ -1332,6 +1385,7 @@ public class EC2Worker implements Worker {
 				lbI.setInstanceId(tempInstance.getInstanceId());
 				lbInstanceList.add(lbI);
 			} */
+			
 		
 		}
 		//LOG.info("Addresses: "+lbAddresses);
@@ -1384,12 +1438,25 @@ public class EC2Worker implements Worker {
 		return tempAddress;
 	}
 	
-	private String imageId(Job job, String service) throws WorkerException{
+	private String imageId(Job job, String service, Cluster cluster) throws WorkerException {
 		String imageId = null;
 		if (job.getCloud() == InstanceService.CLOUD_TYPE_AMAZON) {
-			imageId = PropertyManager.getProperty(PROPERTY_PREFIX + service + ".image.amazon");
+			imageId = PropertyManager.getProperty(PROPERTY_PREFIX + service + ".image.amazon."+cluster.getEbsImageUsed());
 		} else if (job.getCloud() == InstanceService.CLOUD_TYPE_EUCALYPTUS) {
-			imageId = PropertyManager.getProperty(PROPERTY_PREFIX + service + ".image.eucalyptus");
+			imageId = PropertyManager.getProperty(PROPERTY_PREFIX + service + ".image.eucalyptus."+cluster.getEbsImageUsed());
+		}
+		if (imageId == null || imageId.length() < 5) {
+			throw new WorkerException("Can't find image id from service " + service);
+		}
+		return imageId;
+	}
+	
+	private String imageId(int cloudType, String service, int ebs) throws WorkerException {
+		String imageId = null;
+		if(cloudType == InstanceService.CLOUD_TYPE_AMAZON) {
+			imageId = PropertyManager.getProperty(PROPERTY_PREFIX + service + ".image.amazon."+ebs);
+		} else if(cloudType == InstanceService.CLOUD_TYPE_EUCALYPTUS) {
+			imageId = PropertyManager.getProperty(PROPERTY_PREFIX + service + ".image.eucalyptus."+ebs);
 		}
 		if (imageId == null || imageId.length() < 5) {
 			throw new WorkerException("Can't find image id from service " + service);

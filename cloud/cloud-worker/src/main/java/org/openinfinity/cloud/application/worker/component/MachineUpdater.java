@@ -104,6 +104,7 @@ public class MachineUpdater implements Updater {
 						Machine machine = machineService.getMachine(instance.getInstanceId());
 						if (machine != null) {
 							machine.setDnsName(instance.getPublicDnsName());
+							machine.setPrivateDnsName(instance.getPrivateDnsName());
 							machine.setState(instance.getState().getName());
 							if(machine.getType() != null && machine.getType().equalsIgnoreCase("loadbalancer")) {
 								Cluster cluster = clusterService.getCluster(machine.getClusterId());

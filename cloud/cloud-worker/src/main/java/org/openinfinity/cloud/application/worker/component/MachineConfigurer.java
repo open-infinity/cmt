@@ -30,6 +30,7 @@ import org.openinfinity.cloud.domain.Instance;
 import org.openinfinity.cloud.domain.Key;
 import org.openinfinity.cloud.domain.Machine;
 import org.openinfinity.cloud.service.administrator.ClusterService;
+import org.openinfinity.cloud.service.administrator.EC2Wrapper;
 import org.openinfinity.cloud.service.administrator.InstanceService;
 import org.openinfinity.cloud.service.administrator.KeyService;
 import org.openinfinity.cloud.service.administrator.MachineService;
@@ -39,6 +40,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
+import com.amazonaws.auth.AWSCredentials;
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSch;
@@ -71,6 +73,10 @@ public class MachineConfigurer implements Configurer {
 	@Qualifier("keyService")
 	private KeyService keyService;
 	
+	@Autowired
+	@Qualifier("cloudCredentials")
+	private AWSCredentials eucaCredentials;
+	
 	@Async
 	public void configure(Machine m) {
 		String threadName = Thread.currentThread().getName();
@@ -78,6 +84,58 @@ public class MachineConfigurer implements Configurer {
 		Cluster c = clusterService.getCluster(m.getClusterId());
 		Instance instance = instanceService.getInstance(c.getInstanceId());
 		Key k = keyService.getKeyByInstanceId(instance.getInstanceId());
+		
+		EC2Wrapper ec2 = new EC2Wrapper();
+		String endPoint = PropertyManager.getProperty("cloudadmin.worker.eucalyptus.endpoint");
+		if(m.getCloud() == InstanceService.CLOUD_TYPE_AMAZON) {
+			// TODO
+		} else if(m.getCloud() == InstanceService.CLOUD_TYPE_EUCALYPTUS) {
+			ec2.setEndpoint(endPoint);
+			ec2.init(eucaCredentials, m.getCloud());
+		}
+		int maxWaitForRunning = 96;
+		while(!m.getState().equals("running") && maxWaitForRunning > 0) {
+			LOG.info(threadName+": Waiting instance "+m.getInstanceId()+" to be at 'running' state. Waiting for "+maxWaitForRunning+" times");
+			try {
+				Thread.sleep(5000);
+			} catch (InterruptedException e) {
+				LOG.error(threadName+": Someone interrupted my sleep! How rude! "+e.getMessage());
+			}
+			m = machineService.getMachine(m.getId());
+			maxWaitForRunning--;
+		}
+		if(m.getEbsVolumeSize() > 0) {	
+			String volumeState = ec2.getVolumeState(m.getEbsVolumeId());
+			if(volumeState != null && volumeState.equals("creating")) {
+				LOG.info(threadName+": EBS volume still in creating phase, we need to wait a bit");
+				int maxWaitForEBS = 96;
+				while(volumeState.equals("creating") && maxWaitForEBS > 0) {
+					LOG.info(threadName+": Waiting for EBS volume "+m.getEbsVolumeId()+" to be available");
+					try {
+						Thread.sleep(5000);
+					} catch (InterruptedException e) {
+						LOG.error(threadName+": Someone interrupted my sleep! How rude! "+e.getMessage());
+					}
+					volumeState = ec2.getVolumeState(m.getEbsVolumeId());
+					maxWaitForEBS--;
+				}
+			}
+			if (volumeState != null && volumeState.equals("available")) {
+				String ebsDevice = null;
+				if (c.getEbsImageUsed() > 0) {
+					ebsDevice = "vdc";
+				} else {
+					ebsDevice = "vdb";
+				}
+				LOG.info(threadName + ": Attachin ebs volume "
+						+ m.getEbsVolumeId() + " to instance "
+						+ m.getInstanceId() + " as device " + ebsDevice);
+				ec2.attachVolume(m.getEbsVolumeId(), m.getInstanceId(),
+						ebsDevice);
+				m.setEbsVolumeDevice(ebsDevice);
+				machineService.updateMachine(m);
+			}
+		}
 		
 		boolean connectOK = false;
 		boolean needNewRun = false;
@@ -131,6 +189,7 @@ public class MachineConfigurer implements Configurer {
 				}
 			}
 		}
+		
 		
 		byte[] privkey = k.getSecret_key().getBytes();
 		final byte[] emptyPassPhrase = new byte[0];
@@ -202,6 +261,18 @@ public class MachineConfigurer implements Configurer {
 		} else {
 			LOG.info(threadName+": Configuration ready for machine "+m.getId());
 			machineService.updateMachineConfigure(m.getId(), MachineService.MACHINE_CONFIGURE_READY);
+		}
+		if(m.getType().equalsIgnoreCase("clustermember")) {
+			Machine loadBalancer = machineService.getMachine(c.getLbInstanceId());
+			if(loadBalancer != null) {
+				LOG.debug(threadName+": Loadbalancer configure status: "+loadBalancer.getConfigured());
+				if(loadBalancer.getConfigured() == MachineService.MACHINE_CONFIGURE_READY) {
+					LOG.info(threadName+": Forcing loadbalancer reconfigure");
+					machineService.updateMachineConfigure(loadBalancer.getId(), MachineService.MACHINE_CONFIGURE_NOT_STARTED);
+				}
+			} else {
+				LOG.warn(threadName+": Loadbalancer was null, this coud be a problem...");
+			}
 		}
 	}
 

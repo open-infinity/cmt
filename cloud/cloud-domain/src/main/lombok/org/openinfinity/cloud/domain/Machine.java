@@ -82,5 +82,14 @@ public class Machine implements Serializable {
 	
 	@NotScript
 	private int cloud;
+	
+	@NotScript
+	private String ebsVolumeId;
+	
+	@NotScript
+	private String ebsVolumeDevice;
+	
+	@NotScript
+	private int ebsVolumeSize;
 
 }

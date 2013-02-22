@@ -43,7 +43,6 @@ import org.springframework.util.Assert;
  * 
  * @author Ossi Hämäläinen
  * @author Ilkka Leinonen
- * @author Juha-Matti Sironen
  * @version 1.0.0 Initial version
  * @since 1.0.0
  */
@@ -81,6 +80,8 @@ public class ClusterRepositoryJdbcImpl implements ClusterRepository {
 		parameters.put("cluster_security_group_name", cluster.getSecurityGroupName());
 		parameters.put("cluster_multicast_address", cluster.getMulticastAddress());
 		parameters.put("cluster_machine_type", cluster.getMachineType());
+		parameters.put("cluster_ebs_image_used", cluster.getEbsImageUsed());
+		parameters.put("cluster_ebs_volumes_used", cluster.getEbsVolumesUsed());
 		LOG.info(parameters.toString());
 		Number newId = insert.executeAndReturnKey(parameters);
 		LOG.info("Key: "+newId);
@@ -90,7 +91,7 @@ public class ClusterRepositoryJdbcImpl implements ClusterRepository {
 
 	@AuditTrail
 	public void updateCluster(final Cluster cluster) {
-		jdbcTemplate.update("update cluster_tbl set cluster_name = ?, cluster_number_of_machines = ?, cluster_lb_name = ?, cluster_lb_dns = ?, instance_id = ?, cluster_type = ?, cluster_pub = ?, cluster_live = ?, cluster_lb_instance_id = ?, cluster_security_group_id = ?, cluster_security_group_name = ?, cluster_multicast_address = ?, cluster_machine_type = ? where cluster_id = ?", 
+		jdbcTemplate.update("update cluster_tbl set cluster_name = ?, cluster_number_of_machines = ?, cluster_lb_name = ?, cluster_lb_dns = ?, instance_id = ?, cluster_type = ?, cluster_pub = ?, cluster_live = ?, cluster_lb_instance_id = ?, cluster_security_group_id = ?, cluster_security_group_name = ?, cluster_multicast_address = ?, cluster_machine_type = ?, cluster_ebs_image_used = ?, cluster_ebs_volumes_used = ? where cluster_id = ?", 
 				new PreparedStatementSetter() {
 					public void setValues(PreparedStatement ps) throws SQLException {
 						ps.setString(1, cluster.getName());
@@ -106,7 +107,9 @@ public class ClusterRepositoryJdbcImpl implements ClusterRepository {
 						ps.setString(11, cluster.getSecurityGroupName());
 						ps.setString(12, cluster.getMulticastAddress());
 						ps.setInt(13, cluster.getMachineType());
-						ps.setInt(14, cluster.getId());
+						ps.setInt(14, cluster.getEbsImageUsed());
+						ps.setInt(15, cluster.getEbsVolumesUsed());
+						ps.setInt(16, cluster.getId());
 					}
 				}
 		);
@@ -175,6 +178,8 @@ public class ClusterRepositoryJdbcImpl implements ClusterRepository {
 			cluster.setSecurityGroupName(rs.getString("cluster_security_group_name"));
 			cluster.setMulticastAddress(rs.getString("cluster_multicast_address"));
 			cluster.setMachineType(rs.getInt("cluster_machine_type"));
+			cluster.setEbsImageUsed(rs.getInt("cluster_ebs_image_used"));
+			cluster.setEbsVolumesUsed(rs.getInt("cluster_ebs_volumes_used"));
 			return cluster;
 		}
 	}

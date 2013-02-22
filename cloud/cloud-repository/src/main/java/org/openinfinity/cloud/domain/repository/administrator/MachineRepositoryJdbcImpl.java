@@ -42,7 +42,6 @@ import org.springframework.util.Assert;
  
  * @author Ossi Hämäläinen
  * @author Ilkka Leinonen
- * @author Juha-Matti Sironen
  * @version 1.0.0 Initial version
  * @since 1.0.0
  */
@@ -83,6 +82,9 @@ public class MachineRepositoryJdbcImpl implements MachineRepository {
 		parameters.put("machine_type", machine.getType());
 		parameters.put("machine_configured", machine.getConfigured());
 		parameters.put("machine_cloud_type", machine.getCloud());
+		parameters.put("machine_extra_ebs_volume_id", machine.getEbsVolumeId());
+		parameters.put("machine_extra_ebs_volume_device", machine.getEbsVolumeDevice());
+		parameters.put("machine_extra_ebs_volume_size", machine.getEbsVolumeSize());
 		
 		Number newId = insert.executeAndReturnKey(parameters);
 		machine.setId(newId.intValue());
@@ -131,13 +133,24 @@ public class MachineRepositoryJdbcImpl implements MachineRepository {
 
 	@AuditTrail
 	public void updateMachine(final Machine machine) {
-		jdbcTemplate.update("update machine_tbl set machine_dns_name = ?, machine_state = ?, machine_private_dns_name = ?, machine_last_update = NOW() where machine_id = ?",
+		jdbcTemplate.update("update machine_tbl set machine_instance_id = ?, machine_name = ?, machine_dns_name = ?, machine_username = ?, machine_running = ?, machine_state = ?, machine_cluster_id = ?, machine_private_dns_name = ?, machine_type = ?, machine_configured = ?, machine_last_update = NOW(), machine_cloud_type = ?, machine_extra_ebs_volume_id = ?, machine_extra_ebs_volume_device = ?, machine_extra_ebs_volume_size = ? where machine_id = ?",
 				new PreparedStatementSetter() {
 					public void setValues(PreparedStatement ps) throws SQLException {
-						ps.setString(1, machine.getDnsName());
-						ps.setString(2, machine.getState());
-						ps.setString(3, machine.getPrivateDnsName());
-						ps.setInt(4, machine.getId());
+						ps.setString(1, machine.getInstanceId());
+						ps.setString(2, machine.getName());
+						ps.setString(3, machine.getDnsName());
+						ps.setString(4, machine.getUserName());
+						ps.setInt(5, machine.getRunning());
+						ps.setString(6, machine.getState());
+						ps.setInt(7, machine.getClusterId());
+						ps.setString(8, machine.getPrivateDnsName());
+						ps.setString(9, machine.getType());
+						ps.setInt(10, machine.getConfigured());
+						ps.setInt(11, machine.getCloud());
+						ps.setString(12, machine.getEbsVolumeId());
+						ps.setString(13, machine.getEbsVolumeDevice());
+						ps.setInt(14, machine.getEbsVolumeSize());
+						ps.setInt(15, machine.getId());
 						
 					}
 				}
