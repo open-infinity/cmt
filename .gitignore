@@ -1,0 +1,14 @@
+
+cloud/cloud-connectionpool-manager/.classpath
+
+cloud/cloud-worker/src/main/resources/worker_jdbc.properties
+
+*.properties
+
+cloud/cloud-connectionpool-manager/.project
+
+cloud/cloud-worker/src/main/resources/EucaCredentials.properties
+
+cloud/cloud-worker/src/main/resources/cloudadminworker.properties
+
+cloud/cloud-worker/src/main/resources/infrastructure.properties
