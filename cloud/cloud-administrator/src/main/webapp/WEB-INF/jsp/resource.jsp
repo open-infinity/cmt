@@ -170,7 +170,7 @@ dialogRes.setResource({
 
 <%-- template for SOLR toggle button --%>
 <div id="solrToggleTemplate" class="template">
-    <div id="" class="toggleSolrRow configRow">
+    <div class="toggleSolrRow configRow">
         <label class="toggleSolrLabel instanceCreationLabel">Solr</label>
         <div class="radioButton">
             <input type="radio" id="toggleSolrRadioOn_" name="toggleSolrRadio_" />

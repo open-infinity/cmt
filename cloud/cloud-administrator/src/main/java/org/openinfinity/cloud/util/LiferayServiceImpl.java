@@ -19,13 +19,18 @@ package org.openinfinity.cloud.util;
 import javax.portlet.PortletRequest;
 import javax.portlet.ResourceResponse;
 
+import com.liferay.portal.model.Organization;
+import com.liferay.portal.service.OrganizationLocalServiceUtil;
 import org.apache.log4j.Logger;
 
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.model.User;
+import org.springframework.context.annotation.Bean;
+import org.springframework.stereotype.Component;
 
-import org.openinfinity.cloud.util.AdminGeneral;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Liferay related utilities
@@ -34,10 +39,11 @@ import org.openinfinity.cloud.util.AdminGeneral;
  * @since 1.0.0
  */
 
-public class LiferayUtil {
-	private static final Logger LOG = Logger.getLogger(LiferayUtil.class.getName());
+@Component("liferayService")
+public class LiferayServiceImpl implements LiferayService {
+	private static final Logger LOG = Logger.getLogger(LiferayServiceImpl.class.getName());
 	
-	public static User getUser(PortletRequest request) {
+	public User getUser(PortletRequest request) {
 		User user = null;
 		
 		try {
@@ -53,11 +59,28 @@ public class LiferayUtil {
 		return user;	
 	}
 	
-	public static User getUser(PortletRequest request, ResourceResponse response) {
+	public User getUser(PortletRequest request, ResourceResponse response) {
 		User user = getUser(request);
 		if(user == null) 
 			response.setProperty(ResourceResponse.HTTP_STATUS_CODE, AdminGeneral.HTTP_ERROR_CODE_USER_NOT_LOGGED_IN);
 		return user;	
 	}
-	
+
+    public List<String> getOrganizationNames(User user) {
+        List<Organization> userOrganizations = null;
+        List<Organization> subOrganizations = null;
+        try {
+            userOrganizations = user.getOrganizations();
+            subOrganizations = OrganizationLocalServiceUtil.getSuborganizations(userOrganizations);
+        } catch (Exception e) {
+            throw new RuntimeException("user organizations or suborganizations could not be obtained", e);
+        }
+
+        List<String> orgNames = new LinkedList<String>();
+        for (Organization org : userOrganizations)
+            orgNames.add(org.getName());
+        for (Organization subOrg : subOrganizations)
+            orgNames.add(subOrg.getName());
+        return orgNames;
+    }
 }
