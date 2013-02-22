@@ -20,7 +20,10 @@ import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 
 import org.apache.log4j.Logger;
-import org.openinfinity.cloud.util.LiferayUtil;
+import org.openinfinity.cloud.util.LiferayService;
+import org.openinfinity.cloud.util.LiferayServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.portlet.bind.annotation.RenderMapping;
@@ -42,9 +45,13 @@ public class CloudAdminConfigController {
 	
 	private static final Logger LOG = Logger.getLogger(CloudAdminConfigController.class.getName());
 
-	@RenderMapping
+    @Autowired
+    @Qualifier("liferayService")
+    private LiferayService liferayService;
+
+    @RenderMapping
 	public String showView(RenderRequest request, RenderResponse response) {
-		User user = LiferayUtil.getUser(request);
+		User user = liferayService.getUser(request);
 		if(user == null) {
 			return "notlogged";
 		}

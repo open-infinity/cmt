@@ -502,11 +502,13 @@ var instanceManager = {
 						
 			for(var i = 1; i < records; i++) {
 				id = $('#instances').jqGrid('getCell',i,'instanceId');
-				console.log("refreshInstanceStatus id="+id);
-				url = portletURL.url.instance.instanceStatusURL + "&instanceId="+id;
-
-				//console.log("fetching data for instance id : " + id);
-				instanceManager.updateInstanceStatus(i, url);
+				if (id != false) {
+					console.log("refreshInstanceStatus id="+id);
+					url = portletURL.url.instance.instanceStatusURL + "&instanceId="+id;
+	
+					//console.log("fetching data for instance id : " + id);
+					instanceManager.updateInstanceStatus(i, url);
+				}
 			}	
 		},
 		

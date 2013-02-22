@@ -17,15 +17,19 @@
 package org.openinfinity.cloud.domain.repository.administrator;
 
 import java.util.Collection;
+import java.util.List;
+
 import javax.sql.DataSource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
-import org.springframework.stereotype.Repository;
-import org.springframework.util.Assert;
+
 import org.openinfinity.cloud.domain.ClusterType;
 import org.openinfinity.core.annotation.AuditTrail;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.stereotype.Repository;
+import org.springframework.util.Assert;
 
 /**
  * Cluster repository interface
@@ -41,17 +45,22 @@ class ClusterTypeRepositoryJdbcImpl implements ClusterTypeRepository{
 	@Autowired
 	RowMapper<ClusterType> clusterTypeRowMapper;
 	
-	private JdbcTemplate jdbcTemplate;
+	private NamedParameterJdbcTemplate jdbcTemplate;
 	private DataSource dataSource;
 	
 	@Autowired
 	public ClusterTypeRepositoryJdbcImpl(@Qualifier("cloudDataSource") DataSource ds) {
 		Assert.notNull(ds, "Please define datasource for machine repository.");
-		this.jdbcTemplate = new JdbcTemplate(ds);
+		this.jdbcTemplate = new NamedParameterJdbcTemplate(ds);
 		this.dataSource = ds;
 	}
+		
 	@AuditTrail
-	public Collection<ClusterType> getAvailableClusterTypes(int configurationId){
-		return jdbcTemplate.query("select * from cluster_type_tbl where configuration_id = ? order by id", new Object[] { configurationId }, clusterTypeRowMapper);
+	public Collection<ClusterType> getAvailableClusterTypes(List<String> userOrganizations) {
+		MapSqlParameterSource parameters = new MapSqlParameterSource();
+		parameters.addValue("orgNames", userOrganizations);
+		return jdbcTemplate.query("select distinct cluster.* from cluster_type_tbl as cluster, acl_cluster_type_tbl as acl " +
+				"where acl.org_name in (:orgNames) and acl.cluster_id = cluster.id order by cluster.id", parameters, clusterTypeRowMapper);
 	}
+	
 }

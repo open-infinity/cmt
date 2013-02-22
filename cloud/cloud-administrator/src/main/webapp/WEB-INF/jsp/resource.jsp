@@ -21,7 +21,8 @@ portletURL.initialize({
 	    errorResponseURL : 				'<portlet:resourceURL id="errorResponse"/>',
 	    getInstanceKeyURL : 			'<portlet:resourceURL id="getInstanceKey"/>',
 	    getClusterTypesURL : 			'<portlet:resourceURL id="getClusterTypes"/>',
-	    getMachineTypesURL : 			'<portlet:resourceURL id="getMachineTypes"/>'
+	    getMachineTypesURL : 			'<portlet:resourceURL id="getMachineTypes"/>',
+	    getCloudProvidersURL : 			'<portlet:resourceURL id="getCloudProviders"/>'
     },
     cluster: {
     	availableClustersURL : 			'<portlet:resourceURL id="availableClusters"/>',    	
@@ -94,17 +95,7 @@ dialogRes.setResource({
 		<div class="machineSizeRow configRow ordinaryMachine">
 			<label class="machineSizeLabel instanceCreationLabel">Machine size </label>
 			<div class="radioButton">
-				<input type="radio" id="machineSizeRadioSmall_" name="machineSizeRadio_" checked="checked" value="0"/>
-				<label for="machineSizeRadioSmall_">Small</label>
-				<input type="radio" id="machineSizeRadioMedium_" name="machineSizeRadio_" value="1"/>
-				<label for="machineSizeRadioMedium_">Medium</label>
-				<input type="radio" id="machineSizeRadioLarge_" name="machineSizeRadio_" value="2"/>
-				<label for="machineSizeRadioLarge_">Large</label>
-				<input type="radio" id="machineSizeRadioXLarge_" name="machineSizeRadio_" value="3"/>
-				<label for="machineSizeRadioXLarge_">XLarge</label>
-				<input type="radio" id="machineSizeRadioXXLarge_" name="machineSizeRadio_" value="4"/>
-				<label for="machineSizeRadioXXLarge_">XXLarge</label>
-			</div>	
+			</div>
 			<div class="valueDisplay valueDisplayButtonSet"></div>
 		</div>
 		<div class="imageTypeRow configRow">			
@@ -131,11 +122,71 @@ dialogRes.setResource({
 				<div class="jq_slider ui_disabled"></div> 
 			</div> 	
 			<div class="valueDisplay valueDisplaySlider"></div>
+		</div>		
+	</div>
+</div>
+
+<div id="liveInstanceTemplate" class="template">
+	<div class="liveInstanceBody">
+		<div class="toggleLiveInstanceRow configRow">
+			<label class="toggleLiveInstanceLabel instanceCreationLabel">Live instance</label>
+			<div class="radioButton">
+				<input type="radio" id="toggleLiveInstanceRadioOn_" name="toggleLiveInstanceRadio_" />
+				<label for="toggleLiveInstanceRadioOn_"> On </label>
+				<input type="radio" id="toggleLiveInstanceRadioOff_" name="toggleLiveInstanceRadio_" checked="checked"/>
+				<label for="toggleLiveInstanceRadioOff_"> Off </label>
 			</div>
 		</div>
 	</div>
-</div>	
-		
+</div>
+
+<div id="datasourceTemplate" class="template">
+	<div class="datasourceBody">
+		<div class="toggleDatasourceRow configRow">			
+			<label class="toggleDatasourceLabel instanceCreationLabel">External datasource</label>
+			<div class="radioButton">
+				<input type="radio" id="toggleDatasourceRadioOn_" name="toggleDatasourceRadio_" />
+				<label for="toggleDatasourceRadioOn_"> On </label>
+				<input type="radio" id="toggleDatasourceRadioOff_" name="toggleDatasourceRadio_" checked="checked"/>
+				<label for="toggleDatasourceRadioOff_"> Off </label>
+			</div>
+		</div>
+		<div class="datasourceRow">
+			<label class="datasourceTitle instanceCreationLabel">URL</label>
+			<div class="inputRow">				
+				<input type="text" class="urlInput" id="newDatasourceUrlText_"  name="newDatasourceUrlText_" size="25" />
+			</div>
+			<label class="datasourceTitle instanceCreationLabel">User name</label>
+			<div class="inputRow">				
+				<input type="text" class="userNameInput" id="newDatasourceUserNameText_"  name="newDatasourceUserNameText_"  size="10"/>
+			</div>
+			<label class="datasourceTitle instanceCreationLabel">Password</label>
+			<div class="inputRow">				
+				<input type="password" class="passwordInput" id="newDatasourcePasswordText_"  name="newDatasourcePasswordText_" size="10"/>
+			</div>				
+		</div>
+	</div>
+</div>
+
+<%-- template for SOLR toggle button --%>
+<div id="solrToggleTemplate" class="template">
+    <div class="toggleSolrRow configRow">
+        <label class="toggleSolrLabel instanceCreationLabel">Solr</label>
+        <div class="radioButton">
+            <input type="radio" id="toggleSolrRadioOn_" name="toggleSolrRadio_" />
+            <label for="toggleSolrRadioOn_"> On </label>
+            <input type="radio" id="toggleSolrRadioOff_" name="toggleSolrRadio_" checked="checked"/>
+            <label for="toggleSolrRadioOff_"> Off </label>
+        </div>
+    </div>
+</div>
+
+<%-- template for single machine type button --%>
+<div id="machineTypeTemplate" class="template">
+    <input type="radio" id="machineSizeRadio" name="machineSizeRadio_" value=""/>
+    <label for="machineSizeRadio"></label>
+</div>
+
 <%-- Cluster template --%>
 <ul id="clusterTemplate" class="template">
 	<li class="newlist ui-corner-all">
@@ -290,3 +341,4 @@ dialogRes.setResource({
 		</div>	
 	</div>
 </div>
+

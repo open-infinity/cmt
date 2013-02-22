@@ -21,9 +21,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
-import javax.portlet.PortletRequest;
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
 
@@ -38,9 +36,8 @@ import org.openinfinity.cloud.service.administrator.InstanceService;
 import org.openinfinity.cloud.service.administrator.KeyService;
 import org.openinfinity.cloud.service.administrator.MachineService;
 import org.openinfinity.cloud.util.AdminException;
-import org.openinfinity.cloud.util.AdminGeneral;
+import org.openinfinity.cloud.util.LiferayService;
 import org.openinfinity.cloud.util.serialization.JsonDataWrapper;
-import org.openinfinity.cloud.util.LiferayUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -52,7 +49,6 @@ import org.springframework.web.portlet.bind.annotation.ResourceMapping;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.services.ec2.model.Instance;
 import com.amazonaws.services.ec2.model.Reservation;
-import com.liferay.portal.model.User;
 
 /**
  * Controller for handling Machine related CloudAdmin requests
@@ -66,7 +62,11 @@ import com.liferay.portal.model.User;
 @RequestMapping(value = "VIEW")
 public class MachineController {
 	private static final Logger LOG = Logger.getLogger(MachineController.class.getName());
-	
+
+    @Autowired
+    @Qualifier("liferayService")
+    private LiferayService liferayService;
+
 	@Autowired
 	@Qualifier("machineService")
 	private MachineService machineService;
@@ -93,7 +93,7 @@ public class MachineController {
 	@ResourceMapping("machineList")
 	public void getMachines(ResourceRequest request, ResourceResponse response, @RequestParam("page") int page, @RequestParam("rows") int rows, @RequestParam("instanceId") int instanceId) throws Exception {
 		LOG.info("Inside getMachineList in the controller, page: "+page+", rows: "+rows +", instanceId: " +instanceId);
-		if (LiferayUtil.getUser(request, response) == null) return;
+		if (liferayService.getUser(request, response) == null) return;
 		
 		org.openinfinity.cloud.domain.Instance toasInstance = instanceService.getInstance(instanceId);
 		if(toasInstance == null) {
@@ -136,7 +136,7 @@ public class MachineController {
 	@ResourceMapping("keyList")
 	public void getKeys(ResourceRequest request, ResourceResponse response) throws IOException {
 		LOG.info("Inside getKeylist in the machine controller");
-		if (LiferayUtil.getUser(request, response) == null) return;
+		if (liferayService.getUser(request, response) == null) return;
 		List<Key> keyList = keyService.getKeys();
 		ObjectMapper mapper = new ObjectMapper();
 		try {
@@ -148,7 +148,7 @@ public class MachineController {
 	
 	@ResourceMapping("machine")
 	public void getMachine(ResourceRequest request, ResourceResponse response, @RequestParam("id") int id) throws IOException {
-		if (LiferayUtil.getUser(request, response) == null) return;
+		if (liferayService.getUser(request, response) == null) return;
 		LOG.info("Machine id: "+id);
 		Machine machine = machineService.getMachine(id);
 		
@@ -164,7 +164,7 @@ public class MachineController {
 	
 	@ResourceMapping("terminateMachine")
 	public void terminateMachine(ResourceRequest request, ResourceResponse response, @RequestParam("id") int id) throws Exception {
-		if (LiferayUtil.getUser(request, response) == null) return;
+		if (liferayService.getUser(request, response) == null) return;
 		LOG.info("Terminating machine id: "+id);
 		Machine machine = machineService.getMachine(id);
 		if(machine == null) {

@@ -17,11 +17,9 @@
 package org.openinfinity.cloud.service.administrator;
 
 import java.util.Collection;
+import java.util.List;
 
-import org.openinfinity.cloud.domain.Cluster;
 import org.openinfinity.cloud.domain.ClusterType;
-import org.openinfinity.cloud.domain.Machine;
-import org.springframework.stereotype.Service;
 
 /**
  * ClusterType service interface provides access to cluster types and their configuration 
@@ -39,5 +37,6 @@ public interface ClusterTypeService {
 	  			"Cores: 8, RAM: 8GB, Disk: 800GB",
 	  			"Cores: 16, RAM: 16GB, Disk: 1000GB"};
 
-	Collection<ClusterType> getAvailableClusterTypes(int configurationId);
+	
+	Collection<ClusterType> getAvailableClusterTypes(List<String> userOrganizations);
 }

@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -31,22 +32,21 @@ import javax.portlet.ResourceResponse;
 
 import org.apache.log4j.Logger;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.openinfinity.cloud.domain.AvailabilityZone;
+import org.openinfinity.cloud.domain.CloudProvider;
 import org.openinfinity.cloud.domain.Cluster;
 import org.openinfinity.cloud.domain.ClusterType;
 import org.openinfinity.cloud.domain.Instance;
 import org.openinfinity.cloud.domain.Job;
+import org.openinfinity.cloud.domain.JobPlatformParameter;
 import org.openinfinity.cloud.domain.Key;
-import org.openinfinity.cloud.service.administrator.ClusterService;
-import org.openinfinity.cloud.service.administrator.ClusterTypeService;
-import org.openinfinity.cloud.service.administrator.InstanceService;
-import org.openinfinity.cloud.service.administrator.JobService;
-import org.openinfinity.cloud.service.administrator.KeyService;
+import org.openinfinity.cloud.service.administrator.*;
 import org.openinfinity.cloud.util.AdminException;
 import org.openinfinity.cloud.util.AdminGeneral;
-import org.openinfinity.cloud.util.LiferayUtil;
-import org.openinfinity.cloud.util.serialization.SerializerUtil;
-import org.openinfinity.cloud.util.serialization.JsonDataWrapper;
+import org.openinfinity.cloud.util.LiferayService;
 import org.openinfinity.cloud.util.collection.ListUtil;
+import org.openinfinity.cloud.util.serialization.JsonDataWrapper;
+import org.openinfinity.cloud.util.serialization.SerializerUtil;
 import org.openinfinity.core.util.ExceptionUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -69,6 +69,7 @@ import com.liferay.portal.service.UserLocalServiceUtil;
  * @author Ossi Hämäläinen
  * @author Juha-Matti Sironen
  * @author Vedran Bartonicek 
+ * @author Timo Tapanainen
  * @version 1.0.0 Initial version
  * @since 1.0.0
  */
@@ -81,6 +82,11 @@ public class CloudAdminController {
 	private static final String MSG_INSTANCE_WRITING_ERROR = "Error writing instance data to HTTP response";
 	private static final String MSG_HTTP_REPLY_WRITING_ERROR = "Error while writing the http reply";
 	private static final int CLUSTER_CONFIGURATION_DEFAULT = 1;
+
+    @Autowired
+    @Qualifier("liferayService")
+    private LiferayService liferayService;
+
 	
 	@Autowired
 	@Qualifier("instanceService")
@@ -93,6 +99,14 @@ public class CloudAdminController {
 	@Autowired
 	@Qualifier("clusterTypeService")
 	private ClusterTypeService clusterTypeService;
+
+    @Autowired
+    @Qualifier("machineTypeService")
+    private MachineTypeService machineTypeService;
+
+    @Autowired
+	@Qualifier("cloudProviderService")
+	private CloudProviderService cloudService;
 	
 	@Autowired
 	@Qualifier("keyService")
@@ -102,12 +116,13 @@ public class CloudAdminController {
 	@Qualifier("jobService")
 	private JobService jobService;
 	
-	@Value("${zonelist}")
-	private List<String> eucaZones;
+	@Autowired
+	@Qualifier("availabilityZoneService")
+	private AvailabilityZoneService zoneService;
 	
 	@RenderMapping
 	public String showView(RenderRequest request, RenderResponse response) {
-		User user = LiferayUtil.getUser(request);
+		User user = liferayService.getUser(request);
 		if(user == null) {
 			response.setProperty(ResourceResponse.HTTP_STATUS_CODE, AdminGeneral.HTTP_ERROR_CODE_USER_NOT_LOGGED_IN);
 			return "notlogged";
@@ -118,7 +133,7 @@ public class CloudAdminController {
 	@ResourceMapping("instanceList")
 	public void getInstanceList(ResourceRequest request, ResourceResponse response) throws Exception {
 		LOG.debug("getInstanceList()");
-		User user = LiferayUtil.getUser(request, response);
+		User user = liferayService.getUser(request, response);
 		if (user == null) return;
 		Collection<Instance> instanceList = instanceService.getInstances(user.getUserId());
 		SerializerUtil.jsonSerialize(response.getWriter(), instanceList);
@@ -128,7 +143,7 @@ public class CloudAdminController {
 	@ResourceMapping("instanceTable")
 	public void getInstanceTable(ResourceRequest request, ResourceResponse response, @RequestParam("page") int page, @RequestParam("rows") int rows) throws Exception {
 		LOG.debug("getInstanceTable()");
-		User user  = LiferayUtil.getUser(request, response);
+		User user  = liferayService.getUser(request, response);
 		if (user == null) return;
 		List<Organization> organizationList = null;
 		List<Organization> subOrganizationList = null;
@@ -202,7 +217,7 @@ public class CloudAdminController {
 	@ResourceMapping("getInstanceKey")
 	public void getInstanceKey(ResourceRequest request, ResourceResponse response, @RequestParam("id") int instanceId) throws IOException {
 		LOG.debug("getInstanceKey()");
-		User user = LiferayUtil.getUser(request, response);
+		User user = liferayService.getUser(request, response);
 		if (user == null) return;	
 		Instance instance = instanceService.getInstance(instanceId);
 		if(instance == null) {
@@ -231,7 +246,7 @@ public class CloudAdminController {
 	@ResourceMapping("instance")
 	public void getInstance(ResourceRequest request, ResourceResponse response, @RequestParam("id") int instanceId) throws Exception {
 		LOG.debug("getInstance()");
-		if (LiferayUtil.getUser(request, response) == null) return;
+		if (liferayService.getUser(request, response) == null) return;
 		Instance instance = instanceService.getInstance(instanceId);
 		LOG.info("Found instance : "+instance.getName() + " Id: "+instance.getInstanceId());	
 		ObjectMapper mapper = new ObjectMapper();
@@ -244,22 +259,29 @@ public class CloudAdminController {
 		}
 	}
 	
+	@ResourceMapping("getCloudProviders")
+	public void getCloudProviders(ResourceRequest request, ResourceResponse response) throws Exception {
+		LOG.debug("getCloudProviders()");
+        User user = liferayService.getUser(request, response);
+		if (user == null) return;
+        List<String> userOrgNames = liferayService.getOrganizationNames(user);
+		Collection<CloudProvider> providers = cloudService.getCloudProviders(userOrgNames);
+		try {
+			SerializerUtil.jsonSerialize(response.getWriter(), providers);
+		} catch (Exception e) {
+			LOG.error("Could not send json coded list of the cloud providers");
+			response.setProperty(ResourceResponse.HTTP_STATUS_CODE, "421");
+			response.getWriter().write("Error locating cloud providers.");
+		}
+	}
 	
 	@ResourceMapping("getCloudZones")
-	public void getCloudZones(ResourceRequest request, ResourceResponse response, @RequestParam("cloud")String cloud) throws Exception {
+	public void getCloudZones(ResourceRequest request, ResourceResponse response, @RequestParam("cloud") int cloudId) throws Exception {
 		LOG.debug("getCloudZones()");
-		if (LiferayUtil.getUser(request, response) == null) return;
-		HashMap<String,String> zones = new HashMap<String,String>();
-		if(cloud != null && cloud.toLowerCase().equals("amazon")) {
-			// TODO fix this hardcoded stuff
-			zones.put("eu-west-1a", "eu-west-1a");
-			zones.put("eu-west-1b", "eu-west-1b");
-			zones.put("eu-west-1c", "eu-west-1c");
-		} else if(cloud != null && cloud.toLowerCase().equals("eucalyptus")) {
-			for(String zone : eucaZones) {
-				zones.put(zone, zone);
-			}
-		}
+        User user = liferayService.getUser(request, response);
+        if (user == null) return;
+        List<String> userOrgNames = liferayService.getOrganizationNames(user);
+        Collection<AvailabilityZone> zones = zoneService.getAvailabilityZones(cloudId, userOrgNames);
 		try {
 			SerializerUtil.jsonSerialize(response.getWriter(), zones);
 		} catch (Exception e) {
@@ -272,10 +294,22 @@ public class CloudAdminController {
 	@ResourceMapping("getAvailableServices")
 	public void getAvailableServices(ResourceRequest request, ResourceResponse response, @RequestParam("id") int instanceId) throws Exception {
 		LOG.debug("getAvailableServices()");
-		if (LiferayUtil.getUser(request, response) == null) return;
-		Instance instance = instanceService.getInstance(instanceId);
 		
+		User user = liferayService.getUser(request, response);
+		if (user == null) return;
+
+		Instance instance = instanceService.getInstance(instanceId);
 		Collection<Cluster> clusterList = clusterService.getClusters(instance.getInstanceId());
+		
+		List<String> userOrgNames = liferayService.getOrganizationNames(user);
+		LOG.info("user organizations: " + userOrgNames);
+		Collection<ClusterType> clusterTypeList = clusterTypeService.getAvailableClusterTypes(userOrgNames);
+		HashMap<Integer,String> serviceMap = new HashMap<Integer,String>();
+		for (ClusterType clusterType : clusterTypeList){
+			serviceMap.put(clusterType.getId(), clusterType.getTitle());
+		}
+
+		/*12.2.2013 PK: reading configuration from database
 		HashMap<Integer,String> serviceMap = new HashMap<Integer,String>();
 		serviceMap.put(ClusterService.CLUSTER_TYPE_PORTAL, ClusterService.CLUSTER_TYPE_NAME[ClusterService.CLUSTER_TYPE_PORTAL]);
 		serviceMap.put(ClusterService.CLUSTER_TYPE_BIGDATA, ClusterService.CLUSTER_TYPE_NAME[ClusterService.CLUSTER_TYPE_BIGDATA]);
@@ -286,6 +320,7 @@ public class CloudAdminController {
 		serviceMap.put(ClusterService.CLUSTER_TYPE_IDENTITY_GATEWAY, ClusterService.CLUSTER_TYPE_NAME[ClusterService.CLUSTER_TYPE_IDENTITY_GATEWAY]);
 		serviceMap.put(ClusterService.CLUSTER_TYPE_EE, ClusterService.CLUSTER_TYPE_NAME[ClusterService.CLUSTER_TYPE_EE]);
 		serviceMap.put(ClusterService.CLUSTER_TYPE_ECM, ClusterService.CLUSTER_TYPE_NAME[ClusterService.CLUSTER_TYPE_ECM]);
+		*/
 
 		Iterator<Cluster> i = clusterList.iterator();	
 		while(i.hasNext()) {
@@ -303,7 +338,7 @@ public class CloudAdminController {
 		@RequestParam("id") int instanceId) {
 		
 		try {
-			if (LiferayUtil.getUser(request, response) == null) 
+			if (liferayService.getUser(request, response) == null)
 				throw new AdminException("User not logged in");
 			
 			Instance instance = instanceService.getInstance(instanceId);
@@ -331,7 +366,7 @@ public class CloudAdminController {
 	public void deleteInstance(ResourceRequest request, ResourceResponse response, @RequestParam("id") int instanceId) throws Exception {
 		LOG.info("deleteInstance() for instance id: " + instanceId);
 
-		if (LiferayUtil.getUser(request, response) == null) return;	
+		if (liferayService.getUser(request, response) == null) return;
 		Instance instance = instanceService.getInstance(instanceId);
 		if(instance != null) {
 			instanceService.updateInstanceStatus(instanceId, "Deleting");		
@@ -343,24 +378,22 @@ public class CloudAdminController {
 	@ResourceMapping("addInstance")
 	public void addInstance(ResourceRequest request, ResourceResponse response, @RequestParam Map<String, String> pm){
 		try{
-			LOG.error("addInstance " + pm);
+			LOG.info("addInstance " + pm);
 			
-			User user = LiferayUtil.getUser(request, response);
+			User user = liferayService.getUser(request, response);
 			if (user == null) throw new AdminException("User not logged in");
 			Instance instance = new Instance();
 			instance.setName(pm.get("instancename"));
 			instance.setUserId((int)user.getUserId());
 			instance.setZone(pm.get("zone"));
 			long[] orgIds = user.getOrganizationIds();
-			if(orgIds.length > 0) instance.setOrganizationid(orgIds[0]);
+			if (orgIds.length > 0) 
+				instance.setOrganizationid(orgIds[0]);
 			
-			if (pm.get("cloudtype").equals("amazon"))	instance.setCloudType(InstanceService.CLOUD_TYPE_AMAZON);
-			else if (pm.get("cloudtype").equals("eucalyptus")) instance.setCloudType(InstanceService.CLOUD_TYPE_EUCALYPTUS);
-			//else plop
-			
+			instance.setCloudType(Integer.parseInt(pm.get("cloudtype")));
 			instance.setStatus("Starting");
 			instanceService.addInstance(instance);			
-			
+
 			Job job = new Job(	"create_instance", 
 								instance.getInstanceId(), 
 								instance.getCloudType(), 
@@ -389,6 +422,32 @@ public class CloudAdminController {
 					pm.get("rdbmsimagetype"), pm.get("rdbmsesbvolumesize"));
 			}
 			
+			if ("true".equals(pm.get("jbossservice"))) {
+				job.addService(ClusterService.SERVICE_NAME[ClusterService.CLUSTER_TYPE_YA_SERVICE],	pm.get("jbossserviceclustersize"), pm.get("jbossservicemachinesize"),
+					pm.get("jbossserviceimagetype"), pm.get("jbossserviceesbvolumesize"));
+				if (pm.get("jbossservicedatasourceurl").length() > 0) {
+					job.addParameter(new JobPlatformParameter("service_datasource_url", pm.get("jbossservicedatasourceurl")));
+					job.addParameter(new JobPlatformParameter("service_datasource_user", pm.get("jbossservicedatasourceuser")));
+					job.addParameter(new JobPlatformParameter("service_datasource_password", pm.get("jbossservicedatasourcepassword")));
+				}			
+			}			
+
+			if ("true".equals(pm.get("jbossportal"))) {
+				job.addService(ClusterService.SERVICE_NAME[ClusterService.CLUSTER_TYPE_YA_PORTAL],	pm.get("jbossportalclustersize"), pm.get("jbossportalmachinesize"),
+					pm.get("jbossportalimagetype"), pm.get("jbossportalesbvolumesize"));
+				if ("true".equals(pm.get("jbossportalliveinstance"))) {
+					job.addParameter(new JobPlatformParameter("portal_live", pm.get("jbossportalliveinstance")));
+				}
+				if (pm.get("jbossportaldatasourceurl").length() > 0) {
+					job.addParameter(new JobPlatformParameter("portal_datasource_url", pm.get("jbossportaldatasourceurl")));
+					job.addParameter(new JobPlatformParameter("portal_datasource_user", pm.get("jbossportaldatasourceuser")));
+					job.addParameter(new JobPlatformParameter("portal_datasource_password", pm.get("jbossportaldatasourcepassword")));
+				}
+                if ("true".equals(pm.get("jbossportalsolr"))) {
+                    job.addParameter(new JobPlatformParameter("portal_solr", "true"));
+                }
+			}
+			
 			boolean withEcmService = "true".equals(pm.get("ecm"));
 			boolean withIgService = "true".equals(pm.get("ig"));
 			if ("true".equals(pm.get("portal"))) {
@@ -413,7 +472,7 @@ public class CloudAdminController {
 			jobService.addJob(job);
 			
 		} catch (Exception e) {
-			LOG.error("Error setting up the instance: "+e.getMessage());
+			LOG.error("Error setting up the instance: "+e.getMessage(), e);
 			response.setProperty(ResourceResponse.HTTP_STATUS_CODE, "421");
 			try {
 				response.getWriter().write(e.getMessage());
@@ -425,7 +484,7 @@ public class CloudAdminController {
 	
 	@ResourceMapping("availableClusters")
 	public void instanceContent(ResourceRequest request, ResourceResponse response, @RequestParam("instanceId") int instanceId) throws Exception {
-		if (LiferayUtil.getUser(request, response) == null) return;
+		if (liferayService.getUser(request, response) == null) return;
 		Collection<Cluster> clusterList = clusterService.getClusters(instanceId);
 		if(clusterList !=  null) SerializerUtil.jsonSerialize(response.getWriter(), clusterList);
 		else return;
@@ -433,7 +492,7 @@ public class CloudAdminController {
 
 	@ResourceMapping("instanceStatus")
 	public void instanceStatus(ResourceRequest request, ResourceResponse response, @RequestParam("instanceId") int instanceId) throws Exception {
-		if (LiferayUtil.getUser(request, response) == null) return;
+		if (liferayService.getUser(request, response) == null) return;
 		try {
 			Instance instance = instanceService.getInstance(instanceId);	
 			if(instance != null) response.getWriter().write(instance.getStatus());
@@ -448,15 +507,22 @@ public class CloudAdminController {
 	
 	@ResourceMapping("getClusterTypes")
 	public void getClusterTypes(ResourceRequest request, ResourceResponse response) throws Exception {
-		if (LiferayUtil.getUser(request, response) == null) return;
-		Collection<ClusterType> clusterTypeList = clusterTypeService.getAvailableClusterTypes(CLUSTER_CONFIGURATION_DEFAULT);
+		User user = liferayService.getUser(request, response);
+		if (user == null) return;
+		List<String> userOrgNames = liferayService.getOrganizationNames(user);
+		LOG.info("user organizations: " + userOrgNames);
+		Collection<ClusterType> clusterTypeList = clusterTypeService.getAvailableClusterTypes(userOrgNames);
 		if(clusterTypeList !=  null) SerializerUtil.jsonSerialize(response.getWriter(), clusterTypeList);
 		else return;
 	}
 	
 	@ResourceMapping("getMachineTypes")
 	public void getMachineTypes(ResourceRequest request, ResourceResponse response) throws Exception {
-		if (LiferayUtil.getUser(request, response) == null) return;
-		SerializerUtil.jsonSerialize(response.getWriter(), ClusterTypeService.MACHINE_TYPES);
+        User user = liferayService.getUser(request, response);
+        if (user == null) return;
+        List<String> userOrgNames = liferayService.getOrganizationNames(user);
+        SerializerUtil.jsonSerialize(response.getWriter(), machineTypeService.getMachineTypes(userOrgNames));
 	}
+	
+
 }

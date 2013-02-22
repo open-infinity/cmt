@@ -17,6 +17,9 @@ package org.openinfinity.cloud.domain;
 
 import java.sql.Timestamp;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import lombok.Data;
 
 /**
@@ -42,6 +45,9 @@ public class Job {
 	private Timestamp createTime;
 	private Timestamp startTime;
 	private Timestamp endTime;
+	
+	//Job and Platform parameters
+	private List<JobPlatformParameter> parameters;
 	
 	// Constructors
 	public Job (){};
@@ -104,6 +110,14 @@ public class Job {
 	public void addService(String service, String numberOfMachines, String machineSize, String imageType, String ebsVolumeSize) {
 		addService(service, Integer.parseInt(numberOfMachines));
 		this.services += "," + machineSize + "," + imageType + "," +ebsVolumeSize;
+	}
+
+	public void addParameter(JobPlatformParameter param) {
+		if (parameters==null){
+			parameters=new ArrayList<JobPlatformParameter>();
+		}
+		parameters.add(param);
+		
 	}
 	
 }

@@ -18,6 +18,8 @@ package org.openinfinity.cloud.domain;
 
 import java.io.Serializable;
 
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.openinfinity.core.annotation.NotScript;
 
 import lombok.Data;
@@ -33,6 +35,8 @@ import lombok.NonNull;
  */
 
 @Data
+@NoArgsConstructor
+@RequiredArgsConstructor
 public class ClusterType implements Serializable {
 	@NonNull
 	@NotScript
