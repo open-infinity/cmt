@@ -213,19 +213,19 @@ public class CloudAdminControllerTest {
 
         int foundParams = 0;
         for (JobPlatformParameter p : parameters) {
-            if ("portal.solr".equals(p.getKey())) {
+            if ("portal_solr".equals(p.getKey())) {
                 assertEquals("true", p.getValue());
                 ++foundParams;
-            } else if ("portal.live".equals(p.getKey())) {
+            } else if ("portal_live".equals(p.getKey())) {
                 assertEquals("true", p.getValue());
                 ++foundParams;
-            } else if ("portal.datasource.url".equals(p.getKey())) {
+            } else if ("portal_datasource_url".equals(p.getKey())) {
                 assertEquals("testurl", p.getValue());
                 ++foundParams;
-            } else if ("portal.datasource.user".equals(p.getKey())) {
+            } else if ("portal_datasource_user".equals(p.getKey())) {
                 assertEquals("testuser", p.getValue());
                 ++foundParams;
-            } else if ("portal.datasource.password".equals(p.getKey())) {
+            } else if ("portal_datasource_password".equals(p.getKey())) {
                 assertEquals("testpassword", p.getValue());
                 ++foundParams;
             } else {
