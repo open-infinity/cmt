@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -37,8 +36,8 @@ import org.openinfinity.cloud.domain.CloudProvider;
 import org.openinfinity.cloud.domain.Cluster;
 import org.openinfinity.cloud.domain.ClusterType;
 import org.openinfinity.cloud.domain.Instance;
+import org.openinfinity.cloud.domain.InstanceParameter;
 import org.openinfinity.cloud.domain.Job;
-import org.openinfinity.cloud.domain.JobPlatformParameter;
 import org.openinfinity.cloud.domain.Key;
 import org.openinfinity.cloud.service.administrator.*;
 import org.openinfinity.cloud.util.AdminException;
@@ -50,7 +49,6 @@ import org.openinfinity.cloud.util.serialization.SerializerUtil;
 import org.openinfinity.core.util.ExceptionUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -70,6 +68,7 @@ import com.liferay.portal.service.UserLocalServiceUtil;
  * @author Juha-Matti Sironen
  * @author Vedran Bartonicek 
  * @author Timo Tapanainen
+ * @author Ari Simanainen
  * @version 1.0.0 Initial version
  * @since 1.0.0
  */
@@ -81,7 +80,6 @@ public class CloudAdminController {
 	private static final Logger LOG = Logger.getLogger(CloudAdminController.class.getName());
 	private static final String MSG_INSTANCE_WRITING_ERROR = "Error writing instance data to HTTP response";
 	private static final String MSG_HTTP_REPLY_WRITING_ERROR = "Error while writing the http reply";
-	private static final int CLUSTER_CONFIGURATION_DEFAULT = 1;
 
     @Autowired
     @Qualifier("liferayService")
@@ -309,19 +307,6 @@ public class CloudAdminController {
 			serviceMap.put(clusterType.getId(), clusterType.getTitle());
 		}
 
-		/*12.2.2013 PK: reading configuration from database
-		HashMap<Integer,String> serviceMap = new HashMap<Integer,String>();
-		serviceMap.put(ClusterService.CLUSTER_TYPE_PORTAL, ClusterService.CLUSTER_TYPE_NAME[ClusterService.CLUSTER_TYPE_PORTAL]);
-		serviceMap.put(ClusterService.CLUSTER_TYPE_BIGDATA, ClusterService.CLUSTER_TYPE_NAME[ClusterService.CLUSTER_TYPE_BIGDATA]);
-		serviceMap.put(ClusterService.CLUSTER_TYPE_MULE_MQ, ClusterService.CLUSTER_TYPE_NAME[ClusterService.CLUSTER_TYPE_MULE_MQ]);
-		serviceMap.put(ClusterService.CLUSTER_TYPE_DATABASE, ClusterService.CLUSTER_TYPE_NAME[ClusterService.CLUSTER_TYPE_DATABASE]);
-		serviceMap.put(ClusterService.CLUSTER_TYPE_BAS, ClusterService.CLUSTER_TYPE_NAME[ClusterService.CLUSTER_TYPE_BAS]);
-		serviceMap.put(ClusterService.CLUSTER_TYPE_NOSQL, ClusterService.CLUSTER_TYPE_NAME[ClusterService.CLUSTER_TYPE_NOSQL]);
-		serviceMap.put(ClusterService.CLUSTER_TYPE_IDENTITY_GATEWAY, ClusterService.CLUSTER_TYPE_NAME[ClusterService.CLUSTER_TYPE_IDENTITY_GATEWAY]);
-		serviceMap.put(ClusterService.CLUSTER_TYPE_EE, ClusterService.CLUSTER_TYPE_NAME[ClusterService.CLUSTER_TYPE_EE]);
-		serviceMap.put(ClusterService.CLUSTER_TYPE_ECM, ClusterService.CLUSTER_TYPE_NAME[ClusterService.CLUSTER_TYPE_ECM]);
-		*/
-
 		Iterator<Cluster> i = clusterList.iterator();	
 		while(i.hasNext()) {
 			Cluster cluster = i.next();
@@ -392,7 +377,27 @@ public class CloudAdminController {
 			
 			instance.setCloudType(Integer.parseInt(pm.get("cloudtype")));
 			instance.setStatus("Starting");
-			instanceService.addInstance(instance);			
+			if ("true".equals(pm.get("jbossservice"))) {
+				if (pm.get("jbossservicedatasourceurl").length() > 0) {
+					instance.addParameter(new InstanceParameter("service_datasource_url", pm.get("jbossservicedatasourceurl")));
+					instance.addParameter(new InstanceParameter("service_datasource_user", pm.get("jbossservicedatasourceuser")));
+					instance.addParameter(new InstanceParameter("service_datasource_password", pm.get("jbossservicedatasourcepassword")));
+				}
+			}
+			if ("true".equals(pm.get("jbossportal"))) {
+				if ("true".equals(pm.get("jbossportalliveinstance"))) {
+					instance.addParameter(new InstanceParameter("portal_live", pm.get("jbossportalliveinstance")));
+				}
+				if (pm.get("jbossportaldatasourceurl").length() > 0) {
+					instance.addParameter(new InstanceParameter("portal_datasource_url", pm.get("jbossportaldatasourceurl")));
+					instance.addParameter(new InstanceParameter("portal_datasource_user", pm.get("jbossportaldatasourceuser")));
+					instance.addParameter(new InstanceParameter("portal_datasource_password", pm.get("jbossportaldatasourcepassword")));
+				}
+                if ("true".equals(pm.get("jbossportalsolr"))) {
+                	instance.addParameter(new InstanceParameter("portal_solr", "true"));
+                }
+			}
+			instanceService.addInstance(instance);
 
 			Job job = new Job(	"create_instance", 
 								instance.getInstanceId(), 
@@ -425,27 +430,11 @@ public class CloudAdminController {
 			if ("true".equals(pm.get("jbossservice"))) {
 				job.addService(ClusterService.SERVICE_NAME[ClusterService.CLUSTER_TYPE_YA_SERVICE],	pm.get("jbossserviceclustersize"), pm.get("jbossservicemachinesize"),
 					pm.get("jbossserviceimagetype"), pm.get("jbossserviceesbvolumesize"));
-				if (pm.get("jbossservicedatasourceurl").length() > 0) {
-					job.addParameter(new JobPlatformParameter("service_datasource_url", pm.get("jbossservicedatasourceurl")));
-					job.addParameter(new JobPlatformParameter("service_datasource_user", pm.get("jbossservicedatasourceuser")));
-					job.addParameter(new JobPlatformParameter("service_datasource_password", pm.get("jbossservicedatasourcepassword")));
-				}			
 			}			
 
 			if ("true".equals(pm.get("jbossportal"))) {
 				job.addService(ClusterService.SERVICE_NAME[ClusterService.CLUSTER_TYPE_YA_PORTAL],	pm.get("jbossportalclustersize"), pm.get("jbossportalmachinesize"),
 					pm.get("jbossportalimagetype"), pm.get("jbossportalesbvolumesize"));
-				if ("true".equals(pm.get("jbossportalliveinstance"))) {
-					job.addParameter(new JobPlatformParameter("portal_live", pm.get("jbossportalliveinstance")));
-				}
-				if (pm.get("jbossportaldatasourceurl").length() > 0) {
-					job.addParameter(new JobPlatformParameter("portal_datasource_url", pm.get("jbossportaldatasourceurl")));
-					job.addParameter(new JobPlatformParameter("portal_datasource_user", pm.get("jbossportaldatasourceuser")));
-					job.addParameter(new JobPlatformParameter("portal_datasource_password", pm.get("jbossportaldatasourcepassword")));
-				}
-                if ("true".equals(pm.get("jbossportalsolr"))) {
-                    job.addParameter(new JobPlatformParameter("portal_solr", "true"));
-                }
 			}
 			
 			boolean withEcmService = "true".equals(pm.get("ecm"));

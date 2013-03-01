@@ -17,6 +17,8 @@
 package org.openinfinity.cloud.domain;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.openinfinity.core.annotation.NotScript;
 
@@ -53,4 +55,14 @@ public class Instance implements Serializable {
 	@NotScript
 	private String organizationName;
 	
+	//Instance parameters
+	private List<InstanceParameter> parameters;
+		
+	public void addParameter(InstanceParameter param) {
+		if (parameters==null){
+			parameters=new ArrayList<InstanceParameter>();
+		}
+		parameters.add(param);		
+	}
+		
 }
