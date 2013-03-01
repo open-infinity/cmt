@@ -27,6 +27,7 @@ import javax.sql.DataSource;
 
 import org.apache.log4j.Logger;
 import org.openinfinity.cloud.domain.Instance;
+import org.openinfinity.cloud.domain.InstanceParameter;
 import org.openinfinity.core.annotation.AuditTrail;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -66,18 +67,31 @@ public class InstanceRepositoryJdbcImpl implements InstanceRepository {
 	public Instance getInstance(int instanceId) {
 		List<Instance> instances = this.jdbcTemplate.query("select * from instance_tbl where instance_active = 1 and instance_id = ?", new Object[] { instanceId }, new InstanceMapper());
 		Instance instance = DataAccessUtils.singleResult(instances);
+		if (instance!=null){
+			instance.setParameters(getParameters(instance.getInstanceId()));
+		}
 		return instance;
 	}
-
+	
 	@AuditTrail
 	public Collection<Instance> getInstances(Long userId) {
 		Collection<Instance> instances = this.jdbcTemplate.query("select * from instance_tbl where instance_active = 1 and user_id = ?", new Object[] { userId }, new InstanceMapper());
+		if (instances!=null){
+			for (Instance instance:instances){
+				instance.setParameters(getParameters(instance.getInstanceId()));
+			}
+		}
 		return instances;
 	}
 	
 	@AuditTrail
 	public Collection<Instance> getOrganizationInstances(Long organizationId) {
 		Collection<Instance> instances = this.jdbcTemplate.query("select * from instance_tbl where instance_active = 1 and organization_id = ?", new Object[] {organizationId}, new InstanceMapper());
+		if (instances!=null){
+			for (Instance instance:instances){
+				instance.setParameters(getParameters(instance.getInstanceId()));
+			}
+		}
 		return instances;
 	}
 
@@ -85,6 +99,9 @@ public class InstanceRepositoryJdbcImpl implements InstanceRepository {
 	public Instance getInstance(String name) {
 		Collection<Instance> instances = this.jdbcTemplate.query("select * from instance_tbl where instance_active = 1 and instance_name = ?", new Object[] { name }, new InstanceMapper());
 		Instance instance = DataAccessUtils.singleResult(instances);
+		if (instance!=null){
+			instance.setParameters(getParameters(instance.getInstanceId()));
+		}
 		return instance;
 	}
 
@@ -92,6 +109,9 @@ public class InstanceRepositoryJdbcImpl implements InstanceRepository {
 	public Instance getInstance(int userId, String name) {
 		Collection<Instance> instances = this.jdbcTemplate.query("select * from instance_tbl where instance_active = 1 and instance_name = ? and user_id = ?", new Object[] { name, userId }, new InstanceMapper());
 		Instance instance = DataAccessUtils.singleResult(instances);
+		if (instance!=null){
+			instance.setParameters(getParameters(instance.getInstanceId()));
+		}
 		return instance;
 	}
 	
@@ -99,6 +119,9 @@ public class InstanceRepositoryJdbcImpl implements InstanceRepository {
 	public Instance getInstanceByMachineId(int machineId) {
 		Collection<Instance> instances = this.jdbcTemplate.query("select * from instance_tbl where instance_id = (select instance_id from cluster_tbl where cluster_id = (select machine_cluster_id from machine_tbl where machine_id = ?))", new Object[] {machineId}, new InstanceMapper());
 		Instance instance = DataAccessUtils.singleResult(instances);
+		if (instance!=null){
+			instance.setParameters(getParameters(instance.getInstanceId()));
+		}
 		return instance;
 	}
 	
@@ -121,11 +144,27 @@ public class InstanceRepositoryJdbcImpl implements InstanceRepository {
 		Number newId = insert.executeAndReturnKey(parameters);
 		LOG.info("Instance id: "+newId);
 		instance.setInstanceId(newId.intValue());
+		
+		if (instance.getParameters()!=null){
+			for (InstanceParameter parameter:instance.getParameters()){
+				SimpleJdbcInsert paraminsert = new SimpleJdbcInsert(dataSource).withTableName("instance_parameter_tbl").usingGeneratedKeyColumns("id");
+				Map<String,Object> parametersmap = new HashMap<String,Object>();
+				parametersmap.put("instance_id", newId);
+				parametersmap.put("pkey", parameter.getKey());
+				parametersmap.put("pvalue", parameter.getValue());
+				paraminsert.executeAndReturnKey(parametersmap);
+			}
+		}		
 	}
 
 	@AuditTrail
 	public void deleteInstance(int instanceId) {
 		this.jdbcTemplate.execute("update instance_tbl set instance_active = 0 where instance_id = "+instanceId);
+	}
+
+	private List<InstanceParameter> getParameters(int instanceId){
+		List<InstanceParameter> parameters= this.jdbcTemplate.query("select * from instance_parameter_tbl where instance_id = ?", new Object[] {instanceId}, new InstanceParameterMapper());		
+		return parameters;
 	}
 	
 	private static final class InstanceMapper implements RowMapper<Instance> {
@@ -144,4 +183,15 @@ public class InstanceRepositoryJdbcImpl implements InstanceRepository {
 		
 	}
 	
+	private static final class InstanceParameterMapper implements RowMapper<InstanceParameter> {
+
+		public InstanceParameter mapRow(ResultSet rs, int rowNumber) throws SQLException {
+			InstanceParameter parameter = new InstanceParameter();
+			parameter.setInstanceId(rs.getInt("instance_id"));
+			parameter.setId(rs.getInt("id"));
+			parameter.setKey(rs.getString("pkey"));
+			parameter.setValue(rs.getString("pvalue"));
+			return parameter;
+		}		
+	}
 }

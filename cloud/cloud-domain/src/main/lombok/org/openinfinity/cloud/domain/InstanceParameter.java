@@ -3,22 +3,22 @@ package org.openinfinity.cloud.domain;
 import lombok.Data;
 
 /**
- * JobPlatformParameter domain object
- * @author Pasi Kilponen
+ * InstanceParameter domain object
+ * @author Ari Simanainen
  * @version 1.0.0 Initial version
  * @since 1.0.0
  */
 @Data
-public class JobPlatformParameter {
+public class InstanceParameter {
 	private int id;
-	private int jobId;
+	private int instanceId;
 	private String key;
 	private String value;
 
 	// Constructors
-	public JobPlatformParameter (){};
+	public InstanceParameter (){};
 	
-	public JobPlatformParameter (String aKey, String aValue){
+	public InstanceParameter (String aKey, String aValue){
 		key = aKey;
 		value = aValue;
 	}
