@@ -5,7 +5,7 @@ DROP TABLE IF EXISTS `acl_machine_type_tbl`;
 DROP TABLE IF EXISTS `availability_zone_tbl`;
 DROP TABLE IF EXISTS `cloud_provider_tbl`;
 DROP TABLE IF EXISTS `machine_type_tbl`;
-DROP TABLE IF EXISTS `job_platform_parameter_tbl`;
+DROP TABLE IF EXISTS `instance_parameter_tbl`;
 DROP TABLE IF EXISTS `DEPLOYMENT`;
 DROP TABLE IF EXISTS `authorized_ip_tbl`;
 DROP TABLE IF EXISTS `cluster_tbl`;

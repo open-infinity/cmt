@@ -203,16 +203,10 @@ public class CloudAdminControllerTest {
         assertEquals(EUCA_ID, inst1.getCloudType());
         assertEquals("inst1", inst1.getName());
         assertEquals(EUCA_ZONE_NAME, inst1.getZone());
-
-        List<Job> jobs = jobRepository.getJobsForInstance(inst1id);
-        assertEquals(1, jobs.size());
-        Job inst1Job = jobs.get(0);
-        assertEquals("jboss_portal_platform,1,0,0,null", inst1Job.getServices());
-        List<JobPlatformParameter> parameters = inst1Job.getParameters();
+        List<InstanceParameter> parameters = inst1.getParameters();
         assertEquals(5, parameters.size());
-
         int foundParams = 0;
-        for (JobPlatformParameter p : parameters) {
+        for (InstanceParameter p : parameters) {
             if ("portal_solr".equals(p.getKey())) {
                 assertEquals("true", p.getValue());
                 ++foundParams;
@@ -233,6 +227,11 @@ public class CloudAdminControllerTest {
             }
         }
         assertEquals("expected job parameters do not match with actual", 5, foundParams);
+
+        List<Job> jobs = jobRepository.getJobsForInstance(inst1id);
+        assertEquals(1, jobs.size());
+        Job inst1Job = jobs.get(0);
+        assertEquals("jboss_portal_platform,1,0,0,null", inst1Job.getServices());
 
     }
 }
