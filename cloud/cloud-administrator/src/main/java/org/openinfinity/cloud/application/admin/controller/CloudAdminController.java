@@ -447,8 +447,17 @@ public class CloudAdminController {
                     job.addParameter(new JobPlatformParameter("portal_solr", "true"));
                 }
 			}
-			
-			boolean withEcmService = "true".equals(pm.get("ecm"));
+
+            if ("true".equals(pm.get("jbosssolr"))) {
+                job.addService(ClusterService.SERVICE_NAME[ClusterService.CLUSTER_TYPE_JBOSS_SOLR],
+                        pm.get("jbosssolrclustersize"),
+                        pm.get("jbosssolrmachinesize"),
+                        pm.get("jbosssolrimagetype"),
+                        pm.get("jbosssolresbvolumesize"));
+            }
+
+
+            boolean withEcmService = "true".equals(pm.get("ecm"));
 			boolean withIgService = "true".equals(pm.get("ig"));
 			if ("true".equals(pm.get("portal"))) {
 				// TODO create constants

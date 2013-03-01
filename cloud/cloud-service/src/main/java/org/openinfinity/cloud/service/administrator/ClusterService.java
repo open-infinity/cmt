@@ -55,6 +55,8 @@ public interface ClusterService {
 	static final int CLUSTER_TYPE_JBOSS_PORTAL = 10;
 	
 	static final int CLUSTER_TYPE_JBOSS_SERVICE = 11;
+
+    static final int CLUSTER_TYPE_JBOSS_SOLR = 12;
 	
 	static final int CLUSTER_STATUS_PUBLIC = 1;
 	

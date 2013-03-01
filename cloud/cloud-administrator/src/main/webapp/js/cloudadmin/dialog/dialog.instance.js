@@ -184,7 +184,7 @@
 									}
 								}
 								// make dependency possible to unselect
-								if (!found ) depenentPlatformContainer.find('.togglePlatformSelectionRow :radio').attr("disabled", false).button("refresh");
+								if (!found ) dependentPlatformContainer.find('.togglePlatformSelectionRow :radio').attr("disabled", false).button("refresh");
 							}
 							grandpa.find(".jq_slider").slider({ disabled: true});		
 							grandpa.find(".configRow").fadeTo(500, ".5");
@@ -242,8 +242,26 @@
 							datasourceRow.find(":password").attr("disabled", false);
 						}
 					});
-										
-					$("#addInstanceDialog .machineSizeRow :radio").change(function(e) {
+
+                    $("#addInstanceDialog .toggleSolrRow :radio").change(function() {
+                        var $source = $(this);
+                        var $dependentPlatformContainer = $("#jbosssolr");
+                        var $dependentTogglePlatformOnRadio;
+                        if ($source.attr('id').indexOf('toggleSolrRadioOn') != -1) {
+                            $dependentTogglePlatformOnRadio = $dependentPlatformContainer.find('input[id*="togglePlatformRadioOn_"]');
+                            $dependentTogglePlatformOnRadio.attr('checked',true).button("refresh");
+                            // make dependency selected
+                            toggleGrandunclesClass($dependentTogglePlatformOnRadio, "select", 0);
+                            // make dependency impossible to unselect
+                            $dependentPlatformContainer.find('.togglePlatformSelectionRow :radio').attr("disabled", true).button("refresh");
+                        } else {
+                            // make dependency possible to unselect
+                            $dependentPlatformContainer.find('.togglePlatformSelectionRow :radio').attr("disabled", false).button("refresh");
+                        }
+                    });
+
+
+                    $("#addInstanceDialog .machineSizeRow :radio").change(function(e) {
 						$(this).parent().next().text(cloudadmin.resource.machineTypes[$(this).attr("value")].specification);
 					});	
 							
