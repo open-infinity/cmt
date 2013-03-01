@@ -1,14 +1,12 @@
 
-cloud/cloud-connectionpool-manager/.classpath
+# ignore maven build stuff
+target/
 
-cloud/cloud-worker/src/main/resources/worker_jdbc.properties
+# ignore Eclipse metadata
+.settings/
+.project
+.classpath
 
-*.properties
+# ignore IDEA metadata
+*.iml
 
-cloud/cloud-connectionpool-manager/.project
-
-cloud/cloud-worker/src/main/resources/EucaCredentials.properties
-
-cloud/cloud-worker/src/main/resources/cloudadminworker.properties
-
-cloud/cloud-worker/src/main/resources/infrastructure.properties
