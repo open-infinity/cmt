@@ -428,12 +428,12 @@ public class CloudAdminController {
 			}
 			
 			if ("true".equals(pm.get("jbossservice"))) {
-				job.addService(ClusterService.SERVICE_NAME[ClusterService.CLUSTER_TYPE_YA_SERVICE],	pm.get("jbossserviceclustersize"), pm.get("jbossservicemachinesize"),
+				job.addService(ClusterService.SERVICE_NAME[ClusterService.CLUSTER_TYPE_JBOSS_SERVICE],	pm.get("jbossserviceclustersize"), pm.get("jbossservicemachinesize"),
 					pm.get("jbossserviceimagetype"), pm.get("jbossserviceesbvolumesize"));
 			}			
 
 			if ("true".equals(pm.get("jbossportal"))) {
-				job.addService(ClusterService.SERVICE_NAME[ClusterService.CLUSTER_TYPE_YA_PORTAL],	pm.get("jbossportalclustersize"), pm.get("jbossportalmachinesize"),
+				job.addService(ClusterService.SERVICE_NAME[ClusterService.CLUSTER_TYPE_JBOSS_PORTAL],	pm.get("jbossportalclustersize"), pm.get("jbossportalmachinesize"),
 					pm.get("jbossportalimagetype"), pm.get("jbossportalesbvolumesize"));
 			}
 			
