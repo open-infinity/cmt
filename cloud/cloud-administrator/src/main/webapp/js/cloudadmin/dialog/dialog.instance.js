@@ -246,17 +246,21 @@
                     $("#addInstanceDialog .toggleSolrRow :radio").change(function() {
                         var $source = $(this);
                         var $dependentPlatformContainer = $("#jbosssolr");
-                        var $dependentTogglePlatformOnRadio;
+
                         if ($source.attr('id').indexOf('toggleSolrRadioOn') != -1) {
-                            $dependentTogglePlatformOnRadio = $dependentPlatformContainer.find('input[id*="togglePlatformRadioOn_"]');
-                            $dependentTogglePlatformOnRadio.attr('checked',true).button("refresh");
-                            // make dependency selected
-                            toggleGrandunclesClass($dependentTogglePlatformOnRadio, "select", 0);
-                            // make dependency impossible to unselect
+                            var $dependentTogglePlatformOnRadio = $dependentPlatformContainer.find('input[id*="togglePlatformRadioOn_"]');
+                            $dependentTogglePlatformOnRadio.attr('checked',true).trigger("change"); //button("refresh");
                             $dependentPlatformContainer.find('.togglePlatformSelectionRow :radio').attr("disabled", true).button("refresh");
+                            // make dependency selected
+                            //toggleGrandunclesClass($dependentTogglePlatformOnRadio, "select", 0);
+                            // make dependency impossible to unselect
+
                         } else {
-                            // make dependency possible to unselect
+                            var $dependentTogglePlatformOffRadio = $dependentPlatformContainer.find('input[id*="togglePlatformRadioOff_"]');
                             $dependentPlatformContainer.find('.togglePlatformSelectionRow :radio').attr("disabled", false).button("refresh");
+                            $dependentTogglePlatformOffRadio.attr('checked',false).trigger("change"); //button("refresh");
+                            //toggleGrandunclesClass($dependentTogglePlatformOffRadio, "unselect", 0);
+
                         }
                     });
 
@@ -381,7 +385,9 @@
 						if($('#' + "toggleLiveInstanceRadioOn_" + clusters[i].name).attr('checked')){
 							outData[clusters[i].name + "liveinstance"] = "true";
 						}
-						else {
+                        // replaced earlier "else" statement with explicit check of live instance status
+                        // this was done to prevent live instance parameter to leak other platform types
+                        if($('#' + "toggleLiveInstanceRadioOff_" + clusters[i].name).attr('checked')) {
 							outData[clusters[i].name + "liveinstance"] = "false";
 						}
 						if($('#' + "toggleSolrRadioOn_" + clusters[i].name).attr('checked')){

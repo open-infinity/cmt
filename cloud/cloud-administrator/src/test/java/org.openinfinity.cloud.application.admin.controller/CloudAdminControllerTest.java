@@ -164,6 +164,7 @@ public class CloudAdminControllerTest {
         assertEquals(CTYPE_JBOSS_SERVICE_NAME, ct.getName());
     }
 
+
     @Test
     public void testAddJBossPortalInstance() {
         liferayService.mockUserWithOrganizations("OPPYATOAS");
@@ -179,11 +180,94 @@ public class CloudAdminControllerTest {
         requestMap.put("jbossportalimagetype", "0");
         requestMap.put("jbossportalesb", "false");
         requestMap.put("jbossportalvolumesize", "0");
+        requestMap.put("jbossportalsolr", "false");
+        requestMap.put("jbossportalliveinstance", "true");
+        requestMap.put("jbossportaldatasourceurl", "testurl");
+        requestMap.put("jbossportaldatasourceuser", "testuser");
+        requestMap.put("jbossportaldatasourcepassword", "testpassword");
+
+        // TODO, UI shouldn't pass parameters for unselected platforms
+        requestMap.put("jbossservice", "false");
+        requestMap.put("jbossserviceclustersize", "0");
+        requestMap.put("jbossservicemachinesize", "0");
+        requestMap.put("jbossserviceesb", "false");
+        requestMap.put("jbossservicevolumesize", "0");
+        requestMap.put("jbossservicedatasourceurl", "");
+
+        requestMap.put("jbosssolr", "false");
+        requestMap.put("jbosssolrclustersize", "0");
+        requestMap.put("jbosssolrmachinesize", "0");
+        requestMap.put("jbosssolreesb", "false");
+        requestMap.put("jbosssolrvolumesize", "0");
+        requestMap.put("jbosssolrdatasourceurl", "");
+
+        try {
+            adminController.addInstance(new MockResourceRequest(), response, requestMap);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        Instance inst1 = instanceRepository.getInstance("inst1");
+        int inst1id = inst1.getInstanceId();
+        assertEquals(EUCA_ID, inst1.getCloudType());
+        assertEquals("inst1", inst1.getName());
+        assertEquals(EUCA_ZONE_NAME, inst1.getZone());
+        List<InstanceParameter> parameters = inst1.getParameters();
+        assertEquals(4, parameters.size());
+        int foundParams = 0;
+        for (InstanceParameter p : parameters) {
+            if ("portal_live".equals(p.getKey())) {
+                assertEquals("true", p.getValue());
+                ++foundParams;
+            } else if ("portal_datasource_url".equals(p.getKey())) {
+                assertEquals("testurl", p.getValue());
+                ++foundParams;
+            } else if ("portal_datasource_user".equals(p.getKey())) {
+                assertEquals("testuser", p.getValue());
+                ++foundParams;
+            } else if ("portal_datasource_password".equals(p.getKey())) {
+                assertEquals("testpassword", p.getValue());
+                ++foundParams;
+            } else {
+                fail("JobPlatformParameters contains unknown parameter: " + p.getKey());
+            }
+        }
+        assertEquals("expected job parameters do not match with actual", 4, foundParams);
+
+        List<Job> jobs = jobRepository.getJobsForInstance(inst1id);
+        assertEquals(1, jobs.size());
+        Job inst1Job = jobs.get(0);
+        assertEquals("jboss_portal_platform,1,0,0,null", inst1Job.getServices());
+
+    }
+
+    @Test
+    public void testAddJBossPortalInstanceWithSolr() {
+        liferayService.mockUserWithOrganizations("OPPYATOAS");
+        MockResourceResponse response = new MockResourceResponse();
+        Map<String, String> requestMap = new HashMap<String, String>();
+
+        requestMap.put("cloudtype", "1");
+        requestMap.put("instancename", "inst2");
+        requestMap.put("zone", EUCA_ZONE_NAME);
+        requestMap.put("jbossportal", "true");
+        requestMap.put("jbossportalclustersize", "1");
+        requestMap.put("jbossportalmachinesize", "0");
+        requestMap.put("jbossportalimagetype", "0");
+        requestMap.put("jbossportalesb", "false");
+        requestMap.put("jbossportalvolumesize", "0");
         requestMap.put("jbossportalsolr", "true");
         requestMap.put("jbossportalliveinstance", "true");
         requestMap.put("jbossportaldatasourceurl", "testurl");
         requestMap.put("jbossportaldatasourceuser", "testuser");
         requestMap.put("jbossportaldatasourcepassword", "testpassword");
+
+        requestMap.put("jbosssolr", "true");
+        requestMap.put("jbosssolrclustersize", "1");
+        requestMap.put("jbosssolrmachinesize", "0");
+        requestMap.put("jbosssolreesb", "false");
+        requestMap.put("jbosssolrvolumesize", "0");
+        requestMap.put("jbosssolrdatasourceurl", "");
+        requestMap.put("jbosssolrimagetype", "0");
 
         // TODO, UI shouldn't pass parameters for unselected platforms
         requestMap.put("jbossservice", "false");
@@ -198,12 +282,12 @@ public class CloudAdminControllerTest {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        Instance inst1 = instanceRepository.getInstance("inst1");
-        int inst1id = inst1.getInstanceId();
-        assertEquals(EUCA_ID, inst1.getCloudType());
-        assertEquals("inst1", inst1.getName());
-        assertEquals(EUCA_ZONE_NAME, inst1.getZone());
-        List<InstanceParameter> parameters = inst1.getParameters();
+        Instance inst2 = instanceRepository.getInstance("inst2");
+        int inst2id = inst2.getInstanceId();
+        assertEquals(EUCA_ID, inst2.getCloudType());
+        assertEquals("inst2", inst2.getName());
+        assertEquals(EUCA_ZONE_NAME, inst2.getZone());
+        List<InstanceParameter> parameters = inst2.getParameters();
         assertEquals(5, parameters.size());
         int foundParams = 0;
         for (InstanceParameter p : parameters) {
@@ -228,10 +312,11 @@ public class CloudAdminControllerTest {
         }
         assertEquals("expected job parameters do not match with actual", 5, foundParams);
 
-        List<Job> jobs = jobRepository.getJobsForInstance(inst1id);
+        List<Job> jobs = jobRepository.getJobsForInstance(inst2id);
         assertEquals(1, jobs.size());
-        Job inst1Job = jobs.get(0);
-        assertEquals("jboss_portal_platform,1,0,0,null", inst1Job.getServices());
+        Job inst2Job = jobs.get(0);
+        System.out.println(inst2Job.getServices());
+        assertEquals("jboss_portal_platform,1,0,0,null,jboss_solr_platform,1,0,0,null", inst2Job.getServices());
 
     }
 }
