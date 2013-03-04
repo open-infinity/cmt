@@ -377,27 +377,8 @@ public class CloudAdminController {
 			
 			instance.setCloudType(Integer.parseInt(pm.get("cloudtype")));
 			instance.setStatus("Starting");
-			if ("true".equals(pm.get("jbossservice"))) {
-				if (pm.get("jbossservicedatasourceurl").length() > 0) {
-					instance.addParameter(new InstanceParameter("service_datasource_url", pm.get("jbossservicedatasourceurl")));
-					instance.addParameter(new InstanceParameter("service_datasource_user", pm.get("jbossservicedatasourceuser")));
-					instance.addParameter(new InstanceParameter("service_datasource_password", pm.get("jbossservicedatasourcepassword")));
-				}
-			}
-			if ("true".equals(pm.get("jbossportal"))) {
-				if ("true".equals(pm.get("jbossportalliveinstance"))) {
-					instance.addParameter(new InstanceParameter("portal_live", pm.get("jbossportalliveinstance")));
-				}
-				if (pm.get("jbossportaldatasourceurl").length() > 0) {
-					instance.addParameter(new InstanceParameter("portal_datasource_url", pm.get("jbossportaldatasourceurl")));
-					instance.addParameter(new InstanceParameter("portal_datasource_user", pm.get("jbossportaldatasourceuser")));
-					instance.addParameter(new InstanceParameter("portal_datasource_password", pm.get("jbossportaldatasourcepassword")));
-				}
-                if ("true".equals(pm.get("jbossportalsolr"))) {
-                	instance.addParameter(new InstanceParameter("portal_solr", "true"));
-                }
-			}
-			instanceService.addInstance(instance);
+
+            instanceService.addInstance(instance);
 
 			Job job = new Job(	"create_instance", 
 								instance.getInstanceId(), 
@@ -426,17 +407,7 @@ public class CloudAdminController {
 				job.addService(ClusterService.SERVICE_NAME[ClusterService.CLUSTER_TYPE_DATABASE], pm.get("rdbmsclustersize"), pm.get("rdbmsmachinesize"),
 					pm.get("rdbmsimagetype"), pm.get("rdbmsesbvolumesize"));
 			}
-			
-			if ("true".equals(pm.get("jbossservice"))) {
-				job.addService(ClusterService.SERVICE_NAME[ClusterService.CLUSTER_TYPE_JBOSS_SERVICE],	pm.get("jbossserviceclustersize"), pm.get("jbossservicemachinesize"),
-					pm.get("jbossserviceimagetype"), pm.get("jbossserviceesbvolumesize"));
-			}			
 
-			if ("true".equals(pm.get("jbossportal"))) {
-				job.addService(ClusterService.SERVICE_NAME[ClusterService.CLUSTER_TYPE_JBOSS_PORTAL],	pm.get("jbossportalclustersize"), pm.get("jbossportalmachinesize"),
-					pm.get("jbossportalimagetype"), pm.get("jbossportalesbvolumesize"));
-			}
-			
 			boolean withEcmService = "true".equals(pm.get("ecm"));
 			boolean withIgService = "true".equals(pm.get("ig"));
 			if ("true".equals(pm.get("portal"))) {

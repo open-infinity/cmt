@@ -50,30 +50,6 @@
 						}				
 						header.find(".clusterTypeTitle").html(clusters[i].title);
 
-						// insert data source fields into body
-						if ("jbossservice" == clusters[i].name || "jbossportal" == clusters[i].name) {
-							var datasource = $('#datasourceTemplate .datasourceBody').clone();
-							datasource.find('[type="text"]').each(function () {
-								$(this).attr('id', $(this).attr('id') + clusters[i].name);
-								$(this).attr('name', $(this).attr('name') + clusters[i].name);
-							});
-							datasource.find('[type="password"]').each(function () {
-								$(this).attr('id', $(this).attr('id') + clusters[i].name);
-								$(this).attr('name', $(this).attr('name') + clusters[i].name);
-							});
-							body.find('.ebsSizeRow').after(datasource);
-						}
-						// insert staging (liveInstance) fields into body
-						if ("jbossportal" == clusters[i].name) {
-							var datasource = $('#liveInstanceTemplate .liveInstanceBody').clone();
-							body.find('.ebsSizeRow').after(datasource);
-						}
-
-                        // insert solr toggle button if platform is jboss portal
-                        if ("jbossportal" == clusters[i].name) {
-                            var solrToggle = $("#solrToggleTemplate .toggleSolrRow").clone();
-                            body.find('.ebsSizeRow').after(solrToggle);
-                        }
 
                         // insert machine types into body before element ids and names are adjusted below
 						var machineTypeInjectLocation$ = body.find('.machineSizeRow .radioButton');
@@ -152,18 +128,11 @@
 							grandpa.find(".machineSizeRow :radio").attr("disabled", false).button("refresh");
 							grandpa.find(".imageTypeRow :radio").attr("disabled", false).button("refresh");
 							grandpa.find(".toggleEbsRow :radio").attr("disabled", false).button("refresh");
-							grandpa.find(".toggleDatasourceRow :radio").attr("disabled", false).button("refresh");
-							grandpa.find(".toggleLiveInstanceRow :radio").attr("disabled", false).button("refresh");
-							grandpa.find(".toggleSolrRow :radio").attr("disabled", false).button("refresh");
+
 							if ($('#' + "toggleEbsRadioOn_" + grandpa.data('clusterConfiguration').name).attr('checked')){
 								grandpa.find(".ebsSizeRow").fadeTo(500, "1");	
 								grandpa.find(".jq_slider").slider({ disabled: false });	
 							}
-							if ($('#' + "toggleDatasourceRadioOn_" + grandpa.data('clusterConfiguration').name).attr('checked')){
-								grandpa.find(".datasourceRow").fadeTo(500, "1");
-								grandpa.find(".datasourceRow :text").attr("disabled", false);
-								grandpa.find(".datasourceRow :password").attr("disabled", false);								
-							}							
 						}
 						else if (el.attr("id").indexOf("togglePlatformRadioOff") !=  -1) {
 							var grandpa = toggleGrandunclesClass(el, "unselect", 0);
@@ -189,15 +158,9 @@
 							grandpa.find(".jq_slider").slider({ disabled: true});		
 							grandpa.find(".configRow").fadeTo(500, ".5");
 							grandpa.find(".ebsSizeRow").fadeTo(500, ".5");	
-							grandpa.find(".datasourceRow").fadeTo(500, ".5");							
 							grandpa.find(".machineSizeRow :radio").attr("disabled", true).button("refresh");
 							grandpa.find(".imageTypeRow :radio").attr("disabled", true).button("refresh");
 							grandpa.find(".toggleEbsRow :radio").attr("disabled", true).button("refresh");
-							grandpa.find(".toggleDatasourceRow :radio").attr("disabled", true).button("refresh");
-							grandpa.find(".toggleLiveInstanceRow :radio").attr("disabled", true).button("refresh");
-							grandpa.find(".toggleSolrRow :radio").attr("disabled", true).button("refresh");
-							grandpa.find(".datasourceRow :text").attr("disabled", true);
-							grandpa.find(".datasourceRow :password").attr("disabled", true);
 						}
 						el.siblings().attr('checked',false).button("refresh");
 						el.attr('checked',true).button("refresh");		
@@ -226,23 +189,6 @@
 						}
 					});
 
-					$("#addInstanceDialog .toggleDatasourceRow :radio").change(function(e) {
-						var el = $(this);
-						var datasourceRow = el.parent().parent().next();
-	
-						if (el.attr("id").indexOf("toggleDatasourceRadioOff") !=  -1) {
-							datasourceRow.fadeTo(500, ".5");							
-							datasourceRow.find(":text").attr("disabled", true);
-							datasourceRow.find(":password").attr("disabled", true);
-							
-						}
-						else{
-							datasourceRow.fadeTo(500, "1");
-							datasourceRow.find(":text").attr("disabled", false);
-							datasourceRow.find(":password").attr("disabled", false);
-						}
-					});
-										
 					$("#addInstanceDialog .machineSizeRow :radio").change(function(e) {
 						$(this).parent().next().text(cloudadmin.resource.machineTypes[$(this).attr("value")].specification);
 					});	
@@ -302,16 +248,12 @@
 			$('#addInstanceDialog .togglePlatformSelectionRow input[id*="togglePlatformRadioOff_"]').attr('checked',true).button("refresh");
 			$('#addInstanceDialog .imageTypeRow input[id*="imageTypeEphemeral_"]').attr('checked',true).button("refresh");
 			$('#addInstanceDialog .toggleEbsRow input[id*="toggleEbsRadioOff_"]').attr('checked',true).button("refresh");
-            $('#addInstanceDialog .toggleSolrRow input[id*="toggleSolrRadioOff_"]').attr('checked',true).button("refresh");
             if (cloudadmin.resource.machineTypes.length > 0) { // select first machine type and reset label if there are any machine types
                 $("#addInstanceDialog .valueDisplayButtonSet").text(cloudadmin.resource.machineTypes[0].specification);
                 $("#addInstanceDialog .machineSizeRow input:first-child").attr('checked',true).button("refresh");
             }
             // reset cloud selection, fire also change event to update zone selection
             $("#cloudSelect option").eq(0).attr("selected", "selected").trigger("change");
-			$('#addInstanceDialog .toggleDatasourceRow input[id*="toggleDatasourceRadioOff_"]').attr('checked',true).button("refresh");			
-			$('#addInstanceDialog .toggleLiveInstanceRow input[id*="toggleLiveInstanceRadioOff_"]').attr('checked',true).button("refresh");			
-			$('#addInstanceDialog .datasourceRow input').val('');
 			dimElements();
 			$(".addInstanceDialogError").hide();
 			$("#addInstanceDialog").dialog("open");
@@ -337,7 +279,6 @@
 					outData[clusters[i].name + "machinesize"] 	= 0;
 					outData[clusters[i].name + "esb"] 		  	= "false";
 					outData[clusters[i].name + "volumesize"]  	= 0;
-                  	outData[clusters[i].name + "datasourceurl"] = "";
 				}
 				for(var i = 0; i < clusters.length; i++){
 					if($('#' + "togglePlatformRadioOn_" + clusters[i].name).attr('checked')){
@@ -360,25 +301,7 @@
 						if($('#' + "toggleEbsRadioOn_" + clusters[i].name).attr('checked')){
 							outData[clusters[i].name + "esbvolumesize"] = $('#' + clusters[i].name + ' .ebsSizeRow .jq_slider').parent().next().text();
 						}
-						if($('#' + "toggleLiveInstanceRadioOn_" + clusters[i].name).attr('checked')){
-							outData[clusters[i].name + "liveinstance"] = "true";
-						}
-						else {
-							outData[clusters[i].name + "liveinstance"] = "false";
-						}
-						if($('#' + "toggleSolrRadioOn_" + clusters[i].name).attr('checked')){
-                            outData[clusters[i].name + "solr"] = "true";
-                        }
-
-						if($('#' + "toggleDatasourceRadioOn_" + clusters[i].name).attr('checked')){
-							if (!validateField($('#' + "newDatasourceUrlText_" + clusters[i].name))) return;
-							if (!validateField($('#' + "newDatasourceUserNameText_" + clusters[i].name))) return;
-							if (!validateField($('#' + "newDatasourcePasswordText_" + clusters[i].name))) return;
-							outData[clusters[i].name + "datasourceurl"] = $('#' + "newDatasourceUrlText_" + clusters[i].name).val();
-							outData[clusters[i].name + "datasourceuser"] = $('#' + "newDatasourceUserNameText_" + clusters[i].name).val();
-							outData[clusters[i].name + "datasourcepassword"] = $('#' + "newDatasourcePasswordText_" + clusters[i].name).val();
-						}
-					} 
+					}
 				}
 				$.ajax({
 					type: 'POST',
@@ -450,8 +373,7 @@
 		$("#addInstanceDialog .jq_slider").slider({ disabled: true }).css("opacity", "1");
 		$("#addInstanceDialog .clusterSizeRow").css("opacity", ".5");
 		$("#addInstanceDialog .configRow").css("opacity", ".5");	
-		$("#addInstanceDialog .ebsSizeRow").css("opacity", ".5");			
-		$("#addInstanceDialog .datasourceRow").css("opacity", ".5");			
+		$("#addInstanceDialog .ebsSizeRow").css("opacity", ".5");
 	}
 	
 })(jQuery);

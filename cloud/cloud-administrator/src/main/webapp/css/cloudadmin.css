@@ -490,19 +490,10 @@ col.data {
 
 #addInstanceDialog .toggleEbsLabel{margin-top:.1em;float:left;}
 
-#addInstanceDialog .toggleSolrRow{position:relative;margin-top:1.1em;display:block;clear:left;}
-
-#addInstanceDialog .toggleSolrLabel{margin-top:.1em;float:left;}
-
 #addInstanceDialog .ebsSizeRow{position:relative;margin-top:1.1em;display:block;clear:left;}
 
 #addInstanceDialog .ebsSizeLabel{margin-top:.3em;float:left;}
 
-#addInstanceDialog .toggleLiveInstanceRow{position:relative;margin-top:1.1em;display:block;clear:left;}
-
-#addInstanceDialog .toggleDatasourceRow{position:relative;margin-top:1.1em;display:block;clear:left;}
-
-#addInstanceDialog .datasourceRow{position:relative;margin-top:1.1em;display:block;clear:left;}
 
 
 #addInstanceDialog  .sliderMask{
