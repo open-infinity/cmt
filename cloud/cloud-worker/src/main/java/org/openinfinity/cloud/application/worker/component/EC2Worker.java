@@ -1264,6 +1264,7 @@ public class EC2Worker implements Worker {
 				String group = i.next();
 				if(!group.equals(c.getSecurityGroupName())) {
 					ec2.authorizeGroup(c.getSecurityGroupName(), group, securityGroupOwner, 0, 65535, "tcp");
+					ec2.authorizeGroup(c.getSecurityGroupName(), group, securityGroupOwner, 0, 65535, "udp");
 				}
 			}
 		}
