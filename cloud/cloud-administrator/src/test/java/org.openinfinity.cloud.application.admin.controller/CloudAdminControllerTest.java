@@ -316,7 +316,7 @@ public class CloudAdminControllerTest {
         assertEquals(1, jobs.size());
         Job inst2Job = jobs.get(0);
         System.out.println(inst2Job.getServices());
-        assertEquals("jboss_portal_platform,1,0,0,null,jboss_solr_platform,1,0,0,null", inst2Job.getServices());
+        assertEquals("jboss_solr_platform,1,0,0,null,jboss_portal_platform,1,0,0,null", inst2Job.getServices());
 
     }
 }

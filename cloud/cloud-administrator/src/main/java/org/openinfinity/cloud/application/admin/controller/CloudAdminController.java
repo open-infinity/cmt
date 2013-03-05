@@ -426,8 +426,16 @@ public class CloudAdminController {
 				job.addService(ClusterService.SERVICE_NAME[ClusterService.CLUSTER_TYPE_DATABASE], pm.get("rdbmsclustersize"), pm.get("rdbmsmachinesize"),
 					pm.get("rdbmsimagetype"), pm.get("rdbmsesbvolumesize"));
 			}
-			
-			if ("true".equals(pm.get("jbossservice"))) {
+
+            if ("true".equals(pm.get("jbosssolr"))) {
+                job.addService(ClusterService.SERVICE_NAME[ClusterService.CLUSTER_TYPE_JBOSS_SOLR],
+                        pm.get("jbosssolrclustersize"),
+                        pm.get("jbosssolrmachinesize"),
+                        pm.get("jbosssolrimagetype"),
+                        pm.get("jbosssolresbvolumesize"));
+            }
+
+            if ("true".equals(pm.get("jbossservice"))) {
 				job.addService(ClusterService.SERVICE_NAME[ClusterService.CLUSTER_TYPE_JBOSS_SERVICE],	pm.get("jbossserviceclustersize"), pm.get("jbossservicemachinesize"),
 					pm.get("jbossserviceimagetype"), pm.get("jbossserviceesbvolumesize"));
 			}			
@@ -437,13 +445,6 @@ public class CloudAdminController {
 					pm.get("jbossportalimagetype"), pm.get("jbossportalesbvolumesize"));
 			}
 
-            if ("true".equals(pm.get("jbosssolr"))) {
-                job.addService(ClusterService.SERVICE_NAME[ClusterService.CLUSTER_TYPE_JBOSS_SOLR],
-                        pm.get("jbosssolrclustersize"),
-                        pm.get("jbosssolrmachinesize"),
-                        pm.get("jbosssolrimagetype"),
-                        pm.get("jbosssolresbvolumesize"));
-            }
 
 
             boolean withEcmService = "true".equals(pm.get("ecm"));
