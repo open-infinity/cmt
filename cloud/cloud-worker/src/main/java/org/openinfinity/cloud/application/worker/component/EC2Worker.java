@@ -48,8 +48,6 @@ import org.openinfinity.cloud.service.administrator.MulticastAddressService;
 import org.openinfinity.cloud.util.PropertyManager;
 import org.openinfinity.cloud.util.WorkerException;
 import org.openinfinity.cloud.util.XmlParse;
-import org.openinfinity.core.exception.ApplicationException;
-import org.openinfinity.core.util.ExceptionUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Async;
@@ -1264,6 +1262,7 @@ public class EC2Worker implements Worker {
 				String group = i.next();
 				if(!group.equals(c.getSecurityGroupName())) {
 					ec2.authorizeGroup(c.getSecurityGroupName(), group, securityGroupOwner, 0, 65535, "tcp");
+					ec2.authorizeGroup(c.getSecurityGroupName(), group, securityGroupOwner, 0, 65535, "udp");
 				}
 			}
 		}
@@ -1321,7 +1320,8 @@ public class EC2Worker implements Worker {
 		Iterator<com.amazonaws.services.ec2.model.Instance> ite = instances.iterator();
 		Collection<String> machinesToTag = new ArrayList<String>();
 	//	Collection<com.amazonaws.services.elasticloadbalancing.model.Instance> lbInstanceList = new ArrayList<com.amazonaws.services.elasticloadbalancing.model.Instance>();
-		boolean  loadBalancerMarked = false;
+		boolean loadBalancerMarked = false;
+		boolean masterMarked = false;
 		while(ite.hasNext()) {
 			
 			com.amazonaws.services.ec2.model.Instance tempInstance = ite.next();
@@ -1337,7 +1337,17 @@ public class EC2Worker implements Worker {
 				cluster.setLbInstanceId(machine.getInstanceId());
 				clusterService.updateCluster(cluster);
 			} else {
-				machine.setType("clustermember");
+				String clusterModel = PropertyManager.getProperty(PROPERTY_PREFIX+service+".clustermodel");
+				if (clusterModel.equals("normal")) {
+					machine.setType("clustermember");
+				} else if (clusterModel.equals("masterslave")) {
+					if (!masterMarked) {
+						machine.setType("clustermembermaster");
+						masterMarked = true;
+					} else {
+						machine.setType("clustermemberslave");
+					}
+				}
 				if(cluster.getEbsVolumesUsed() > 0) {
 					String volumeId = ec2.createVolume(cluster.getEbsVolumesUsed(), zone);
 					machine.setEbsVolumeId(volumeId);

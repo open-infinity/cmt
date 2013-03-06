@@ -1,0 +1,4 @@
+jdbc.driverClassName=com.mysql.jdbc.Driver
+jdbc.url=jdbc:mysql://xx.xx.xx.xx/<database_name>?useUnicode=true&amp;autoReconnect=true&amp;
+jdbc.username=
+jdbc.password=
