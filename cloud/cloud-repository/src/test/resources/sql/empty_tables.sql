@@ -10,7 +10,6 @@ delete from cluster_tbl;
 delete from deployment;
 delete from elastic_ip_tbl;
 delete from instance_tbl;
-delete from job_platform_parameter_tbl;
 delete from job_tbl;
 delete from machine_tbl;
 delete from user_authorized_ip_tbl;
