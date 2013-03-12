@@ -522,6 +522,10 @@ public class EC2Worker implements Worker {
 		int machines = Integer.parseInt(services[1]);
 		Cluster cluster = clusterService.getCluster(clusterId);
 		String service = ClusterService.SERVICE_NAME[cluster.getType()];
+		
+		//12.3.2013 Scaling of master/slave mode cluster. Scaling down need to remove first slaves. 
+		//Scaling up need verify that there is at least one master, other are slaves.
+		String clusterModel = PropertyManager.getProperty(PROPERTY_PREFIX+service+".clustermodel"); 
 		if(cluster.getNumberOfMachines() > machines) {
 			int needToTerminate = cluster.getNumberOfMachines() - machines;
 			LOG.info(threadName+": Scaling down cluster "+clusterId+", terminating "+needToTerminate+" machines");
@@ -542,13 +546,35 @@ public class EC2Worker implements Worker {
 			mList.remove(j);
 			int terminated = 0;
 			int i = 0;
-			while(terminated < needToTerminate) {
+			String removeFirstMachineType="clustermember";
+			String removeLastMachineType="clustermember";
+			if ("masterslave".equals(clusterModel)){
+				removeFirstMachineType = "clustermembermaster";
+				removeLastMachineType = "clustermemberslave";
+			}
+			
+			//first iteration removes removeFirstMachineType
+			while(terminated < needToTerminate && i < mList.size()) {
 				Machine m = mList.get(i);
-				machineService.stopMachine(m.getId());
-				ec2.terminateInstance(m.getInstanceId());
-				terminated++;
+				if (removeFirstMachineType.equals(m.getType())){
+					machineService.stopMachine(m.getId());
+					ec2.terminateInstance(m.getInstanceId());
+					terminated++;
+				}
 				i++;
 			}
+			//second iteration removes removeLastMachineType
+			i=0;
+			while(terminated < needToTerminate && i < mList.size()) {
+				Machine m = mList.get(i);
+				if (removeLastMachineType.equals(m.getType())){
+					machineService.stopMachine(m.getId());
+					ec2.terminateInstance(m.getInstanceId());
+					terminated++;
+				}
+				i++;
+			}
+			//second iteration removes 
 			LOG.info(threadName+": terminated "+terminated+" machines");
 			// force reconfigure for loadbalancer
 			machineService.updateMachineConfigure(lb.getId(), MachineService.MACHINE_CONFIGURE_NOT_STARTED);
@@ -561,12 +587,17 @@ public class EC2Worker implements Worker {
 			} else {
 				List<Machine> mList = (List<Machine>) machineService.getMachinesInCluster(clusterId);
 				Machine lb = null;
-				int j = 0;
-				for (j = 0; j < mList.size(); j++) {
+				//int j = 0;
+
+				boolean masterMarked=false;
+				for (int j = 0; j < mList.size(); j++) {
 					Machine temp = mList.get(j);
 					if (temp.getType().equalsIgnoreCase("loadbalancer")) {
 						lb = temp;
-						continue;
+					}
+					else if ("clustermembermaster".equals(temp.getType())){
+						//record existence of master node for masterslave configuration
+						masterMarked=true;
 					}
 				}
 				if (lb == null) {
@@ -589,7 +620,17 @@ public class EC2Worker implements Worker {
 					Machine machine = new Machine();
 					machine.setName(cluster.getName());
 					machine.setCloud(job.getCloud());
-					machine.setType("clustermember");
+					if (clusterModel.equals("normal")) {
+						machine.setType("clustermember");
+					} else if (clusterModel.equals("masterslave")) {
+						if (!masterMarked) {
+							machine.setType("clustermembermaster");
+							masterMarked = true;
+						} else {
+							machine.setType("clustermemberslave");
+						}
+					}
+
 
 					machine.setInstanceId(tempInstance.getInstanceId());
 
