@@ -549,8 +549,8 @@ public class EC2Worker implements Worker {
 			String removeFirstMachineType="clustermember";
 			String removeLastMachineType="clustermember";
 			if ("masterslave".equals(clusterModel)){
-				removeFirstMachineType = "clustermembermaster";
-				removeLastMachineType = "clustermemberslave";
+				removeFirstMachineType = "clustermemberslave";
+				removeLastMachineType = "clustermembermaster";
 			}
 			
 			//first iteration removes removeFirstMachineType
