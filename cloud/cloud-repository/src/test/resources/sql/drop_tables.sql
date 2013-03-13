@@ -17,3 +17,4 @@ DROP TABLE IF EXISTS `machine_tbl`;
 DROP TABLE IF EXISTS `user_authorized_ip_tbl`;
 DROP TABLE IF EXISTS `scaling_rule_tbl`;
 DROP TABLE IF EXISTS `cluster_type_tbl`;
+DROP TABLE IF EXISTS `usage_hours_tbl`;
