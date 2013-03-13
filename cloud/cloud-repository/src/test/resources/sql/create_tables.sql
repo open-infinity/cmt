@@ -249,3 +249,16 @@ CREATE TABLE `instance_parameter_tbl` (
   PRIMARY KEY (`id`),
   CONSTRAINT fk_instance FOREIGN KEY (instance_id) REFERENCES instance_tbl(instance_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `usage_hours_tbl`;
+
+create table `usage_hours_tbl` (
+	`id` bigint(20) not null auto_increment, 
+	`organization_id` bigint(20) not null, 
+	`cluster_id` bigint(20) not null, 
+	`platform_id` char(254) not null, 
+	`machine_id` char(254) not null, 
+	`state` int(11) not null, 
+	`cur_timestamp` timestamp not null default current_timestamp, 
+	primary key (`id`)
+);
