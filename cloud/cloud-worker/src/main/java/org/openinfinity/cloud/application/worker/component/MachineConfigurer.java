@@ -87,6 +87,7 @@ public class MachineConfigurer implements Configurer {
 		
 		EC2Wrapper ec2 = new EC2Wrapper();
 		String endPoint = PropertyManager.getProperty("cloudadmin.worker.eucalyptus.endpoint");
+		boolean isPuppetDebug = Boolean.valueOf(PropertyManager.getProperty("cloudadmin.worker.puppet.debug"));
 		if(m.getCloud() == InstanceService.CLOUD_TYPE_AMAZON) {
 			// TODO
 		} else if(m.getCloud() == InstanceService.CLOUD_TYPE_EUCALYPTUS) {
@@ -203,7 +204,13 @@ public class MachineConfigurer implements Configurer {
 			LOG.info(threadName+": Connecting with ssh to "+m.getDnsName());
 			
 			session.connect();
-			String command = "/usr/bin/puppet agent --test --no-daemonize --onetime --certname ";
+			String command=null;
+			if (isPuppetDebug){
+				command = "/usr/bin/puppet agent --verbose --debug --test --no-daemonize --onetime --certname ";
+			}
+			else{
+				command = "/usr/bin/puppet agent --test --no-daemonize --onetime --certname ";
+			}
 			command += instance.getInstanceId()+"_";
 			command += c.getId()+"_";
 			command += m.getId()+"_";
