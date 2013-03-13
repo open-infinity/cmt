@@ -52,7 +52,7 @@ public class UsageHourRepositoryTests {
 	UsageHourRepository usageHourRepository;
 
 	@Test
-	public void givenWhenThen() {
+	public void givenKnownUsageHourOfVirtualMachineWhenModifyingStateOfVirtualMachineThenModificationMustBeAccessibleFromRepositoryInterface() {
 		long organizationId = System.currentTimeMillis();
 		UsageHour expected = new UsageHour();
 		expected.setClusterId(System.currentTimeMillis());
@@ -77,7 +77,7 @@ public class UsageHourRepositoryTests {
 	}
 	
 	@Test
-	public void givenWhenThen2() {
+	public void givenKnownOrganizationIdAndTimePeriodWhenQueringStateModificationOfVirtualMachinesThenModificationMustBeAccessibleFromRepositoryInterfaceDuringDefinedTimePeriod() {
 		long organizationId = System.currentTimeMillis();
 		UsageHour expected = new UsageHour();
 		expected.setClusterId(System.currentTimeMillis());
