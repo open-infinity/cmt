@@ -22,7 +22,7 @@
   		     classpath:EucaCredentials.properties"/>
 	</bean> --> 
     
-   <context:property-placeholder location="classpath:worker_jdbc.properties,classpath:infrastructure.properties"/>
+   <context:property-placeholder location="classpath:worker_jdbc.properties,classpath:infrastructure.properties,classpath:userPoolDatasource.properties"/>
     
     <context:component-scan base-package="org.openinfinity.cloud">
     	<context:exclude-filter type="regex" expression="org.openinfinity.cloud.service.healthmonitoring.*.*"/>
@@ -42,8 +42,21 @@
         <property name="validationQuery" value="select 1" />
         <property name="maxActive" value="8"/>
         <property name="maxIdle" value="2"/>
-    </bean>  
-    
+    </bean>
+
+    <bean id="portalUserDataSource" destroy-method="close" class="org.apache.commons.dbcp.BasicDataSource">
+        <property name="driverClassName" value="${userPool.jdbc.driverClassName}"/>
+        <property name="url" value="${userPool.jdbc.url}"/>
+        <property name="username" value="${userPool.jdbc.username}"/>
+        <property name="password" value="${userPool.jdbc.password}}"/>
+    </bean>
+
+    <bean id="portalDsTxManager"
+          class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="portalUserDataSource" />
+        <qualifier value="userPool"/>
+    </bean>
+
    <!--  <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
 		<property name="dataSource">
 			<ref bean="myDataSource" />
