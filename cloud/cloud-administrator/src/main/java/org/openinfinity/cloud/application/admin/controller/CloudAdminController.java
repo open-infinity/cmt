@@ -28,6 +28,7 @@ import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -49,9 +50,12 @@ import org.openinfinity.cloud.util.serialization.SerializerUtil;
 import org.openinfinity.core.util.ExceptionUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.portlet.bind.annotation.RenderMapping;
 import org.springframework.web.portlet.bind.annotation.ResourceMapping;
 
@@ -89,7 +93,11 @@ public class CloudAdminController {
 	@Autowired
 	@Qualifier("instanceService")
 	private InstanceService instanceService;
-	
+
+    @Autowired
+    @Qualifier("portalDbUserPoolService")
+    private PortalDbUserPoolService portalDbUserPool;
+
 	@Autowired
 	@Qualifier("clusterService")
 	private ClusterService clusterService;
@@ -117,7 +125,14 @@ public class CloudAdminController {
 	@Autowired
 	@Qualifier("availabilityZoneService")
 	private AvailabilityZoneService zoneService;
-	
+
+    @ExceptionHandler(Exception.class)
+    public void handleExceptions(Exception e, ResourceResponse response) throws IOException {
+        LOG.error("Exception occurred in cmt: " + e.getMessage());
+        response.setProperty(ResourceResponse.HTTP_STATUS_CODE, "" + HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        SerializerUtil.jsonSerialize(response.getWriter(), e.getMessage());
+    }
+
 	@RenderMapping
 	public String showView(RenderRequest request, RenderResponse response) {
 		User user = liferayService.getUser(request);
@@ -516,12 +531,19 @@ public class CloudAdminController {
 	}
 	
 	@ResourceMapping("getMachineTypes")
-	public void getMachineTypes(ResourceRequest request, ResourceResponse response) throws Exception {
+     public void getMachineTypes(ResourceRequest request, ResourceResponse response) throws Exception {
         User user = liferayService.getUser(request, response);
         if (user == null) return;
         List<String> userOrgNames = liferayService.getOrganizationNames(user);
         SerializerUtil.jsonSerialize(response.getWriter(), machineTypeService.getMachineTypes(userOrgNames));
-	}
+    }
+
+    @ResourceMapping("getNextFreeDbUserid")
+    public void getNextFreePortalDbUserid(ResourceRequest request, ResourceResponse response) throws Exception {
+        User user = liferayService.getUser(request, response);
+        if (user == null) return;
+        SerializerUtil.jsonSerialize(response.getWriter(), portalDbUserPool.getNextFreeUserid());
+    }
 	
 
 }

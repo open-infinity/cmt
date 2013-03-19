@@ -24,7 +24,10 @@
 	</div>
 	<div class="subtitleLabel"><fmt:message key = "cloud.instancedialog.title.available"/></div>
 	<p style ="font-size:.9em" class="instanceConfigurationValidateTips"><fmt:message key = "cloud.instancedialog.info.selectServices"/></p>
-	<div id="cloudTypesSelectionAccordion"></div>	
+	<div id="cloudTypesSelectionAccordion"></div>
+    <div id="allUsersTakenDialog" title="All users are reserved">
+        <p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0:"></span>All users are already taken.</p>
+    </div>
 </div>
 
 <div id="deleteInstanceConfirmDialog" title="<fmt:message key="cloud.instancedialog.title.delete" />">
@@ -35,6 +38,8 @@
 <%-- add service dialog --%>
 <div id="addServiceDialog" title="<fmt:message key="cloud.servicedialog.title.addNew" />">
 </div>
+
+
 
 
 <%-- cluster dialogs --%>

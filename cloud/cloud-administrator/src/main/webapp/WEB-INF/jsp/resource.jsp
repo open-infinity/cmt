@@ -2,6 +2,7 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 
 <fmt:setBundle basename="cloudadmin"/>
+<fmt:setBundle basename="platformDatasource" var="platformDsProps"/>
 
 <script type="text/javascript">
 
@@ -22,7 +23,8 @@ portletURL.initialize({
 	    getInstanceKeyURL : 			'<portlet:resourceURL id="getInstanceKey"/>',
 	    getClusterTypesURL : 			'<portlet:resourceURL id="getClusterTypes"/>',
 	    getMachineTypesURL : 			'<portlet:resourceURL id="getMachineTypes"/>',
-	    getCloudProvidersURL : 			'<portlet:resourceURL id="getCloudProviders"/>'
+	    getCloudProvidersURL : 			'<portlet:resourceURL id="getCloudProviders"/>',
+        getNextFreeUidURL : 			'<portlet:resourceURL id="getNextFreeDbUserid"/>'
     },
     cluster: {
     	availableClustersURL : 			'<portlet:resourceURL id="availableClusters"/>',    	
@@ -64,7 +66,10 @@ dialogRes.setResource({
 	dialog: {
 		applyingChanges : 			'<fmt:message key="cloud.dialog.info.applyingChanges" />',		
 		cancel : 					'<fmt:message key="cloud.dialog.button.cancel" />'
-	}			
+	},
+    platform: {
+        datasourceURL:              '<fmt:message bundle="${platformDsProps}" key="platform.datasource.url"/>'
+    }
 });
 	
 </script>
@@ -159,12 +164,15 @@ dialogRes.setResource({
 			<label class="datasourceTitle instanceCreationLabel">User name</label>
 			<div class="inputRow">				
 				<input type="text" class="userNameInput" id="newDatasourceUserNameText_"  name="newDatasourceUserNameText_"  size="10"/>
+                <div id="reserveUser_" class="reserveUserBtn"></div>
+                <img class="spinner" src="<%=request.getContextPath()%>/css/images/load.gif" alt="spinner"/>
 			</div>
 			<label class="datasourceTitle instanceCreationLabel">Password</label>
 			<div class="inputRow">				
 				<input type="password" class="passwordInput" id="newDatasourcePasswordText_"  name="newDatasourcePasswordText_" size="10"/>
 			</div>				
 		</div>
+
 	</div>
 </div>
 

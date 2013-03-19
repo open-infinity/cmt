@@ -23,7 +23,7 @@
 					var o = new Object();
 					o.dialog = $("#addInstanceDialog");
 					o.accordion = $("#cloudTypesSelectionAccordion");
-					
+
 					// populates cloud provider options
 					var cloudSelect = o.dialog.find("#cloudSelect");
 					$.each(cloudProviders, function(index, provider) {
@@ -61,6 +61,14 @@
 								$(this).attr('id', $(this).attr('id') + clusters[i].name);
 								$(this).attr('name', $(this).attr('name') + clusters[i].name);
 							});
+                            datasource.find('.reserveUserBtn').each(function() {
+                                var $btn = $(this);
+                                $btn.attr('id', $btn.attr('id') + clusters[i].name);
+                                $btn.button({disabled:true, label: 'Reserve user'});
+                            });
+                            datasource.find('.spinner').each(function() {
+                                $(this).hide();
+                            });
 							body.find('.ebsSizeRow').after(datasource);
 						}
 						// insert staging (liveInstance) fields into body
@@ -99,15 +107,23 @@
 					$("#addInstanceDialog .radioButton").buttonset();
                     if (cloudadmin.resource.machineTypes.length > 0)
 					    $("#addInstanceDialog .valueDisplayButtonSet").text(cloudadmin.resource.machineTypes[0].specification);
-	
+
+                    o.dialog.find("#allUsersTakenDialog").dialog({
+                        autoOpen : false,
+                        modal : true,
+                        buttons: [ { text: "Ok", click: function() { $( this ).dialog( "close" ); } } ]
+                    });
+
 					o.accordion.accordion({collapsible: true, autoHeight:false, heightStyle: "content", active:false});
+
 					o.dialog.dialog({		
 						autoOpen : false,
 						height : 745,
 						width : 710,
 						modal : true,
 						buttons : cloudadmin.dialog.instanceAddButtons
-					});	
+					});
+
 					
 					dimElements();		
 	
@@ -162,7 +178,9 @@
 							if ($('#' + "toggleDatasourceRadioOn_" + grandpa.data('clusterConfiguration').name).attr('checked')){
 								grandpa.find(".datasourceRow").fadeTo(500, "1");
 								grandpa.find(".datasourceRow :text").attr("disabled", false);
-								grandpa.find(".datasourceRow :password").attr("disabled", false);								
+                                grandpa.find(".datasourceRow .urlInput").val(dialogRes.resource.platform.datasourceURL);
+								grandpa.find(".datasourceRow :password").attr("disabled", false);
+                                grandpa.find(".datasourceRow .reserveUserBtn").button("enable");
 							}							
 						}
 						else if (el.attr("id").indexOf("togglePlatformRadioOff") !=  -1) {
@@ -234,12 +252,15 @@
 							datasourceRow.fadeTo(500, ".5");							
 							datasourceRow.find(":text").attr("disabled", true);
 							datasourceRow.find(":password").attr("disabled", true);
-							
+                            datasourceRow.find(".urlInput").val("");
+                            datasourceRow.find(".reserveUserBtn").button("disable");
 						}
 						else{
 							datasourceRow.fadeTo(500, "1");
 							datasourceRow.find(":text").attr("disabled", false);
 							datasourceRow.find(":password").attr("disabled", false);
+                            datasourceRow.find(".reserveUserBtn").button("enable");
+                            datasourceRow.find(".urlInput").val(dialogRes.resource.platform.datasourceURL);
 						}
 					});
 
@@ -267,7 +288,34 @@
 
                     $("#addInstanceDialog .machineSizeRow :radio").change(function(e) {
 						$(this).parent().next().text(cloudadmin.resource.machineTypes[$(this).attr("value")].specification);
-					});	
+					});
+
+                    $("#addInstanceDialog .reserveUserBtn").button().click(function() {
+                        console.log("on button click");
+                        var $btn = $(this);
+                        $.ajax({
+                            dataType: "json",
+                            beforeSend: function() {
+                                $btn.parent().find(".spinner").show();
+                            },
+                            complete: function() {
+                                $btn.parent().find(".spinner").hide();
+                            },
+                            url: portletURL.url.instance.getNextFreeUidURL,
+                            success: function(result) {
+                                console.log('reserved user: ' + result);
+                                if (result) {
+                                    $btn.parent().parent().find('.userNameInput').val(result);
+                                } else {
+                                    $("#allUsersTakenDialog").dialog("open");
+                                }
+                            },
+                            error: function (xhr, ajaxOptions, thrownError) {
+                                $("<div title='Error occurred'></div>").html(status + ' ' + thrownError).dialog();
+                            }
+                        });
+
+                    });
 							
 					 // Helper functions
 					function  toggleGrandunclesClass(el, mode, delay){
