@@ -28,7 +28,8 @@
 	    "classpath*:system.properties, 
 	     classpath*:infrastructure.properties, 
 	     classpath*:EucaCredentials.properties,
-	     classpath*:infrastructure.properties" />
+	     classpath*:infrastructure.properties,
+	     classpath*:userPoolDatasource.properties" />
 
  	<bean id="cloudDataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
 		destroy-method="close">
@@ -56,21 +57,44 @@
 		<property name="testConnectionOnCheckout">
 			<value>true</value>
 		</property>
-	</bean>  
-	
-	<bean id="txManager"
-		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-		<property name="dataSource" ref="cloudDataSource" />
-	</bean> 
-	
-	<context:component-scan base-package="org.openinfinity">
+	</bean>
+
+    <bean id="txManager"
+          class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="cloudDataSource" />
+    </bean>
+
+
+    <bean id="portalUserDataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+          destroy-method="close">
+        <property name="driverClass">
+            <value>${userPool.jdbc.driverClassName}</value>
+        </property>
+        <property name="jdbcUrl">
+            <value>${userPool.jdbc.url}</value>
+        </property>
+        <property name="user">
+            <value>${userPool.jdbc.username}</value>
+        </property>
+        <property name="password">
+            <value>${userPool.jdbc.password}</value>
+        </property>
+        <property name="testConnectionOnCheckout">
+            <value>true</value>
+        </property>
+    </bean>
+
+    <bean id="portalDsTxManager"
+          class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="portalUserDataSource" />
+        <qualifier value="userPool"/>
+    </bean>
+
+    <context:component-scan base-package="org.openinfinity">
 	    <context:exclude-filter type="regex" expression="org.openinfinity.cloud.service.healthmonitoring.*.*" />
 	    <context:exclude-filter type="regex" expression="org.openinfinity.cloud.domain.repository.deployer.*.*" />
 	    <context:exclude-filter type="regex" expression="org.openinfinity.cloud.service.deployer.*.*" />
-	    
 	</context:component-scan>
-	
-				
 
   	<tx:annotation-driven transaction-manager="txManager"/>
 	
