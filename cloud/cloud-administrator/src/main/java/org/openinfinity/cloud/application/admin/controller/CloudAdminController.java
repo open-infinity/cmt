@@ -128,7 +128,7 @@ public class CloudAdminController {
 
     @ExceptionHandler(Exception.class)
     public void handleExceptions(Exception e, ResourceResponse response) throws IOException {
-        LOG.error("Exception occurred in cmt: " + e.getMessage());
+        LOG.error("Exception occurred in cmt: " + e.getMessage(), e);
         response.setProperty(ResourceResponse.HTTP_STATUS_CODE, "" + HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         SerializerUtil.jsonSerialize(response.getWriter(), e.getMessage());
     }
