@@ -164,8 +164,6 @@ dialogRes.setResource({
 			<label class="datasourceTitle instanceCreationLabel">User name</label>
 			<div class="inputRow">				
 				<input type="text" class="userNameInput" id="newDatasourceUserNameText_"  name="newDatasourceUserNameText_"  size="10"/>
-                <div id="reserveUser_" class="reserveUserBtn"></div>
-                <img class="spinner" src="<%=request.getContextPath()%>/css/images/load.gif" alt="spinner"/>
 			</div>
 			<label class="datasourceTitle instanceCreationLabel">Password</label>
 			<div class="inputRow">				
@@ -175,7 +173,10 @@ dialogRes.setResource({
 
 	</div>
 </div>
-
+<div id="reserveUserBtnTemplate" class="template">
+    <div id="reserveUserBtn" class="reserveUserBtn">Reserve user</div>
+    <img id="reserveUserSpinner" class="spinner" src="<%=request.getContextPath()%>/css/images/load.gif" alt="spinner" style='display: none'/>
+</div>
 <%-- template for SOLR toggle button --%>
 <div id="solrToggleTemplate" class="template">
     <div class="toggleSolrRow configRow">

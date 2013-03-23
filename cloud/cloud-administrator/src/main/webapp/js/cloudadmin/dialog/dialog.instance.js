@@ -61,27 +61,28 @@
 								$(this).attr('id', $(this).attr('id') + clusters[i].name);
 								$(this).attr('name', $(this).attr('name') + clusters[i].name);
 							});
-                            datasource.find('.reserveUserBtn').each(function() {
-                                var $btn = $(this);
-                                $btn.attr('id', $btn.attr('id') + clusters[i].name);
-                                $btn.button({disabled:true, label: 'Reserve user'});
-                            });
-                            datasource.find('.spinner').each(function() {
-                                $(this).hide();
-                            });
 							body.find('.ebsSizeRow').after(datasource);
 						}
 						// insert staging (liveInstance) fields into body
 						if ("jbossportal" == clusters[i].name) {
-							var datasource = $('#liveInstanceTemplate .liveInstanceBody').clone();
-							body.find('.ebsSizeRow').after(datasource);
-						}
+							var liveBtn = $('#liveInstanceTemplate .liveInstanceBody').clone();
+							body.find('.ebsSizeRow').after(liveBtn);
 
-                        // insert solr toggle button if platform is jboss portal
-                        if ("jbossportal" == clusters[i].name) {
+                            // insert solr toggle button if platform is jboss portal
                             var solrToggle = $("#solrToggleTemplate .toggleSolrRow").clone();
                             body.find('.ebsSizeRow').after(solrToggle);
-                        }
+
+                            // insert user reservation button
+                            var $reserveUserBtn = $('#reserveUserBtnTemplate *').clone();
+                            console.log($reserveUserBtn.html());
+                            console.log($reserveUserBtn.find('#reserveUserBtn'))
+                            $reserveUserBtn.find('#reserveUserBtn').button({disabled:true, label: 'Reserve user'});
+                            console.log($reserveUserBtn.html());
+                            console.log($reserveUserBtn.find('#reserveUserSpinner'))
+                            $reserveUserBtn.find('#reserveUserSpinner').hide();
+                            console.log($reserveUserBtn.html());
+                            body.find('.userNameInput').after($reserveUserBtn);
+						}
 
                         // insert machine types into body before element ids and names are adjusted below
 						var machineTypeInjectLocation$ = body.find('.machineSizeRow .radioButton');
@@ -180,7 +181,7 @@
 								grandpa.find(".datasourceRow :text").attr("disabled", false);
                                 grandpa.find(".datasourceRow .urlInput").val(dialogRes.resource.platform.datasourceURL);
 								grandpa.find(".datasourceRow :password").attr("disabled", false);
-                                grandpa.find(".datasourceRow .reserveUserBtn").button("enable");
+                                grandpa.find(".datasourceRow #reserveUserBtn").button("enable");
 							}							
 						}
 						else if (el.attr("id").indexOf("togglePlatformRadioOff") !=  -1) {
@@ -253,7 +254,7 @@
 							datasourceRow.find(":text").attr("disabled", true);
 							datasourceRow.find(":password").attr("disabled", true);
                             datasourceRow.find(".urlInput").val("");
-                            datasourceRow.find(".reserveUserBtn").button("disable");
+                            datasourceRow.find("#reserveUserBtn").button("disable");
 						}
 						else{
 							datasourceRow.fadeTo(500, "1");
@@ -291,7 +292,6 @@
 					});
 
                     $("#addInstanceDialog .reserveUserBtn").button().click(function() {
-                        console.log("on button click");
                         var $btn = $(this);
                         $.ajax({
                             dataType: "json",
