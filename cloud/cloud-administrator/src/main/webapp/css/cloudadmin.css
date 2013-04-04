@@ -472,6 +472,8 @@ col.data {
 
 #addInstanceDialog .clusterSizeRow{position:relative;margin-top: 1.1em;}
 
+#addInstanceDialog .clusterSizeRowDisabled{position:relative;margin-top: 1.1em; opacity:0.5;}
+
 #addInstanceDialog .clusterSizeLabel{margin-top:0.3em;float:left;display: block; clear: left;}
 
 #addInstanceDialog .machineSizeRow{position:relative;margin-top:1.1em;}

@@ -50,6 +50,12 @@
 						}				
 						header.find(".clusterTypeTitle").html(clusters[i].title);
 
+						// disable clusterSizeRow
+						if ("jbossportal" == clusters[i].name) {
+							body.find(".clusterSizeRow .jq_slider").slider({ disabled: true});
+							body.find(".clusterSizeRow .valueDisplay").text("1");
+							body.find(".clusterSizeRow").toggleClass("clusterSizeRow configRow clusterSizeRowDisabled");							
+						}
 						// insert data source fields into body
 						if ("jbossservice" == clusters[i].name || "jbossportal" == clusters[i].name) {
 							var datasource = $('#datasourceTemplate .datasourceBody').clone();
