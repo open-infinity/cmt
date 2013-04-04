@@ -17,6 +17,7 @@
  * @author Juha-Matti Sironen
  * @author Ilkka Leinonen
  * @author Vedran Bartonicek
+ * @author Ari Simanainen
  * @version 1.0.0 Initial version
  * @since 1.0.0
  */
@@ -371,49 +372,14 @@ var instanceManager = {
 						// Apply cluster data to template
 						$template.attr("id", "cluster_" + val.id);
 						$template.attr("data-cluster-type", val.type);
-						
-						switch (val.type)
-						{
-						case 0:
-							// portal
-							$template.attr("data-cluster-min-size", 1);
-							$template.attr("data-cluster-max-size", 12);
-						  break;
-						case 1:
-							// mule
-							$template.attr("data-cluster-min-size", 1);
-							$template.attr("data-cluster-max-size", 12);
-						  break;
-						case 2:
-							// pentaho
-							$template.attr("data-cluster-min-size", 1);
-							$template.attr("data-cluster-max-size", 12);
-						  break;
-						case 3:
-							// bigdata
-							$template.attr("data-cluster-min-size", 7);
-							$template.attr("data-cluster-max-size", 12);
-						  break;
-						case 4:
-							// database
-							$template.attr("data-cluster-min-size", 1);
-							$template.attr("data-cluster-max-size", 1);
-						  break;
-						case 5:
-							// bas
-							$template.attr("data-cluster-min-size", 1);
-							$template.attr("data-cluster-max-size", 12);
-						  break;
-						case 6:
-							// nosql
-							$template.attr("data-cluster-min-size", 6);
-							$template.attr("data-cluster-max-size", 10);
-						  break;  
-						default:
-						  console.log("No cluster-type matches in template creation.");
+						$template.attr("data-cluster-instance-id", val.instanceId);
+						var clusters = cloudadmin.resource.clusterTypes;
+						for(var i = 0; i < clusters.length; i++){
+							if (clusters[i].id == val.type) {
+								$template.attr("data-cluster-min-size", clusters[i].minMachines);
+								$template.attr("data-cluster-max-size", clusters[i].maxMachines);
+							}
 						}
-						
-						$template.attr("data-cluster-instance-id", val.instanceId);						
 						$template.children().eq(1).append('<b>'+val.name+'</b>');
 						
 						
@@ -640,16 +606,20 @@ var instanceManager = {
 				format:		dateFormat,  
 				labelTitle:	"Scheduled scaling end"
 			});
-			o.mbManualScaleSlider.addClass("{startAt: "+ machines +"}").mbSlider({			
-				minVal: clusterData.clusterMinSize,
-				maxVal: clusterData.clusterMaxSize,
+			
+			var sliderMin = parseInt(clusterData.clusterMinSize);
+			var sliderMax = parseInt(clusterData.clusterMaxSize);
+			
+			o.mbManualScaleSlider.addClass("{startAt: "+ machines +"}").mbSlider({
+				minVal: sliderMin,
+				maxVal: sliderMax,
 				grid: 1
-			});							
+			});
 			o.jqClusterSizeRangeSlider.slider({
 				range: true,
-				min: 0,
-				max: 100,
-				values: [ 15, 60 ],
+				min: sliderMin,
+				max: sliderMax,
+				values: [ sliderMin + 1, sliderMax - 1 ],
 				slide: function( event, ui) {
 					o.clusterSizeRange.text(setRangeText(ui));
 				}
@@ -662,10 +632,10 @@ var instanceManager = {
 				slide: function(event, ui) {
 					o.cpuThresholdRange.text(setRangeText(ui));
 				}
-			});			
-			o.mbScheduledSizeSlider.mbSlider({			
-				minVal: 0,
-				maxVal: 100,
+			});
+			o.mbScheduledSizeSlider.mbSlider({
+				minVal: sliderMin,
+				maxVal: sliderMax,
 				grid: 1
 			});
 			o.clusterSizeRange.text(updateRangeText(o.jqClusterSizeRangeSlider));
