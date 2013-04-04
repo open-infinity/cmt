@@ -27,13 +27,13 @@ insert into cluster_type_tbl (id, configuration_id, name, title, dependency, rep
 values(9, 1, 'ecm', 'Enterprise Content Management', -1, false, 1, 12, null, null);
 
 insert into cluster_type_tbl (id, configuration_id, name, title, dependency, replicated, min_machines, max_machines, min_repl_machines, max_repl_machines )
-values(10, 1, 'jbossportal', 'JBoss Portal Platform', -1, false, 1, 12, null, null);
+values(10, 1, 'jbossportal', 'JBoss Portal Platform', -1, false, 1, 6, null, null);
 
 insert into cluster_type_tbl (id, configuration_id, name, title, dependency, replicated, min_machines, max_machines, min_repl_machines, max_repl_machines )
-values(11, 1, 'jbossservice', 'JBoss Service Platform', -1, false, 1, 12, null, null);
+values(11, 1, 'jbossservice', 'JBoss Service Platform', -1, false, 1, 6, null, null);
 
 insert into cluster_type_tbl (id, configuration_id, name, title, dependency, replicated, min_machines, max_machines, min_repl_machines, max_repl_machines )
-values(12, 1, 'jbosssolr', 'JBoss Solr Platform', -1, false, 1, 12, null, null);
+values(12, 1, 'jbosssolr', 'JBoss Solr Platform', -1, false, 1, 6, null, null);
 
 insert into cloud_provider_tbl (id, name) values(0, 'Amazon');
 insert into cloud_provider_tbl (id, name) values(1, 'Eucalyptus');
