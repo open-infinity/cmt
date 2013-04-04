@@ -46,6 +46,8 @@ CREATE TABLE `cluster_tbl` (
   `cluster_security_group_name` varchar(100) DEFAULT NULL,
   `cluster_multicast_address` varchar(50) DEFAULT NULL,
   `cluster_machine_type` tinyint(4) DEFAULT NULL,
+  `cluster_ebs_image_used` int(11) DEFAULT NULL,
+  `cluster_ebs_volumes_used` int(11) DEFAULT NULL,
   PRIMARY KEY (`cluster_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
@@ -125,6 +127,9 @@ CREATE TABLE `machine_tbl` (
   `machine_configured` int(11) DEFAULT NULL,
   `machine_last_update` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `machine_cloud_type` int(11) DEFAULT NULL,
+  `machine_extra_ebs_volume_id` varchar(20) DEFAULT NULL,
+  `machine_extra_ebs_volume_device`	varchar(10) DEFAULT NULL,
+  `machine_extra_ebs_volume_size` int(11) DEFAULT NULL,
   PRIMARY KEY (`machine_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
