@@ -22,6 +22,7 @@ import java.util.HashMap;
 
 import org.openinfinity.cloud.domain.Cluster;
 import org.openinfinity.cloud.domain.Deployment;
+import org.openinfinity.cloud.domain.DeploymentStatus;
 import org.openinfinity.cloud.domain.Instance;
 import org.openinfinity.cloud.domain.repository.administrator.ClusterRepository;
 import org.openinfinity.cloud.domain.repository.administrator.InstanceRepository;
@@ -98,6 +99,16 @@ public class DeployerServiceImpl implements DeployerService {
 	@Override
 	public InputStream load(String bucketName, String key) {
 		return bucketRepository.load(bucketName, key);
+	}
+
+	@Override
+	public void storeDeploymentStatus(DeploymentStatus deploymentStatus) {
+		deploymentRepository.storeDeploymentStatus(deploymentStatus);
+	}
+
+	@Override
+	public Collection<DeploymentStatus> loadDeploymentStatusesForCluster(int clusterId) {
+		return deploymentRepository.loadDeploymentStatuses(clusterId);
 	}
 
 }

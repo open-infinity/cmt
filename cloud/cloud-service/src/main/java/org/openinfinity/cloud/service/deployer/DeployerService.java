@@ -19,6 +19,7 @@ import java.io.InputStream;
 import java.util.Collection;
 
 import org.openinfinity.cloud.domain.Deployment;
+import org.openinfinity.cloud.domain.DeploymentStatus;
 import org.openinfinity.cloud.domain.Instance;
 import org.openinfinity.cloud.domain.Cluster;
 
@@ -94,5 +95,20 @@ public interface DeployerService {
 	 * @return
 	 */
 	public InputStream load(String bucketName, String key);
+
+	/**
+	 * Stores deployment status object.
+	 * 
+	 * @param deploymentStatus Represents the state of deployment on specified machine.
+	 */
+	void storeDeploymentStatus(DeploymentStatus deploymentStatus);
+
+	/**
+	 * Loads deployment statuses of specified cluster.
+	 * 
+	 * @param clusterId Represents unique cluster id.
+	 * @return Collection<DeploymentStatus> Represents collection of deployment statuses of specified cluster.
+	 */
+	Collection<DeploymentStatus> loadDeploymentStatusesForCluster(int clusterId);
 	
 }
