@@ -294,7 +294,11 @@
 
 
                     $("#addInstanceDialog .machineSizeRow :radio").change(function(e) {
-						$(this).parent().next().text(cloudadmin.resource.machineTypes[$(this).attr("value")].specification);
+						for (var mt = 0; mt < cloudadmin.resource.machineTypes.length; ++mt) {
+							if (machineTypes[mt].id == $(this).attr("value")) {
+								$(this).parent().next().text(cloudadmin.resource.machineTypes[mt].specification);								
+							}
+						}
 					});
 
                     $("#addInstanceDialog .reserveUserBtn").button().click(function() {
