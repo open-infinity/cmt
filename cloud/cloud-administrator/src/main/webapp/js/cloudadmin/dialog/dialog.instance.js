@@ -427,6 +427,9 @@
 						// should be like this: 
 						// outData[clusters[i].name + "clustersize"] 	= $('#' + clusters[i].name + ' .clusterSizeRow .jq_slider').slider("value");
 						outData[clusters[i].name + "clustersize"] = $('#' + clusters[i].name + ' .clusterSizeRow .jq_slider').parent().next().text();
+						if (outData[clusters[i].name + "clustersize"] == "") {
+							outData[clusters[i].name + "clustersize"] = $('#' + clusters[i].name + ' .clusterSizeRowDisabled .jq_slider').parent().next().text();							
+						}
 						outData[clusters[i].name + "machinesize"] = machineSize(clusters[i].name, 1);
 						if (clusters[i].replicated == true){
 							outData[clusters[i].name + "replclustersize"] = $('#' + clusters[i].name + ' .replicationClusterSizeRow .jq_slider').parent().next().text();
