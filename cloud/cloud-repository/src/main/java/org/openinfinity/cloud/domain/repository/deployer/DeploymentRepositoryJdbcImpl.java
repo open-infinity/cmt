@@ -17,12 +17,15 @@ package org.openinfinity.cloud.domain.repository.deployer;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
 import javax.sql.DataSource;
 
 import org.openinfinity.cloud.domain.Deployment;
+import org.openinfinity.cloud.domain.DeploymentStatus;
+import org.openinfinity.cloud.domain.DeploymentStatus.DeploymentState;
 import org.openinfinity.core.annotation.AuditTrail;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -35,7 +38,7 @@ import org.springframework.util.Assert;
  * JDBC Repository implementation of the <code>org.openinfinity.core.cloud.deployer.repository.DeploymentRepository</code> interface.
  * 
  * @author Ilkka Leinonen
- * @version 1.0.0
+ * @version 1.1.0
  * @since 1.0.0
  */
 @Repository
@@ -73,9 +76,29 @@ public class DeploymentRepositoryJdbcImpl implements DeploymentRepository {
 	private static final String LOAD_ALL_FOR_ORG_SQL = "SELECT * FROM DEPLOYMENT WHERE ORGANIZATION_ID = ?";
 	
 	/**
+	 * Represents the SQL script for loading all Deployment objects with cluster id.
+	 */
+	private static final String LOAD_ALL_FOR_CLUSTER_SQL = "SELECT * FROM DEPLOYMENT WHERE CLUSTER_ID = ?";
+	
+	/**
 	 * Represents the SQL script for deleting Deployment object.
 	 */
 	private static final String DELETE_BY_ID = "DELETE FROM DEPLOYMENT WHERE ORGANIZATION_ID = ? AND NAME = ?";
+
+	/**
+	 * Represents the SQL script for updating deployment stated of the object.
+	 */
+	private static final String DEPLOYMENT_STATE_UPDATE_SQL = "update deployment_state_tbl set state = ? where id = ?";
+
+	/**
+	 * Represents the SQL script for inserting deployment stated of the object.
+	 */
+	private static final String DEPLOYMENT_STATE_INSERT_SQL = "insert into deployment_state_tbl (deployment_id, machine_id, state) values (?, ?, ?)";
+	
+	/**
+	 * Represents the SQL script for quering deployment status of the object by deployment i.
+	 */
+	private static final String QUERY_FOR_DEPLOYMENT_STATUS_BY_DEPLOYMENT_ID_SQL = "select * from deployment_state_tbl where deployment_id = ?";
 	
 	/**
 	 * Represents the SQL script for fetching last inserted id of the Deployment object.
@@ -159,6 +182,33 @@ public class DeploymentRepositoryJdbcImpl implements DeploymentRepository {
 		return null;
 	}
 	
+	/**
+	 * Persists deployment status object.
+	 */
+	@Override
+	public void storeDeploymentStatus(DeploymentStatus deploymentStatus) {
+		String sql = deploymentStatus.getDeploymentState().getValue() == 0 ? DEPLOYMENT_STATE_INSERT_SQL:DEPLOYMENT_STATE_UPDATE_SQL;
+		Object[] parameters = deploymentStatus.getDeploymentState().getValue() == 0 ? new Object[] {deploymentStatus.getDeployment().getId(), deploymentStatus.getMachineId(), deploymentStatus.getDeploymentState().getValue()} : new Object[]{deploymentStatus.getDeploymentState().getValue(), deploymentStatus.getId()};
+		jdbcTemplate.update(sql, parameters);
+	}
+
+	/**
+	 * Executes querys based on cluster id to persistent memory containing deployment status information.
+	 */
+	@Override
+	public Collection<DeploymentStatus> loadDeploymentStatuses(long clusterId) {
+		Collection<DeploymentStatus> allDeploymentStatusesWithSameClusterId = new ArrayList<DeploymentStatus>();
+		Collection<Deployment> deployments = jdbcTemplate.query(LOAD_ALL_FOR_CLUSTER_SQL, new Object[]{clusterId}, new DeploymentRowMapper());
+		for (Deployment deployment : deployments) {
+			Collection<DeploymentStatus> deploymentStatuses = jdbcTemplate.query(QUERY_FOR_DEPLOYMENT_STATUS_BY_DEPLOYMENT_ID_SQL, new Object[]{deployment.getId()}, new DeploymentStateRowMapper());
+			for (DeploymentStatus deploymentStatus : deploymentStatuses) {
+				deploymentStatus.setDeployment(deployment);
+			}
+			allDeploymentStatusesWithSameClusterId.addAll(deploymentStatuses);
+		}
+		return Collections.unmodifiableCollection(allDeploymentStatusesWithSameClusterId);
+	}
+	
 	private class DeploymentRowMapper implements RowMapper<Deployment> {
 		
 		public Deployment mapRow(ResultSet resultSet, int rowNum) throws SQLException {
@@ -172,6 +222,20 @@ public class DeploymentRepositoryJdbcImpl implements DeploymentRepository {
 			deployment.setName(resultSet.getString("NAME"));
 			deployment.setDeploymentTimestamp(resultSet.getTimestamp("cur_timestamp"));
 			return deployment;
+		}
+	
+	}
+
+	private class DeploymentStateRowMapper implements RowMapper<DeploymentStatus> {
+		
+		public DeploymentStatus mapRow(ResultSet resultSet, int rowNum) throws SQLException {
+			DeploymentStatus deploymentStatus = new DeploymentStatus();
+			DeploymentState deploymentState = DeploymentStatus.getDeploymentStateWithNumericValue(resultSet.getInt("state"));
+			deploymentStatus.setDeploymentState(deploymentState);
+			deploymentStatus.setId(resultSet.getInt("id"));
+			deploymentStatus.setMachineId(resultSet.getInt("machine_id"));
+			deploymentStatus.setTimestamp(resultSet.getTimestamp("cur_timestamp"));
+			return deploymentStatus;
 		}
 	
 	}

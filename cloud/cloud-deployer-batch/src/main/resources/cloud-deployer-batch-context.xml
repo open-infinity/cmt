@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:batch="http://www.springframework.org/schema/batch"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xmlns:p="http://www.springframework.org/schema/p" 
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context-3.0.xsd
+		http://www.springframework.org/schema/batch
+		http://www.springframework.org/schema/batch/spring-batch-2.1.xsd
+        http://www.springframework.org/schema/task
+        http://www.springframework.org/schema/task/spring-task-3.0.xsd">
+       
+    <context:property-placeholder 
+    	location="classpath:/META-INF/properties/system.properties,
+    	classpath:/META-INF/properties/infrastructure.properties,
+    	classpath:/META-INF/properties/jets3.properties,
+    	classpath:/META-INF/properties/repository.properties" />  
+     
+    <context:component-scan base-package="org.openinfinity"/>   
+        		    
+	<import resource="classpath*:/META-INF/spring/cloud-context-util.xml" />
+	<import resource="classpath*:/META-INF/spring/cloud-context-core.xml" />
+	<import resource="classpath*:/META-INF/spring/cloud-context-repository.xml" />
+	<import resource="classpath*:/META-INF/spring/cloud-context-service.xml" />
+		
+	<bean id="txManager" 
+	    class="org.springframework.jdbc.datasource.DataSourceTransactionManager"
+		p:dataSource-ref="cloudDataSource" /> 	
+	
+	<bean id="jobRepository" class="org.springframework.batch.core.repository.support.JobRepositoryFactoryBean"
+		p:dataSource-ref="cloudDataSource"
+		p:transactionManager-ref="txManager" />
+	
+	<bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher"
+		p:jobRepository-ref="jobRepository" />
+	
+	<bean id="periodicCloudDeployerWriter" class="org.openinfinity.cloud.application.deployer.batch.PeriodicCloudDeployerWriter">
+<!-- 		<property name="deploymentHostPort" value="${deploymentHostPort}" /> -->
+<!-- 		<property name="username" value="${technicalUsername}" /> -->
+		<property name="deploymentHostPort" value="22" />
+		<property name="username" value="root" />
+		<property name="fileSystemUser" value="toas" />
+		<property name="fileSystemGroup" value="toas" />
+		<property name="pathToDeploymentDirectoryMap">
+			<map key-type="java.lang.String" value-type="java.lang.String">
+				<entry key="portal" value="/opt/openinfinity/tomcat/deploy/"/>
+				<entry key="bas" value="/opt/openinfinity/tomcat/apache-tomcat-7.0.27/webapps/"/>
+				<entry key="service" value="/opt/openinfinity/tomcat/apache-tomcat-7.0.27/webapps"/>
+				<entry key="analytics" value="/opt/openinfinity/tomcat/apache-tomcat-7.0.27/webapps/"/>
+				<entry key="ig" value="/opt/openinfinity/tomcat/apache-tomcat-7.0.27/webapps/"/>
+				<entry key="ee" value="/opt/openinfinity/tomcat/apache-tomcat-7.0.27/webapps/"/>
+				<entry key="ecm" value="/opt/openinfinity/tomcat/apache-tomcat-7.0.27/webapps/"/>
+				<entry key="bigdata" value="/opt/openinfinity/hadoop/"/>
+				<entry key="db" value="/opt/openinfinity/mariadb/"/>
+				<entry key="nosql" value="/opt/openinfinity/mongodb/"/>
+			</map>
+		</property>
+		<property name="keyService" ref="keyService" />
+		<property name="machineTypeService" ref="machineTypeService" />
+		<property name="clusterService" ref="clusterService" />
+		<property name="instanceService" ref="instanceService" />
+	</bean>
+	
+	<batch:job id="cloudDeployerBatchJob">
+		<batch:step id="stepP1">
+			<batch:tasklet transaction-manager="txManager"
+				start-limit="3">
+				<batch:chunk 
+					reader="periodicCloudDeployerReader" 
+					processor="periodicCloudDeployerProcessor"
+					writer="periodicCloudDeployerWriter" 
+					commit-interval="100" 
+					retry-limit="3">
+					<batch:retryable-exception-classes>
+                    	<batch:include class="org.springframework.dao.OptimisticLockingFailureException" />
+                        <batch:include class="org.springframework.dao.DeadlockLoserDataAccessException" />
+                    </batch:retryable-exception-classes>
+                </batch:chunk>
+			</batch:tasklet>
+		</batch:step>	
+	</batch:job>
+	
+	<task:scheduled-tasks>  
+	    <task:scheduled ref="periodicCloudDeployerLauncher" method="launch" cron="*/10 * * * * ?"/>
+	</task:scheduled-tasks>
+		
+</beans>

@@ -18,6 +18,7 @@ package org.openinfinity.cloud.domain.repository.deployer;
 import java.util.Collection;
 
 import org.openinfinity.cloud.domain.Deployment;
+import org.openinfinity.cloud.domain.DeploymentStatus;
 
 /**
  * CRUD interface for storing <code>org.openinfinity.core.cloud.domain.Deployment</code> objects.
@@ -74,5 +75,15 @@ public interface DeploymentRepository {
 	 * @param deployment Represents the <code>org.openinfinity.core.cloud.domain.Deployment</code> object for deletion.
 	 */
 	void delete(Deployment deployment);
+	
+	/**
+	 * Persists deployment status object.
+	 */
+	void storeDeploymentStatus(DeploymentStatus deploymentStatus);
+	
+	/**
+	 * Executes queries based on cluster id to persistent memory containing deployment status information.
+	 */
+	public Collection<DeploymentStatus> loadDeploymentStatuses(long clusterId);
 
 }

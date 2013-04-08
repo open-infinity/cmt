@@ -19,6 +19,7 @@
 		<module>cloud-service</module>
 		<module>cloud-autoscaler</module>
 		<module>cloud-deployer</module>
+		<module>cloud-deployer-batch</module>
 		<module>cloud-administrator</module>
 		<module>cloud-connectionpool-manager</module>
 		<module>cloud-properties</module>
