@@ -70,7 +70,7 @@
                      syntax="string"
                      i18nKey="a4022JdbcURL">
         <DefaultValues>
-            <Value>jdbc:mysql://<%= dbAddress %>/lportal?useUnicode=true&amp;characterEncoding=UTF-8&amp;useFastDateParsing=false</Value>
+            <Value>jdbc:mysql://<%= dbaddress %>/lportal?useUnicode=true&amp;characterEncoding=UTF-8&amp;useFastDateParsing=false</Value>
         </DefaultValues>
     </AttributeSchema>
     <AttributeSchema name="sun-opensso-database-JDBCDbuser"

@@ -8,9 +8,14 @@ class oi-identity-gateway::install {
 		ensure => present,
 		require => Package["oi-tomcat-7.0.27-1"]
 	}
+	
+	package {"haproxy":
+		ensure => installed
+	}
 
 	exec {"set-privileges":
                 command => "/bin/chown -R toas:toas /opt/openinfinity/2.0.0",
-                require => Package["oi-identitygateway-2.0.0-1"]
+                require => Package["oi-identitygateway-2.0.0-1"],
+		tries => 3
         }
 }

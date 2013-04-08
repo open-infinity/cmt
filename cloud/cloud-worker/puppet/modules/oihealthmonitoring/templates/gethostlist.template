@@ -12,7 +12,11 @@ LOCALHOST_GROUP_DESRIPTION="liferay"
 ## perfect sense to specify here at least IP of the first configured host
 ## (plus our own of cause)
 
-## this record represents us DO NOT REMOVE OR MODIFY!
-echo "$MY_IP $(hostname -f) $LOCALHOST_GROUP_DESRIPTION"
+<% cluster_member_addresses.each do |cluster_member_address|%>echo "<%=cluster_member_address%> <%=cluster_member_address%> $LOCALHOST_GROUP_DESRIPTION"
+<% end %>
+
+## this record represents us DO NOT REMOVE OR MODIFY! 
+<%# Removed -f switch from the hostname %>
+echo "$MY_IP $(hostname) $LOCALHOST_GROUP_DESRIPTION"
 
 

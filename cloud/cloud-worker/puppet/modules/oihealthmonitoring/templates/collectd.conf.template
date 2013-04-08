@@ -97,7 +97,7 @@ LoadPlugin memory
 LoadPlugin mysql
 ##LoadPlugin netapp
 ##LoadPlugin netlink
-#LoadPlugin network
+LoadPlugin network
 #LoadPlugin nfs
 #LoadPlugin nginx
 ##LoadPlugin notify_desktop
@@ -118,7 +118,7 @@ LoadPlugin mysql
 #LoadPlugin python
 ##LoadPlugin routeros
 ##LoadPlugin rrdcached
-#LoadPlugin rrdtool
+LoadPlugin rrdtool
 #LoadPlugin sensors
 #LoadPlugin serial
 #LoadPlugin snmp
@@ -449,6 +449,7 @@ LoadPlugin mysql
 #	</Host>
 #</Plugin>
 
+# Notice, this plugin monitors database, not saves data into it
 <Plugin mysql>
 	<Database test>
 		Host "localhost"
@@ -761,13 +762,13 @@ LoadPlugin mysql
 #	CreateFiles true
 #	CollectStatistics true
 #</Plugin>
-Include "TOAS_COLLECTD_ROOT/etc/collectd.d/"
+Include "<%=toas_collectd_root%>/etc/collectd.d/"
 
-#<Plugin rrdtool>
-#	DataDir "/opt/collectd//usr/var/lib/collectd/rrd"
-#	CacheTimeout 120
-#	CacheFlush   900
-#</Plugin>
+<Plugin rrdtool>
+	DataDir "/opt/collectd/usr/var/lib/collectd/rrd"
+	CacheTimeout 120
+	CacheFlush   900
+</Plugin>
 
 #<Plugin sensors>
 #	Sensor "it8712-isa-0290/temperature-temp1"

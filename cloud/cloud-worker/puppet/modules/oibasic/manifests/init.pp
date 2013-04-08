@@ -4,6 +4,7 @@ class oibasic::config {
                 owner => 'root',
                 group => 'root',
                 mode => 777,
+#		require => Class["oiebs"],
         }
 
         file {"/data":
@@ -48,11 +49,28 @@ class oibasic::config {
 
         group {"toas":
                 ensure => present,
+#		require => Class["oiebs"],
         }
+}
 
+class oibasic::service {
+	service { "crond":
+		ensure => running,
+		hasstatus => true,
+		hasrestart => true,
+		enable => true,
+		require => Class["oibasic::install"],
+	}
+}
+
+class oibasic::install {
+    package { ["cronie"]:
+        ensure => installed,
+	require => Class["oibasic::config"],
+    }
 }
 
 class oibasic {
-        include oibasic::config
+        include  oibasic::install, oibasic::config,  oibasic::service
 }
 

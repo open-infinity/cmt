@@ -123,6 +123,14 @@ class oi-identity-gateway::config {
 		subscribe => File ["/opt/openinfinity/2.0.0/sso-tools/generate-configs.sh"],
 	}
 
+	file {"/etc/haproxy/haproxy.cfg":
+		ensure => present,
+		owner => 'root',
+		group => 'root',
+		mode => 0644,
+		source => "puppet:///modules/oi-identity-gateway/haproxy.cfg",
+		require => Package["haproxy"],
+		notify => Service["haproxy"],
+	}
+
 }
-
-

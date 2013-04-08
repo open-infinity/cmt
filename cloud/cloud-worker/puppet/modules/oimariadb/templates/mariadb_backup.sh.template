@@ -1,0 +1,17 @@
+#!/bin/sh
+
+export HOST_NAME=`uname -n`
+export CURRENT_DATE=`date +"%d-%m-%y_%H:%M"`
+
+export BACKUP_DIR=/opt/openinfinity/2.0.0/backup/dumps
+export DUMP_FILENAME=$BACKUP_DIR/toas-mariadb-$HOSTNAME-dump-$CURRENT_DATE.sql.gz
+
+# Make database dump
+/opt/openinfinity/2.0.0/mariadb/bin/mysqldump -ubackup -ptoasbackup --all-databases --lock-all-tables | gzip > $DUMP_FILENAME || exit 1
+
+# Delete old backups
+cd $BACKUP_DIR
+find $BACKUP_DIR/* -mtime +1 -exec rm {} \;
+
+
+

@@ -1,0 +1,9 @@
+LoadPlugin df
+<Plugin df>
+#       Device "/dev/sda1"
+#        FSType "ext4"
+	MountPoint "/opt"
+        ReportByDevice true
+        ReportInodes true
+</Plugin>
+

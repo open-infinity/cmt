@@ -51,6 +51,15 @@ class oiportal::config {
                 require => Class["oiportal::install"],
         }
 
+	file {"/opt/openinfinity/2.0.0/tomcat/bin/setenv.sh":
+                ensure => present,
+                owner => 'toas',
+                group => 'toas',
+                mode => 0755,
+                source => "puppet:///modules/oiportal/setenv.sh",
+                require => Class["oiportal::install"],
+        }
+
 	file {"/opt/openinfinity/2.0.0/tomcat/conf/Catalina/localhost/ROOT.xml":
 		ensure => present,
 		owner => 'toas',
@@ -102,6 +111,15 @@ class oiportal::config {
                 source => "puppet:///modules/oiportal/oi-tomcat",
                 require => Class["oiportal::install"],
         }
+	
+	file {"/opt/openinfinity/2.0.0/portal-setup-wizard.properties":
+		ensure => present,
+		owner => 'toas',
+		group => 'toas',
+		mode => 0644,
+		source => "puppet:///modules/oiportal/portal-setup-wizard.properties",
+		require => Class["oiportal::install"],
+	}
 }
 
 class oiportal::service {

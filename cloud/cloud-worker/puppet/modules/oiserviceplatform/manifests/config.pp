@@ -1,13 +1,4 @@
 class oiserviceplatform::config inherits oibas::config {
-	file {"/opt/openinfinity/2.0.0/tomcat/bin/setenv.sh":
-		ensure => present,
-		owner => 'toas',
-		group => 'toas',
-		mode => 0755,
-		source => "puppet:///modules/oiserviceplatform/setenv.sh",
-		require => Class["oiserviceplatform::install"],
-	}
-	
 	file {"/opt/openinfinity/2.0.0/tomcat/conf/activemq.xml":
 		ensure => present,
 		owner => 'toas',

@@ -1,0 +1,12 @@
+#!/bin/sh
+
+# Loop for special cases before rsync
+cd /opt/openinfinity/2.0.0/backup/scripts/pre-backup.d
+for f in $( ls ) ; do
+	"./$f"
+done
+
+# rsync backup
+cd <%=backup_source_dir%>
+/opt/openinfinity/2.0.0/backup/scripts/rsync-backup.sh <%=backup_source_dir%>
+

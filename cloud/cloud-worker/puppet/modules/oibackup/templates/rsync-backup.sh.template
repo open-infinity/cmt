@@ -1,0 +1,27 @@
+#!/bin/sh
+
+#
+# Syncs the local directory with a remote one
+#
+
+export SSH_KEY=/opt/openinfinity/2.0.0/backup/ssh-keys/toas-backup-private.key
+export SOURCE_DIR=$1
+export TARGET_USER=<%=backup_user%>
+export TARGET_HOST=<%=backup_host%>
+export TARGET_DIR=<%=backup_dir%>
+
+if [ ! -z $SOURCE_DIR ] ; then
+	if [ ! -z $TARGET_USER ] ; then
+		if [ ! -z $TARGET_HOST ] ; then
+			if [ ! -z $TARGET_DIR ] ; then
+				ssh -i ${SSH_KEY} -o "StrictHostKeyChecking no" ${TARGET_USER}@${TARGET_HOST} "mkdir -p \"${TARGET_DIR}\"" || exit 1 
+				rsync -a --delete -e "ssh -Ci ${SSH_KEY} -o \"StrictHostKeyChecking no\"" ${SOURCE_DIR} ${TARGET_USER}@${TARGET_HOST}:"${TARGET_DIR}" || exit 1
+				exit 0
+			fi
+		fi
+	fi
+fi
+
+echo "Aborted, because a backup parameter is missing!" >/dev/stderr
+exit 1
+

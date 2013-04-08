@@ -1,0 +1,187 @@
+#!/bin/bash
+
+SLEEP_TIME=10
+JAVA_PROCESS_NAME=java
+HOSTCHECKER_JAR_NAME=$TOAS_HEALTH_MONITORING_ROOT/lib/hostchecker.jar
+HTTP_LISTENER_FILE_NAME=$TOAS_HEALTH_MONITORING_ROOT/lib/rrd-data-reader.jar
+RRD_READER_JVM_OPTS="-Xss256k -Xmx20m -Xms16m -XX:PermSize=12m -XX:MaxPermSize=18m -XX:+CMSClassUnloadingEnabled -XX:+UseCompressedOops"
+HOSTCHECKER_JVM_OPTS="-Xmx16m -Xms4m -XX:PermSize=4m -XX:MaxPermSize=8m -XX:+UseCompressedOops"
+
+HOST_LIST_FILE=$TOAS_HEALTH_MONITORING_ROOT/etc/nodelist.conf
+
+ON_JOIN_SCRIPT_DIR=$TOAS_HEALTH_MONITORING_ROOT/bin/join
+ON_LEAVE_SCRIPT_DIR=$TOAS_HEALTH_MONITORING_ROOT/bin/leave
+
+NET_INTERFACE=$TOAS_COMMUNICATION_IFACE
+
+LOCAL_BALANCE_PORT=8181
+REMOTE_BALANCE_PORT=8181
+PID_FILE=$TOAS_HEALTH_MONITORING_ROOT/tmp/balance.pid
+
+COMMAND_PIPE=$TOAS_HEALTH_MONITORING_ROOT/tmp/monitoring_pipe
+
+MY_IP=$(ifconfig $NET_INTERFACE | grep 'inet addr' | cut -d: -f2 | cut -d' '  -f1)
+CURRENT_MAIN_IP=$MY_IP
+#CURRENT_MAIN_IP=$(head -n 1 $HOST_LIST_FILE | awk '{print $1}')
+
+THRESHOLD_VALUES=$TOAS_HEALTH_MONITORING_ROOT/var/share/collectd/threshold_values.conf
+THRESHOLD_CONF=$TOAS_COLLECTD_ROOT/etc/collectd.d/threshold.conf
+
+MONITORING_LOG=$TOAS_HEALTH_MONITORING_ROOT/var/log/monitoring.log
+
+function init() {
+	/usr/local/bin/gethostlist > $TOAS_HEALTH_MONITORING_ROOT/etc/nodelist.conf
+	log "========== Initial parameters =========="
+	log $(cat $TOAS_HEALTH_MONITORING_ROOT/etc/nodelist.conf)
+	log "========================================"
+
+	[ ! -d $TOAS_COLLECTD_ROOT/etc/collectd.d/ ] && mkdir -p $TOAS_COLLECTD_ROOT/etc/collectd.d/
+	[ ! -d $TOAS_HEALTH_MONITORING_ROOT/var/log/ ] && mkdir -p $TOAS_HEALTH_MONITORING_ROOT/var/log/
+	[ ! -d $TOAS_HEALTH_MONITORING_ROOT/tmp/ ] && mkdir -p $TOAS_HEALTH_MONITORING_ROOT/tmp/
+	
+	CURRENT_MAIN_IP=$(head -n 1 $HOST_LIST_FILE | awk '{print $1}')
+	touch $HOST_LIST_FILE".tmp"
+	[[ -p $COMMAND_PIPE ]] && rm -rf $COMMAND_PIPE
+	mkfifo $COMMAND_PIPE
+
+	generateCollectdThresholdConf
+}
+
+function startHostchecker() {	
+	(
+		cd $(dirname $HOSTCHECKER_JAR_NAME);
+		java $HOSTCHECKER_JVM_OPTS -jar $HOSTCHECKER_JAR_NAME &
+	)
+}
+
+
+function generateCollectdConf() {
+	if [[ ! -n "$1" || ! -n "$2" ]];then 
+		log "generateCollectdConf(): function should be called with 2 params LOCAL_IP, MAIN_HOST_IP"
+		return 1;
+	fi
+	
+	local MY_IP=$1
+    local MAIN_HOST_IP=$2
+	log "generateCollectdConf(): MY_IP: $MY_IP : MAIN_HOST_IP: $MAIN_HOST_IP"
+	if [[ "$MY_IP" != "$MAIN_HOST_IP" ]]; then
+                log "generateCollectdConf(): Me is NOT main host, generating config for client"
+                cat $TOAS_HEALTH_MONITORING_ROOT/var/share/collectd/client.tpl | sed -e "s#SERVER_IP#$MAIN_HOST_IP#g" > $TOAS_COLLECTD_ROOT/etc/collectd.d/network.conf
+        else
+                log "generateCollectdConf(): Me is MAIN host, generating config for server-client"
+                cat $TOAS_HEALTH_MONITORING_ROOT/var/share/collectd/client-server.tpl | sed -e "s#SERVER_IP#$MAIN_HOST_IP#g" | sed -e "s#LISTEN_IP#$MAIN_HOST_IP#g" | sed -e "s#RRD_DATA_DIR#$TOAS_COLLECTD_ROOT/usr/var/lib/collectd/rrd#g" > $TOAS_COLLECTD_ROOT/etc/collectd.d/network.conf
+        fi
+	return 0;
+}
+
+function startBalance() {
+	local _MY_IP=$1;
+	local _CURRENT_MAIN_IP=$2;
+	[ -a "$PID_FILE" ] && rm -f $PID_FILE
+        if [[ "$_MY_IP" != "$_CURRENT_MAIN_IP" ]]; then
+		log "startBalance(): starting balance: redirecting to $_CURRENT_MAIN_IP:$REMOTE_BALANCE_PORT"
+                balance $LOCAL_BALANCE_PORT $_CURRENT_MAIN_IP:$REMOTE_BALANCE_PORT
+                local PID=$(ps aux | grep "$LOCAL_BALANCE_PORT $_CURRENT_MAIN_IP:$REMOTE_BALANCE_PORT" | grep -v grep | awk '{print $2}')
+                echo "$PID $_CURRENT_MAIN_IP" > $PID_FILE
+        fi
+}
+
+function restartCollectd() {
+	local _MY_IP=$1;
+    local _CURRENT_MAIN_IP=$2;
+    service collectd stop
+    generateCollectdConf $_MY_IP $_CURRENT_MAIN_IP
+    if [[ $? == 0 ]]; then
+        service collectd start
+    fi
+}
+
+function startHttpListener() {
+	local _MY_IP=$1;
+    local _CURRENT_MAIN_IP=$2;
+	log "startHttpListener(): MY_IP: $_MY_IP, CURRENT_MAIN_IP: $_CURRENT_MAIN_IP"
+    if [[ "$_MY_IP" == "$_CURRENT_MAIN_IP" ]]; then
+		log "Starting http listener on port $LOCAL_BALANCE_PORT ..."
+		(
+			cd $(dirname $HTTP_LISTENER_FILE_NAME);
+			java $RRD_READER_JVM_OPTS -jar $HTTP_LISTENER_FILE_NAME &
+		)
+    fi
+}
+
+
+function generateCollectdThresholdConf() {
+	echo "LoadPlugin threshold" > $THRESHOLD_CONF;
+	echo "<Plugin threshold>" >> $THRESHOLD_CONF;
+	for i in `cat $THRESHOLD_VALUES`; do  
+		if [[ -n "$i" && ${i:0:1} != "#" ]]; then
+			fullname=$(echo $i | awk -F \# '{print $1}'); 
+			threshold=$(echo $i | awk -F \# '{print $2}'); 
+			plugin=$(echo $fullname| awk -F . '{print $1}'); 
+			plugin_instance=$(echo $fullname| awk -F . '{print $2}'); 
+			type=$(echo $fullname| awk -F . '{print $3}'); 
+			type_instance=$(echo $fullname| awk -F . '{print $4}'); 
+			datasource=$(echo $fullname| awk -F . '{print $5}'); 
+			edge=$(echo $threshold| awk -F = '{print $1}'); 
+			value=$(echo $threshold| awk -F = '{print $2}'); 
+			
+			if [[ "$value" =~ ^[0-9]+\%$ ]]; then
+				UNK="-"
+				value=$(transformToRealValue "${plugin:=UNK}" "${plugin_instance:=UNK}" "${type:=UNK}" "${type_instance:=UNK}" "${value:=0}")
+			fi
+			
+			echo "<Plugin $plugin>" >> $THRESHOLD_CONF;
+			[[ -n "$plugin_instance" ]] && echo "Instance $plugin_instance" >> $THRESHOLD_CONF;
+			echo "<Type $type>" >> $THRESHOLD_CONF;
+			[[ -n "$type_instance" ]] && echo "Instance $type_instance" >> $THRESHOLD_CONF; 
+			[[ -n "$datasource" ]] &&  echo "DataSource $datasource" >> $THRESHOLD_CONF; 
+			echo "$edge $value" >> $THRESHOLD_CONF; 
+			if [[ "$value" =~ ^[0-9]+\%$ ]]; then
+				echo "Percentage true" >> $THRESHOLD_CONF;
+            fi
+			echo "</Type>" >> $THRESHOLD_CONF; 
+			echo "</Plugin>" >> $THRESHOLD_CONF;
+		fi
+	done
+	
+	echo "</Plugin>" >> $THRESHOLD_CONF;
+}
+function transformToRealValue() {
+	plugin=$1;
+	plugin_instance=$2
+	type=$3
+	type_instance=$4
+	value=$5
+
+	if [[ $plugin == 'memory' && $type='memory' && $type_instance='free' ]]; then 
+		totalKb=$(($(cat /proc/meminfo | grep 'MemTotal'| awk '{print $2}')*1000));
+		l=$(($(echo $value | wc -L)-1));
+		percent=${value:0:$l}
+		echo $((totalKb-totalKb*$percent/100))
+		return
+	fi
+	echo $value
+	return
+}
+function log() {
+	echo $@ >> $MONITORING_LOG
+}
+
+
+function startNotificator() {
+	local _MY_IP=$1;
+	local _CURRENT_MAIN_IP=$2;
+	if [[ "$_MY_IP" == "$_CURRENT_MAIN_IP" ]];then
+		log "Creating notificator cron job..."
+		cat $TOAS_HEALTH_MONITORING_ROOT/var/share/cron.tpl | sed -e "s#TOAS_HEALTH_MONITORING_ROOT#$TOAS_HEALTH_MONITORING_ROOT#g" | sed -e "s#TOAS_COLLECTD_ROOT#$TOAS_COLLECTD_ROOT#g" > /etc/cron.d/notifications_monitoring
+	fi
+}
+function stopNotificator() {
+	local _MY_IP=$1;
+        local _CURRENT_MAIN_IP=$2;	
+	if [[ "$_CURRENT_MAIN_IP" != "$_MY_IP" ]];then
+		log "Stopping notificator cron job"
+		rm -f /etc/cron.d/notifications_monitoring;
+		rm -f $TOAS_HEALTH_MONITORING_ROOT/tmp/*.lock
+	fi
+}

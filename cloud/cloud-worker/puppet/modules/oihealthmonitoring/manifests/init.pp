@@ -1,6 +1,7 @@
 class oihealthmonitoring {
     include oihealthmonitoring::install
     include oihealthmonitoring::config
-    include oihealthmonitoring::service
+    include oihealthmonitoring::service_collectd
+    include oihealthmonitoring::service_monitoring
 }
 

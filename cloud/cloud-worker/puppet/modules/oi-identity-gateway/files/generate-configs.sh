@@ -12,4 +12,3 @@ rm -f /opt/openinfinity/2.0.0/sso-tools/admintools/resources/amIdRepoService.pro
 
 mv /opt/openinfinity/2.0.0/sso-tools/admintools/resources/amIdRepoService.properties.temp /opt/openinfinity/2.0.0/sso-tools/admintools/resources/amIdRepoService.properties
 
-touch /opt/openinfinity/2.0.0/sso-tools/configs-generated

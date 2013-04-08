@@ -1,0 +1,3 @@
+class oibackup::install {
+}
+

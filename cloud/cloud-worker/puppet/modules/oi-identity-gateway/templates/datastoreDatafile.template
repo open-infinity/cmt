@@ -17,5 +17,5 @@ sun-opensso-database-UserAttrs=firstName
 sun-opensso-database-UserAttrs=password_
 sun-opensso-database-UserAttrs=timeZoneId
 sun-opensso-database-JDBCDriver=com.mysql.jdbc.Driver
-sun-opensso-database-JDBCUrl=jdbc:mysql://<%= dbAddress %>/lportal?useUnicode=true&characterEncoding=UTF-8&useFastDateParsing=false
+sun-opensso-database-JDBCUrl=jdbc:mysql://<%= dbaddress %>/lportal?useUnicode=true&characterEncoding=UTF-8&useFastDateParsing=false
 sunIdRepoClass=org.openinfinity.sso.openam.userdata.LiferayDatabaseRepo

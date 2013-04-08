@@ -1,4 +1,4 @@
-<EntityDescriptor entityID="http://<%= liferayAddress %>/saml/metadata/alias/defaultAlias" xmlns="urn:oasis:names:tc:SAML:2.0:metadata">
+<EntityDescriptor entityID="http://<%= liferayAddress %>:80/saml/metadata/alias/defaultAlias" xmlns="urn:oasis:names:tc:SAML:2.0:metadata">
     <SPSSODescriptor AuthnRequestsSigned="false" WantAssertionsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
         <KeyDescriptor use="signing">
             <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
@@ -7,9 +7,9 @@
                 </ds:X509Data>
             </ds:KeyInfo>
         </KeyDescriptor>
-        <SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="http://<%= identityGatewayAddress %>:<%= identityGatewayPort %>/openam/SPSloRedirect/metaAlias/openinfinity/sp1" ResponseLocation="http://<%= liferayAddress %>/saml/SingleLogout/alias/defaultAlias"/>
-        <SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="http://<%= identityGatewayAddress %>:<%= identityGatewayPort %>/openam/SPSloPOST/metaAlias/openinfinity/sp1" ResponseLocation="http://<%= liferayAddress %>/saml/SSO/SingleLogout/defaultAlias"/>
-        <SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="http://<%= liferayAddress %>/saml/SingleLogout/alias/defaultAlias"/>
+        <SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="http://<%= identityGatewayAddress %>:<%= identityGatewayPort %>/openam/SPSloRedirect/metaAlias/openinfinity/sp1" ResponseLocation="http://<%= liferayAddress %>:80/saml/SingleLogout/alias/defaultAlias"/>
+        <SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="http://<%= identityGatewayAddress %>:<%= identityGatewayPort %>/openam/SPSloPOST/metaAlias/openinfinity/sp1" ResponseLocation="http://<%= liferayAddress %>:80/saml/SSO/SingleLogout/defaultAlias"/>
+        <SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="http://<%= liferayAddress %>:80/saml/SingleLogout/alias/defaultAlias"/>
         <ManageNameIDService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="http://<%= identityGatewayAddress %>:<%= identityGatewayPort %>/openam/SPMniRedirect/metaAlias/openinfinity/sp1" ResponseLocation="http://<%= identityGatewayAddress %>:<%= identityGatewayPort %>/openam/SPMniRedirect/metaAlias/openinfinity/sp1"/>
         <ManageNameIDService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="http://<%= identityGatewayAddress %>:<%= identityGatewayPort %>/openam/SPMniPOST/metaAlias/openinfinity/sp1" ResponseLocation="http://<%= identityGatewayAddress %>:<%= identityGatewayPort %>/openam/SPMniPOST/metaAlias/openinfinity/sp1"/>
         <ManageNameIDService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="http://<%= identityGatewayAddress %>:<%= identityGatewayPort %>/openam/SPMniSoap/metaAlias/openinfinity/sp1" ResponseLocation="http://<%= identityGatewayAddress %>:<%= identityGatewayPort %>/openam/SPMniSoap/metaAlias/openinfinity/sp1"/>
@@ -20,8 +20,8 @@
         <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:WindowsDomainQualifiedName</NameIDFormat>
         <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:kerberos</NameIDFormat>
         <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName</NameIDFormat>
-        <AssertionConsumerService index="0" isDefault="true" Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact" Location="http://<%= liferayAddress %>/saml/SSO/alias/defaultAlias"/>
-        <AssertionConsumerService index="1" isDefault="false" Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="http://<%= liferayAddress %>/saml/SSO/alias/defaultAlias"/>
-        <AssertionConsumerService index="2" isDefault="false" Binding="urn:oasis:names:tc:SAML:2.0:bindings:PAOS" Location="http://<%= liferayAddress %>/saml/SSO/alias/defaultAlias"/>
+        <AssertionConsumerService index="0" isDefault="true" Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact" Location="http://<%= liferayAddress %>:80/saml/SSO/alias/defaultAlias"/>
+        <AssertionConsumerService index="1" isDefault="false" Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="http://<%= liferayAddress %>:80/saml/SSO/alias/defaultAlias"/>
+        <AssertionConsumerService index="2" isDefault="false" Binding="urn:oasis:names:tc:SAML:2.0:bindings:PAOS" Location="http://<%= liferayAddress %>:80/saml/SSO/alias/defaultAlias"/>
     </SPSSODescriptor>
 </EntityDescriptor>

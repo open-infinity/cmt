@@ -1,0 +1,63 @@
+#!/bin/bash
+
+FAILURE_COUNT=3;
+
+#PLUGINS=("mysql-test" "GenericJMX-memory")
+
+TOAS_COLLECTD_ROOT=$1
+TOAS_HEALTH_MONITORING_ROOT=$2
+
+OUTPUT_DIR="$TOAS_HEALTH_MONITORING_ROOT/notifications/"
+RRD_ROOT="$TOAS_COLLECTD_ROOT/usr/var/lib/collectd/rrd/"
+
+for HOST in `ls -1 $RRD_ROOT`;do
+
+	# Iterate plugins
+	HOSTNAME=`hostname`
+	cd $RRD_ROOT
+        for PLUGIN in `find $HOSTNAME -type d | cut -d / -f 2 | tail -n +2 | sort`; do
+#        for PLUGIN in ${PLUGINS[@]}; do
+
+                if [ ! -d $RRD_ROOT/$HOST/$PLUGIN ];then
+                        break;
+                fi
+
+                if [ -a $TOAS_HEALTH_MONITORING_ROOT/tmp/"$HOST"_"$PLUGIN".lock ];then
+                        break;
+                fi
+
+                TEMP_FILE=$(mktemp)
+                
+                TYPE=`ls -1 $RRD_ROOT/$HOST/$PLUGIN | head -n 1`
+                rrdtool fetch $RRD_ROOT/$HOST/$PLUGIN/$TYPE AVERAGE -s $((`date +"%s"`-40)) -e $((`date +"%s"`-10)) | grep -E '^[0-9]+.*$' > $TEMP_FILE
+                
+                while read line; do
+                        if [[ "-nan" == $(echo `echo $line | cut -d":" -f2`) ]]; then
+                                count=$((count+1))
+                        else
+                                count=0;
+                        fi
+                done < $TEMP_FILE
+                if [[ $FAILURE_COUNT -le $count ]]; then
+                        OUTPUT_FILE=$(mktemp --tmpdir=$OUTPUT_DIR)
+                        echo "Severity: FAILURE" >> $OUTPUT_FILE
+                        echo "Time:"$(date +"%s")  >> $OUTPUT_FILE
+                        echo "Host: $HOST"  >> $OUTPUT_FILE
+                        echo "Plugin: $PLUGIN"  >> $OUTPUT_FILE
+                        echo "PluginInstance: $PLUGIN_INSTANCE"  >> $OUTPUT_FILE
+                        echo "Type: $(echo $TYPE | cut -d"-" -f1)"  >> $OUTPUT_FILE
+                        echo "TypeInstance: $(echo $TYPE | cut -d"-" -f2)" >> $OUTPUT_FILE
+                        echo "Value: 0" >> $OUTPUT_FILE
+                        echo ""
+                        echo "Message: Service $PLUGIN is unavailable!"  >> $OUTPUT_FILE
+                
+                        touch $TOAS_HEALTH_MONITORING_ROOT/tmp/"$HOST"_"$PLUGIN".lock
+
+                fi
+                
+                rm -f $TEMP_FILE
+        done;
+done;
+
+exit 0;
+

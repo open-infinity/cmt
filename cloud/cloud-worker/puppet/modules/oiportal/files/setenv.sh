@@ -1,0 +1,1 @@
+JAVA_OPTS="$JAVA_OPTS -Dltt.configuration.filename=/opt/openinfinity/2.0.0/ltt-watch/ltt.xml -Dfile.encoding=UTF8 -Dorg.apache.catalina.loader.WebappClassLoader.ENABLE_CLEAR_REFERENCES=false -Duser.timezone=EET -Xmx2048m -XX:MaxPermSize=512m"

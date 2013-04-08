@@ -3,9 +3,9 @@ login.config.url=classpath:samljaas.conf
 authority.granter.class=org.openinfinity.sso.springsecurity.PatternAuthorityGranter
 #authority.granter.pattern=cn=([a-zA-Z0-9_]+),ou=groups,dc=opensso,dc=java,dc=net
 authority.granter.pattern=([a-zA-Z0-9_.]+)
-idp.metadata.url=classpath:tapidp-samlr2-metadata.xml
+idp.metadata.url=classpath:toasidp-samlr2-metadata.xml
 sp.metadata.url=classpath:sp1.xml
-hosted.sp.name=http://<%= liferayAddress %>/saml/metadata/alias/defaultAlias
+hosted.sp.name=http://<%= liferayAddress %>:80/saml/metadata/alias/defaultAlias
 default.idp=http://<%= identityGatewayAddress %>:<%= identityGatewayPort %>/openam
 default.realm=test
 amadmin.username=<%= amAdminUsername %>

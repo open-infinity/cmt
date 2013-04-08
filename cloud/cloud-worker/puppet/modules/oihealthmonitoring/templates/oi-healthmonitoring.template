@@ -26,7 +26,9 @@ TOAS_OWNER=toas; export TOAS_OWNER
     start)
           # Start daemon.
           echo -n "Starting TOAS health monitoring: "
-          su $TOAS_OWNER -c $TOAS_HEALTH_MONITORING_ROOT/bin/start.sh
+          # TODO: enhance startup error handling
+          #nohup su $TOAS_OWNER -c $TOAS_HEALTH_MONITORING_ROOT/bin/start.sh &
+          nohup $TOAS_HEALTH_MONITORING_ROOT/bin/start.sh &
           RETVAL=$?
           echo
           [ $RETVAL = 0 ] && touch /var/lock/subsys/oi-healthmonitoring
@@ -34,8 +36,10 @@ TOAS_OWNER=toas; export TOAS_OWNER
     stop)
           # Stop daemons.
           echo -n "Shutting down TOAS health monitoring: "
-          su $TOAS_OWNER -c $TOAS_HEALTH_MONITORING_ROOT/bin/stop.sh
+          #su $TOAS_OWNER -c $TOAS_HEALTH_MONITORING_ROOT/bin/stop.sh
+          $TOAS_HEALTH_MONITORING_ROOT/bin/stop.sh
           sleep 10
+          
           RETVAL=$?
           echo
           [ $RETVAL = 0 ] && rm -f /var/lock/subsys/oi-healthmonitoring

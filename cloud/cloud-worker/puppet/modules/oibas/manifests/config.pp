@@ -4,6 +4,15 @@ class oibas::config {
                 require => Class["oibas::install"],
         }
 
+	file {"/opt/openinfinity/2.0.0/tomcat/bin/setenv.sh":
+                ensure => present,
+                owner => 'toas',
+                group => 'toas',
+                mode => 0755,
+                source => "puppet:///modules/oibas/setenv.sh",
+                require => Class["oibas::install"],
+        }
+
 	file {"/opt/openinfinity/2.0.0/tomcat/conf/catalina.properties":
 		ensure => present,
 		owner => 'toas',
@@ -32,14 +41,14 @@ class oibas::config {
 		require => Class["oibas::install"],
 	}
 
-#	file {"/opt/openinfinity/2.0.0/tomcat/conf/hazelcast.xml":
-#		ensure => present,
-#		owner => 'toas',
-#		group => 'toas',
-#		mode => 0600,
-#		content => template("oibas/hazelcast.xml.erb"),
-#		require => Class["oibas::install"],
-#	}
+	file {"/opt/openinfinity/2.0.0/tomcat/conf/hazelcast.xml":
+		ensure => present,
+		owner => 'toas',
+		group => 'toas',
+		mode => 0600,
+		content => template("oibas/hazelcast.xml.erb"),
+		require => Class["oibas::install"],
+	}
 
 	file {"/etc/init.d/oi-tomcat":
                 ensure => present,
@@ -48,5 +57,12 @@ class oibas::config {
                 mode => 0755,
                 source => "puppet:///modules/oibas/oi-tomcat",
                 require => Class["oibas::install"],
-        }
+    }
+
+    # Try ensure, that the supported Java is chosen
+    exec { "choose-java":
+            command => "/usr/sbin/alternatives --install /usr/bin/java java /usr/lib/jvm/jre-1.6.0-openjdk.x86_64/bin/java 190000",
+            require => Package["java-1.6.0-openjdk"]
+    }
 }
+

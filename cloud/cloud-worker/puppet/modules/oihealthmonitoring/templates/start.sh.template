@@ -1,0 +1,86 @@
+#!/bin/bash
+
+if [[ ! -n "$TOAS_HEALTH_MONITORING_ROOT" ]]; then
+	echo "TOAS_HEALTH_MONITORING_ROOT is not defined"
+	exit 1;
+fi
+
+. $TOAS_HEALTH_MONITORING_ROOT/bin/common.sh
+
+
+function monitor() {
+	echo  $(inotifywait -q -t 10 -e MODIFY  $HOST_LIST_FILE)
+}
+
+function process() {
+	DIR=""
+    if [[ -s "$HOST_LIST_FILE.tmp" ]]; then
+		log "$HOST_LIST_FILE.tmp not empty. Processing action....."
+		ACTION=$(head -n 1 $HOST_LIST_FILE".tmp" | awk '{print $1}')
+		log "process(); ACTION="$ACTION
+		case $ACTION in	
+			1)	
+				DIR="$ON_JOIN_SCRIPT_DIR" 
+				;;
+			2)	
+				DIR="$ON_LEAVE_SCRIPT_DIR"
+				;;
+			3)	
+				DIR="$ON_JOIN_SCRIPT_DIR $ON_LEAVE_SCRIPT_DIR"
+				;;
+			*)
+				;;
+		esac
+		log "process(): DIR="$DIR
+        if [[ -n "$DIR" ]]; then
+			log "Starting scripts from $DIR ..."
+            local CURRENT_MAIN_IP=$(head -n 1 $HOST_LIST_FILE | awk '{print $1}')
+            local LAST_MAIN_IP=$([ -a "$PID_FILE" ] && cat $PID_FILE | awk '{print $2}')
+            [ ! -n "$LAST_MAIN_IP" ] && LAST_MAIN_IP=$MY_IP
+
+            log "Following parameters detected: current main ip: '$CURRENT_MAIN_IP', last main ip: '$LAST_MAIN_IP'"
+            for d in $DIR; do
+				for i in $(find $d -name '*.sh' | sort); do
+					sh $i "$LAST_MAIN_IP" "$CURRENT_MAIN_IP"
+                done
+            done
+        fi
+		sed 1d $HOST_LIST_FILE".tmp" > $HOST_LIST_FILE".tmp"
+		process
+	fi
+}
+
+function processStarter() {
+	while [[ -n $(ps aux | grep "$JAVA_PROCESS_NAME" | grep "$HOSTCHECKER_JAR_NAME") ]]; do
+		local commands=$(cat < $COMMAND_PIPE)
+		while [[ -n "$commands" ]];do
+			$(echo $commands | cut -d '#' -f 1)
+            commands=$(echo $commands | sed -e 's|^[^#]*#||')
+		done
+	done
+}
+
+init
+startHostchecker
+
+for i in $TOAS_HEALTH_MONITORING_ROOT/bin/build.collectd_conf/*.sh; do
+	source $i;
+done
+
+restartCollectd $MY_IP $CURRENT_MAIN_IP
+startBalance $MY_IP $CURRENT_MAIN_IP
+startHttpListener $MY_IP $CURRENT_MAIN_IP
+startNotificator $MY_IP $CURRENT_MAIN_IP
+processStarter &
+
+log "Starting monitor..."
+
+while [[ -n $(ps aux | grep "$JAVA_PROCESS_NAME" | grep "$HOSTCHECKER_JAR_NAME") ]]; do
+	DIR=''
+	MONITOR_RESULT=$(echo $(monitor)| awk '{print $2}')
+	if [[ -n "$MONITOR_RESULT" ]]; then
+		log $MONITOR_RESULT
+		echo "process#" > $COMMAND_PIPE
+	fi
+done
+

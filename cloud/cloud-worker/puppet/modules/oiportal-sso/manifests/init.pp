@@ -4,6 +4,11 @@ class oiportal-sso::install {
 		require => Class["oibasic"],
 	}
 
+	package {"oi-autologin-hook-2.0.0-1":
+		ensure => present,
+		require => Package["oi-liferay-2.0.1-1"],
+	}
+
 	file {"/opt/openinfinity/2.0.0/deploy":
                 ensure => directory,
                 owner => 'toas',
@@ -42,7 +47,7 @@ class oiportal-sso::config {
 		notify => Service["oi-tomcat"],
 	}
 
-	file {"opt/openinfinity/2.0.0/tomcat/lib/org.openinfinity.security.properties":
+	file {"/opt/openinfinity/2.0.0/tomcat/lib/org.openinfinity.security.properties":
 		ensure => present,
 		owner => 'toas',
 		group => 'toas',
@@ -57,6 +62,15 @@ class oiportal-sso::config {
                 group => 'toas',
                 mode => 0600,
                 source => "puppet:///modules/oiportal-sso/catalina.properties",
+                require => Class["oiportal-sso::install"],
+        }
+
+	file {"/opt/openinfinity/2.0.0/tomcat/bin/setenv.sh":
+		ensure => present,
+                owner => 'toas',
+                group => 'toas',
+                mode => 0755,
+                source => "puppet:///modules/oiportal-sso/setenv.sh",
                 require => Class["oiportal-sso::install"],
         }
 
@@ -130,6 +144,23 @@ class oiportal-sso::config {
                 require => Class["oiportal-sso::install"],
         }
 
+	file {"/opt/openinfinity/2.0.0/tomcat/lib/security":
+		ensure => directory,
+		owner => 'toas',
+                group => 'toas',
+		mode => 0755,
+		require => Class["oiportal-sso::install"],
+	}
+
+	file {"/opt/openinfinity/2.0.0/tomcat/lib/security/securityContext.xml":
+                ensure => present,
+                owner => 'toas',
+                group => 'toas',
+                mode => 0644,
+                content => template("oiportal-sso/securityContext.xml.template"),
+                require => file["/opt/openinfinity/2.0.0/tomcat/lib/security"],
+        }
+
         file {"/opt/openinfinity/2.0.0/tomcat/conf/context.xml":
                 ensure => present,
                 owner => 'toas',
@@ -145,6 +176,15 @@ class oiportal-sso::config {
                 group => 'root',
                 mode => 0755,
                 source => "puppet:///modules/oiportal-sso/oi-tomcat",
+                require => Class["oiportal-sso::install"],
+        }
+	
+	file {"/opt/openinfinity/2.0.0/portal-setup-wizard.properties":
+                ensure => present,
+                owner => 'toas',
+                group => 'toas',
+                mode => 0644,
+                source => "puppet:///modules/oiportal-sso/portal-setup-wizard.properties",
                 require => Class["oiportal-sso::install"],
         }
 }
