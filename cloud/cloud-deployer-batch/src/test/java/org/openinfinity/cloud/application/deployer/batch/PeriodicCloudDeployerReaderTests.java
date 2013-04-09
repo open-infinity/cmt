@@ -86,7 +86,7 @@ public class PeriodicCloudDeployerReaderTests {
 		DeployerService deployerService = mock(DeployerService.class);
 		InstanceService instanceService = mock(InstanceService.class);
 		
-		when(deployerService.loadDeploymentStatusesForCluster(new Long(1))).thenReturn(deploymentStatuses);
+		when(deployerService.loadDeploymentStatusesForCluster(1)).thenReturn(deploymentStatuses);
 		when(instanceService.getAllActiveInstances()).thenReturn(instances);
 		when(deployerService.loadDeploymentsForOrganization(ORGANIZATION_ID)).thenReturn(deployments);
 		when(deployerService.loadDeploymentStatusesForCluster(CLUSTER_ID)).thenReturn(deploymentStatuses);
