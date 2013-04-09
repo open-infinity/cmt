@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.openinfinity.cloud.domain.DeploymentStatus;
 import org.openinfinity.cloud.domain.DeploymentStatus.DeploymentState;
+import org.openinfinity.cloud.domain.Cluster;
 import org.openinfinity.cloud.domain.Key;
 import org.openinfinity.cloud.domain.Machine;
 import org.openinfinity.cloud.service.administrator.ClusterService;
@@ -53,7 +54,7 @@ public class PeriodicCloudDeployerWriter implements ItemWriter<DeploymentStatus>
 	
 	//@Value("${pathToDeploymentDirectoryMap}")
 	//@Autowired(required=true)
-	Map<String, String> pathToDeploymentDirectoryMap;
+	Map<Integer, String> pathToDeploymentDirectoryMap;
 	
 	@Value("${deploymentHostPort}")
 	int deploymentHostPort;
@@ -94,7 +95,7 @@ public class PeriodicCloudDeployerWriter implements ItemWriter<DeploymentStatus>
 		this.fileSystemGroup = fileSystemGroup;
 	}
 
-	public void setPathToDeploymentDirectoryMap(Map<String, String> pathToDeploymentDirectoryMap) {
+	public void setPathToDeploymentDirectoryMap(Map<Integer, String> pathToDeploymentDirectoryMap) {
 		this.pathToDeploymentDirectoryMap = pathToDeploymentDirectoryMap;
 	}
 
@@ -133,10 +134,9 @@ public class PeriodicCloudDeployerWriter implements ItemWriter<DeploymentStatus>
 			Key key = keyService.getKeyByInstanceId(deploymentStatus.getDeployment().getInstanceId());
 			Machine machine = machineService.getMachine(deploymentStatus.getMachineId());
 			LOGGER.debug("Processing machine with id [" + machine.getId() + "] with instance id [" + machine.getInstanceId() + "].");
-			String host = machine.getDnsName();
-			String type = machine.getType();
+			Cluster cluster = clusterService.getClusterByClusterId(deploymentStatus.getDeployment().getClusterId());
+			int type = cluster.getMachineType();
 			String deploymentDirectory = pathToDeploymentDirectoryMap.get(type);
-			deploymentDirectory += host + ":" + deploymentDirectory;
 			LOGGER.debug("Pushing deployment to machine with id [" + machine.getId() + "] for deployment directory [" + deploymentDirectory + "] with artifact named [" + deploymentStatus.getDeployment().getName() + "].");	
 			SSHGateway.pushToServer(
 					key.getSecret_key().getBytes(), 
