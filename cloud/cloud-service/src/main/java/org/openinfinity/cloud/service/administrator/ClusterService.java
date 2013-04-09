@@ -89,4 +89,6 @@ public interface ClusterService {
 
 	Cluster getClusterByLoadBalancerId(int id);
 	
+	Cluster getClusterByClusterId(int id);
+	
 }

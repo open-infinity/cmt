@@ -120,5 +120,10 @@ public class ClusterServiceImpl implements ClusterService {
 	public Cluster getClusterByLoadBalancerId(int loadBalancerId) {
 		return clusterRepository.getClusterByLoadBalancerId(loadBalancerId);
 	}
+
+	@Override
+	public Cluster getClusterByClusterId(int id) {
+		return clusterRepository.getCluster(id);
+	}
 	
 }
