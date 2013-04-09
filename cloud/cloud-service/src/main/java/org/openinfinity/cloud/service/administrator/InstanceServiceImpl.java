@@ -78,4 +78,9 @@ public class InstanceServiceImpl implements InstanceService {
 		return instanceList;
 	}
 
+	@Override
+	public Collection<Instance> getAllActiveInstances() {
+		return instanceRepository.getAllActiveInstances();
+	}
+
 }

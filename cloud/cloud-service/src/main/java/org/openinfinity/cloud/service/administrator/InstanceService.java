@@ -34,5 +34,7 @@ public interface InstanceService {
 	void updateInstanceStatus(int instanceId, String status);
 	
 	Collection<Instance> getUserInstances(Collection<Long> organizationIds);
+
+	Collection<Instance> getAllActiveInstances();
 	
 }
