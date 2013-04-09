@@ -50,4 +50,6 @@ public interface InstanceRepository {
 	
 	void updateInstanceStatus(int instanceId, String status);
 
+	Collection<Instance> getAllActiveInstances();
+
 }

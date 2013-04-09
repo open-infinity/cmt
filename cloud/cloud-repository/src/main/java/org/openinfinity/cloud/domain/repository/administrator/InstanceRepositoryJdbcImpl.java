@@ -194,4 +194,15 @@ public class InstanceRepositoryJdbcImpl implements InstanceRepository {
 			return parameter;
 		}		
 	}
+
+	@Override
+	public Collection<Instance> getAllActiveInstances() {
+		Collection<Instance> instances = this.jdbcTemplate.query("select * from instance_tbl where instance_active = 1", new InstanceMapper());
+		if (instances!=null){
+			for (Instance instance:instances){
+				instance.setParameters(getParameters(instance.getInstanceId()));
+			}
+		}
+		return instances;
+	}
 }
