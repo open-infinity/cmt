@@ -86,8 +86,10 @@ public class BucketRepositoryJets3tImpl implements BucketRepository {
 	public InputStream load(String bucketName, String key) {
 		InputStream inputStream = null;
 		try {
+			simpleStorageService = new RestS3Service(new ProviderCredentialsImpl(accesskeyid, secretkey));		
 			inputStream = simpleStorageService.getObject(bucketName, key).getDataInputStream();
 		} catch (Throwable throwable) {
+			throwable.printStackTrace();
 			ExceptionUtil.throwSystemException(throwable.getMessage(), ExceptionLevel.ERROR, BucketRepository.EXCEPTION_MESSAGE_CONNECTION_FAILURE);
 		}
 		return inputStream;

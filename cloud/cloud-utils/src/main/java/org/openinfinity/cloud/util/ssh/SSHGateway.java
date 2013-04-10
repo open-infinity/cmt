@@ -67,6 +67,7 @@ public class SSHGateway {
 			}
 			
 			session = jsch.getSession(username, host, port);
+			LOGGER.trace("Starting session with username [" + username + "] to host ["+host+"] at port ["+port+"]");
 			if (password != null && password.length() > 0)
 				session.setPassword(password);
 			Properties config = new Properties();

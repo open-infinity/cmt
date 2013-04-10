@@ -96,6 +96,7 @@ public class DeployerServiceImpl implements DeployerService {
 		// TODO Auto-generated method stub	
 	}
 
+	@Log
 	@Override
 	public InputStream load(String bucketName, String key) {
 		return bucketRepository.load(bucketName, key);

@@ -39,25 +39,30 @@
 	<bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher"
 		p:jobRepository-ref="jobRepository" />
 	
+<!-- 	static final int CLUSTER_TYPE_PORTAL = 0; -->
+<!-- 	static final int CLUSTER_TYPE_MULE_MQ = 1; -->
+<!-- 	static final int CLUSTER_TYPE_PENTAHO = 2; -->
+<!-- 	static final int CLUSTER_TYPE_BIGDATA = 3; -->
+<!-- 	static final int CLUSTER_TYPE_DATABASE = 4; -->
+<!-- 	static final int CLUSTER_TYPE_BAS = 5; -->
+<!-- 	static final int CLUSTER_TYPE_NOSQL = 6; -->
+<!-- 	static final int CLUSTER_TYPE_IDENTITY_GATEWAY = 7; -->
+
 	<bean id="periodicCloudDeployerWriter" class="org.openinfinity.cloud.application.deployer.batch.PeriodicCloudDeployerWriter">
-<!-- 		<property name="deploymentHostPort" value="${deploymentHostPort}" /> -->
-<!-- 		<property name="username" value="${technicalUsername}" /> -->
 		<property name="deploymentHostPort" value="22" />
 		<property name="username" value="root" />
 		<property name="fileSystemUser" value="toas" />
 		<property name="fileSystemGroup" value="toas" />
 		<property name="pathToDeploymentDirectoryMap">
 			<map key-type="java.lang.String" value-type="java.lang.String">
-				<entry key="portal" value="/opt/openinfinity/tomcat/deploy/"/>
-				<entry key="bas" value="/opt/openinfinity/tomcat/apache-tomcat-7.0.27/webapps/"/>
-				<entry key="service" value="/opt/openinfinity/tomcat/apache-tomcat-7.0.27/webapps"/>
-				<entry key="analytics" value="/opt/openinfinity/tomcat/apache-tomcat-7.0.27/webapps/"/>
-				<entry key="ig" value="/opt/openinfinity/tomcat/apache-tomcat-7.0.27/webapps/"/>
-				<entry key="ee" value="/opt/openinfinity/tomcat/apache-tomcat-7.0.27/webapps/"/>
-				<entry key="ecm" value="/opt/openinfinity/tomcat/apache-tomcat-7.0.27/webapps/"/>
-				<entry key="bigdata" value="/opt/openinfinity/hadoop/"/>
-				<entry key="db" value="/opt/openinfinity/mariadb/"/>
-				<entry key="nosql" value="/opt/openinfinity/mongodb/"/>
+				<entry key="0" value="/opt/openinfinity/tomcat/deploy/"/>
+				<entry key="1" value="/opt/openinfinity/tomcat/apache-tomcat-7.0.27/webapps"/>
+				<entry key="2" value="/opt/openinfinity/tomcat/apache-tomcat-7.0.27/webapps/"/>
+				<entry key="3" value="/opt/openinfinity/hadoop/"/>
+				<entry key="4" value="/opt/openinfinity/mariadb/"/>
+				<entry key="5" value="/opt/openinfinity/tomcat/apache-tomcat-7.0.27/webapps/"/>
+				<entry key="6" value="/opt/openinfinity/mongodb/"/>
+				<entry key="7" value="/opt/openinfinity/tomcat/apache-tomcat-7.0.27/webapps/"/>
 			</map>
 		</property>
 		<property name="keyService" ref="keyService" />
@@ -65,6 +70,33 @@
 		<property name="clusterService" ref="clusterService" />
 		<property name="instanceService" ref="instanceService" />
 	</bean>
+	
+<!-- 	<bean id="periodicCloudDeployerWriter" class="org.openinfinity.cloud.application.deployer.batch.PeriodicCloudDeployerWriter"> -->
+<!-- 		<property name="deploymentHostPort" value="${deploymentHostPort}" /> --> 
+<!-- 		<property name="username" value="${technicalUsername}" /> --> 
+<!-- 		<property name="deploymentHostPort" value="22" /> -->
+<!-- 		<property name="username" value="root" /> -->
+<!-- 		<property name="fileSystemUser" value="toas" /> -->
+<!-- 		<property name="fileSystemGroup" value="toas" /> -->
+<!-- 		<property name="pathToDeploymentDirectoryMap"> -->
+<!-- 			<map key-type="java.lang.String" value-type="java.lang.String"> -->
+<!-- 				<entry key="portal" value="/opt/openinfinity/tomcat/deploy/"/> -->
+<!-- 				<entry key="bas" value="/opt/openinfinity/tomcat/apache-tomcat-7.0.27/webapps/"/> -->
+<!-- 				<entry key="service" value="/opt/openinfinity/tomcat/apache-tomcat-7.0.27/webapps"/> -->
+<!-- 				<entry key="analytics" value="/opt/openinfinity/tomcat/apache-tomcat-7.0.27/webapps/"/> -->
+<!-- 				<entry key="ig" value="/opt/openinfinity/tomcat/apache-tomcat-7.0.27/webapps/"/> -->
+<!-- 				<entry key="ee" value="/opt/openinfinity/tomcat/apache-tomcat-7.0.27/webapps/"/> -->
+<!-- 				<entry key="ecm" value="/opt/openinfinity/tomcat/apache-tomcat-7.0.27/webapps/"/> -->
+<!-- 				<entry key="bigdata" value="/opt/openinfinity/hadoop/"/> -->
+<!-- 				<entry key="db" value="/opt/openinfinity/mariadb/"/> -->
+<!-- 				<entry key="nosql" value="/opt/openinfinity/mongodb/"/> -->
+<!-- 			</map> -->
+<!-- 		</property> -->
+<!-- 		<property name="keyService" ref="keyService" /> -->
+<!-- 		<property name="machineTypeService" ref="machineTypeService" /> -->
+<!-- 		<property name="clusterService" ref="clusterService" /> -->
+<!-- 		<property name="instanceService" ref="instanceService" /> -->
+<!-- 	</bean> -->
 	
 	<batch:job id="cloudDeployerBatchJob">
 		<batch:step id="stepP1">
