@@ -478,7 +478,7 @@ public class EC2Worker implements Worker {
 		}
 		
 		LOG.debug(threadName+": Creating keypair");
-		String keyName = "TOASdevInstance" + Integer.toString(job.getInstanceId());
+		String keyName = "TOASnstance" + Integer.toString(job.getInstanceId());
 
 		Key key = null;
 		try {
