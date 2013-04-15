@@ -14,4 +14,10 @@ public interface PortalDbUserPoolService {
      * @return userid or null if all users are taken
      */
     public String getNextFreeUserid();
+
+    /**
+     * Release given userid to pool.
+     * @return released userid 
+     */
+    public String releaseUserid(String userid);
 }
