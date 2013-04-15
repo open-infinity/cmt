@@ -50,6 +50,7 @@ import org.openinfinity.cloud.util.serialization.SerializerUtil;
 import org.openinfinity.core.util.ExceptionUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -125,6 +126,9 @@ public class CloudAdminController {
 	@Autowired
 	@Qualifier("availabilityZoneService")
 	private AvailabilityZoneService zoneService;
+
+    @Value("${coherence.config.url}")
+    private String coherenceConfigURL;
 
     @ExceptionHandler(Exception.class)
     public void handleExceptions(Exception e, ResourceResponse response) throws IOException {
@@ -398,6 +402,7 @@ public class CloudAdminController {
 					instance.addParameter(new InstanceParameter("service_datasource_user", pm.get("jbossservicedatasourceuser")));
 					instance.addParameter(new InstanceParameter("service_datasource_password", pm.get("jbossservicedatasourcepassword")));
 				}
+                instance.addParameter(new InstanceParameter("service_coherence_url", coherenceConfigURL));
 			}
 			if ("true".equals(pm.get("jbossportal"))) {
 				if ("true".equals(pm.get("jbossportalliveinstance"))) {
@@ -411,6 +416,7 @@ public class CloudAdminController {
                 if ("true".equals(pm.get("jbossportalsolr"))) {
                 	instance.addParameter(new InstanceParameter("portal_solr", "true"));
                 }
+                instance.addParameter(new InstanceParameter("portal_coherence_url", coherenceConfigURL));
 			}
 			instanceService.addInstance(instance);
 

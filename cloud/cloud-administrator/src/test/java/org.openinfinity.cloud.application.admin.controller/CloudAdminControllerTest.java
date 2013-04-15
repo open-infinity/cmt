@@ -70,7 +70,7 @@ public class CloudAdminControllerTest {
     @Qualifier("liferayService")
     private LiferayServiceMock liferayService;
 
-    private  ObjectMapper objectMapper = new ObjectMapper();
+    private ObjectMapper objectMapper = new ObjectMapper();
 
     @Test
     public void testGetCloudZones() {
@@ -78,14 +78,16 @@ public class CloudAdminControllerTest {
             liferayService.mockUserWithOrganizations("OPPYATOAS");
             MockResourceResponse response = new MockResourceResponse();
             adminController.getCloudZones(new MockResourceRequest(), response, EUCA_ID);
-            List<AvailabilityZone> zones = objectMapper.readValue(response.getContentAsString(), new TypeReference<List<AvailabilityZone>>(){});
+            List<AvailabilityZone> zones = objectMapper.readValue(response.getContentAsString(), new TypeReference<List<AvailabilityZone>>() {
+            });
             assertEquals(1, zones.size());
             assertEquals("dev-cluster01", zones.get(0).getName());
 
             liferayService.mockUserWithOrganizations("TOAS", "OPPYATOAS");
             response = new MockResourceResponse();
             adminController.getCloudZones(new MockResourceRequest(), response, AWS_ID);
-            zones = objectMapper.readValue(response.getContentAsString(), new TypeReference<List<AvailabilityZone>>(){});
+            zones = objectMapper.readValue(response.getContentAsString(), new TypeReference<List<AvailabilityZone>>() {
+            });
             assertEquals(2, zones.size());
             assertEquals(AWS_ZONE1_NAME, zones.get(0).getName());
             assertEquals(AWS_ZONE2_NAME, zones.get(1).getName());
@@ -102,7 +104,8 @@ public class CloudAdminControllerTest {
             liferayService.mockUserWithOrganizations("OPPYATOAS");
             MockResourceResponse response = new MockResourceResponse();
             adminController.getCloudProviders(new MockResourceRequest(), response);
-            List<CloudProvider> providers = objectMapper.readValue(response.getContentAsString(), new TypeReference<List<CloudProvider>>(){});
+            List<CloudProvider> providers = objectMapper.readValue(response.getContentAsString(), new TypeReference<List<CloudProvider>>() {
+            });
             assertEquals(1, providers.size());
             CloudProvider provider = providers.get(0);
             assertEquals(EUCA_PROVIDER, provider.getName());
@@ -112,7 +115,8 @@ public class CloudAdminControllerTest {
             liferayService.mockUserWithOrganizations("Tieto Finland", "OPPYATOAS", "TOAS");
             response = new MockResourceResponse();
             adminController.getCloudProviders(new MockResourceRequest(), response);
-            providers = objectMapper.readValue(response.getContentAsString(), new TypeReference<List<CloudProvider>>(){});
+            providers = objectMapper.readValue(response.getContentAsString(), new TypeReference<List<CloudProvider>>() {
+            });
             assertEquals(2, providers.size());
             CloudProvider amazon = providers.get(0);
             assertEquals(AWS_PROVIDER, amazon.getName());
@@ -133,7 +137,8 @@ public class CloudAdminControllerTest {
         List<MachineType> machineTypes;
         try {
             adminController.getMachineTypes(new MockResourceRequest(), response);
-            machineTypes = objectMapper.readValue(response.getContentAsString(), new TypeReference<List<MachineType>>(){});
+            machineTypes = objectMapper.readValue(response.getContentAsString(), new TypeReference<List<MachineType>>() {
+            });
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -152,7 +157,8 @@ public class CloudAdminControllerTest {
         List<ClusterType> clusterTypes;
         try {
             adminController.getClusterTypes(new MockResourceRequest(), response);
-            clusterTypes = objectMapper.readValue(response.getContentAsString(), new TypeReference<List<ClusterType>>(){});
+            clusterTypes = objectMapper.readValue(response.getContentAsString(), new TypeReference<List<ClusterType>>() {
+            });
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -212,7 +218,7 @@ public class CloudAdminControllerTest {
         assertEquals("inst1", inst1.getName());
         assertEquals(EUCA_ZONE_NAME, inst1.getZone());
         List<InstanceParameter> parameters = inst1.getParameters();
-        assertEquals(4, parameters.size());
+        assertEquals(5, parameters.size());
         int foundParams = 0;
         for (InstanceParameter p : parameters) {
             if ("portal_live".equals(p.getKey())) {
@@ -227,11 +233,13 @@ public class CloudAdminControllerTest {
             } else if ("portal_datasource_password".equals(p.getKey())) {
                 assertEquals("testpassword", p.getValue());
                 ++foundParams;
+            } else if ("portal_coherence_url".equals(p.getKey())) {
+                ++foundParams;
             } else {
                 fail("JobPlatformParameters contains unknown parameter: " + p.getKey());
             }
         }
-        assertEquals("expected job parameters do not match with actual", 4, foundParams);
+        assertEquals("expected job parameters do not match with actual", 5, foundParams);
 
         List<Job> jobs = jobRepository.getJobsForInstance(inst1id);
         assertEquals(1, jobs.size());
@@ -288,7 +296,7 @@ public class CloudAdminControllerTest {
         assertEquals("inst2", inst2.getName());
         assertEquals(EUCA_ZONE_NAME, inst2.getZone());
         List<InstanceParameter> parameters = inst2.getParameters();
-        assertEquals(5, parameters.size());
+        assertEquals(6, parameters.size());
         int foundParams = 0;
         for (InstanceParameter p : parameters) {
             if ("portal_solr".equals(p.getKey())) {
@@ -306,11 +314,13 @@ public class CloudAdminControllerTest {
             } else if ("portal_datasource_password".equals(p.getKey())) {
                 assertEquals("testpassword", p.getValue());
                 ++foundParams;
+            } else if ("portal_coherence_url".equals(p.getKey())) {
+                ++foundParams;
             } else {
                 fail("JobPlatformParameters contains unknown parameter: " + p.getKey());
             }
         }
-        assertEquals("expected job parameters do not match with actual", 5, foundParams);
+        assertEquals("expected job parameters do not match with actual", 6, foundParams);
 
         List<Job> jobs = jobRepository.getJobsForInstance(inst2id);
         assertEquals(1, jobs.size());
