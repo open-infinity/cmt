@@ -33,6 +33,7 @@ import org.openinfinity.cloud.domain.AuthorizationRoute;
 import org.openinfinity.cloud.domain.Cluster;
 import org.openinfinity.cloud.domain.ElasticIP;
 import org.openinfinity.cloud.domain.Instance;
+import org.openinfinity.cloud.domain.InstanceParameter;
 import org.openinfinity.cloud.domain.Job;
 import org.openinfinity.cloud.domain.Key;
 import org.openinfinity.cloud.domain.Machine;
@@ -45,6 +46,7 @@ import org.openinfinity.cloud.service.administrator.JobService;
 import org.openinfinity.cloud.service.administrator.KeyService;
 import org.openinfinity.cloud.service.administrator.MachineService;
 import org.openinfinity.cloud.service.administrator.MulticastAddressService;
+import org.openinfinity.cloud.service.administrator.PortalDbUserPoolService;
 import org.openinfinity.cloud.util.PropertyManager;
 import org.openinfinity.cloud.util.WorkerException;
 import org.openinfinity.cloud.util.XmlParse;
@@ -77,6 +79,10 @@ public class EC2Worker implements Worker {
 	@Autowired
 	@Qualifier("instanceService")
 	private InstanceService instanceService;
+	
+	@Autowired
+	@Qualifier("portalDbUserPoolService")
+	private PortalDbUserPoolService portalDbUserPoolService;
 
 	@Autowired
 	@Qualifier("jobService")
@@ -246,6 +252,7 @@ public class EC2Worker implements Worker {
 					keyService.deleteKey(instance.getInstanceId());
 				}
 				instanceService.deleteInstance(job.getInstanceId());
+				freeDBUserByParameterName(instance, "portal_datasource_user",threadName);
 				LOG.info(threadName+": Instance "+instance.getInstanceId()+" deleted");
 			} else {
 				LOG.info(threadName+": Found "+clusters.size()+" clusters");
@@ -341,6 +348,7 @@ public class EC2Worker implements Worker {
 				
 				arService.deleteInstanceIPs(job.getInstanceId());
 				instanceService.deleteInstance(job.getInstanceId());
+				freeDBUserByParameterName(instance, "portal_datasource_user",threadName);
 				LOG.info(threadName+": Instance "+job.getInstanceId()+" deleted");
 			}
 		}
@@ -348,6 +356,23 @@ public class EC2Worker implements Worker {
 		
 		return returnValue;
 	}
+	
+	private void freeDBUserByParameterName(Instance instance, String parameterName, String threadName){
+		LOG.info("Freeing user for instance="+instance.getInstanceId());
+		try{
+			InstanceParameter parameter = instanceService.getInstanceParameterByName(instance.getParameters(), parameterName);
+			if (parameter!=null){
+				LOG.info("Freeing user for instance="+instance.getInstanceId()+", user="+parameter.getValue());
+				portalDbUserPoolService.releaseUserid(parameter.getValue());
+			}
+		}
+		catch (Exception e){
+			LOG.warn(threadName+": Could not free up database user",e);
+		}
+			
+		
+	}
+
 	
 	private int deleteCluster(Job job) throws WorkerException {
 		int returnValue = -1;
