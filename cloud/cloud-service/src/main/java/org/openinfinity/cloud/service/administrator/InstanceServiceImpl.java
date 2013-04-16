@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.openinfinity.cloud.domain.Instance;
+import org.openinfinity.cloud.domain.InstanceParameter;
 import org.openinfinity.cloud.domain.repository.administrator.InstanceRepository;
 import org.openinfinity.core.annotation.Log;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,6 +77,22 @@ public class InstanceServiceImpl implements InstanceService {
 		}
 
 		return instanceList;
+	}
+	
+	@Log
+	public InstanceParameter getInstanceParameterByName(
+			Collection<InstanceParameter> parameters, String key) {
+		if (parameters==null || key==null){
+			return null;
+		}
+		InstanceParameter ret=null;
+		for (InstanceParameter parameter:parameters){
+			if (key.equals(parameter.getKey())){
+				ret=parameter;
+				break;
+			}
+		}
+		return ret;
 	}
 
 }
