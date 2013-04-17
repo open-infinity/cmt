@@ -27,4 +27,12 @@ public class PortalDbUserPoolServiceImpl implements PortalDbUserPoolService {
     public String getNextFreeUserid() {
         return repository.getNextFreeUserid();
     }
+
+	@Override
+    @Log
+    @Transactional("userPool")
+	public String releaseUserid(String userid) {
+		return repository.releaseUserid(userid);
+	}
+    
 }

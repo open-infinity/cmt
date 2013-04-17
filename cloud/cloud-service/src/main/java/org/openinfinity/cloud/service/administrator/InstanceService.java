@@ -3,6 +3,7 @@ package org.openinfinity.cloud.service.administrator;
 import java.util.Collection;
 
 import org.openinfinity.cloud.domain.Instance;
+import org.openinfinity.cloud.domain.InstanceParameter;
 
 /**
  * Cloud instance handling interface for handling cloud instances.
@@ -34,5 +35,7 @@ public interface InstanceService {
 	void updateInstanceStatus(int instanceId, String status);
 	
 	Collection<Instance> getUserInstances(Collection<Long> organizationIds);
+	
+	InstanceParameter getInstanceParameterByName(Collection<InstanceParameter> parameters, String key);
 	
 }
