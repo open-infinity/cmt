@@ -48,7 +48,7 @@
         <property name="driverClassName" value="${userPool.jdbc.driverClassName}"/>
         <property name="url" value="${userPool.jdbc.url}"/>
         <property name="username" value="${userPool.jdbc.username}"/>
-        <property name="password" value="${userPool.jdbc.password}}"/>
+        <property name="password" value="${userPool.jdbc.password}"/>
     </bean>
 
     <bean id="portalDsTxManager"
