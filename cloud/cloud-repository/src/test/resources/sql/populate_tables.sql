@@ -75,4 +75,4 @@ insert into acl_machine_type_tbl select 'TOAS', id from machine_type_tbl;
 insert into acl_machine_type_tbl select 'Tieto Finland', id from machine_type_tbl;
 
 insert into machine_type_cluster_type_rule_tbl select m.id, c.id, true from machine_type_tbl m,  cluster_type_tbl c;
-update machine_type_cluster_type_rule_tbl set allowed = false where machine_type_id = 0 and cluster_id = 10;
+update machine_type_cluster_type_rule_tbl set allowed = false where machine_type_id = 0 and cluster_type_id = 10;
