@@ -28,6 +28,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openinfinity.cloud.domain.UsageHour;
 import org.openinfinity.cloud.domain.UsageHour.VirtualMachineState;
+import org.openinfinity.cloud.domain.UsagePeriod;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ContextConfiguration;
@@ -101,6 +102,64 @@ public class UsageHourRepositoryTests {
 		assertEquals(expected.getVirtualMachineState().getValue(), actual.getVirtualMachineState().getValue());
 		assertNotNull(actual.getTimeStamp());
 		assertNotSame(expected.getId(), actual.getId());	
+	}
+	
+	@Test
+	public void givenKnownOrganizationIdAndTimePeriodWhenQueringStateModificationOfVirtualMachinesThenModificationMustBeAccessibleFromRepositoryInterfaceDuringDefinedTimePeriodAndCertainUptimeTimeSchedulesNeedsBeGiven() {
+		long startTimeMilliseconds = System.currentTimeMillis();
+		UsageHour usageHour = createUsageHour(startTimeMilliseconds, VirtualMachineState.STOPPED);
+		usageHourRepository.store(usageHour);
+		UsageHour usageHour0 = createUsageHour(startTimeMilliseconds, VirtualMachineState.STARTED);
+		usageHourRepository.store(usageHour0);
+		UsageHour usageHour1 = createUsageHour(startTimeMilliseconds, VirtualMachineState.STOPPED);
+		usageHourRepository.store(usageHour1);
+		UsageHour usageHour2 = createUsageHour(startTimeMilliseconds, VirtualMachineState.STARTED);
+		usageHourRepository.store(usageHour2);
+		UsageHour usageHour3 = createUsageHour(startTimeMilliseconds, VirtualMachineState.PAUSED);
+		usageHourRepository.store(usageHour3);
+		UsageHour usageHour4 = createUsageHour(startTimeMilliseconds, VirtualMachineState.RESUMED);
+		usageHourRepository.store(usageHour4);
+		UsageHour usageHour5 = createUsageHour(startTimeMilliseconds, VirtualMachineState.STOPPED);
+		usageHourRepository.store(usageHour5);
+		UsageHour usageHour6 = createUsageHour(startTimeMilliseconds, VirtualMachineState.STARTED);
+		usageHourRepository.store(usageHour6);
+		UsageHour usageHour7 = createUsageHour(startTimeMilliseconds, VirtualMachineState.STOPPED);
+		usageHourRepository.store(usageHour7);
+		UsageHour usageHour8 = createUsageHour(startTimeMilliseconds, VirtualMachineState.PAUSED);
+		usageHourRepository.store(usageHour8);
+		UsageHour usageHour9 = createUsageHour(startTimeMilliseconds, VirtualMachineState.RESUMED);
+		usageHourRepository.store(usageHour9);
+		UsageHour usageHour10 = createUsageHour(startTimeMilliseconds, VirtualMachineState.TERMINATED);
+		usageHourRepository.store(usageHour10);
+		
+		DateTime startTime = new DateTime(startTimeMilliseconds);
+		DateTime endTime = new DateTime(System.currentTimeMillis());
+		Collection<UsageHour> usageHours = usageHourRepository.loadUsageHoursByOrganizationIdAndUsagePeriod(startTimeMilliseconds, startTime.toDate(), endTime.toDate());
+		
+		assertEquals(12, usageHours.size());
+		
+		UsagePeriod usagePeriod = new UsagePeriod();
+		usagePeriod.setUsageHours(usageHours);
+		usagePeriod.setStartTime(startTime.toDate());
+		usagePeriod.setEndTime(endTime.toDate());
+		usagePeriod.loadUptimeHours();
+		
+		float uptime = usagePeriod.getUptime();
+		
+		System.out.println("Uptime in seconds : " + uptime / 1000);
+		System.out.println("Uptime in minutes : " + uptime / 1000 / 60);
+		System.out.println("Uptime in hours : " + uptime / 1000 / 60 / 60);
+	}
+
+	private UsageHour createUsageHour(long startTimeMilliseconds, VirtualMachineState virtualMachineState) {
+		try { Thread.sleep(100); } catch (InterruptedException e) {}
+		UsageHour usageHour = new UsageHour();
+		usageHour.setClusterId(System.currentTimeMillis());
+		usageHour.setMachineId("MACHINE_ID_12345");
+		usageHour.setOrganizationId(startTimeMilliseconds);
+		usageHour.setPlatformId("1");
+		usageHour.setVirtualMachineState(virtualMachineState);
+		return usageHour;
 	}
 
 }

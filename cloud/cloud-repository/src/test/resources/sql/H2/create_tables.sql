@@ -265,3 +265,14 @@ create table `usage_hours_tbl` (
 	`cur_timestamp` timestamp not null default current_timestamp, 
 	primary key (`id`)
 );
+
+DROP TABLE IF EXISTS `deployment_state_tbl`;
+
+CREATE TABLE `deployment_state_tbl` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `deployment_id` int(11) NOT NULL,
+  `machine_id` int(11) NOT NULL,
+  `state` int(11) DEFAULT '0',
+  `cur_timestamp` timestamp NOT NULL,
+  PRIMARY KEY (`id`)
+);

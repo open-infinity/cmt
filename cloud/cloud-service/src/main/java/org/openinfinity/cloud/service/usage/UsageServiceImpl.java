@@ -77,9 +77,8 @@ public class UsageServiceImpl implements UsageService {
 		usagePeriod.setOrganizationId(organizationId);
 		usagePeriod.setStartTime(startTime);
 		usagePeriod.setEndTime(endTime);
-		for (UsageHour usageHour : usageHours) {
-			usagePeriod.addUsageHour(usageHour);
-		}
+		usagePeriod.setUsageHours(usageHours);
+		usagePeriod.loadUptimeHours();
 		return usagePeriod;
 	}
 
