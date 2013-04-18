@@ -2,6 +2,7 @@ delete from acl_machine_type_tbl;
 delete from acl_availability_zone_tbl;
 delete from acl_cloud_provider_tbl;
 delete from acl_cluster_type_tbl;
+delete from machine_type_cluster_type_rule_tbl;
 delete from cluster_type_tbl;
 delete from availability_zone_tbl;
 delete from cloud_provider_tbl;

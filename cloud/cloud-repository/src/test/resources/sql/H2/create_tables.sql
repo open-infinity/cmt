@@ -211,6 +211,17 @@ CREATE TABLE `machine_type_tbl` (
   PRIMARY KEY (`id`)
 );
 
+DROP TABLE IF EXISTS `machine_type_cluster_type_rule_tbl`;
+
+CREATE TABLE `machine_type_cluster_type_rule_tbl` (
+  `machine_type_id` int(11) NOT NULL,
+  `cluster_id` int(11) NOT NULL,
+  `allowed` boolean DEFAULT NULL,
+  PRIMARY KEY (`machine_type_id`, `cluster_id`),
+  CONSTRAINT fk_machine_type_cluster_type_rule_cluster FOREIGN KEY (cluster_id) REFERENCES cluster_type_tbl(id),
+  CONSTRAINT fk_machine_type_cluster_type_rule_machine FOREIGN KEY (machine_type_id) REFERENCES machine_type_tbl(id)  
+);
+
 DROP TABLE IF EXISTS `acl_cluster_type_tbl`;
 
 CREATE TABLE `acl_cluster_type_tbl` (
