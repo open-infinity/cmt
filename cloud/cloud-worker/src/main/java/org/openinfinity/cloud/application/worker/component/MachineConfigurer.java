@@ -205,11 +205,13 @@ public class MachineConfigurer implements Configurer {
 			
 			session.connect();
 			String command=null;
+			//19.4.2013 TE: added pluginsync option to enable picking up of custom puppet facts (could also have it at puppet.conf 
+			// which put into vm image)
 			if (isPuppetDebug){
-				command = "/usr/bin/puppet agent --verbose --debug --test --no-daemonize --onetime --certname ";
+				command = "/usr/bin/puppet agent --pluginsync --verbose --debug --test --no-daemonize --onetime --certname ";
 			}
 			else{
-				command = "/usr/bin/puppet agent --test --no-daemonize --onetime --certname ";
+				command = "/usr/bin/puppet agent --pluginsync --test --no-daemonize --onetime --certname ";
 			}
 			command += instance.getInstanceId()+"_";
 			command += c.getId()+"_";
