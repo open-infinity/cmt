@@ -91,7 +91,7 @@ public class EC2Wrapper {
 	
 	public EC2Wrapper(String aEndpoint, int aCloudType, AWSCredentials eucaCredentials){
 		if(aCloudType == InstanceService.CLOUD_TYPE_AMAZON) {
-			// TODO
+			this.init(eucaCredentials, aCloudType);
 		} else if(aCloudType == InstanceService.CLOUD_TYPE_EUCALYPTUS) {
 			endpoint = aEndpoint;
 			this.init(eucaCredentials, aCloudType);
@@ -112,6 +112,7 @@ public class EC2Wrapper {
 		try {
 			if (ec2 == null) {
 				if (cloudType == CLOUD_TYPE_AMAZON) {
+					LOG.info("Credentials: "+credentials.getAWSAccessKeyId()+", "+credentials.getAWSSecretKey());
 					ec2 = new AmazonEC2Client(credentials);
 					ec2.setEndpoint("ec2.eu-west-1.amazonaws.com");
 				} else if (cloudType == CLOUD_TYPE_EUCALYPTUS) {
@@ -121,10 +122,10 @@ public class EC2Wrapper {
 				}
 			}
 			if (lb == null) {
-				if (cloudType == CLOUD_TYPE_AMAZON) {
+				/* if (cloudType == CLOUD_TYPE_AMAZON) {
 					lb = new AmazonElasticLoadBalancingClient(credentials);
 					lb.setEndpoint("elasticloadbalancing.eu-west-1.amazonaws.com");
-				}
+				} */
 			}
 		} catch (Exception e) {
 			String message = e.getMessage();
@@ -268,7 +269,7 @@ public class EC2Wrapper {
 	public String createLoadBalancer(String lbName, String zone, String keyName) {
 		CreateLoadBalancerResult result = null;
 		
-		if (this.cloudType == InstanceService.CLOUD_TYPE_AMAZON) {
+	/*	if (this.cloudType == InstanceService.CLOUD_TYPE_AMAZON) {
 
 			try {
 				CreateLoadBalancerRequest request = new CreateLoadBalancerRequest();
@@ -300,14 +301,14 @@ public class EC2Wrapper {
 			}
 		} else if(this.cloudType == InstanceService.CLOUD_TYPE_EUCALYPTUS) {
 			// TODO currently do nothing...
-		} 
+		}  */
 		
 		
 		return null;
 	}
 	
 	public void deleteLoadBalancer(String name, String lbInstanceId) {
-		if (this.cloudType == CLOUD_TYPE_AMAZON) {
+	/*	if (this.cloudType == CLOUD_TYPE_AMAZON) {
 			try {
 				DeleteLoadBalancerRequest request = new DeleteLoadBalancerRequest();
 				request.setLoadBalancerName(name);
@@ -316,10 +317,10 @@ public class EC2Wrapper {
 				String message = e.getMessage();
 				LOG.error("Error deleting loadbalancer: "+message);
 				ExceptionUtil.throwSystemException(message, e);
-			}
-		} else if(this.cloudType == CLOUD_TYPE_EUCALYPTUS) {
+			} 
+		} else if(this.cloudType == CLOUD_TYPE_EUCALYPTUS) { */
 			terminateInstance(lbInstanceId);
-		}
+	/*	} */
 	}
 	
 	public void setAppCookieStickiness(String cookieName, String policyName, String lbName) {
