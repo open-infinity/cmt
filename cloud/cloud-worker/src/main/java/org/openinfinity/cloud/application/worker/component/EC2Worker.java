@@ -45,6 +45,7 @@ import org.openinfinity.cloud.service.administrator.JobService;
 import org.openinfinity.cloud.service.administrator.KeyService;
 import org.openinfinity.cloud.service.administrator.MachineService;
 import org.openinfinity.cloud.service.administrator.MulticastAddressService;
+import org.openinfinity.cloud.service.usage.UsageService;
 import org.openinfinity.cloud.util.PropertyManager;
 import org.openinfinity.cloud.util.WorkerException;
 import org.openinfinity.cloud.util.XmlParse;
@@ -105,6 +106,10 @@ public class EC2Worker implements Worker {
 	@Autowired
 	@Qualifier("multicastAddressService")
 	private MulticastAddressService maService;
+	
+	@Autowired
+	@Qualifier("usageService")
+	private UsageService usageService;
 	
 	@Async
 	public void work(Job job) {
@@ -300,9 +305,16 @@ public class EC2Worker implements Worker {
 							ec2.deleteVolume(machine.getEbsVolumeId());
 						}
 						ec2.terminateInstance(machine.getInstanceId());
+						// usage
+						usageService.stopVirtualMachineUsageMonitoring(instance.getOrganizationid(), c.getType(), c.getId(), machine.getId());
 					}
 					try {
 						ec2.deleteLoadBalancer(c.getLbName(), c.getLbInstanceId());
+						if(instance.getCloudType() == InstanceService.CLOUD_TYPE_EUCALYPTUS) {
+							// usage
+							Machine m = machineService.getMachine(c.getLbInstanceId());
+							usageService.stopVirtualMachineUsageMonitoring(instance.getOrganizationid(), c.getType(), c.getId(), m.getId());
+						}
 					} catch (Exception ex) {
 						LOG.warn(threadName+": Error deleting loadbalacer, continuing with the delete");
 					}
@@ -390,6 +402,7 @@ public class EC2Worker implements Worker {
 	}
 	
 	private void deleteMachinesInCluster(Cluster c, String threadName, EC2Wrapper ec2){
+		Instance oiInstance = instanceService.getInstance(c.getInstanceId());
 		Collection<Machine> machines = machineService.getMachinesInCluster(c.getId());
 		ArrayList<com.amazonaws.services.elasticloadbalancing.model.Instance> instanceL = new ArrayList<com.amazonaws.services.elasticloadbalancing.model.Instance>();
 		Iterator<Machine> j = machines.iterator();
@@ -427,9 +440,16 @@ public class EC2Worker implements Worker {
 				ec2.deleteVolume(machine.getEbsVolumeId());
 			}
 			ec2.terminateInstance(machine.getInstanceId());
+			// usage
+			usageService.stopVirtualMachineUsageMonitoring(oiInstance.getOrganizationid(), c.getType(), c.getId(), machine.getId());
 		}
 		try {
 			ec2.deleteLoadBalancer(c.getLbName(), c.getLbInstanceId());
+			if(oiInstance.getCloudType() == InstanceService.CLOUD_TYPE_EUCALYPTUS) {
+				// usage
+				Machine m = machineService.getMachine(c.getLbInstanceId());
+				usageService.stopVirtualMachineUsageMonitoring(oiInstance.getOrganizationid(), c.getType(), c.getId(), m.getId());
+			}
 		} catch (Exception ex) {
 			LOG.warn(threadName+": Error deleting loadbalacer, continuing with the delete");
 		}	
@@ -514,7 +534,7 @@ public class EC2Worker implements Worker {
 			ec2.setEndpoint(endPoint);
 			ec2.init(eucaCredentials, job.getCloud());
 		}
-		
+		Instance oiInstance = instanceService.getInstance(job.getInstanceId());
 		Key key = keyService.getKeyByInstanceId(job.getInstanceId());
 		String[] services = job.getServices().split(",");
 		int clusterId = Integer.parseInt(services[0]);
@@ -546,6 +566,8 @@ public class EC2Worker implements Worker {
 				Machine m = mList.get(i);
 				machineService.stopMachine(m.getId());
 				ec2.terminateInstance(m.getInstanceId());
+				// usage service implementation
+				usageService.stopVirtualMachineUsageMonitoring(oiInstance.getOrganizationid(), cluster.getType(), cluster.getId(), m.getId());
 				terminated++;
 				i++;
 			}
@@ -627,6 +649,10 @@ public class EC2Worker implements Worker {
 					machine.setConfigured(0);
 					machine.setRunning(1);
 					machineService.addMachine(machine);
+					
+					// Usage Service implementation
+					usageService.startVirtualMachineUsageMonitoring(oiInstance.getOrganizationid(), cluster.getType(), cluster.getId(), machine.getId());
+					
 				}
 				machineService.updateMachineConfigure(lb.getId(), MachineService.MACHINE_CONFIGURE_NOT_STARTED);
 			}
@@ -634,7 +660,7 @@ public class EC2Worker implements Worker {
 		cluster.setNumberOfMachines(machines);
 		clusterService.updateCluster(cluster);
 		
-		Collection<Cluster> clusterList = clusterService.getClusters(job.getInstanceId());
+	/*	Collection<Cluster> clusterList = clusterService.getClusters(job.getInstanceId());
 		Iterator<Cluster> k = clusterList.iterator();
 		while(k.hasNext()) {
 			Cluster c = k.next();
@@ -644,7 +670,7 @@ public class EC2Worker implements Worker {
 				AuthorizationRoute ip = i.next();
 				ec2.authorizeIPs(c.getSecurityGroupName(), ip.getCidrIp(), ip.getFromPort(), ip.getToPort(), ip.getProtocol());
 			}
-		}
+		} */
 		
 		return 1;
 	}
@@ -1378,7 +1404,13 @@ public class EC2Worker implements Worker {
 			machine.setConfigured(0);
 			machine.setRunning(1);
 			
+			
 			machineService.addMachine(machine);
+			
+			// Usage Service implementation
+			Instance instance = instanceService.getInstance(cluster.getInstanceId());
+			usageService.startVirtualMachineUsageMonitoring(instance.getOrganizationid(), cluster.getType(), cluster.getId(), machine.getId());
+						
 			machinesToTag.add(tempInstance.getInstanceId());
 		/*	if(tempInstance.getInstanceType().equalsIgnoreCase("m1.small")) {
 				com.amazonaws.services.elasticloadbalancing.model.Instance lbI = new com.amazonaws.services.elasticloadbalancing.model.Instance();
