@@ -56,7 +56,7 @@ public class UsageHourRepositoryJdbcImpl implements UsageHourRepository {
 	/**
 	 * Represents the SQL script for loading usage hour information.
 	 */
-	private static final String LOAD_BY_MACHINE_ID = "SELECT * FROM usage_hours_tbl WHERE machine_id = ? ORDER BY TIMESTAMP DESC";
+	private static final String LOAD_BY_MACHINE_ID = "SELECT * FROM usage_hours_tbl WHERE machine_id = ? ORDER BY cur_timestamp DESC";
 	
 	/**
 	 * Represents the SQL script for loading all UsageHour object by given organization id.
