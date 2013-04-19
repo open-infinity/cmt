@@ -28,6 +28,7 @@ import org.openinfinity.cloud.domain.UsageHour;
 import org.openinfinity.core.annotation.AuditTrail;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
@@ -81,7 +82,8 @@ public class UsageHourRepositoryJdbcImpl implements UsageHourRepository {
 
 	@AuditTrail
 	public UsageHour loadByMachineId(int machineId) {
-		return (UsageHour) jdbcTemplate.query(LOAD_BY_MACHINE_ID, new Object[]{machineId}, new UsageHourRowMapper());
+		List<UsageHour> usageList = jdbcTemplate.query(LOAD_BY_MACHINE_ID, new Object[]{machineId}, new UsageHourRowMapper());
+		return DataAccessUtils.singleResult(usageList);
 	}
 
 	@AuditTrail
