@@ -21,7 +21,7 @@ public interface UsageService {
 	 * @param clusterId
 	 * @param machineId
 	 */
-	void startVirtualMachineUsageMonitoring(long organizationId, String platformId, long clusterId, String machineId);
+	void startVirtualMachineUsageMonitoring(long organizationId, int platformId, int clusterId, int machineId);
 	
 	/**
 	 * Resumes a virtual machine usage hour trend gathering.
@@ -31,7 +31,7 @@ public interface UsageService {
 	 * @param clusterId
 	 * @param machineId
 	 */
-	void resumeVirtualMachineUsageMonitoring(long organizationId, int platformId, long clusterId, String machineId);
+	void resumeVirtualMachineUsageMonitoring(long organizationId, int platformId, int clusterId, int machineId);
 	
 	/**
 	 * Stops a virtual machine usage hour trend gathering.
@@ -41,7 +41,7 @@ public interface UsageService {
 	 * @param clusterId
 	 * @param machineId
 	 */
-	void stopVirtualMachineUsageMonitoring(long organizationId, int platformId, long clusterId, String machineId);
+	void stopVirtualMachineUsageMonitoring(long organizationId, int platformId, int clusterId, int machineId);
 	
 	/**
 	 * Pauses a virtual machine usage hour trend gathering.
