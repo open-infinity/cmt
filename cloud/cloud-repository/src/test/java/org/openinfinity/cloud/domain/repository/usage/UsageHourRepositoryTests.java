@@ -56,10 +56,10 @@ public class UsageHourRepositoryTests {
 	public void givenKnownUsageHourOfVirtualMachineWhenModifyingStateOfVirtualMachineThenModificationMustBeAccessibleFromRepositoryInterface() {
 		long organizationId = System.currentTimeMillis();
 		UsageHour expected = new UsageHour();
-		expected.setClusterId(System.currentTimeMillis());
-		expected.setMachineId("MACHINE_ID_12345");
+		expected.setClusterId(123456);
+		expected.setMachineId(654321);
 		expected.setOrganizationId(organizationId);
-		expected.setPlatformId("1");
+		expected.setPlatformId(2);
 		expected.setVirtualMachineState(VirtualMachineState.STARTED);
 		usageHourRepository.store(expected);
 		Collection<UsageHour> usageHours = usageHourRepository.loadUsageHoursByOrganizationId(organizationId);
@@ -81,10 +81,10 @@ public class UsageHourRepositoryTests {
 	public void givenKnownOrganizationIdAndTimePeriodWhenQueringStateModificationOfVirtualMachinesThenModificationMustBeAccessibleFromRepositoryInterfaceDuringDefinedTimePeriod() {
 		long organizationId = System.currentTimeMillis();
 		UsageHour expected = new UsageHour();
-		expected.setClusterId(System.currentTimeMillis());
-		expected.setMachineId("MACHINE_ID_12345");
+		expected.setClusterId(123456);
+		expected.setMachineId(654321);
 		expected.setOrganizationId(organizationId);
-		expected.setPlatformId("1");
+		expected.setPlatformId(2);
 		expected.setVirtualMachineState(VirtualMachineState.STARTED);
 		usageHourRepository.store(expected);
 		DateTime startTime = new DateTime(1979, 4, 3, 12, 0, 0, 0);
@@ -154,10 +154,10 @@ public class UsageHourRepositoryTests {
 	private UsageHour createUsageHour(long startTimeMilliseconds, VirtualMachineState virtualMachineState) {
 		try { Thread.sleep(100); } catch (InterruptedException e) {}
 		UsageHour usageHour = new UsageHour();
-		usageHour.setClusterId(System.currentTimeMillis());
-		usageHour.setMachineId("MACHINE_ID_12345");
+		usageHour.setClusterId(123456);
+		usageHour.setMachineId(654321);
 		usageHour.setOrganizationId(startTimeMilliseconds);
-		usageHour.setPlatformId("1");
+		usageHour.setPlatformId(2);
 		usageHour.setVirtualMachineState(virtualMachineState);
 		return usageHour;
 	}

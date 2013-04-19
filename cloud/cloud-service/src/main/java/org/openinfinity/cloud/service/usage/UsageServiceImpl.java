@@ -19,7 +19,7 @@ import org.springframework.stereotype.Service;
  * @version 1.0.0
  * @since 1.2.0
  */ 
-@Service
+@Service("usageService")
 public class UsageServiceImpl implements UsageService {
 
 	@Autowired
@@ -27,7 +27,7 @@ public class UsageServiceImpl implements UsageService {
 	
 	@Log
 	@AuditTrail
-	public void startVirtualMachineUsageMonitoring(long organizationId, String platformId, long clusterId, String machineId) {
+	public void startVirtualMachineUsageMonitoring(long organizationId, int platformId, int clusterId, int machineId) {
 		UsageHour usageHour = new UsageHour();
 		usageHour.setClusterId(clusterId);
 		usageHour.setMachineId(machineId);
@@ -39,7 +39,7 @@ public class UsageServiceImpl implements UsageService {
 	
 	@Log
 	@AuditTrail
-	public void resumeVirtualMachineUsageMonitoring(long organizationId, int platformId, long clusterId, String machineId) {
+	public void resumeVirtualMachineUsageMonitoring(long organizationId, int platformId, int clusterId, int machineId) {
 		UsageHour usageHours = usageRepository.loadByMachineId(machineId);
 		usageHours.setVirtualMachineState(VirtualMachineState.RESUMED);
 		usageRepository.store(usageHours);
@@ -47,7 +47,7 @@ public class UsageServiceImpl implements UsageService {
 
 	@Log
 	@AuditTrail
-	public void stopVirtualMachineUsageMonitoring(long organizationId, int platformId, long clusterId, String machineId) {
+	public void stopVirtualMachineUsageMonitoring(long organizationId, int platformId, int clusterId, int machineId) {
 		UsageHour usageHours = usageRepository.loadByMachineId(machineId);
 		usageHours.setVirtualMachineState(VirtualMachineState.STOPPED);
 		usageRepository.store(usageHours);
@@ -55,7 +55,7 @@ public class UsageServiceImpl implements UsageService {
 
 	@Log
 	@AuditTrail
-	public void pauseVirtualMachineUsageMonitoring(String machineId) {
+	public void pauseVirtualMachineUsageMonitoring(int machineId) {
 		UsageHour usageHours = usageRepository.loadByMachineId(machineId);
 		usageHours.setVirtualMachineState(VirtualMachineState.PAUSED);
 		usageRepository.store(usageHours);
@@ -63,7 +63,7 @@ public class UsageServiceImpl implements UsageService {
 
 	@Log
 	@AuditTrail
-	public void terminateVirtualMachineUsageMonitoring(String machineId) {
+	public void terminateVirtualMachineUsageMonitoring(int machineId) {
 		UsageHour usageHours = usageRepository.loadByMachineId(machineId);
 		usageHours.setVirtualMachineState(VirtualMachineState.TERMINATED);
 		usageRepository.store(usageHours);

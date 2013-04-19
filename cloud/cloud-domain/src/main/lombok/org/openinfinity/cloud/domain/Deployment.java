@@ -58,6 +58,10 @@ public class Deployment implements Serializable {
 	@NotScript
 	private Timestamp deploymentTimestamp;
 	
+	private String type;
+	private String cloudInstance;
+	
+	
 	public Deployment (Deployment d){
 		id = d.getId();
 		state = d.getState();

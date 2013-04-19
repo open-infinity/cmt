@@ -42,14 +42,14 @@ public class UsageHour {
 	
 	@NotScript
 	@NotNull
-	private String platformId;
+	private int platformId;
 	
 	@NotNull
-	private long clusterId;
+	private int clusterId;
 	
 	@NotScript
 	@NotNull
-	private String machineId;
+	private int machineId;
 	
 	@NotNull
 	private Date timeStamp;

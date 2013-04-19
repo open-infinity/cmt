@@ -42,7 +42,7 @@ public interface UsageHourRepository {
 	 * @param machineId Represents the unique virtual machine id.
 	 * @return Collection of virtual machine's usage hours.
 	 */
-	UsageHour loadByMachineId(String machineId);
+	UsageHour loadByMachineId(int machineId);
 	
 	/**
 	 * Load usage hours for a specified organization.

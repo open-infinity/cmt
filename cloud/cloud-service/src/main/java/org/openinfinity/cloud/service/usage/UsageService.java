@@ -51,7 +51,7 @@ public interface UsageService {
 	 * @param clusterId
 	 * @param machineId
 	 */
-	void pauseVirtualMachineUsageMonitoring(String machineId);
+	void pauseVirtualMachineUsageMonitoring(int machineId);
 	
 	/**
 	 * Terminates a virtual machine usage hour trend gathering.
@@ -61,7 +61,7 @@ public interface UsageService {
 	 * @param clusterId
 	 * @param machineId
 	 */
-	void terminateVirtualMachineUsageMonitoring(String machineId);
+	void terminateVirtualMachineUsageMonitoring(int machineId);
 
 	/**
 	 * Loads usage period based on organization id, start time of the period, and end time of the period.

@@ -80,7 +80,7 @@ public class UsageHourRepositoryJdbcImpl implements UsageHourRepository {
 	}
 
 	@AuditTrail
-	public UsageHour loadByMachineId(String machineId) {
+	public UsageHour loadByMachineId(int machineId) {
 		return (UsageHour) jdbcTemplate.query(LOAD_BY_MACHINE_ID, new UsageHourRowMapper());
 	}
 
@@ -100,11 +100,11 @@ public class UsageHourRepositoryJdbcImpl implements UsageHourRepository {
 
 		public UsageHour mapRow(ResultSet resultSet, int rowNum) throws SQLException {
 			UsageHour usageHour = new UsageHour();
-			usageHour.setId(resultSet.getInt("id"));
+			usageHour.setId(resultSet.getLong("id"));
 			usageHour.setOrganizationId(resultSet.getLong("organization_id"));
-			usageHour.setClusterId(resultSet.getLong("cluster_id"));
-			usageHour.setPlatformId(resultSet.getString("platform_id"));
-			usageHour.setMachineId(resultSet.getString("machine_id"));
+			usageHour.setClusterId(resultSet.getInt("cluster_id"));
+			usageHour.setPlatformId(resultSet.getInt("platform_id"));
+			usageHour.setMachineId(resultSet.getInt("machine_id"));
 			usageHour.setVirtualMachineState(UsageHour.getVirtualMachineStateWithNumericValue(resultSet.getInt("state")));
 			usageHour.setTimeStamp(resultSet.getTimestamp("cur_timestamp"));
 			return usageHour;

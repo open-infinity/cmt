@@ -68,8 +68,8 @@ public class UsagePeriod {
 		LOGGER.debug("Gathering start time: " + gatheringStartTime);
 		LOGGER.debug("Gathering end time: " + gatheringEndTime);
 		long previousGatheringPointOfTime = 0;
-		Map<String, List<UsageHour>> usageHoursPerMachine = generateUsageHourTreePerMachineId();
-		for (Map.Entry<String, List<UsageHour>> entry : usageHoursPerMachine.entrySet()) {
+		Map<Integer, List<UsageHour>> usageHoursPerMachine = generateUsageHourTreePerMachineId();
+		for (Map.Entry<Integer, List<UsageHour>> entry : usageHoursPerMachine.entrySet()) {
 			List<UsageHour> usageHoursList = entry.getValue();
 			boolean firstIndex = false;
 			boolean lastIndex = false;
@@ -121,10 +121,10 @@ public class UsagePeriod {
 		return firstIndex ? gatheringStartTime : (lastIndex ? gatheringEndTime : usageHour.getTimeStamp().getTime());
 	}
 	
-	private Map<String, List<UsageHour>> generateUsageHourTreePerMachineId() {
-		Map<String, List<UsageHour>> usageHoursPerMachine = new HashMap<String, List<UsageHour>>(); 
+	private Map<Integer, List<UsageHour>> generateUsageHourTreePerMachineId() {
+		Map<Integer, List<UsageHour>> usageHoursPerMachine = new HashMap<Integer, List<UsageHour>>(); 
 		for (UsageHour usageHour : usageHours) {
-			String machineId = usageHour.getMachineId();
+			int machineId = usageHour.getMachineId();
 			if (usageHoursPerMachine.containsKey(machineId)) {
 				List<UsageHour> usageHours = usageHoursPerMachine.get(machineId);
 				usageHours.add(usageHour);
