@@ -306,14 +306,22 @@ public class EC2Worker implements Worker {
 						}
 						ec2.terminateInstance(machine.getInstanceId());
 						// usage
-						usageService.stopVirtualMachineUsageMonitoring(instance.getOrganizationid(), c.getType(), c.getId(), machine.getId());
+						try {
+							usageService.stopVirtualMachineUsageMonitoring(instance.getOrganizationid(), c.getType(), c.getId(), machine.getId());
+						} catch (Exception e) {
+							LOG.error(threadName+": Error stopping usage monitoring "+e.getMessage());
+						}
 					}
 					try {
 						ec2.deleteLoadBalancer(c.getLbName(), c.getLbInstanceId());
 						if(instance.getCloudType() == InstanceService.CLOUD_TYPE_EUCALYPTUS) {
 							// usage
 							Machine m = machineService.getMachine(c.getLbInstanceId());
-							usageService.stopVirtualMachineUsageMonitoring(instance.getOrganizationid(), c.getType(), c.getId(), m.getId());
+							try {
+								usageService.stopVirtualMachineUsageMonitoring(instance.getOrganizationid(), c.getType(), c.getId(), m.getId());
+							} catch (Exception e) {
+								LOG.error(threadName+": Error stopping usage monitoring "+e.getMessage());
+							}
 						}
 					} catch (Exception ex) {
 						LOG.warn(threadName+": Error deleting loadbalacer, continuing with the delete");
@@ -441,14 +449,22 @@ public class EC2Worker implements Worker {
 			}
 			ec2.terminateInstance(machine.getInstanceId());
 			// usage
-			usageService.stopVirtualMachineUsageMonitoring(oiInstance.getOrganizationid(), c.getType(), c.getId(), machine.getId());
+			try {
+				usageService.stopVirtualMachineUsageMonitoring(oiInstance.getOrganizationid(), c.getType(), c.getId(), machine.getId());
+			}catch (Exception e) {
+				LOG.error(threadName+": Error stopping usage monitoring "+e.getMessage());
+			}
 		}
 		try {
 			ec2.deleteLoadBalancer(c.getLbName(), c.getLbInstanceId());
 			if(oiInstance.getCloudType() == InstanceService.CLOUD_TYPE_EUCALYPTUS) {
 				// usage
 				Machine m = machineService.getMachine(c.getLbInstanceId());
-				usageService.stopVirtualMachineUsageMonitoring(oiInstance.getOrganizationid(), c.getType(), c.getId(), m.getId());
+				try {
+					usageService.stopVirtualMachineUsageMonitoring(oiInstance.getOrganizationid(), c.getType(), c.getId(), m.getId());
+				} catch (Exception e) {
+					LOG.error(threadName+": Error stopping usage monitoring "+e.getMessage());
+				}
 			}
 		} catch (Exception ex) {
 			LOG.warn(threadName+": Error deleting loadbalacer, continuing with the delete");
@@ -567,7 +583,11 @@ public class EC2Worker implements Worker {
 				machineService.stopMachine(m.getId());
 				ec2.terminateInstance(m.getInstanceId());
 				// usage service implementation
-				usageService.stopVirtualMachineUsageMonitoring(oiInstance.getOrganizationid(), cluster.getType(), cluster.getId(), m.getId());
+				try {
+					usageService.stopVirtualMachineUsageMonitoring(oiInstance.getOrganizationid(), cluster.getType(), cluster.getId(), m.getId());
+				} catch (Exception e) {
+					LOG.error(threadName+": Error stopping usage monitoring "+e.getMessage());
+				}
 				terminated++;
 				i++;
 			}
@@ -651,7 +671,11 @@ public class EC2Worker implements Worker {
 					machineService.addMachine(machine);
 					
 					// Usage Service implementation
-					usageService.startVirtualMachineUsageMonitoring(oiInstance.getOrganizationid(), cluster.getType(), cluster.getId(), machine.getId());
+					try {
+						usageService.startVirtualMachineUsageMonitoring(oiInstance.getOrganizationid(), cluster.getType(), cluster.getId(), machine.getId());
+					} catch (Exception e) {
+						LOG.error(threadName+": Error starting usage monitoring");
+					}
 					
 				}
 				machineService.updateMachineConfigure(lb.getId(), MachineService.MACHINE_CONFIGURE_NOT_STARTED);
@@ -1409,7 +1433,11 @@ public class EC2Worker implements Worker {
 			
 			// Usage Service implementation
 			Instance instance = instanceService.getInstance(cluster.getInstanceId());
-			usageService.startVirtualMachineUsageMonitoring(instance.getOrganizationid(), cluster.getType(), cluster.getId(), machine.getId());
+			try {
+				usageService.startVirtualMachineUsageMonitoring(instance.getOrganizationid(), cluster.getType(), cluster.getId(), machine.getId());
+			} catch (Exception e) {
+				LOG.error(threadName+": Error starting usage monitoring");
+			}
 						
 			machinesToTag.add(tempInstance.getInstanceId());
 		/*	if(tempInstance.getInstanceType().equalsIgnoreCase("m1.small")) {

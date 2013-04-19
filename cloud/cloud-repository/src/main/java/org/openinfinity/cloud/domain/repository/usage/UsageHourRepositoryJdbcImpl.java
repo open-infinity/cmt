@@ -81,7 +81,7 @@ public class UsageHourRepositoryJdbcImpl implements UsageHourRepository {
 
 	@AuditTrail
 	public UsageHour loadByMachineId(int machineId) {
-		return (UsageHour) jdbcTemplate.query(LOAD_BY_MACHINE_ID, new UsageHourRowMapper());
+		return (UsageHour) jdbcTemplate.query(LOAD_BY_MACHINE_ID, new Object[]{machineId}, new UsageHourRowMapper());
 	}
 
 	@AuditTrail
