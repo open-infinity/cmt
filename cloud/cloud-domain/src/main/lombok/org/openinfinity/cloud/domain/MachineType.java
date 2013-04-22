@@ -18,6 +18,7 @@ package org.openinfinity.cloud.domain;
 
 import java.io.Serializable;
 import java.lang.String;
+import java.util.List;
 
 import org.openinfinity.core.annotation.NotScript;
 
@@ -40,5 +41,6 @@ public class MachineType implements Serializable {
 	private String name;
 	@NotScript
 	private String specification;
-		
+	@NotScript
+	List<MachineTypeClusterTypeRule> compatibleClusterTypes;		
 }

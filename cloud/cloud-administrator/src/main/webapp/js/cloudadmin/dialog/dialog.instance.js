@@ -93,9 +93,15 @@
                         // insert machine types into body before element ids and names are adjusted below
 						var machineTypeInjectLocation$ = body.find('.machineSizeRow .radioButton');
 						for (var mt = 0; mt < machineTypes.length; ++mt) {
-							var machineTypeInstanceId = 'machineSizeRadio' + machineTypes[mt].name + '_';
-							$('#machineTypeTemplate').children('[type="radio"]').clone().attr({id: machineTypeInstanceId, value: machineTypes[mt].id}).appendTo(machineTypeInjectLocation$);
-							$('#machineTypeTemplate').children('label').clone().attr({'for': machineTypeInstanceId}).html(machineTypes[mt].name).appendTo(machineTypeInjectLocation$);
+							// check if this machine type is allowed to this cluster type
+							var compatibleClusterTypes = machineTypes[mt].compatibleClusterTypes;
+							for (var ct = 0; ct < compatibleClusterTypes.length; ++ct) {
+								if (compatibleClusterTypes[ct].clusterTypeId == clusters[i].id) {
+									var machineTypeInstanceId = 'machineSizeRadio' + machineTypes[mt].name + '_';
+									$('#machineTypeTemplate').children('[type="radio"]').clone().attr({id: machineTypeInstanceId, value: machineTypes[mt].id}).appendTo(machineTypeInjectLocation$);
+									$('#machineTypeTemplate').children('label').clone().attr({'for': machineTypeInstanceId}).html(machineTypes[mt].name).appendTo(machineTypeInjectLocation$);
+								}								
+							}							
 						}
 						// prepares element ids and names
 						body.attr('id', clusters[i].name).find('[type="radio"]').each(function () {

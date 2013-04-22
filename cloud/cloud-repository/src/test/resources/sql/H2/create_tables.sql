@@ -218,6 +218,8 @@ CREATE TABLE `machine_type_cluster_type_rule_tbl` (
   `cluster_type_id` int(11) NOT NULL,
   `allowed` boolean DEFAULT NULL,
   PRIMARY KEY (`machine_type_id`, `cluster_type_id`),
+  CONSTRAINT fk_machine_type_cluster_type_rule_cluster FOREIGN KEY (cluster_type_id) REFERENCES cluster_type_tbl(id),
+  CONSTRAINT fk_machine_type_cluster_type_rule_machine FOREIGN KEY (machine_type_id) REFERENCES machine_type_tbl(id)  
 );
 
 DROP TABLE IF EXISTS `acl_cluster_type_tbl`;

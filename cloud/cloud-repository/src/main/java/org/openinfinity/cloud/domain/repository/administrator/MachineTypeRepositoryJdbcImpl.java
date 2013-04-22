@@ -16,9 +16,8 @@
 
 package org.openinfinity.cloud.domain.repository.administrator;
 
-import org.openinfinity.cloud.domain.CloudProvider;
-import org.openinfinity.cloud.domain.ClusterType;
 import org.openinfinity.cloud.domain.MachineType;
+import org.openinfinity.cloud.domain.MachineTypeClusterTypeRule;
 import org.openinfinity.core.annotation.AuditTrail;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -59,8 +58,22 @@ class MachineTypeRepositoryJdbcImpl implements MachineTypeRepository{
 	public Collection<MachineType> getMachineTypes(List<String> userOrganizations) {
 		MapSqlParameterSource parameters = new MapSqlParameterSource();
 		parameters.addValue("orgNames", userOrganizations);
-		return jdbcTemplate.query("select distinct machine.* from machine_type_tbl as machine, acl_machine_type_tbl as acl " +
+		Collection<MachineType> machineTypes = jdbcTemplate.query("select distinct machine.* from machine_type_tbl as machine, acl_machine_type_tbl as acl " +
 				"where acl.org_name in (:orgNames) and acl.machine_type_id = machine.id order by machine.id", parameters, new MachineTypeWrapper());
+		if (machineTypes != null){
+			for (MachineType machineType : machineTypes){
+				machineType.setCompatibleClusterTypes(getMachineTypeClusterTypeRules(machineType.getId()));
+			}
+		}
+		return machineTypes;
+	}
+		
+	private List<MachineTypeClusterTypeRule> getMachineTypeClusterTypeRules(int machineTypeId) {
+		MapSqlParameterSource parameters = new MapSqlParameterSource();
+		parameters.addValue("machineTypeId", machineTypeId);
+		List<MachineTypeClusterTypeRule> rules = jdbcTemplate.query("select * from machine_type_cluster_type_rule_tbl " +
+				"where machine_type_id = :machineTypeId and allowed = true order by cluster_type_id ", parameters, new MachineTypeClusterTypeRuleWrapper());
+		return rules;
 	}
 
     private static final class MachineTypeWrapper implements RowMapper<MachineType> {
@@ -73,5 +86,13 @@ class MachineTypeRepositoryJdbcImpl implements MachineTypeRepository{
         }
     }
 
-
+    private static final class MachineTypeClusterTypeRuleWrapper implements RowMapper<MachineTypeClusterTypeRule> {
+        public MachineTypeClusterTypeRule mapRow(ResultSet rs, int rowNumber) throws SQLException {
+        	MachineTypeClusterTypeRule rule = new MachineTypeClusterTypeRule();
+            rule.setMachineTypeId(rs.getInt("machine_type_id"));
+            rule.setClusterTypeId(rs.getInt("cluster_type_id"));
+            rule.setAllowed(rs.getBoolean("allowed"));
+            return rule;
+        }
+    }
 }
