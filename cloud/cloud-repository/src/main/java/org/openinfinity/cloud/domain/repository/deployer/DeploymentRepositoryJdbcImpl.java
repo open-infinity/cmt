@@ -188,7 +188,7 @@ public class DeploymentRepositoryJdbcImpl implements DeploymentRepository {
 	@Override
 	public void storeDeploymentStatus(DeploymentStatus deploymentStatus) {
 		String sql = deploymentStatus.getId() == 0 ? DEPLOYMENT_STATE_INSERT_SQL:DEPLOYMENT_STATE_UPDATE_SQL;
-		Object[] parameters = deploymentStatus.getDeploymentState().getValue() == 0 ? new Object[] {deploymentStatus.getDeployment().getId(), deploymentStatus.getMachineId(), deploymentStatus.getDeploymentState().getValue()} : new Object[]{deploymentStatus.getDeploymentState().getValue(), deploymentStatus.getId()};
+		Object[] parameters = deploymentStatus.getId() == 0  ? new Object[] {deploymentStatus.getDeployment().getId(), deploymentStatus.getMachineId(), deploymentStatus.getDeploymentState().getValue()} : new Object[]{deploymentStatus.getDeploymentState().getValue(), deploymentStatus.getId()};
 		jdbcTemplate.update(sql, parameters);
 	}
 
