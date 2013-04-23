@@ -9,8 +9,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.sql.DataSource;
-import javax.validation.constraints.AssertTrue;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

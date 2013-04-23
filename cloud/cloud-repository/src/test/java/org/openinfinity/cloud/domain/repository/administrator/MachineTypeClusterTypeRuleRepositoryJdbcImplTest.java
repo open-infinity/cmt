@@ -117,5 +117,4 @@ public class MachineTypeClusterTypeRuleRepositoryJdbcImplTest {
 		assertEquals(rules.get(1).getMachineTypeId(), machineTypeIdSmall);
 		assertEquals(rules.get(1).getClusterTypeId(), clusterTypeIdService);
 	}
-
 }

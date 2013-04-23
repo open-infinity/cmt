@@ -125,8 +125,6 @@
 					
 					// Initialize other widgets 
 					$("#addInstanceDialog .radioButton").buttonset();
-                    if (cloudadmin.resource.machineTypes.length > 0)
-					    $("#addInstanceDialog .valueDisplayButtonSet").text(cloudadmin.resource.machineTypes[0].specification);
 
                     o.dialog.find("#allUsersTakenDialog").dialog({
                         autoOpen : false,
@@ -363,11 +361,18 @@
 		// from "create new instance" button.
 		// The function clears resets all dialog element values and styles to defaults,
 		// and finally opens the dialog
-		createNewInstance: function() {				
+		createNewInstance: function() {
 			$("#instanceName").val('');
 			var clusters = cloudadmin.resource.clusterTypes;
+            var machineTypes = cloudadmin.resource.machineTypes;
 			for(var i = 0; i < clusters.length; i++){
 				var selectorName = '#' + clusters[i].name;
+				// set the label by default machine type
+				for (var mt = 0; mt < machineTypes.length; ++mt) {
+					if (machineTypes[mt].id == $(selectorName + " .machineSizeRow input:first-child").attr('value')) {
+						$(selectorName + " .valueDisplayButtonSet").text(machineTypes[mt].specification);
+					}
+	            }
 				$(selectorName + ' .clusterSizeRow .jq_slider')
 					.slider({
 						min: clusters[i].minMachines,
@@ -402,7 +407,6 @@
 			$('#addInstanceDialog .toggleEbsRow input[id*="toggleEbsRadioOff_"]').attr('checked',true).button("refresh");
             $('#addInstanceDialog .toggleSolrRow input[id*="toggleSolrRadioOff_"]').attr('checked',true).button("refresh");
             if (cloudadmin.resource.machineTypes.length > 0) { // select first machine type and reset label if there are any machine types
-                $("#addInstanceDialog .valueDisplayButtonSet").text(cloudadmin.resource.machineTypes[0].specification);
                 $("#addInstanceDialog .machineSizeRow input:first-child").attr('checked',true).button("refresh");
             }
             // reset cloud selection, fire also change event to update zone selection
