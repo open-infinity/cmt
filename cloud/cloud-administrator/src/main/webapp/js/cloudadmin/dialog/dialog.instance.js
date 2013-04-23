@@ -58,6 +58,13 @@
 						}
 						// insert data source fields into body
 						if ("jbossservice" == clusters[i].name || "jbossportal" == clusters[i].name) {
+						    var coherenceRow = $('#coherenceURLTemplate .coherenceURLRow').clone();
+                            coherenceRow.find('[type="text"]').each(function () {
+                                $(this).attr('id', $(this).attr('id') + clusters[i].name);
+                                $(this).attr('name', $(this).attr('name') + clusters[i].name);
+                            });
+                            body.find('.ebsSizeRow').after(coherenceRow);
+
 							var datasource = $('#datasourceTemplate .datasourceBody').clone();
 							datasource.find('[type="text"]').each(function () {
 								$(this).attr('id', $(this).attr('id') + clusters[i].name);
@@ -195,6 +202,10 @@
 								grandpa.find(".datasourceRow :password").attr("disabled", false);
                                 grandpa.find(".datasourceRow #reserveUserBtn").button("enable");
 							}							
+							var coherenceURLRow = grandpa.find(".coherenceURLRow input");
+                            if (coherenceURLRow) {
+                                coherenceURLRow.val(dialogRes.resource.platform.coherenceURL);
+                            }
 						}
 						else if (el.attr("id").indexOf("togglePlatformRadioOff") !=  -1) {
 							var grandpa = toggleGrandunclesClass(el, "unselect", 0);
@@ -229,6 +240,7 @@
 							grandpa.find(".toggleSolrRow :radio").attr("disabled", true).button("refresh");
 							grandpa.find(".datasourceRow :text").attr("disabled", true);
 							grandpa.find(".datasourceRow :password").attr("disabled", true);
+							grandpa.find(".coherenceURLRow").fadeTo(500, ".5");
 						}
 						el.siblings().attr('checked',false).button("refresh");
 						el.attr('checked',true).button("refresh");		
@@ -398,6 +410,7 @@
 			$('#addInstanceDialog .toggleDatasourceRow input[id*="toggleDatasourceRadioOff_"]').attr('checked',true).button("refresh");			
 			$('#addInstanceDialog .toggleLiveInstanceRow input[id*="toggleLiveInstanceRadioOff_"]').attr('checked',true).button("refresh");			
 			$('#addInstanceDialog .datasourceRow input').val('');
+			$('#addInstanceDialog .coherenceURLRow input').val('');
 			dimElements();
 			$(".addInstanceDialogError").hide();
 			$("#addInstanceDialog").dialog("open");
@@ -424,6 +437,7 @@
 					outData[clusters[i].name + "esb"] 		  	= "false";
 					outData[clusters[i].name + "volumesize"]  	= 0;
                   	outData[clusters[i].name + "datasourceurl"] = "";
+					outData[clusters[i].name + "coherenceurl"]  = "";
 				}
 				for(var i = 0; i < clusters.length; i++){
 					if($('#' + "togglePlatformRadioOn_" + clusters[i].name).attr('checked')){
@@ -452,6 +466,11 @@
 						if($('#' + "toggleLiveInstanceRadioOn_" + clusters[i].name).attr('checked')){
 							outData[clusters[i].name + "liveinstance"] = "true";
 						}
+						
+						var coherenceInput = $('#coherenceURL_' + clusters[i].name);
+                        if (coherenceInput)
+                            outData[clusters[i].name + 'coherenceurl'] = coherenceInput.val();
+							
                         // replaced earlier "else" statement with explicit check of live instance status
                         // this was done to prevent live instance parameter to leak other platform types
                         if($('#' + "toggleLiveInstanceRadioOff_" + clusters[i].name).attr('checked')) {

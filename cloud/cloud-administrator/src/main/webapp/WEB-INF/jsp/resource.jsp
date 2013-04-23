@@ -2,7 +2,7 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 
 <fmt:setBundle basename="cloudadmin"/>
-<fmt:setBundle basename="oppya" var="platformDsProps"/>
+<fmt:setBundle basename="oppya" var="oppyaProps"/>
 
 <script type="text/javascript">
 
@@ -68,7 +68,8 @@ dialogRes.setResource({
 		cancel : 					'<fmt:message key="cloud.dialog.button.cancel" />'
 	},
     platform: {
-        datasourceURL:              '<fmt:message bundle="${platformDsProps}" key="platform.datasource.url"/>'
+        datasourceURL:              '<fmt:message bundle="${oppyaProps}" key="platform.datasource.url"/>',
+        coherenceURL:               '<fmt:message bundle="${oppyaProps}" key="coherence.config.url"/>'
     }
 });
 	
@@ -186,6 +187,16 @@ dialogRes.setResource({
             <label for="toggleSolrRadioOn_"> On </label>
             <input type="radio" id="toggleSolrRadioOff_" name="toggleSolrRadio_" checked="checked"/>
             <label for="toggleSolrRadioOff_"> Off </label>
+        </div>
+    </div>
+</div>
+
+<%-- template for Coherence URL input field --%>
+<div id="coherenceURLTemplate" class="template">
+    <div class="coherenceURLRow configRow">
+        <label class="coherenceURLLabel instanceCreationLabel">Coherence URL</label>
+        <div class="inputRow">
+            <input type="text" class="urlInput" id="coherenceURL_"  name="coherenceURL_" size="25" />
         </div>
     </div>
 </div>
