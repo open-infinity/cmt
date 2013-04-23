@@ -785,11 +785,11 @@ public class EC2Worker implements Worker {
 					machineTmp.setType("shard");
 				}
 			} 
-			int maxWait = 20;
+			int maxWait = 60;
 			while (tempInstance.getPrivateDnsName().equals("0.0.0.0") && maxWait > 0) {
 				LOG.info(threadName + ": Cloud not get IP address yet, waiting for a moment");
 				try {
-					Thread.sleep(1000);
+					Thread.sleep(3000);
 				} catch (InterruptedException e) {
 					LOG.error(threadName + ": Something interrupted my sleep: " + e.getMessage());
 				}
@@ -1067,7 +1067,7 @@ public class EC2Worker implements Worker {
 			y++;
 		}
 		
-		Collection<Cluster> clusterList = clusterService.getClusters(job.getInstanceId());
+	/*	Collection<Cluster> clusterList = clusterService.getClusters(job.getInstanceId());
 		Iterator<Cluster> k = clusterList.iterator();
 		while(k.hasNext()) {
 			Cluster c = k.next();
@@ -1077,8 +1077,25 @@ public class EC2Worker implements Worker {
 				AuthorizationRoute ip = i.next();
 				ec2.authorizeIPs(c.getSecurityGroupName(), ip.getCidrIp(), ip.getFromPort(), ip.getToPort(), ip.getProtocol());
 			}
-		}
+		} */
 		
+		String securityGroupOwner = PropertyManager.getProperty("cloudadmin.worker.eucalyptus.securitygroup.owner");
+		Collection<Cluster> clusterList = clusterService.getClusters(job.getInstanceId());
+		Iterator<Cluster> k = clusterList.iterator();
+		while(k.hasNext()) {
+			Cluster c = k.next();
+		
+			Collection<String> groupList = arService.getAllSecurityGroupsInInstance(c.getInstanceId());
+			Iterator<String> i = groupList.iterator();
+			while(i.hasNext()) {
+				String group = i.next();
+				if(!group.equals(c.getSecurityGroupName())) {
+					ec2.authorizeGroup(c.getSecurityGroupName(), group, securityGroupOwner, 0, 65535, "tcp");
+					ec2.authorizeGroup(c.getSecurityGroupName(), group, securityGroupOwner, 0, 65535, "udp");
+				}
+			}
+		}
+		 
 		return 1;
 	}
 	
