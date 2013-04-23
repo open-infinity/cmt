@@ -1,0 +1,52 @@
+<settings>
+
+<profiles>
+        <profile>
+                <id>dev</id>
+                <activation>
+                        <activeByDefault>true</activeByDefault>
+                </activation>
+
+                <properties>
+                        <euca.endpoint>http://localhost:8773/services/Eucalyptus</euca.endpoint>
+                        <euca.securityGroupOwner>1111111111111</euca.securityGroupOwner>
+                        <cloudadmin.worker.adminportal.address>0.0.0.0</cloudadmin.worker.adminportal.address>
+                        <cloudadmin.worker.service.portal_platform.image.eucalyptus.0>emi-xxxxxxxxx</cloudadmin.worker.service.portal_platform.image.eucalyptus.0>
+                        <cloudadmin.worker.service.portal_platform.image.eucalyptus.1>emi-xxxxxxxxx</cloudadmin.worker.service.portal_platform.image.eucalyptus.1>
+                        <cloudadmin.worker.service.database_platform.image.eucalyptus.0>emi-xxxxxxxxx</cloudadmin.worker.service.database_platform.image.eucalyptus.0>
+                        <cloudadmin.worker.service.database_platform.image.eucalyptus.1>emi-xxxxxxxxx</cloudadmin.worker.service.database_platform.image.eucalyptus.1>
+                        <cloudadmin.worker.service.service_platform.image.eucalyptus.0>emi-xxxxxxxxx</cloudadmin.worker.service.service_platform.image.eucalyptus.0>
+                        <cloudadmin.worker.service.service_platform.image.eucalyptus.1>emi-xxxxxxxxx</cloudadmin.worker.service.service_platform.image.eucalyptus.1>
+                        <cloudadmin.worker.service.bas_platform.image.eucalyptus.0>emi-xxxxxxxxxx</cloudadmin.worker.service.bas_platform.image.eucalyptus.0>
+                        <cloudadmin.worker.service.bas_platform.image.eucalyptus.1>emi-xxxxxxxxxx</cloudadmin.worker.service.bas_platform.image.eucalyptus.1>
+                        <cloudadmin.worker.service.ig_platform.image.eucalyptus.0>emi-xxxxxxxxxx</cloudadmin.worker.service.ig_platform.image.eucalyptus.0>
+                        <cloudadmin.worker.service.ig_platform.image.eucalyptus.1>emi-xxxxxxxxx</cloudadmin.worker.service.ig_platform.image.eucalyptus.1>
+                        <cloudadmin.worker.service.ee_platform.image.eucalyptus.0>emi-xxxxxxxxxx</cloudadmin.worker.service.ee_platform.image.eucalyptus.0>
+                        <cloudadmin.worker.service.ee_platform.image.eucalyptus.1>emi-xxxxxxxxxx</cloudadmin.worker.service.ee_platform.image.eucalyptus.1>
+                        <cloudadmin.worker.service.bigdata_platform.image.eucalyptus>emi-xxxxxxxxx</cloudadmin.worker.service.bigdata_platform.image.eucalyptus>
+                        <cloudadmin.worker.service.nosql_platform.image.eucalyptus>emi-xxxxxxxxxx</cloudadmin.worker.service.nosql_platform.image.eucalyptus>
+                        <euca.accessKey>abc1234567</euca.accessKey>
+                        <euca.secretKey>abc1234567</euca.secretKey>
+                        <euca.zonelist>zone1</euca.zonelist>
+                        <infrastructure.awsaccesskeyid>abc1234567</infrastructure.awsaccesskeyid>
+                        <infrastructure.awssecretkey>abc1234567</infrastructure.awssecretkey>
+                        <cmt-admin.jdbc.driverClassName>com.mysql.jdbc.Driver</cmt-admin.jdbc.driverClassName>
+                        <cmt-admin.jdbc.url>jdbc:mysql://localhost</cmt-admin.jdbc.url>
+                        <cmt-admin.jdbc.username>user</cmt-admin.jdbc.username>
+                        <cmt-admin.jdbc.password>passwd</cmt-admin.jdbc.password>
+			
+                        <aws.bucketendpoint>0.0.0.0</aws.bucketendpoint>		  
+                        <aws.accessKey>abc1234567</aws.accessKey>
+                        <aws.secretKey>abc1234567</aws.secretKey>
+			
+                        <s3.endpoint>0.0.0.0</s3.endpoint>
+                        <s3.endpoint.http.port>8773</s3.endpoint.http.port>
+                        <s3.endpoint.virtual.path>/Walrus</s3.endpoint.virtual.path>
+
+                        <bucket.endpoint>0.0.0.0:8773</bucket.endpoint>
+                        <bucket.endpoint.port>8773</bucket.endpoint.port>
+                        <bucket.virtualpath>/Walrus</bucket.virtualpath>
+			
+                </properties>
+        </profile>
+</settings>

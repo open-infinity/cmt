@@ -185,17 +185,17 @@ public class DeploymentRepositoryJdbcImpl implements DeploymentRepository {
 	/**
 	 * Persists deployment status object.
 	 */
-	@Override
+	@AuditTrail
 	public void storeDeploymentStatus(DeploymentStatus deploymentStatus) {
-		String sql = deploymentStatus.getDeploymentState().getValue() == 0 ? DEPLOYMENT_STATE_INSERT_SQL:DEPLOYMENT_STATE_UPDATE_SQL;
-		Object[] parameters = deploymentStatus.getDeploymentState().getValue() == 0 ? new Object[] {deploymentStatus.getDeployment().getId(), deploymentStatus.getMachineId(), deploymentStatus.getDeploymentState().getValue()} : new Object[]{deploymentStatus.getDeploymentState().getValue(), deploymentStatus.getId()};
+		String sql = deploymentStatus.getId() == 0 ? DEPLOYMENT_STATE_INSERT_SQL:DEPLOYMENT_STATE_UPDATE_SQL;
+		Object[] parameters = deploymentStatus.getId() == 0  ? new Object[] {deploymentStatus.getDeployment().getId(), deploymentStatus.getMachineId(), deploymentStatus.getDeploymentState().getValue()} : new Object[]{deploymentStatus.getDeploymentState().getValue(), deploymentStatus.getId()};
 		jdbcTemplate.update(sql, parameters);
 	}
 
 	/**
 	 * Executes querys based on cluster id to persistent memory containing deployment status information.
 	 */
-	@Override
+	@AuditTrail
 	public Collection<DeploymentStatus> loadDeploymentStatuses(long clusterId) {
 		Collection<DeploymentStatus> allDeploymentStatusesWithSameClusterId = new ArrayList<DeploymentStatus>();
 		Collection<Deployment> deployments = jdbcTemplate.query(LOAD_ALL_FOR_CLUSTER_SQL, new Object[]{clusterId}, new DeploymentRowMapper());

@@ -34,11 +34,15 @@ public class DeploymentStatus implements Serializable {
 	
 	private static final int DEPLOYMENT_STATE_DEPLOYED = 1;
 	
+	private static final int DEPLOYMENT_STATE_TERMINATED = -1;
+	
 	public enum DeploymentState {
 		
 		NOT_DEPLOYED (DEPLOYMENT_STATE_NOT_DEPLOYED), 
 		
-		DEPLOYED (DEPLOYMENT_STATE_DEPLOYED); 
+		DEPLOYED (DEPLOYMENT_STATE_DEPLOYED),
+		
+		TERMINATED (DEPLOYMENT_STATE_TERMINATED); 
 		
 		private int state;
 		
