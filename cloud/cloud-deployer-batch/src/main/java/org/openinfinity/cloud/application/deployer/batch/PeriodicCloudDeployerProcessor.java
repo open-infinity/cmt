@@ -19,6 +19,7 @@ package org.openinfinity.cloud.application.deployer.batch;
 import java.io.InputStream;
 
 import org.openinfinity.cloud.domain.DeploymentStatus;
+import org.openinfinity.cloud.domain.DeploymentStatus.DeploymentState;
 import org.openinfinity.cloud.service.deployer.DeployerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +31,7 @@ import org.springframework.stereotype.Component;
  * Batch processor for fetching stored software assets and attasching byte stream through deployer service interface.
  * 
  * @author Ilkka Leinonen
+ * @author Tommi Siitonen
  * @version 1.0.0
  * @since 1.2.0
  */
@@ -42,14 +44,17 @@ public class PeriodicCloudDeployerProcessor implements ItemProcessor<DeploymentS
 	DeployerService deployerService;
 	
 	public DeploymentStatus process(DeploymentStatus deploymentStatus) throws Exception {
-		LOGGER.info("Processing of deployment with deployment status [" + deploymentStatus.getId() + "] started.");
-		String bucketName = "" + deploymentStatus.getDeployment().getClusterId();
-		String key = deploymentStatus.getDeployment().getName();
-		LOGGER.debug("Deployment status of [" + deploymentStatus.getId() + "] continued with reading deployment key (S3 key) ["+ deploymentStatus.getDeployment().getName() +"] and organization id (S3 bucket name) [" + deploymentStatus.getDeployment().getClusterId() + "].");
-		InputStream inputStream = deployerService.load(bucketName, key);
-		deploymentStatus.getDeployment().setInputStream(inputStream);
-		LOGGER.trace("Deployment status of [" + deploymentStatus.getId() + "] continued with reading deployment key (S3 key) ["+ deploymentStatus.getDeployment().getName() +"] and organization id (S3 bucket name) [" + deploymentStatus.getDeployment().getClusterId() + "]. Connection to S3 has been established and inputstream found for software asset.");
+		if (deploymentStatus.getDeploymentState()!=DeploymentState.TERMINATED) {			
+			LOGGER.info("Processing of deployment with deployment status [" + deploymentStatus.getId() + "] started.");
+			String bucketName = "" + deploymentStatus.getDeployment().getClusterId();
+			String key = deploymentStatus.getDeployment().getName();
+			LOGGER.debug("Deployment status of [" + deploymentStatus.getId() + "] continued with reading deployment key (S3 key) ["+ deploymentStatus.getDeployment().getName() +"] and organization id (S3 bucket name) [" + deploymentStatus.getDeployment().getClusterId() + "].");
+			InputStream inputStream = deployerService.load(bucketName, key);
+			deploymentStatus.getDeployment().setInputStream(inputStream);
+			LOGGER.trace("Deployment status of [" + deploymentStatus.getId() + "] continued with reading deployment key (S3 key) ["+ deploymentStatus.getDeployment().getName() +"] and organization id (S3 bucket name) [" + deploymentStatus.getDeployment().getClusterId() + "]. Connection to S3 has been established and inputstream found for software asset.");
+		}	
 		return deploymentStatus;		
+		
 	}	
 	
 }

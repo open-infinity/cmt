@@ -26,7 +26,10 @@ import org.openinfinity.cloud.domain.Deployment;
 import org.openinfinity.cloud.domain.DeploymentStatus;
 import org.openinfinity.cloud.domain.DeploymentStatus.DeploymentState;
 import org.openinfinity.cloud.domain.Instance;
+import org.openinfinity.cloud.domain.Machine;
+import org.openinfinity.cloud.domain.MachineType;
 import org.openinfinity.cloud.service.administrator.InstanceService;
+import org.openinfinity.cloud.service.administrator.MachineService;
 import org.openinfinity.cloud.service.deployer.DeployerService;
 import org.openinfinity.core.annotation.Log;
 import org.springframework.batch.item.ItemReader;
@@ -37,6 +40,7 @@ import org.springframework.stereotype.Component;
  * Reader interface implementation for reading deployed software assets.
  * 
  * @author Ilkka Leinonen
+ * @author Tommi Siitonen
  * @version 1.0.0
  * @since 1.2.0
  */
@@ -51,6 +55,9 @@ public class PeriodicCloudDeployerReader implements ItemReader<DeploymentStatus>
 	@Autowired 
 	InstanceService instanceService;
 	
+	@Autowired 	
+	MachineService machineService;
+	
 	private int index = 0;
 	
 	private List<DeploymentStatus> deploymentStatuses = new ArrayList<DeploymentStatus>();
@@ -60,13 +67,19 @@ public class PeriodicCloudDeployerReader implements ItemReader<DeploymentStatus>
 	 */
 	@Log
 	public DeploymentStatus read() throws Exception {
-		if (deploymentStatuses.isEmpty())
+		if (deploymentStatuses.isEmpty()) {
 			deploymentStatuses = loadDeployments();
+			LOGGER.trace("Initializing reader finished. [" + deploymentStatuses.size() + "] deploymentstatuses loaded.");			
+		}
 		if (index < deploymentStatuses.size()) {
 			LOGGER.trace("Processing deployment statuses, current index is [" + index + "].");
-			return deploymentStatuses.get(index++);
+			DeploymentStatus retValue = deploymentStatuses.get(index++);
+			return retValue;
+			//return deploymentStatuses.get(index++);
 		} else {
+			LOGGER.trace("Reader finished, all items handled. Index is [" + index + "]. Returning null");			
 			index = 0;
+			deploymentStatuses.clear();
 			return null;
 		}	
 	}
@@ -75,21 +88,110 @@ public class PeriodicCloudDeployerReader implements ItemReader<DeploymentStatus>
 		LOGGER.info("Deployment of software artifacts started.");
 		Collection<Instance> activeInstances = instanceService.getAllActiveInstances();
 		LOGGER.info("There are total of [" + activeInstances.size() + "] active instances in the infrastructure.");
+		// Looping of instances not necessary?
 		for (Instance instance : activeInstances) {
 			Collection<Deployment> deployments = deployerService.loadDeploymentsForOrganization(instance.getOrganizationid());
-			LOGGER.debug("There are [" + deployments.size() + "] deployment  for instance ["+instance.getInstanceId()+"].");
+			
+			LOGGER.debug("There are [" + deployments.size() + "] deployment  for organization ["+instance.getOrganizationid()+"]. Processing instance <"+instance.getInstanceId()+">.");
+			
 			for (Deployment deployment : deployments) {
-				Collection<DeploymentStatus> deployedMachines = deployerService.loadDeploymentStatusesForCluster(deployment.getClusterId());
-				LOGGER.debug("There are total of [" + deployedMachines.size() + "] for deployment with id [" + deployment.getId() + "].");
-				for (DeploymentStatus deploymentStatus : deployedMachines) {
-					LOGGER.info("Processing deployment state of machine [" + deploymentStatus.getMachineId() + "] for deployment status id [" + deployment.getId() + "] and deployment state of [" + deploymentStatus.getDeploymentState() + "].");
-					deploymentStatus.setDeployment(deployment);
-					DeploymentState deploymentState = deploymentStatus.getDeploymentState();
-					switch (deploymentState) {
-						case NOT_DEPLOYED: deploymentStatuses.add(deploymentStatus); break;
-						case DEPLOYED: verifyTimeStampAndAddDeploymentInformation(deploymentStatuses, deploymentStatus, deployment); break;
-					}
+				// check if deployment is targeted for this instance
+				if (deployment.getInstanceId() != instance.getInstanceId()) {
+					LOGGER.debug("Deployment with id [" + deployment.getId() + "] not targeted for instance <"+instance.getInstanceId()+">. Skipping");					
+					continue;
 				}
+				
+				// Verify machine
+				Collection<Machine> machinesInCluster=machineService.getMachinesInCluster(deployment.getClusterId());
+				// loop machines
+				//boolean exists= false;
+
+				// returns DeploymentStatuses for all deployments with passed clusterId 
+				// TODO - new method to service for retriving statuses by deployment, that should be used
+				Collection<DeploymentStatus> deployedMachines = deployerService.loadDeploymentStatusesForCluster(deployment.getClusterId());
+				LOGGER.debug("There are total of [" + deployedMachines.size() + "] for deployment with clusterid [" + deployment.getClusterId() + "].");
+				
+
+				// examine machines in the cluster
+				// add new machines to deploymentStatuses
+				// add machines with NOT_DEPLOYED status to deploymentStatuses
+				// check machines with DEPLOYED status
+				// 		add machines with old deployment timestamp to deploymentStatuses
+				// 		skip DEPLOYED machines with valid timestamp
+				// add terminated machines for updating state to deploymentStatuses
+				// skip machines with TERMINATED status
+				
+				// check all machines in cluster defined for deployment
+				
+				//boolean deploymentStatusMachineMissingFromClusterMachines = true;  // machine does not exist in cluster anymore
+				// this probably need to handled as an list
+				
+				// loopingOtherWayAround------------------
+				
+				
+				for (DeploymentStatus deploymentStatus : deployedMachines) {												
+					LOGGER.info("Processing deployment for deployment status id [" + deployment.getId() + "] and deployment state of [" + deploymentStatus.getDeploymentState() + "].");						
+					deploymentStatus.setDeployment(deployment);
+				
+					boolean deploymentStatusMachineMissingFromClusterMachines = true;  // machine does not exist in cluster anymore
+				
+					for (Machine machine: machinesInCluster) {
+						LOGGER.info("Processing machine [" + machine.getId() + "] of Deployment ["+deployment.getId()+"]");
+
+						// check if DeploymentStatus is for this machine
+						if(deploymentStatus.getMachineId()==machine.getId()) {
+							// machine exists for this DeploymentStatus
+							deploymentStatusMachineMissingFromClusterMachines=false;
+							
+							// If machines can have only one deploymentState it can be done with remove
+							// otherwise separate collection needed							
+							machinesInCluster.remove(machine);
+							LOGGER.info("Machine [" + machine.getId() + "] found in deploymentStauses of Deployment ["+deployment.getId()+"]");
+							
+							
+							DeploymentState deploymentState = deploymentStatus.getDeploymentState();
+							switch (deploymentState) {
+								case NOT_DEPLOYED: deploymentStatuses.add(deploymentStatus); 
+								LOGGER.info("Not_deployed machine [" + machine.getId() + "] of Deployment ["+deployment.getId()+"]");								
+								break;									
+								case DEPLOYED: verifyTimeStampAndAddDeploymentInformation(deploymentStatuses, deploymentStatus, deployment); 
+								LOGGER.info("Redeployed machine [" + machine.getId() + "] of Deployment ["+deployment.getId()+"]");									
+								break;
+								// do nothing for terminated machines case TERMINATED
+							}
+							// continue; //can there be several statuses for the same machine?
+						} 
+					}
+					// handle deploymentStatuses with machines not existing anymore (TERMINATED) 
+					if (deploymentStatusMachineMissingFromClusterMachines) {
+						LOGGER.info("Terminated machine [" + deploymentStatus.getMachineId() + "] of Deployment ["+deployment.getId()+"]");															
+						deploymentStatus.setDeploymentState(DeploymentState.TERMINATED);
+						deploymentStatuses.add(deploymentStatus);
+					}
+											
+				}
+				
+				// now machine collection contains only machines that did not exist in deploymentStatuses
+				// add machines in cluster not found in DeploymentStatuses
+				for (Machine machine: machinesInCluster) {						
+					// if no deploymentStatuses found for machine it is propably new machine or new deployment
+					// new deploymentstatus added
+					// TODO: need to remove loadbalancers
+					if (machine.getType().equals("loadbalancer")) {
+						LOGGER.info("Skipping (NEW) machine [" + machine.getId() + "] of type loadbalancer");							
+						continue;
+					}
+					LOGGER.info("Undeployed (NEW) machine [" + machine.getId() + "] of Deployment ["+deployment.getId()+"]");
+					//if (machineMissingFromDeploymentStatuses2) {
+						DeploymentStatus newDeploymentStatus =  new DeploymentStatus();
+						newDeploymentStatus.setDeployment(deployment);
+						newDeploymentStatus.setDeploymentState(DeploymentState.NOT_DEPLOYED);
+						newDeploymentStatus.setMachineId(machine.getId());
+						deploymentStatuses.add(newDeploymentStatus); 
+					//}
+					
+				}
+								
 			}
 		}
 		return deploymentStatuses;
@@ -102,5 +204,7 @@ public class PeriodicCloudDeployerReader implements ItemReader<DeploymentStatus>
 			deploymentStatuses.add(deploymentStatus);
 		}
 	}	
+	
+	
 	
 }

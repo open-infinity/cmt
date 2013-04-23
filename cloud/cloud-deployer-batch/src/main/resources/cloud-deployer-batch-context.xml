@@ -55,14 +55,14 @@
 		<property name="fileSystemGroup" value="toas" />
 		<property name="pathToDeploymentDirectoryMap">
 			<map key-type="java.lang.String" value-type="java.lang.String">
-				<entry key="0" value="/opt/openinfinity/tomcat/deploy/"/>
-				<entry key="1" value="/opt/openinfinity/tomcat/apache-tomcat-7.0.27/webapps"/>
-				<entry key="2" value="/opt/openinfinity/tomcat/apache-tomcat-7.0.27/webapps/"/>
-				<entry key="3" value="/opt/openinfinity/hadoop/"/>
-				<entry key="4" value="/opt/openinfinity/mariadb/"/>
-				<entry key="5" value="/opt/openinfinity/tomcat/apache-tomcat-7.0.27/webapps/"/>
-				<entry key="6" value="/opt/openinfinity/mongodb/"/>
-				<entry key="7" value="/opt/openinfinity/tomcat/apache-tomcat-7.0.27/webapps/"/>
+				<entry key="0" value="/opt/openinfinity/2.0.0/tomcat/deploy/"/>
+				<entry key="1" value="/opt/openinfinity/2.0.0/tomcat/apache-tomcat-7.0.27/webapps"/>
+				<entry key="2" value="/opt/openinfinity/2.0.0/tomcat/webapps/"/>
+				<entry key="3" value="/opt/openinfinity/2.0.0/hadoop/"/>
+				<entry key="4" value="/opt/openinfinity/2.0.0/mariadb/"/>
+				<entry key="5" value="/opt/openinfinity/2.0.0/tomcat/webapps/"/>
+				<entry key="6" value="/opt/openinfinity/2.0.0/mongodb/"/>
+				<entry key="7" value="/opt/openinfinity/2.0.0/tomcat/apache-tomcat-7.0.27/webapps/"/>
 			</map>
 		</property>
 		<property name="keyService" ref="keyService" />

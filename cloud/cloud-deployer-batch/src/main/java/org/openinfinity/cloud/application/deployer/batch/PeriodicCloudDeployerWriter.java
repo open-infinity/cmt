@@ -33,6 +33,7 @@ import org.openinfinity.cloud.service.administrator.MachineService;
 import org.openinfinity.cloud.service.administrator.MachineTypeService;
 import org.openinfinity.cloud.service.deployer.DeployerService;
 import org.openinfinity.cloud.util.ssh.SSHGateway;
+import org.openinfinity.core.exception.SystemException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ItemWriter;
@@ -44,6 +45,7 @@ import org.springframework.beans.factory.annotation.Value;
  * Writer interface implementation for deploying software assets to virtual machines.
  * 
  * @author Ilkka Leinonen
+ * @author Tommi Siitonen
  * @version 1.0.0
  * @since 1.2.0
  */
@@ -129,15 +131,26 @@ public class PeriodicCloudDeployerWriter implements ItemWriter<DeploymentStatus>
 
 	@Override
 	public void write(List<? extends DeploymentStatus> deploymentStatuses) throws Exception {
-		LOGGER.info("Processing total of [" + deploymentStatuses.size() + "] deployments.");
+		LOGGER.info("Processing total of [" + deploymentStatuses.size() + "] deployments in writer.");
 		for (DeploymentStatus deploymentStatus : deploymentStatuses) {
+			if (deploymentStatus.getDeploymentState()==DeploymentState.TERMINATED) {
+				LOGGER.debug("Processing deploymentStatus with [" + deploymentStatus.getId() + "]. State TERMINATED, storing status.");				
+				try {
+					deployerService.storeDeploymentStatus(deploymentStatus);					
+				} catch(SystemException se) {
+					LOGGER.error(se.getMessage(),se);
+				}
+				continue;				
+			}
 			Key key = keyService.getKeyByInstanceId(deploymentStatus.getDeployment().getInstanceId());
 			Machine machine = machineService.getMachine(deploymentStatus.getMachineId());
 			LOGGER.debug("Processing machine with id [" + machine.getId() + "] with instance id [" + machine.getInstanceId() + "].");
 			Cluster cluster = clusterService.getClusterByClusterId(deploymentStatus.getDeployment().getClusterId());
-			int type = cluster.getMachineType();
-			String deploymentDirectory = pathToDeploymentDirectoryMap.get(type);
-			LOGGER.debug("Pushing deployment to machine with id [" + machine.getId() + "] for deployment directory [" + deploymentDirectory + "] with artifact named [" + deploymentStatus.getDeployment().getName() + "].");	
+			LOGGER.debug("Processing deploymentStatus with [" + deploymentStatus.getId() + "] with deployment id [" + deploymentStatus.getDeployment().getId() + "] for cluster <"+cluster.getId()+">.");
+			
+			int type = cluster.getType();
+			String deploymentDirectory = pathToDeploymentDirectoryMap.get(new Integer(type));
+			LOGGER.debug("Pushing deployment to machine with id [" + machine.getId() + "] for deployment directory [" + deploymentDirectory + "] with artifact named [" + deploymentStatus.getDeployment().getName() + "]. to cluster type<"+type+">");	
 			SSHGateway.pushToServer(
 					key.getSecret_key().getBytes(), 
 					null,
@@ -146,10 +159,10 @@ public class PeriodicCloudDeployerWriter implements ItemWriter<DeploymentStatus>
 					machine.getDnsName(), 
 					deploymentHostPort, 
 					username, 
-					null,
-					deploymentDirectory);
+					"",
+					deploymentDirectory+deploymentStatus.getDeployment().getName()+".war");
 			Collection<String> commands = new ArrayList<String>();
-			commands.add("chown "+ fileSystemUser + "." + fileSystemGroup + " " + deploymentDirectory + "/" + deploymentStatus.getDeployment().getName() + ".*");
+			commands.add("chown "+ fileSystemUser + "." + fileSystemGroup + " " + deploymentDirectory + deploymentStatus.getDeployment().getName() + ".*");
 			LOGGER.debug("Executing remote commands in machine with id [" + machine.getId() + "] .");
 			SSHGateway.executeRemoteCommands(
 					key.getSecret_key().getBytes(), 
@@ -157,7 +170,7 @@ public class PeriodicCloudDeployerWriter implements ItemWriter<DeploymentStatus>
 					machine.getDnsName(), 
 					deploymentHostPort, 
 					username, 
-					null,
+					"",
 					commands);
 			LOGGER.debug("Updating deployment status with id [" + deploymentStatus.getId() + "] as DEPLOYED.");
 			deploymentStatus.setDeploymentState(DeploymentState.DEPLOYED);

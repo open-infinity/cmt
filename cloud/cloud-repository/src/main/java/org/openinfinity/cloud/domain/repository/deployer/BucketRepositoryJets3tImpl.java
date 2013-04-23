@@ -50,7 +50,7 @@ public class BucketRepositoryJets3tImpl implements BucketRepository {
 	private String secretkey;
 
 	static {
-		Constants.JETS3T_PROPERTIES_FILENAME = "/META-INF/properties/jets3.properties";
+		Constants.JETS3T_PROPERTIES_FILENAME = "META-INF/properties/jets3.properties";
 	}
 	
 	/**
@@ -65,7 +65,7 @@ public class BucketRepositoryJets3tImpl implements BucketRepository {
 	public String createBucket(InputStream inputStream, String bucketName, String key, Map<String, String> metadataMap) {
 		String resource = "";
 		try {
-			simpleStorageService = new RestS3Service(new ProviderCredentialsImpl(accesskeyid, secretkey));			
+			simpleStorageService = new RestS3Service(new ProviderCredentialsImpl(accesskeyid, secretkey));		
 			S3Bucket bucket = simpleStorageService.getOrCreateBucket(bucketName, S3Bucket.LOCATION_EUROPE);
 			S3Object object = new S3Object(key);
 			for (Map.Entry<String, String> entry : metadataMap.entrySet()) object.addMetadata(entry.getKey(), entry.getValue());	
