@@ -514,7 +514,7 @@ public class EC2Worker implements Worker {
 		}
 		
 		LOG.debug(threadName+": Creating keypair");
-		String keyName = "TOASnstance" + Integer.toString(job.getInstanceId());
+		String keyName = "TOASinstance" + Integer.toString(job.getInstanceId());
 
 		Key key = null;
 		try {
@@ -798,7 +798,7 @@ public class EC2Worker implements Worker {
 			}
 			LOG.info(threadName + ": Private dns name: " + tempInstance.getPrivateDnsName());
 			LOG.info(threadName + ": Private IP address: " + tempInstance.getPrivateIpAddress());
-			AuthorizationRoute ip = new AuthorizationRoute();
+		/*	AuthorizationRoute ip = new AuthorizationRoute();
 			if (tempInstance.getPrivateIpAddress() == null) {
 				ip.setCidrIp(tempInstance.getPrivateDnsName() + "/32");
 			} else {
@@ -810,7 +810,7 @@ public class EC2Worker implements Worker {
 			ip.setToPort(65535);
 			ip.setProtocol("tcp");
 			ip.setSecurityGroupName(cluster.getSecurityGroupName());
-			arService.addIP(ip);
+			arService.addIP(ip); */
 			machineTmp.setDnsName(tempInstance.getPublicDnsName());
 			machineTmp.setPrivateDnsName(tempInstance.getPrivateDnsName());
 			machineTmp.setState(tempInstance.getState().getName());
@@ -865,7 +865,10 @@ public class EC2Worker implements Worker {
 		cluster.setSecurityGroupName(securityGroupName);
 		
 		clusterService.updateCluster(cluster);
-		ec2.authorizeIPs(cluster.getSecurityGroupName(), "0.0.0.0/0", 22, 22, "tcp");
+	//	ec2.authorizeIPs(cluster.getSecurityGroupName(), "0.0.0.0/0", 22, 22, "tcp");
+		String adminPortalAddress = PropertyManager.getProperty("cloudadmin.worker.adminportal.address");
+		ec2.authorizeIPs(cluster.getSecurityGroupName(), adminPortalAddress+"/32", 22, 22, "tcp");
+		ec2.authorizeIPs(cluster.getSecurityGroupName(), adminPortalAddress+"/32", 8181, 8181, "tcp");
 		List<String> securityGroups = new ArrayList<String>();
 		securityGroups.add(cluster.getSecurityGroupName());
 		
@@ -882,11 +885,11 @@ public class EC2Worker implements Worker {
 		machine.setInstanceId(machineInstance.getInstanceId());
 		machine.setType("manager");
 		machine.setConfigured(MachineService.MACHINE_CONFIGURE_STARTED);
-		int maxWait = 20;
-		while(machineInstance.getPrivateDnsName().equals("0.0.0.0") && maxWait > 0) {
+		int maxWait = 60;
+		while((machineInstance.getPrivateDnsName().equals("0.0.0.0") || machineInstance.getPrivateDnsName().equals("euca-0-0-0-0")) && maxWait > 0) {
 			LOG.info(threadName+": Could not get IP address yet, waiting for a moment");
 			try {
-				Thread.sleep(1000);
+				Thread.sleep(3000);
 			} catch (InterruptedException e) {
 				LOG.error(threadName+": Something interrupted my sleep: "+e.getMessage());
 			}
@@ -1026,11 +1029,12 @@ public class EC2Worker implements Worker {
 			} else if(tempInstance.getInstanceType().equalsIgnoreCase("m1.xlarge")) {
 				machineTmp.setType("hmaster");
 			}
-			maxWait = 20;
-			while (tempInstance.getPrivateDnsName().equals("0.0.0.0") && maxWait > 0) {
+			maxWait = 60;
+			
+			while ((tempInstance.getPrivateDnsName().equals("0.0.0.0") || tempInstance.getPrivateDnsName().equals("euca-0-0-0-0")) && maxWait > 0) {
 				LOG.info(threadName + ": Cloud not get IP address yet, waiting for a moment");
 				try {
-					Thread.sleep(1000);
+					Thread.sleep(3000);
 				} catch (InterruptedException e) {
 					LOG.error(threadName + ": Something interrupted my sleep: " + e.getMessage());
 				}
@@ -1039,7 +1043,7 @@ public class EC2Worker implements Worker {
 			}
 			LOG.info(threadName + ": Private dns name: " + tempInstance.getPrivateDnsName());
 			LOG.info(threadName + ": Private IP address: " + tempInstance.getPrivateIpAddress());
-			AuthorizationRoute ip = new AuthorizationRoute();
+		/*	AuthorizationRoute ip = new AuthorizationRoute();
 			if (tempInstance.getPrivateIpAddress() == null) {
 				ip.setCidrIp(tempInstance.getPrivateDnsName() + "/32");
 			} else {
@@ -1051,7 +1055,7 @@ public class EC2Worker implements Worker {
 			ip.setToPort(65535);
 			ip.setProtocol("tcp");
 			ip.setSecurityGroupName(cluster.getSecurityGroupName());
-			arService.addIP(ip);
+			arService.addIP(ip); */
 			machineTmp.setDnsName(tempInstance.getPublicDnsName());
 			machineTmp.setPrivateDnsName(tempInstance.getPrivateDnsName());
 			machineTmp.setState(tempInstance.getState().getName());
