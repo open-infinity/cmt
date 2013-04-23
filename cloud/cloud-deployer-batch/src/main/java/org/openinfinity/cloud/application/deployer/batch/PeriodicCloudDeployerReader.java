@@ -103,11 +103,14 @@ public class PeriodicCloudDeployerReader implements ItemReader<DeploymentStatus>
 				
 				// Verify machine
 				Collection<Machine> machinesInCluster=machineService.getMachinesInCluster(deployment.getClusterId());
+				List<Machine> machinesToBeCompared = new ArrayList<Machine>();
+				machinesToBeCompared.addAll(machinesInCluster);
+				
 				// loop machines
 				//boolean exists= false;
 
 				// returns DeploymentStatuses for all deployments with passed clusterId 
-				// TODO - new method to service for retriving statuses by deployment, that should be used
+				// TODO - new method to service for retrieving statuses by deployment, that should be used
 				Collection<DeploymentStatus> deployedMachines = deployerService.loadDeploymentStatusesForCluster(deployment.getClusterId());
 				LOGGER.debug("There are total of [" + deployedMachines.size() + "] for deployment with clusterid [" + deployment.getClusterId() + "].");
 				
@@ -145,7 +148,8 @@ public class PeriodicCloudDeployerReader implements ItemReader<DeploymentStatus>
 							
 							// If machines can have only one deploymentState it can be done with remove
 							// otherwise separate collection needed							
-							machinesInCluster.remove(machine);
+							//machinesInCluster.remove(machine);
+							machinesToBeCompared.remove(machine);
 							LOGGER.info("Machine [" + machine.getId() + "] found in deploymentStauses of Deployment ["+deployment.getId()+"]");
 							
 							
@@ -173,7 +177,8 @@ public class PeriodicCloudDeployerReader implements ItemReader<DeploymentStatus>
 				
 				// now machine collection contains only machines that did not exist in deploymentStatuses
 				// add machines in cluster not found in DeploymentStatuses
-				for (Machine machine: machinesInCluster) {						
+				//for (Machine machine: machinesInCluster) {						
+				for (Machine machine: machinesToBeCompared) {						
 					// if no deploymentStatuses found for machine it is propably new machine or new deployment
 					// new deploymentstatus added
 					// TODO: need to remove loadbalancers

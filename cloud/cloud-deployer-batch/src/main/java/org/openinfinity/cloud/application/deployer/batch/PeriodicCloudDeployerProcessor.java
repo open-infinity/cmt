@@ -44,7 +44,7 @@ public class PeriodicCloudDeployerProcessor implements ItemProcessor<DeploymentS
 	DeployerService deployerService;
 	
 	public DeploymentStatus process(DeploymentStatus deploymentStatus) throws Exception {
-		if (deploymentStatus.getDeploymentState()!=DeploymentState.TERMINATED) {			
+		if (deploymentStatus.getDeploymentState()!=DeploymentState.TERMINATED) {	// skip deployment to terminated machines, just leave for writer for updating state to db
 			LOGGER.info("Processing of deployment with deployment status [" + deploymentStatus.getId() + "] started.");
 			String bucketName = "" + deploymentStatus.getDeployment().getClusterId();
 			String key = deploymentStatus.getDeployment().getName();
