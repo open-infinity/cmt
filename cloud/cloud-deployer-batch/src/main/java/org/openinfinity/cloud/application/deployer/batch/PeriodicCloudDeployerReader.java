@@ -79,7 +79,7 @@ public class PeriodicCloudDeployerReader implements ItemReader<DeploymentStatus>
 		} else {
 			LOGGER.trace("Reader finished, all items handled. Index is [" + index + "]. Returning null");			
 			index = 0;
-			deploymentStatuses.clear();
+			deploymentStatuses.clear();	// this should not be necessary
 			return null;
 		}	
 	}
@@ -111,8 +111,10 @@ public class PeriodicCloudDeployerReader implements ItemReader<DeploymentStatus>
 
 				// returns DeploymentStatuses for all deployments with passed clusterId 
 				// TODO - new method to service for retrieving statuses by deployment, that should be used
-				Collection<DeploymentStatus> deployedMachines = deployerService.loadDeploymentStatusesForCluster(deployment.getClusterId());
-				LOGGER.debug("There are total of [" + deployedMachines.size() + "] for deployment with clusterid [" + deployment.getClusterId() + "].");
+				//Collection<DeploymentStatus> deployedMachines = deployerService.loadDeploymentStatusesForCluster(deployment.getClusterId());
+				//LOGGER.debug("There are total of [" + deployedMachines.size() + "] for deployment with clusterid [" + deployment.getClusterId() + "].");
+				Collection<DeploymentStatus> deployedMachines = deployerService.loadDeploymentStatusesForDeployment(deployment.getId());				
+				LOGGER.debug("There are total of [" + deployedMachines.size() + "] for deploymentStatuses with deploymentId [" + deployment.getId() + "].");
 				
 
 				// examine machines in the cluster
@@ -179,7 +181,7 @@ public class PeriodicCloudDeployerReader implements ItemReader<DeploymentStatus>
 				// add machines in cluster not found in DeploymentStatuses
 				//for (Machine machine: machinesInCluster) {						
 				for (Machine machine: machinesToBeCompared) {						
-					// if no deploymentStatuses found for machine it is propably new machine or new deployment
+					// if no deploymentStatuses found for machine it is probably new machine or new deployment
 					// new deploymentstatus added
 					// TODO: need to remove loadbalancers
 					if (machine.getType().equals("loadbalancer")) {
@@ -187,14 +189,11 @@ public class PeriodicCloudDeployerReader implements ItemReader<DeploymentStatus>
 						continue;
 					}
 					LOGGER.info("Undeployed (NEW) machine [" + machine.getId() + "] of Deployment ["+deployment.getId()+"]");
-					//if (machineMissingFromDeploymentStatuses2) {
-						DeploymentStatus newDeploymentStatus =  new DeploymentStatus();
-						newDeploymentStatus.setDeployment(deployment);
-						newDeploymentStatus.setDeploymentState(DeploymentState.NOT_DEPLOYED);
-						newDeploymentStatus.setMachineId(machine.getId());
-						deploymentStatuses.add(newDeploymentStatus); 
-					//}
-					
+					DeploymentStatus newDeploymentStatus =  new DeploymentStatus();
+					newDeploymentStatus.setDeployment(deployment);
+					newDeploymentStatus.setDeploymentState(DeploymentState.NOT_DEPLOYED);
+					newDeploymentStatus.setMachineId(machine.getId());
+					deploymentStatuses.add(newDeploymentStatus); 					
 				}
 								
 			}

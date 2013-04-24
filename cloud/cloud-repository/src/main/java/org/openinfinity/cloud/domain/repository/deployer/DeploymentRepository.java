@@ -24,6 +24,7 @@ import org.openinfinity.cloud.domain.DeploymentStatus;
  * CRUD interface for storing <code>org.openinfinity.core.cloud.domain.Deployment</code> objects.
  * 
  * @author Ilkka Leinonen
+ * @author Tommi Siitonen
  * @version 1.0.0
  * @since 1.0.0
  */
@@ -84,6 +85,11 @@ public interface DeploymentRepository {
 	/**
 	 * Executes queries based on cluster id to persistent memory containing deployment status information.
 	 */
-	public Collection<DeploymentStatus> loadDeploymentStatuses(long clusterId);
+	public Collection<DeploymentStatus> loadDeploymentStatusesByClusterId(long clusterId);
 
+	/**
+	 * Executes queries based on deployment id to persistent memory containing deployment status information.
+	 */
+	public Collection<DeploymentStatus> loadDeploymentStatusesByDeploymentId(long clusterId);		
+	
 }

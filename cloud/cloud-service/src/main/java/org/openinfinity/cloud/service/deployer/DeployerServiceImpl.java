@@ -37,6 +37,7 @@ import org.springframework.stereotype.Service;
  * Deployer interface implementation for deploying new applications inside a cloud environment.
  * 
  * @author Ilkka Leinonen
+ * @author Tommi Siitonen
  * @version 1.0.0
  * @since 1.0.0
  */
@@ -109,7 +110,11 @@ public class DeployerServiceImpl implements DeployerService {
 
 	@Override
 	public Collection<DeploymentStatus> loadDeploymentStatusesForCluster(int clusterId) {
-		return deploymentRepository.loadDeploymentStatuses(clusterId);
+		return deploymentRepository.loadDeploymentStatusesByClusterId(clusterId);
 	}
-
+	
+	@Override
+	public Collection<DeploymentStatus> loadDeploymentStatusesForDeployment(int deploymentId) {
+		return deploymentRepository.loadDeploymentStatusesByDeploymentId(deploymentId);
+	}	
 }

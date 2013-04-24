@@ -27,6 +27,7 @@ import org.openinfinity.cloud.domain.Cluster;
  * Deployer interface for deploying new applications inside a cloud environment.
  * 
  * @author Ilkka Leinonen
+ * @author Tommi Siitonen
  * @version 1.0.0
  * @since 1.0.0
  */
@@ -110,5 +111,14 @@ public interface DeployerService {
 	 * @return Collection<DeploymentStatus> Represents collection of deployment statuses of specified cluster.
 	 */
 	Collection<DeploymentStatus> loadDeploymentStatusesForCluster(int clusterId);
+	
+	
+	/**
+	 * Loads deployment statuses of specified cluster.
+	 * 
+	 * @param deploymentId Represents unique deployment id.
+	 * @return Collection<DeploymentStatus> Represents collection of deployment statuses of specified deployment.
+	 */
+	Collection<DeploymentStatus> loadDeploymentStatusesForDeployment(int deploymentId);
 	
 }

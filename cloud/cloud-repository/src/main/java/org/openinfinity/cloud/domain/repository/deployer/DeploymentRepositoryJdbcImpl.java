@@ -38,6 +38,7 @@ import org.springframework.util.Assert;
  * JDBC Repository implementation of the <code>org.openinfinity.core.cloud.deployer.repository.DeploymentRepository</code> interface.
  * 
  * @author Ilkka Leinonen
+ * @author Tommi Siitonen
  * @version 1.1.0
  * @since 1.0.0
  */
@@ -196,7 +197,7 @@ public class DeploymentRepositoryJdbcImpl implements DeploymentRepository {
 	 * Executes querys based on cluster id to persistent memory containing deployment status information.
 	 */
 	@AuditTrail
-	public Collection<DeploymentStatus> loadDeploymentStatuses(long clusterId) {
+	public Collection<DeploymentStatus> loadDeploymentStatusesByClusterId(long clusterId) {
 		Collection<DeploymentStatus> allDeploymentStatusesWithSameClusterId = new ArrayList<DeploymentStatus>();
 		Collection<Deployment> deployments = jdbcTemplate.query(LOAD_ALL_FOR_CLUSTER_SQL, new Object[]{clusterId}, new DeploymentRowMapper());
 		for (Deployment deployment : deployments) {
@@ -208,6 +209,16 @@ public class DeploymentRepositoryJdbcImpl implements DeploymentRepository {
 		}
 		return Collections.unmodifiableCollection(allDeploymentStatusesWithSameClusterId);
 	}
+	
+	/**
+	 * Executes querys based on deployment id to persistent memory containing deployment status information.
+	 */
+	@AuditTrail
+	public Collection<DeploymentStatus> loadDeploymentStatusesByDeploymentId(long deploymentId) {	
+		Collection<DeploymentStatus> deploymentStatuses = jdbcTemplate.query(QUERY_FOR_DEPLOYMENT_STATUS_BY_DEPLOYMENT_ID_SQL, new Object[]{deploymentId}, new DeploymentStateRowMapper());		
+		return Collections.unmodifiableCollection(deploymentStatuses);
+	}
+	
 	
 	private class DeploymentRowMapper implements RowMapper<Deployment> {
 		
