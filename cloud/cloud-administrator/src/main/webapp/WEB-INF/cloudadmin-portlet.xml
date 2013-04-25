@@ -29,8 +29,7 @@
 	     classpath*:infrastructure.properties, 
 	     classpath*:EucaCredentials.properties,
 	     classpath*:infrastructure.properties,
-	     classpath*:userPoolDatasource.properties,
-	     classpath*:oppya.properties" />
+	     classpath*:userPoolDatasource.properties" />
 
  	<bean id="cloudDataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
 		destroy-method="close">

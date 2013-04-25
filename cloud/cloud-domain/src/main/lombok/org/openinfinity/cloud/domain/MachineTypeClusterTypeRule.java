@@ -17,30 +17,24 @@
 package org.openinfinity.cloud.domain;
 
 import java.io.Serializable;
-import java.lang.String;
-import java.util.List;
-
 import org.openinfinity.core.annotation.NotScript;
-
 import lombok.Data;
 
 /**
- * Machine type specification.
+ * Machine type Cluster type rule specification; defines allowed machine types for each cluster type.
  *
- * @author Timo Tapanainen
+ * @author Ari Simanainen
  * @version 1.0.0 Initial version
  * @since 1.0.0
  */
 
 @Data
-public class MachineType implements Serializable {
+public class MachineTypeClusterTypeRule implements Serializable {
 	
 	@NotScript
-	private int id;
+	private int machineTypeId;
 	@NotScript
-	private String name;
+	private int clusterTypeId;
 	@NotScript
-	private String specification;
-	@NotScript
-	List<MachineTypeClusterTypeRule> compatibleClusterTypes;		
+	private boolean allowed;
 }

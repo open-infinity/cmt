@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 the original author or authors.
+ * Copyright (c) 2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,33 +14,21 @@
  * limitations under the License.
  */
 
-package org.openinfinity.cloud.domain;
+package org.openinfinity.cloud.domain.repository.administrator;
 
-import java.io.Serializable;
-import java.lang.String;
+import org.openinfinity.cloud.domain.MachineTypeClusterTypeRule;
 import java.util.List;
 
-import org.openinfinity.core.annotation.NotScript;
-
-import lombok.Data;
-
 /**
- * Machine type specification.
- *
- * @author Timo Tapanainen
+ * Machine type Cluster type Rule repository interface; defines allowed machine types for each cluster type.
+ * 
+ * @author Ari Simanainen
  * @version 1.0.0 Initial version
  * @since 1.0.0
  */
 
-@Data
-public class MachineType implements Serializable {
+public interface MachineTypeClusterTypeRuleRepository {
 	
-	@NotScript
-	private int id;
-	@NotScript
-	private String name;
-	@NotScript
-	private String specification;
-	@NotScript
-	List<MachineTypeClusterTypeRule> compatibleClusterTypes;		
+	List<MachineTypeClusterTypeRule> getMachineTypeClusterTypeRules(int machineTypeId);
+	void addMachineTypeClusterTypeRule(MachineTypeClusterTypeRule rule);
 }

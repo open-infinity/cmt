@@ -16,76 +16,69 @@
 
 package org.openinfinity.cloud.domain.repository.administrator;
 
-import org.openinfinity.cloud.domain.MachineType;
-import org.openinfinity.cloud.domain.MachineTypeClusterTypeRule;
 import org.openinfinity.core.annotation.AuditTrail;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.Assert;
 
 import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collection;
 import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.openinfinity.cloud.domain.MachineTypeClusterTypeRule;
+
 
 /**
- * Machine type repository implementation
+ * Machine type Cluster type Rule repository implementation; defines allowed machine types for each cluster type.
  * 
- * @author Timo Tapanainen
+ * @author Ari Simanainen
  * @version 1.0.0 Initial version
  * @since 1.0.0
  */
 
-@Repository("machineTypeRepository")
-class MachineTypeRepositoryJdbcImpl implements MachineTypeRepository{
+@Repository("machineTypeClusterTypeRuleRepository")
+public class MachineTypeClusterTypeRuleRepositoryJdbcImpl implements
+		MachineTypeClusterTypeRuleRepository {
 
 	private NamedParameterJdbcTemplate jdbcTemplate;
 	private DataSource dataSource;
 
 	@Autowired
-	public MachineTypeRepositoryJdbcImpl(@Qualifier("cloudDataSource") DataSource ds) {
-		Assert.notNull(ds, "Please define datasource for machine repository.");
+	public MachineTypeClusterTypeRuleRepositoryJdbcImpl(@Qualifier("cloudDataSource") DataSource ds) {
+		Assert.notNull(ds, "Please define datasource for MachineTypeClusterTypeRuleRepository repository.");
 		this.jdbcTemplate = new NamedParameterJdbcTemplate(ds);
 		this.dataSource = ds;
 	}
 		
 	@AuditTrail
-	public Collection<MachineType> getMachineTypes(List<String> userOrganizations) {
-		MapSqlParameterSource parameters = new MapSqlParameterSource();
-		parameters.addValue("orgNames", userOrganizations);
-		Collection<MachineType> machineTypes = jdbcTemplate.query("select distinct machine.* from machine_type_tbl as machine, acl_machine_type_tbl as acl " +
-				"where acl.org_name in (:orgNames) and acl.machine_type_id = machine.id order by machine.id", parameters, new MachineTypeWrapper());
-		if (machineTypes != null){
-			for (MachineType machineType : machineTypes){
-				machineType.setCompatibleClusterTypes(getMachineTypeClusterTypeRules(machineType.getId()));
-			}
-		}
-		return machineTypes;
-	}
-		
-	private List<MachineTypeClusterTypeRule> getMachineTypeClusterTypeRules(int machineTypeId) {
+	@Override
+	public List<MachineTypeClusterTypeRule> getMachineTypeClusterTypeRules(int machineTypeId) {
 		MapSqlParameterSource parameters = new MapSqlParameterSource();
 		parameters.addValue("machineTypeId", machineTypeId);
 		List<MachineTypeClusterTypeRule> rules = jdbcTemplate.query("select * from machine_type_cluster_type_rule_tbl " +
 				"where machine_type_id = :machineTypeId and allowed = true order by cluster_type_id ", parameters, new MachineTypeClusterTypeRuleWrapper());
 		return rules;
 	}
-
-    private static final class MachineTypeWrapper implements RowMapper<MachineType> {
-        public MachineType mapRow(ResultSet rs, int rowNumber) throws SQLException {
-            MachineType mt = new MachineType();
-            mt.setId(rs.getInt("id"));
-            mt.setName(rs.getString("name"));
-            mt.setSpecification(rs.getString("spec"));
-            return mt;
-        }
-    }
-
+	
+	@AuditTrail
+	@Override
+	public void addMachineTypeClusterTypeRule(MachineTypeClusterTypeRule rule) {
+		SimpleJdbcInsert insert = new SimpleJdbcInsert(dataSource).withTableName("machine_type_cluster_type_rule_tbl");
+		Map<String,Object> parameters = new HashMap<String,Object>();
+		parameters.put("machine_type_id", rule.getMachineTypeId());
+		parameters.put("cluster_type_id", rule.getClusterTypeId());
+		parameters.put("allowed", rule.isAllowed());
+		insert.execute(parameters);
+	}
+	
     private static final class MachineTypeClusterTypeRuleWrapper implements RowMapper<MachineTypeClusterTypeRule> {
         public MachineTypeClusterTypeRule mapRow(ResultSet rs, int rowNumber) throws SQLException {
         	MachineTypeClusterTypeRule rule = new MachineTypeClusterTypeRule();

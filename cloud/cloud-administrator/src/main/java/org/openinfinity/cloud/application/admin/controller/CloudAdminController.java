@@ -127,9 +127,6 @@ public class CloudAdminController {
 	@Qualifier("availabilityZoneService")
 	private AvailabilityZoneService zoneService;
 
-    @Value("${coherence.config.url}")
-    private String coherenceConfigURL;
-
     @ExceptionHandler(Exception.class)
     public void handleExceptions(Exception e, ResourceResponse response) throws IOException {
         LOG.error("Exception occurred in cmt: " + e.getMessage(), e);
@@ -402,7 +399,7 @@ public class CloudAdminController {
 					instance.addParameter(new InstanceParameter("service_datasource_user", pm.get("jbossservicedatasourceuser")));
 					instance.addParameter(new InstanceParameter("service_datasource_password", pm.get("jbossservicedatasourcepassword")));
 				}
-                instance.addParameter(new InstanceParameter("service_coherence_url", coherenceConfigURL));
+                instance.addParameter(new InstanceParameter("service_coherence_url", pm.get("jbossservicecoherenceurl")));
 			}
 			if ("true".equals(pm.get("jbossportal"))) {
 				if ("true".equals(pm.get("jbossportalliveinstance"))) {
@@ -416,7 +413,7 @@ public class CloudAdminController {
                 if ("true".equals(pm.get("jbossportalsolr"))) {
                 	instance.addParameter(new InstanceParameter("portal_solr", "true"));
                 }
-                instance.addParameter(new InstanceParameter("portal_coherence_url", coherenceConfigURL));
+                instance.addParameter(new InstanceParameter("portal_coherence_url", pm.get("jbossportalcoherenceurl")));
 			}
 			instanceService.addInstance(instance);
 

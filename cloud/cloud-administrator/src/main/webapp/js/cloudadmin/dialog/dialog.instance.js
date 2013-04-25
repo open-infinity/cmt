@@ -58,6 +58,13 @@
 						}
 						// insert data source fields into body
 						if ("jbossservice" == clusters[i].name || "jbossportal" == clusters[i].name) {
+						    var coherenceRow = $('#coherenceURLTemplate .coherenceURLRow').clone();
+                            coherenceRow.find('[type="text"]').each(function () {
+                                $(this).attr('id', $(this).attr('id') + clusters[i].name);
+                                $(this).attr('name', $(this).attr('name') + clusters[i].name);
+                            });
+                            body.find('.ebsSizeRow').after(coherenceRow);
+
 							var datasource = $('#datasourceTemplate .datasourceBody').clone();
 							datasource.find('[type="text"]').each(function () {
 								$(this).attr('id', $(this).attr('id') + clusters[i].name);
@@ -93,9 +100,15 @@
                         // insert machine types into body before element ids and names are adjusted below
 						var machineTypeInjectLocation$ = body.find('.machineSizeRow .radioButton');
 						for (var mt = 0; mt < machineTypes.length; ++mt) {
-							var machineTypeInstanceId = 'machineSizeRadio' + machineTypes[mt].name + '_';
-							$('#machineTypeTemplate').children('[type="radio"]').clone().attr({id: machineTypeInstanceId, value: machineTypes[mt].id}).appendTo(machineTypeInjectLocation$);
-							$('#machineTypeTemplate').children('label').clone().attr({'for': machineTypeInstanceId}).html(machineTypes[mt].name).appendTo(machineTypeInjectLocation$);
+							// check if this machine type is allowed to this cluster type
+							var compatibleClusterTypes = machineTypes[mt].compatibleClusterTypes;
+							for (var ct = 0; ct < compatibleClusterTypes.length; ++ct) {
+								if (compatibleClusterTypes[ct].clusterTypeId == clusters[i].id) {
+									var machineTypeInstanceId = 'machineSizeRadio' + machineTypes[mt].name + '_';
+									$('#machineTypeTemplate').children('[type="radio"]').clone().attr({id: machineTypeInstanceId, value: machineTypes[mt].id}).appendTo(machineTypeInjectLocation$);
+									$('#machineTypeTemplate').children('label').clone().attr({'for': machineTypeInstanceId}).html(machineTypes[mt].name).appendTo(machineTypeInjectLocation$);
+								}								
+							}							
 						}
 						// prepares element ids and names
 						body.attr('id', clusters[i].name).find('[type="radio"]').each(function () {
@@ -112,8 +125,6 @@
 					
 					// Initialize other widgets 
 					$("#addInstanceDialog .radioButton").buttonset();
-                    if (cloudadmin.resource.machineTypes.length > 0)
-					    $("#addInstanceDialog .valueDisplayButtonSet").text(cloudadmin.resource.machineTypes[0].specification);
 
                     o.dialog.find("#allUsersTakenDialog").dialog({
                         autoOpen : false,
@@ -189,6 +200,10 @@
 								grandpa.find(".datasourceRow :password").attr("disabled", false);
                                 grandpa.find(".datasourceRow #reserveUserBtn").button("enable");
 							}							
+							var coherenceURLRow = grandpa.find(".coherenceURLRow input");
+                            if (coherenceURLRow) {
+                                coherenceURLRow.val(dialogRes.resource.platform.coherenceURL);
+                            }
 						}
 						else if (el.attr("id").indexOf("togglePlatformRadioOff") !=  -1) {
 							var grandpa = toggleGrandunclesClass(el, "unselect", 0);
@@ -223,6 +238,7 @@
 							grandpa.find(".toggleSolrRow :radio").attr("disabled", true).button("refresh");
 							grandpa.find(".datasourceRow :text").attr("disabled", true);
 							grandpa.find(".datasourceRow :password").attr("disabled", true);
+							grandpa.find(".coherenceURLRow").fadeTo(500, ".5");
 						}
 						el.siblings().attr('checked',false).button("refresh");
 						el.attr('checked',true).button("refresh");		
@@ -345,11 +361,18 @@
 		// from "create new instance" button.
 		// The function clears resets all dialog element values and styles to defaults,
 		// and finally opens the dialog
-		createNewInstance: function() {				
+		createNewInstance: function() {
 			$("#instanceName").val('');
 			var clusters = cloudadmin.resource.clusterTypes;
+            var machineTypes = cloudadmin.resource.machineTypes;
 			for(var i = 0; i < clusters.length; i++){
 				var selectorName = '#' + clusters[i].name;
+				// set the label by default machine type
+				for (var mt = 0; mt < machineTypes.length; ++mt) {
+					if (machineTypes[mt].id == $(selectorName + " .machineSizeRow input:first-child").attr('value')) {
+						$(selectorName + " .valueDisplayButtonSet").text(machineTypes[mt].specification);
+					}
+	            }
 				$(selectorName + ' .clusterSizeRow .jq_slider')
 					.slider({
 						min: clusters[i].minMachines,
@@ -384,7 +407,6 @@
 			$('#addInstanceDialog .toggleEbsRow input[id*="toggleEbsRadioOff_"]').attr('checked',true).button("refresh");
             $('#addInstanceDialog .toggleSolrRow input[id*="toggleSolrRadioOff_"]').attr('checked',true).button("refresh");
             if (cloudadmin.resource.machineTypes.length > 0) { // select first machine type and reset label if there are any machine types
-                $("#addInstanceDialog .valueDisplayButtonSet").text(cloudadmin.resource.machineTypes[0].specification);
                 $("#addInstanceDialog .machineSizeRow input:first-child").attr('checked',true).button("refresh");
             }
             // reset cloud selection, fire also change event to update zone selection
@@ -392,6 +414,7 @@
 			$('#addInstanceDialog .toggleDatasourceRow input[id*="toggleDatasourceRadioOff_"]').attr('checked',true).button("refresh");			
 			$('#addInstanceDialog .toggleLiveInstanceRow input[id*="toggleLiveInstanceRadioOff_"]').attr('checked',true).button("refresh");			
 			$('#addInstanceDialog .datasourceRow input').val('');
+			$('#addInstanceDialog .coherenceURLRow input').val('');
 			dimElements();
 			$(".addInstanceDialogError").hide();
 			$("#addInstanceDialog").dialog("open");
@@ -418,6 +441,7 @@
 					outData[clusters[i].name + "esb"] 		  	= "false";
 					outData[clusters[i].name + "volumesize"]  	= 0;
                   	outData[clusters[i].name + "datasourceurl"] = "";
+					outData[clusters[i].name + "coherenceurl"]  = "";
 				}
 				for(var i = 0; i < clusters.length; i++){
 					if($('#' + "togglePlatformRadioOn_" + clusters[i].name).attr('checked')){
@@ -446,6 +470,11 @@
 						if($('#' + "toggleLiveInstanceRadioOn_" + clusters[i].name).attr('checked')){
 							outData[clusters[i].name + "liveinstance"] = "true";
 						}
+						
+						var coherenceInput = $('#coherenceURL_' + clusters[i].name);
+                        if (coherenceInput)
+                            outData[clusters[i].name + 'coherenceurl'] = coherenceInput.val();
+							
                         // replaced earlier "else" statement with explicit check of live instance status
                         // this was done to prevent live instance parameter to leak other platform types
                         if($('#' + "toggleLiveInstanceRadioOff_" + clusters[i].name).attr('checked')) {
