@@ -100,7 +100,7 @@ public class PeriodicCloudDeployerReader implements ItemReader<DeploymentStatus>
 					LOGGER.debug("Deployment with id [" + deployment.getId() + "] not targeted for instance <"+instance.getInstanceId()+">. Skipping");					
 					continue;
 				}
-				
+						
 				// Verify machine
 				Collection<Machine> machinesInCluster=machineService.getMachinesInCluster(deployment.getClusterId());
 				List<Machine> machinesToBeCompared = new ArrayList<Machine>();
@@ -109,8 +109,8 @@ public class PeriodicCloudDeployerReader implements ItemReader<DeploymentStatus>
 				// loop machines
 				//boolean exists= false;
 
-				// returns DeploymentStatuses for all deployments with passed clusterId 
 				// TODO - new method to service for retrieving statuses by deployment, that should be used
+				// returns DeploymentStatuses for all deployments with passed clusterId 
 				//Collection<DeploymentStatus> deployedMachines = deployerService.loadDeploymentStatusesForCluster(deployment.getClusterId());
 				//LOGGER.debug("There are total of [" + deployedMachines.size() + "] for deployment with clusterid [" + deployment.getClusterId() + "].");
 				Collection<DeploymentStatus> deployedMachines = deployerService.loadDeploymentStatusesForDeployment(deployment.getId());				

@@ -39,6 +39,7 @@ import lombok.Data;
 @Data
 public class Deployment implements Serializable {
 	private static final long serialVersionUID = -5063856729744786978L;
+	
 	@NotScript
 	private int id;
 	@NotScript

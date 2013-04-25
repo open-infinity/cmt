@@ -134,7 +134,7 @@ public class PeriodicCloudDeployerWriter implements ItemWriter<DeploymentStatus>
 		LOGGER.info("Processing total of [" + deploymentStatuses.size() + "] deployments in writer.");
 		for (DeploymentStatus deploymentStatus : deploymentStatuses) {
 			if (deploymentStatus.getDeploymentState()==DeploymentState.TERMINATED) {
-				LOGGER.debug("Processing deploymentStatus with [" + deploymentStatus.getId() + "]. State TERMINATED, storing status.");				
+				LOGGER.debug("Processing deploymentStatus with [" + deploymentStatus.getId() + "] and machineId ["+deploymentStatus.getMachineId()+"]. State TERMINATED, storing status.");				
 				try {
 					deployerService.storeDeploymentStatus(deploymentStatus);					
 				} catch(SystemException se) {
@@ -146,21 +146,31 @@ public class PeriodicCloudDeployerWriter implements ItemWriter<DeploymentStatus>
 			Machine machine = machineService.getMachine(deploymentStatus.getMachineId());
 			LOGGER.debug("Processing machine with id [" + machine.getId() + "] with instance id [" + machine.getInstanceId() + "].");
 			Cluster cluster = clusterService.getClusterByClusterId(deploymentStatus.getDeployment().getClusterId());
-			LOGGER.debug("Processing deploymentStatus with [" + deploymentStatus.getId() + "] with deployment id [" + deploymentStatus.getDeployment().getId() + "] for cluster <"+cluster.getId()+">.");
+			LOGGER.debug("Processing deploymentStatus with [" + deploymentStatus.getId() + "] and machineId ["+deploymentStatus.getMachineId()+"] with deployment id [" + deploymentStatus.getDeployment().getId() + "] for cluster <"+cluster.getId()+">.");
 			
 			int type = cluster.getType();
 			String deploymentDirectory = pathToDeploymentDirectoryMap.get(new Integer(type));
 			LOGGER.debug("Pushing deployment to machine with id [" + machine.getId() + "] for deployment directory [" + deploymentDirectory + "] with artifact named [" + deploymentStatus.getDeployment().getName() + "]. to cluster type<"+type+">");	
+//			SSHGateway.pushToServer(
+//					key.getSecret_key().getBytes(), 
+//					null,
+//					deploymentStatus.getDeployment().getInputStream(), 
+//					deploymentStatus.getDeployment().getName(), 
+//					machine.getDnsName(), 
+//					deploymentHostPort, 
+//					username, 
+//					"",
+//					deploymentDirectory+deploymentStatus.getDeployment().getName()+".war");
 			SSHGateway.pushToServer(
 					key.getSecret_key().getBytes(), 
 					null,
-					deploymentStatus.getDeployment().getInputStream(), 
+					deploymentStatus.getInputStream(), 
 					deploymentStatus.getDeployment().getName(), 
 					machine.getDnsName(), 
 					deploymentHostPort, 
 					username, 
 					"",
-					deploymentDirectory+deploymentStatus.getDeployment().getName()+".war");
+					deploymentDirectory+deploymentStatus.getDeployment().getName()+".war");			
 			Collection<String> commands = new ArrayList<String>();
 			commands.add("chown "+ fileSystemUser + "." + fileSystemGroup + " " + deploymentDirectory + deploymentStatus.getDeployment().getName() + ".*");
 			LOGGER.debug("Executing remote commands in machine with id [" + machine.getId() + "] .");

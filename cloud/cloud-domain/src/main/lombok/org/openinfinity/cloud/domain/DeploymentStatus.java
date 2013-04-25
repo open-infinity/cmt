@@ -15,8 +15,11 @@
  */
 package org.openinfinity.cloud.domain;
 
+import java.io.InputStream;
 import java.io.Serializable;
 import java.util.Date;
+
+import org.openinfinity.core.annotation.NotScript;
 
 import lombok.Data;
 
@@ -71,6 +74,9 @@ public class DeploymentStatus implements Serializable {
 	DeploymentState deploymentState;
 
 	Date timestamp;
+	
+	@NotScript
+	private InputStream inputStream;
 	
 	Deployment deployment;
 	
