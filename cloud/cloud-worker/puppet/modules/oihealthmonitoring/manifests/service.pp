@@ -6,8 +6,11 @@ class oihealthmonitoring::service {
         require => Class["oihealthmonitoring::config"],
     }    
     service { "oi-healthmonitoring":
-        ensure => running,
-        hasrestart => true,
+        #25.4.2013 TE note: disbaled due to stalls installation when running at RHEL 
+        #ensure => running,
+        #hasrestart => true,
+        ensure => stopped,
+        hasrestart => false,
         enable => true,
         require => Class["oihealthmonitoring::config"],
     }    
