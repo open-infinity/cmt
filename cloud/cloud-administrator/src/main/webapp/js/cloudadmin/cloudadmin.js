@@ -316,10 +316,12 @@ var instanceManager = {
 			});
 			
 			// Add services button
+			/* Add services dialog doesn't work and it commented out 24.4.2013
 			$template.find(".add-services").button().click(function() {				
 				cloudadmin.dialog.initAddServiceDialog(instanceId, cloudadmin.resource.clusters);
 				$("#addServiceDialog").dialog("open");
 			});
+			*/
 			
 			//  View instance machines button
 			$template.find(".view-machines").button().click(function() {			

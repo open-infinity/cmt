@@ -37,7 +37,9 @@
 	</div>
 
 	<div class="ui-button-bar">
-		<button class="add-services"><fmt:message key="cloud.instanceview.button.add" /></button>	
+		<%-- Add services dialog doesn't work and it commented out 24.4.2013
+		<button class="add-services"><fmt:message key="cloud.instanceview.button.add" /></button>
+		--%>
 		<button class="view-machines"><fmt:message key="cloud.instanceview.button.machines" /></button>	
 		<button class="get-key"><fmt:message key="cloud.instanceview.button.getkey" /></button>	
 	</div>
