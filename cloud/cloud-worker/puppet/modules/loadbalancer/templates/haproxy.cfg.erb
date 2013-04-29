@@ -20,6 +20,11 @@ defaults
 
 frontend main *:80
 	default_backend liferay
+	
+#frontend main_ssl
+#        bind 0.0.0.0:443 ssl crt /opt/certificates/example.pem #prefer-server-ciphers
+#        default_backend tomcat
+	
 
 frontend stats *:8080
 	default_backend stats
