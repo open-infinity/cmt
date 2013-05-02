@@ -578,7 +578,7 @@ public class EC2Worker implements Worker {
 			mList.remove(j);
 			int terminated = 0;
 			int i = 0;
-			/*while(terminated < needToTerminate) {
+			while(terminated < needToTerminate) {
 				Machine m = mList.get(i);
 				machineService.stopMachine(m.getId());
 				ec2.terminateInstance(m.getInstanceId());
@@ -591,27 +591,10 @@ public class EC2Worker implements Worker {
 				terminated++;
 				i++;
 			}
-			*/
-			
-			for (Machine m: mList){
-				if (terminated < needToTerminate){
-					machineService.stopMachine(m.getId());
-					ec2.terminateInstance(m.getInstanceId());
-					// usage service implementation
-					try {
-						usageService.stopVirtualMachineUsageMonitoring(oiInstance.getOrganizationid(), cluster.getType(), cluster.getId(), m.getId());
-					} catch (Exception e) {
-						LOG.error(threadName+": Error stopping usage monitoring "+e.getMessage());
-					}
-					terminated++;
-				}
-				// Force update of remaining machines, needed for nodelist.conf from oi-healthmonitoring
-				else machineService.updateMachineConfigure(m.getId(), MachineService.MACHINE_CONFIGURE_NOT_STARTED);
-			}
 			
 			LOG.info(threadName+": terminated "+terminated+" machines");
 			// force reconfigure for loadbalancer
-			machineService.updateMachineConfigure(lb.getId(), MachineService.MACHINE_CONFIGURE_NOT_STARTED);
+			// machineService.updateMachineConfigure(lb.getId(), MachineService.MACHINE_CONFIGURE_NOT_STARTED);
 		} else if(cluster.getNumberOfMachines() < machines) {
 			LOG.info(threadName+": Scaling up cluster "+clusterId);
 			if(cluster.getType() == ClusterService.CLUSTER_TYPE_BIGDATA || cluster.getType() == ClusterService.CLUSTER_TYPE_NOSQL) {
@@ -696,16 +679,15 @@ public class EC2Worker implements Worker {
 					}
 					
 				}
-				//machineService.updateMachineConfigure(lb.getId(), MachineService.MACHINE_CONFIGURE_NOT_STARTED);
-				
-				// Once creation is done force update on all machines. Needed for nodelist.conf from oi-healthmonitoring
-				List<Machine> newMachineList = (List<Machine>) machineService.getMachinesInCluster(clusterId);
-				for (Machine m: newMachineList) machineService.updateMachineConfigure(m.getId(), MachineService.MACHINE_CONFIGURE_NOT_STARTED);
-				
+				//machineService.updateMachineConfigure(lb.getId(), MachineService.MACHINE_CONFIGURE_NOT_STARTED);	
 			}
 		}
 		cluster.setNumberOfMachines(machines);
 		clusterService.updateCluster(cluster);
+		// Once creation is done force update on all machines. Needed for nodelist.conf from oi-healthmonitoring
+		List<Machine> updatedMachineList = (List<Machine>) machineService.getMachinesInCluster(clusterId);
+		for (Machine m: updatedMachineList) machineService.updateMachineConfigure(m.getId(), MachineService.MACHINE_CONFIGURE_NOT_STARTED);
+		
 		
 	/*	Collection<Cluster> clusterList = clusterService.getClusters(job.getInstanceId());
 		Iterator<Cluster> k = clusterList.iterator();
@@ -1550,4 +1532,5 @@ public class EC2Worker implements Worker {
 		}
 		return imageId;
 	}
+	
 }
