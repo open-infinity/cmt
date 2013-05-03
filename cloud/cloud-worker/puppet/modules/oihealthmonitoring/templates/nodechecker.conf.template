@@ -1,0 +1,50 @@
+[run]
+# Mode can be TEST or RUN
+# Test mode allows generation of nodelist with nodes listening to different ports
+mode = RUN
+#j
+# Standard log levels: debug, info, warn, erro
+log_level = debug
+log_file = <%=toas_monitoring_root%>/var/log/nodechecker.log
+udp_port = 11911
+
+# If set to "auto",  will find it from the system
+ip_address = auto
+host_name = auto
+
+# Master heartbeat period in seconds
+heartbeat_period = 10
+
+# Period of a rrd data scan in seconds
+rrd_scan_period = 15
+
+# Node is procalimed dead if rrd data is not received by this timeout in seconds
+# This should be bigger than rrd flush period at collectd
+dead_node_timeout = 200
+
+  
+[notifications]
+notifications_home = var/lib/notifications
+inbox_dir = inbox
+sent_dir = sent
+dead_node_string = has not been updated for
+
+
+[email]
+#subject = TOAS Health Monitoring Notification
+#from = <%=mail_from%>
+#to = <%=default_mail_recepient%>
+#smpt_server = <%=mail_host%>
+subject = TOAS Health Monitoring Notification
+from = k@t.com
+to = v@t.com
+smpt_server = s.com
+
+
+[collectd]
+rrd_dir = var/lib/collectd/rrd
+   
+   
+[test]
+dump_dir = dump
+

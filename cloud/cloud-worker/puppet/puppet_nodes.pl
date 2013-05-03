@@ -48,21 +48,25 @@ push(@class, "oibasic");
 #$sth->finish;
 #push(@class, "oiebs");
 #
-# Health monitoring
-#
 if (1) {
 	push(@class, "oihealthmonitoring");
 
 	# Query cluster members
-	my $sql = "select machine_private_dns_name from machine_tbl where machine_type = 'clustermember' and machine_cluster_id = $cluster";
+	my $sql = "select machine_private_dns_name from machine_tbl where machine_cluster_id = $cluster and machine_running > 0";
 	my $sth = $dbh->prepare($sql);
 	$sth->execute() or die "Error in SQL execute: $DBI::errstr";
 	my @addrlist;
+        my @datalist;
 	while(my @row = $sth->fetchrow_array) {
 		push(@addrlist, @row);
 	}
+        foreach (@addrlist) {
+                my $hostdata = $_;
+                $hostdata =~ s/\./-/g;
+                $hostdata = $_ . " " . "ip-" . $hostdata;
+                push(@datalist, $hostdata);
+        }
 	$sth->finish;
-
 	# Decide erb parameters
 	%hm_parameters = (
 		communication_iface => "eth0",
@@ -72,14 +76,12 @@ if (1) {
 		mail_from => "support.toas\@tieto.com",
 		mail_sender_cron_expression => "0 * * * * ? *",
 		default_mail_recepient => "dl.toaspaassupport\@tieto.com",
-		toas_collectd_root => "/opt/collectd",
-		toas_monitoring_root => "/opt/monitoring",
+		toas_collectd_root => "/opt/openinfinity/2.0.0/healthmonitoring/collectd",
+		toas_monitoring_root => "/opt/openinfinity/2.0.0/healthmonitoring/nodechecker",
 		cluster_member_addresses => \@addrlist,
+                cluster_member_data => \@datalist,
 	);
-	
-	
 }
-
 
 if($type eq "hmon0" || $type eq "hmon1" || $type eq "hmon2") {
 	push(@class, "oibas");

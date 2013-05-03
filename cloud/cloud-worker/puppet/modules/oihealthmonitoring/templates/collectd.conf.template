@@ -1,9 +1,10 @@
 #
-#
 # Config file for collectd(1).
 # Please read collectd.conf(5) for a list of options.
 # http://collectd.org/
 #
+
+# aaaaaaaaaaaaa 
 
 ##############################################################################
 # Global                                                                     #
@@ -13,12 +14,21 @@
 
 #Hostname    "localhost"
 FQDNLookup   true
-#BaseDir     "/usr/var/lib/collectd"
-#PIDFile     "/usr/var/run/collectd.pid"
-#PluginDir   "/usr/lib/collectd"
+#BaseDir     "${prefix}/var/lib/collectd"
+#PIDFile     "${prefix}/var/run/collectd.pid"
+#PluginDir   "${exec_prefix}/lib/collectd"
 TypesDB     "<%=toas_collectd_root%>/share/collectd/types.db"
 TypesDB     "<%=toas_collectd_root%>/share/collectd/types.db.monitoring"
+
+#----------------------------------------------------------------------------#
+# Interval at which to query values. This may be overwritten on a per-plugin #
+# base by using the 'Interval' option of the LoadPlugin block:               #
+#   <LoadPlugin foo>                                                         #
+#       Interval 60                                                          #
+#   </LoadPlugin>                                                            #
+#----------------------------------------------------------------------------#
 Interval     10
+
 Timeout      2
 ReadThreads  5
 
@@ -30,7 +40,7 @@ ReadThreads  5
 # accessed.                                                                  #
 ##############################################################################
 
-#LoadPlugin syslog
+LoadPlugin syslog
 LoadPlugin logfile
 
 <Plugin logfile>
@@ -44,6 +54,8 @@ LoadPlugin logfile
 #	LogLevel info
 #</Plugin>
 
+# blablabla
+Include "<%=toas_collectd_root%>/etc/collectd.d/"
 ##############################################################################
 # LoadPlugin section                                                         #
 #----------------------------------------------------------------------------#
@@ -54,74 +66,85 @@ LoadPlugin logfile
 # to missing dependencies or because they have been deactivated explicitly.  #
 ##############################################################################
 
-#LoadPlugin apache
+#LoadPlugin aggregation
+##LoadPlugin amqp
+##LoadPlugin apache
 #LoadPlugin apcups
 ##LoadPlugin apple_sensors
 ##LoadPlugin ascent
 #LoadPlugin battery
-#LoadPlugin bind
+##LoadPlugin bind
 #LoadPlugin conntrack
 #LoadPlugin contextswitch
 LoadPlugin cpu
 #LoadPlugin cpufreq
 #LoadPlugin csv
-#LoadPlugin curl
+##LoadPlugin curl
 ##LoadPlugin curl_json
-#LoadPlugin curl_xml
+##LoadPlugin curl_xml
 ##LoadPlugin dbi
 #LoadPlugin df
 LoadPlugin disk
-#LoadPlugin dns
+##LoadPlugin dns
 #LoadPlugin email
 #LoadPlugin entropy
+#LoadPlugin ethstat
 #LoadPlugin exec
 #LoadPlugin filecount
 #LoadPlugin fscache
 ##LoadPlugin gmond
 #LoadPlugin hddtemp
 LoadPlugin interface
-#LoadPlugin iptables
-#LoadPlugin ipmi
-##LoadPlugin ipvs
+##LoadPlugin iptables
+##LoadPlugin ipmi
+#LoadPlugin ipvs
 #LoadPlugin irq
 #LoadPlugin java
-#LoadPlugin libvirt
+##LoadPlugin libvirt
 LoadPlugin load
+##LoadPlugin lpar
 #LoadPlugin madwifi
 #LoadPlugin mbmon
+#LoadPlugin md
 ##LoadPlugin memcachec
 #LoadPlugin memcached
 LoadPlugin memory
 ##LoadPlugin modbus
 #LoadPlugin multimeter
-LoadPlugin mysql
+##LoadPlugin mysql
 ##LoadPlugin netapp
 ##LoadPlugin netlink
-LoadPlugin network
+#LoadPlugin network
 #LoadPlugin nfs
-#LoadPlugin nginx
+##LoadPlugin nginx
 ##LoadPlugin notify_desktop
 ##LoadPlugin notify_email
 #LoadPlugin ntpd
-#LoadPlugin nut
+#LoadPlugin numa
+##LoadPlugin nut
 #LoadPlugin olsrd
 ##LoadPlugin onewire
 #LoadPlugin openvpn
 ##LoadPlugin oracle
-#LoadPlugin perl
+##<LoadPlugin perl>
+##  Globals true
+##</LoadPlugin>
 ##LoadPlugin pinba
-#LoadPlugin ping
-#LoadPlugin postgresql
+##LoadPlugin ping
+##LoadPlugin postgresql
 #LoadPlugin powerdns
 #LoadPlugin processes
 #LoadPlugin protocols
-#LoadPlugin python
+##<LoadPlugin python>
+##  Globals true
+##</LoadPlugin>
+##LoadPlugin redis
 ##LoadPlugin routeros
 ##LoadPlugin rrdcached
 LoadPlugin rrdtool
-#LoadPlugin sensors
+##LoadPlugin sensors
 #LoadPlugin serial
-#LoadPlugin snmp
+##LoadPlugin snmp
 #LoadPlugin swap
 #LoadPlugin table
 #LoadPlugin tail
@@ -135,10 +158,14 @@ LoadPlugin rrdtool
 #LoadPlugin uptime
 #LoadPlugin users
 #LoadPlugin uuid
+##LoadPlugin varnish
 #LoadPlugin vmem
 #LoadPlugin vserver
 #LoadPlugin wireless
-#LoadPlugin write_http
+#LoadPlugin write_graphite
+##LoadPlugin write_http
+##LoadPlugin write_redis
+##LoadPlugin write_mongodb
 ##LoadPlugin xmms
 ##LoadPlugin zfs_arc
 
@@ -149,11 +176,47 @@ LoadPlugin rrdtool
 # ription of those options is available in the collectd.conf(5) manual page. #
 ##############################################################################
 
+#<Plugin "aggregation">
+#  <Aggregation>
+#    #Host "unspecified"
+#    Plugin "cpu"
+#    #PluginInstance "unspecified"
+#    Type "cpu"
+#    #TypeInstance "unspecified"
+#
+#    GroupBy "Host"
+#    GroupBy "TypeInstance"
+#
+#    CalculateNum false
+#    CalculateSum false
+#    CalculateAverage true
+#    CalculateMinimum false
+#    CalculateMaximum false
+#    CalculateStddev false
+#  </Aggregation>
+#</Plugin>
+
+#<Plugin "amqp">
+#  <Publish "name">
+#    Host "localhost"
+#    Port "5672"
+#    VHost "/"
+#    User "guest"
+#    Password "guest"
+#    Exchange "amq.fanout"
+#    RoutingKey "collectd"
+#    Persistent false
+#    StoreRates false
+#  </Publish>
+#</Plugin>
+
 #<Plugin apache>
-#	URL "http://localhost/status?auto"
-#	User "www-user"
-#	Password "secret"
-#	CACert "/etc/ssl/ca.crt"
+#  <Instance "local">
+#    URL "http://localhost/status?auto"
+#    User "www-user"
+#    Password "secret"
+#    CACert "/etc/ssl/ca.crt"
+#  </Instance>
 #</Plugin>
 
 #<Plugin apcups>
@@ -170,6 +233,7 @@ LoadPlugin rrdtool
 
 #<Plugin "bind">
 #  URL "http://localhost:8053/"
+#  ParseTime       false
 #  OpCodes         true
 #  QTypes          true
 #
@@ -188,7 +252,7 @@ LoadPlugin rrdtool
 #</Plugin>
 
 #<Plugin csv>
-#	DataDir "/usr/var/lib/collectd/csv"
+#	DataDir "${prefix}/var/lib/collectd/csv"
 #	StoreRates false
 #</Plugin>
 
@@ -301,10 +365,17 @@ LoadPlugin rrdtool
 #</Plugin>
 
 #<Plugin email>
-#	SocketFile "/usr/var/run/collectd-email"
+#	SocketFile "${prefix}/var/run/collectd-email"
 #	SocketGroup "collectd"
 #	SocketPerms "0770"
 #	MaxConns 5
+#</Plugin>
+
+#<Plugin ethstat>
+#	Interface "eth0"
+#	Map "rx_csum_offload_errors" "if_rx_errors" "checksum_offload"
+#	Map "multicast" "if_multicast"
+#	MappedOnly false
 #</Plugin>
 
 #<Plugin exec>
@@ -340,13 +411,6 @@ LoadPlugin rrdtool
 #<Plugin hddtemp>
 #  Host "127.0.0.1"
 #  Port "7634"
-#
-#  #----------------------------------------------------------------#
-#  # `TranslateDevicename' enables backwards compatibility behavior #
-#  # and is enabled by default. Setting this option to `false' is   #
-#  # highly recommended.                                            #
-#  #----------------------------------------------------------------#
-#  TranslateDevicename false
 #</Plugin>
 
 #<Plugin interface>
@@ -376,7 +440,7 @@ LoadPlugin rrdtool
 
 #<Plugin "java">
 #	JVMArg "-verbose:jni"
-#	JVMArg "-Djava.class.path=/usr/share/collectd/java/collectd-api.jar"
+#	JVMArg "-Djava.class.path=/home/vedran/work/toas/packaging/hm/collectd/collectd-5.2.1/install_dir/share/collectd/java/collectd-api.jar"
 #
 #	LoadPlugin "org.collectd.java.Foobar"
 #	<Plugin "org.collectd.java.Foobar">
@@ -392,6 +456,12 @@ LoadPlugin rrdtool
 #	InterfaceDevice "name:device"
 #	IgnoreSelected false
 #	HostnameFormat name
+#	InterfaceFormat name
+#</Plugin>
+
+#<Plugin lpar>
+#	CpuPoolStats   false
+#	ReportBySerial false
 #</Plugin>
 
 #<Plugin madwifi>
@@ -410,6 +480,11 @@ LoadPlugin rrdtool
 #	Port "411"
 #</Plugin>
 
+#<Plugin md>
+#	Device "/dev/md0"
+#	IgnoreSelected false
+#</Plugin>
+
 #<Plugin memcachec>
 #	<Page "plugin_instance">
 #		Server "localhost"
@@ -425,8 +500,10 @@ LoadPlugin rrdtool
 #</Plugin>
 
 #<Plugin memcached>
-#	Host "127.0.0.1"
-#	Port "11211"
+#	<Instance "local">
+#		Host "127.0.0.1"
+#		Port "11211"
+#	</Instance>
 #</Plugin>
 
 #<Plugin modbus>
@@ -449,16 +526,14 @@ LoadPlugin rrdtool
 #	</Host>
 #</Plugin>
 
-# Notice, this plugin monitors database, not saves data into it
-<Plugin mysql>
-	<Database test>
-		Host "localhost"
-		User "test"
-		Password ""
-		Database "test"
-		Socket "/opt/openinfinity/mariadb/data/mysql.sock"
+#<Plugin mysql>
+#	<Database db_name>
+#		Host "database.serv.er"
+#		User "db_user"
+#		Password "secret"
+#		Database "db_name"
 #		MasterStats true
-	</Database>
+#	</Database>
 #
 #	<Database db_name2>
 #		Host "localhost"
@@ -466,7 +541,7 @@ LoadPlugin rrdtool
 #		SlaveStats true
 #		SlaveNotifications true
 #	</Database>
-</Plugin>
+#</Plugin>
 
 #<Plugin netapp>
 #	<Host "netapp1.example.com">
@@ -532,7 +607,7 @@ LoadPlugin rrdtool
 #<Plugin network>
 #	# client setup:
 #	Server "ff18::efc0:4a42" "25826"
-#	<Server "192.168.133.131" "25826">
+#	<Server "239.192.74.66" "25826">
 #		SecurityLevel Encrypt
 #		Username "user"
 #		Password "secret"
@@ -588,6 +663,7 @@ LoadPlugin rrdtool
 #	Host "localhost"
 #	Port 123
 #	ReverseLookups false
+#	IncludeUnitID true
 #</Plugin>
 
 #<Plugin nut>
@@ -690,6 +766,11 @@ LoadPlugin rrdtool
 #			ValuesFrom "count"
 #		</Result>
 #	</Query>
+#	<Writer sqlstore>
+#		# See contrib/postgresql/collectd_insert.sql for details
+#		Statement "SELECT collectd_insert($1, $2, $3, $4, $5, $6, $7, $8, $9);"
+#		StoreRates true
+#	</Writer>
 #	<Database foo>
 #		Host "hostname"
 #		Port "5432"
@@ -704,6 +785,12 @@ LoadPlugin rrdtool
 #		Service "service_name"
 #		Query backend # predefined
 #		Query rt36_tickets
+#	</Database>
+#	<Database qux>
+#		Service "collectd_store"
+#		Writer sqlstore
+#		# see collectd.conf(5) for details
+#		CommitInterval 30
 #	</Database>
 #</Plugin>
 
@@ -741,6 +828,14 @@ LoadPlugin rrdtool
 #	</Module>
 #</Plugin>
 
+#<Plugin redis>
+#   <Node example>
+#      Host "redis.example.com"
+#      Port "6379"
+#      Timeout 2000
+#   </Node>
+#</Plugin>
+
 #<Plugin routeros>
 #	<Router>
 #		Host "router.example.com"
@@ -758,19 +853,19 @@ LoadPlugin rrdtool
 
 #<Plugin rrdcached>
 #	DaemonAddress "unix:/tmp/rrdcached.sock"
-#	DataDir "/usr/var/lib/collectd/rrd"
+#	DataDir "${prefix}/var/lib/collectd/rrd"
 #	CreateFiles true
 #	CollectStatistics true
 #</Plugin>
-Include "<%=toas_collectd_root%>/etc/collectd.d/"
 
 <Plugin rrdtool>
-	DataDir "/opt/collectd/usr/var/lib/collectd/rrd"
+	DataDir "/opt/openinfinity/2.0.0/healthmonitoring/collectd/var/lib/collectd/rrd"
 	CacheTimeout 120
 	CacheFlush   900
 </Plugin>
 
 #<Plugin sensors>
+#	SensorConfigFile "/etc/sensors.conf"
 #	Sensor "it8712-isa-0290/temperature-temp1"
 #	Sensor "it8712-isa-0290/fanspeed-fan3"
 #	Sensor "it8712-isa-0290/voltage-in8"
@@ -817,6 +912,11 @@ Include "<%=toas_collectd_root%>/etc/collectd.d/"
 #       Collect "powerplus_voltge_input"
 #       Interval 300
 #   </Host>
+#</Plugin>
+
+#<Plugin "swap">
+#	ReportByDevice false
+#	ReportBytes true
 #</Plugin>
 
 #<Plugin "table">
@@ -886,17 +986,51 @@ Include "<%=toas_collectd_root%>/etc/collectd.d/"
 #</Plugin>
 
 #<Plugin unixsock>
-#	SocketFile "/usr/var/run/collectd-unixsock"
+#	SocketFile "/home/vedran/work/toas/packaging/hm/collectd/collectd-5.2.1/install_dir/var/run/collectd-unixsock"
 #	SocketGroup "collectd"
 #	SocketPerms "0660"
+#	DeleteSocket false
 #</Plugin>
 
 #<Plugin uuid>
 #	UUIDFile "/etc/uuid"
 #</Plugin>
 
+#<Plugin varnish>
+#   This tag support an argument if you want to
+#   monitor the local instance just use </Instance>
+#   If you prefer defining another instance you can do
+#   so by using <Instance "myinstance">
+#   <Instance>
+#      CollectCache true
+#      CollectBackend true
+#      CollectConnections true
+#      CollectSHM true
+#      CollectESI false
+#      CollectFetch false
+#      CollectHCB false
+#      CollectSMA false
+#      CollectSMS false
+#      CollectSM false
+#      CollectTotals false
+#      CollectWorkers false
+#   </Instance>
+#</Plugin>
+
 #<Plugin vmem>
 #	Verbose false
+#</Plugin>
+
+#<Plugin write_graphite>
+#  <Carbon>
+#    Host "localhost"
+#    Port "2003"
+#    Prefix "collectd"
+#    Postfix "collectd"
+#    StoreRates false
+#    AlwaysAppendDS false
+#    EscapeCharacter "_"
+#  </Carbon>
 #</Plugin>
 
 #<Plugin write_http>
@@ -909,6 +1043,23 @@ Include "<%=toas_collectd_root%>/etc/collectd.d/"
 #		Format "Command"
 #		StoreRates false
 #	</URL>
+#</Plugin>
+
+#<Plugin write_redis>
+#	<Node "example">
+#		Host "localhost"
+#		Port "6379"
+#		Timeout 1000
+#	</Node>
+#</Plugin>
+
+#<Plugin write_mongodb>
+#	<Node "example">
+#		Host "localhost"
+#		Port "27017"
+#		Timeout 1000
+#		StoreRates false
+#	</Node>
 #</Plugin>
 
 ##############################################################################
@@ -931,6 +1082,7 @@ Include "<%=toas_collectd_root%>/etc/collectd.d/"
 #LoadPlugin target_replace
 #LoadPlugin target_scale
 #LoadPlugin target_set
+#LoadPlugin target_v5upgrade
 
 #----------------------------------------------------------------------------#
 # The following block demonstrates the default behavior if no filtering is   #
@@ -940,3 +1092,53 @@ Include "<%=toas_collectd_root%>/etc/collectd.d/"
 #<Chain "PostCache">
 #  Target "write"
 #</Chain>
+
+##############################################################################
+# Threshold configuration                                                    #
+#----------------------------------------------------------------------------#
+# The following outlines how to configure collectd's threshold checking      #
+# plugin. The plugin and possible configuration options are documented in    #
+# the collectd-threshold(5) manual page.                                     #
+##############################################################################
+
+#LoadPlugin "threshold"
+#<Plugin "threshold">
+#  <Type "foo">
+#    WarningMin    0.00
+#    WarningMax 1000.00
+#    FailureMin    0.00
+#    FailureMax 1200.00
+#    Invert false
+#    Instance "bar"
+#  </Type>
+#
+#  <Plugin "interface">
+#    Instance "eth0"
+#    <Type "if_octets">
+#      FailureMax 10000000
+#      DataSource "rx"
+#    </Type>
+#  </Plugin>
+#
+#  <Host "hostname">
+#    <Type "cpu">
+#      Instance "idle"
+#      FailureMin 10
+#    </Type>
+#
+#    <Plugin "memory">
+#      <Type "memory">
+#        Instance "cached"
+#        WarningMin 100000000
+#      </Type>
+#    </Plugin>
+#
+#    <Type "load">
+#    	DataSource "midterm"
+#    	FailureMax 4
+#    	Hits 3
+#    	Hysteresis 3
+#    </Type>
+#  </Host>
+#</Plugin>
+
