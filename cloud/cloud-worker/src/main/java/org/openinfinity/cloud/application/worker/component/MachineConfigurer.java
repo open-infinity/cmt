@@ -77,6 +77,10 @@ public class MachineConfigurer implements Configurer {
 	@Qualifier("cloudCredentials")
 	private AWSCredentials eucaCredentials;
 	
+	@Autowired
+	@Qualifier("amazonCredentials")
+	private AWSCredentials amazonCredentials;
+	
 	@Async
 	public void configure(Machine m) {
 		String threadName = Thread.currentThread().getName();
@@ -86,10 +90,13 @@ public class MachineConfigurer implements Configurer {
 		Key k = keyService.getKeyByInstanceId(instance.getInstanceId());
 		
 		EC2Wrapper ec2 = new EC2Wrapper();
-		String endPoint = PropertyManager.getProperty("cloudadmin.worker.eucalyptus.endpoint");
+		
 		if(m.getCloud() == InstanceService.CLOUD_TYPE_AMAZON) {
-			// TODO
+			String endPoint = PropertyManager.getProperty("cloudadmin.worker.amazon.endpoint");
+			ec2.setEndpoint(endPoint);
+			ec2.init(amazonCredentials, m.getCloud());
 		} else if(m.getCloud() == InstanceService.CLOUD_TYPE_EUCALYPTUS) {
+			String endPoint = PropertyManager.getProperty("cloudadmin.worker.eucalyptus.endpoint");
 			ec2.setEndpoint(endPoint);
 			ec2.init(eucaCredentials, m.getCloud());
 		}
@@ -195,15 +202,20 @@ public class MachineConfigurer implements Configurer {
 		final byte[] emptyPassPhrase = new byte[0];
 		JSch jsch = new JSch();
 		try {
-			jsch.addIdentity("root", privkey, null, emptyPassPhrase);
-			Session session = jsch.getSession("root", m.getDnsName(), 22);
+			jsch.addIdentity(m.getUserName(), privkey, null, emptyPassPhrase);
+			Session session = jsch.getSession(m.getUserName(), m.getDnsName(), 22);
 			Properties config = new Properties();
 			config.put("StrictHostKeyChecking", "no");
 			session.setConfig(config);
 			LOG.info(threadName+": Connecting with ssh to "+m.getDnsName());
 			
 			session.connect();
-			String command = "/usr/bin/puppet agent --test --no-daemonize --onetime --certname ";
+			String command = null;
+			if(m.getCloud() == InstanceService.CLOUD_TYPE_AMAZON) {
+				command = "sudo /usr/bin/puppet agent --test --no-daemonize --onetime --certname ";
+			} else {
+				command = "/usr/bin/puppet agent --test --no-daemonize --onetime --certname ";
+			}
 			command += instance.getInstanceId()+"_";
 			command += c.getId()+"_";
 			command += m.getId()+"_";

@@ -89,12 +89,14 @@ public class EC2Wrapper {
 		
 	public EC2Wrapper(){}
 	
-	public EC2Wrapper(String aEndpoint, int aCloudType, AWSCredentials eucaCredentials){
+	public EC2Wrapper(String aEndpoint, int aCloudType, AWSCredentials credentials){
 		if(aCloudType == InstanceService.CLOUD_TYPE_AMAZON) {
-			this.init(eucaCredentials, aCloudType);
+			//endpoint = "ec2.eu-west-1.amazonaws.com";
+			endpoint = aEndpoint;
+			this.init(credentials, aCloudType);
 		} else if(aCloudType == InstanceService.CLOUD_TYPE_EUCALYPTUS) {
 			endpoint = aEndpoint;
-			this.init(eucaCredentials, aCloudType);
+			this.init(credentials, aCloudType);
 		}
 		cloudType = aCloudType;	
 	}
@@ -114,7 +116,7 @@ public class EC2Wrapper {
 				if (cloudType == CLOUD_TYPE_AMAZON) {
 					LOG.info("Credentials: "+credentials.getAWSAccessKeyId()+", "+credentials.getAWSSecretKey());
 					ec2 = new AmazonEC2Client(credentials);
-					ec2.setEndpoint("ec2.eu-west-1.amazonaws.com");
+					ec2.setEndpoint(endpoint);
 				} else if (cloudType == CLOUD_TYPE_EUCALYPTUS) {
 					LOG.info("Credentials: "+credentials.getAWSAccessKeyId()+", "+credentials.getAWSSecretKey());
 					ec2 = new AmazonEC2Client(credentials);

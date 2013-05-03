@@ -62,6 +62,10 @@ public class MachineUpdater implements Updater {
 	@Qualifier("cloudCredentials")
 	AWSCredentials eucaCredentials;
 	
+	@Autowired
+	@Qualifier("amazonCredentials")
+	private AWSCredentials amazonCredentials;
+	
 	@Async
 	public void update(Collection<Machine> mList, int cloud) {
 		String threadName = Thread.currentThread().getName();
@@ -72,13 +76,16 @@ public class MachineUpdater implements Updater {
 			Machine m = i.next();
 			instanceList.add(m.getInstanceId());
 		}
-		String endPoint = PropertyManager.getProperty("cloudadmin.worker.eucalyptus.endpoint");
+		
 		EC2Wrapper ec2 = new EC2Wrapper();
 		LOG.debug(threadName + ": Got credentials, initing ec2 connection");
 		try {
 			if (cloud == InstanceService.CLOUD_TYPE_AMAZON) {
-				// TODO
+				String endPoint = PropertyManager.getProperty("cloudadmin.worker.amazon.endpoint");
+				ec2.setEndpoint(endPoint);
+				ec2.init(amazonCredentials, cloud);
 			} else if (cloud == InstanceService.CLOUD_TYPE_EUCALYPTUS) {
+				String endPoint = PropertyManager.getProperty("cloudadmin.worker.eucalyptus.endpoint");
 				ec2.setEndpoint(endPoint);
 				ec2.init(eucaCredentials, cloud);
 			}
