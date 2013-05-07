@@ -13,14 +13,14 @@ ip_address = auto
 host_name = auto
 
 # Master heartbeat period in seconds
-heartbeat_period = 10
+heartbeat_period = 30
 
 # Period of a rrd data scan in seconds
-rrd_scan_period = 15
+rrd_scan_period = 60
 
 # Node is procalimed dead if rrd data is not received by this timeout in seconds
 # This should be bigger than rrd flush period at collectd
-dead_node_timeout = 200
+dead_node_timeout = 300
 
   
 [notifications]
