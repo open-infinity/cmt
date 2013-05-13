@@ -1,9 +1,5 @@
 class oihealthmonitoring::install {
-# Cronie is installed by oibackup
-#    package { ["cronie"]:
-#        ensure => installed,
-#    }
-    package { ["balance"]:
+    package { ["Pound"]:
         ensure => installed,
 	require => Class["oibasic"]
     }
@@ -15,5 +11,10 @@ class oihealthmonitoring::install {
         ensure => installed,
         require => Class["oibasic"]
     }
+    package { ["rrd-http-server"]:
+        ensure => installed,
+        require => Class["oibasic"]
+    }
+
 }
 

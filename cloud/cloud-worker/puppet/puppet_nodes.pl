@@ -77,6 +77,7 @@ if (1) {
 		mail_sender_cron_expression => "0 * * * * ? *",
 		default_mail_recepient => "dl.toaspaassupport\@tieto.com",
 		toas_collectd_root => "/opt/openinfinity/2.0.0/healthmonitoring/collectd",
+                toas_rrd_http_server_root => "/opt/openinfinity/2.0.0/healthmonitoring/rrd-http-server",
 		toas_monitoring_root => "/opt/openinfinity/2.0.0/healthmonitoring/nodechecker",
 		cluster_member_addresses => \@addrlist,
                 cluster_member_data => \@datalist,
