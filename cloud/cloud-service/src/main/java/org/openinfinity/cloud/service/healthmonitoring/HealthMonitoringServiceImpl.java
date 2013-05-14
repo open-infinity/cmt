@@ -129,7 +129,8 @@ public class HealthMonitoringServiceImpl implements HealthMonitoringService {
     						for(Node node : allNodes) { 
     							if (!groupMachineMap.containsKey(node.getGroupName()))
     								groupMachineMap.put(node.getGroupName(),machine.getDnsName());
-    							hostnameIpMap.put(node.getNodeName(), node.getIpAddress());
+    							//hostnameIpMap.put(node.getNodeName(), node.getIpAddress());
+    							hostnameIpMap.put(node.getNodeName(), machine.getDnsName());
     						}                   
     						break;
     					} else {
