@@ -21,10 +21,10 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.HttpClient;
@@ -80,7 +80,7 @@ public class HealthMonitoringServiceImpl implements HealthMonitoringService {
 	private static final String CONTEXT_PATH = "monitoring";
 	private static final String PROTOCOL = "http://";
     
-    private Map<Integer,String> clusterMasterMap = new HashMap<Integer,String>();
+	private Map<Integer,String> clusterMasterMap = new ConcurrentHashMap<Integer,String>();
 	private List<Machine> badMachines = new ArrayList<Machine>();
 	private List <Cluster> badClusters = new ArrayList<Cluster>();
     private Map<String,String> groupMachineMap = new HashMap<String,String>();
@@ -319,7 +319,12 @@ public class HealthMonitoringServiceImpl implements HealthMonitoringService {
     public GroupListResponse getGroupList() {
     	GroupListResponse finalGroupListResponse = new GroupListResponse();
 		finalGroupListResponse.setGroups(new HashMap<String, Set<String>>());
-		Collection<String> masterMachines = clusterMasterMap.values();
+
+		Collection<String> masterMachines =new ArrayList<String>();
+        for (String machine:clusterMasterMap.values()){
+            masterMachines.add(machine);
+        }
+        
 		for(String sourceName : masterMachines) {
 	        String url = getRequestBuilder(sourceName).buildGroupListRequest(new Request());
 	        String response = HttpHelper.executeHttpRequest(client, url);
@@ -342,7 +347,11 @@ public class HealthMonitoringServiceImpl implements HealthMonitoringService {
     	NotificationResponse finalNotificationResponse = new NotificationResponse();
     	List<Notification> notifications = new ArrayList<Notification>(); 	
     	finalNotificationResponse.setNotifications(notifications);
-		Collection<String> masterMachines = clusterMasterMap.values();
+    	
+    	Collection<String> masterMachines=new ArrayList<String>();
+        for (String machine:clusterMasterMap.values()){
+            masterMachines.add(machine);
+        }
 		for(String sourceName : masterMachines) {
 	    	// Nishant : Create request builder object dynamically for the machine for which notifications are required.
 			//****************************************************
