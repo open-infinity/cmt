@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -320,8 +321,6 @@ public class HealthMonitoringServiceImpl implements HealthMonitoringService {
 		finalGroupListResponse.setGroups(new HashMap<String, Set<String>>());
 		Collection<String> masterMachines = clusterMasterMap.values();
 		for(String sourceName : masterMachines) {
-			// Nishant : Create request builder object dynamically for the machine for which group and host name listing is required.
-			//****************************************************
 	        String url = getRequestBuilder(sourceName).buildGroupListRequest(new Request());
 	        String response = HttpHelper.executeHttpRequest(client, url);
 			
@@ -363,10 +362,14 @@ public class HealthMonitoringServiceImpl implements HealthMonitoringService {
 			@Override
 			public int compare(Notification n1, Notification n2) {
 				// TODO Auto-generated method stub
-				return n1.getTime().compareTo(n2.getTime());
-			}
-			
+				return n1.getFileModificationTime().compareTo(n2.getFileModificationTime());
+			}			
 		};
+		
+		//List<Notification> nonEmptyNotifications = finalNotificationResponse.getNotifications();
+		//for (Iterator<?> it = nonEmptyNotifications.iterator(); it.hasNext();)
+	    //    if ((it.next() == null)) it.remove();
+		//finalNotificationResponse.setNotifications(nonEmptyNotifications);
 		Collections.sort(finalNotificationResponse.getNotifications(), notificationsComparator);
 		Collections.reverse(finalNotificationResponse.getNotifications());
 		return finalNotificationResponse;
