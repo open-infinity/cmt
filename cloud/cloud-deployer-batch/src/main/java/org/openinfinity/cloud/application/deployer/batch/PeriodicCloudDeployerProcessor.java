@@ -72,7 +72,7 @@ public class PeriodicCloudDeployerProcessor implements ItemProcessor<DeploymentS
 			InputStream inputStream = deployerService.load(bucketName, key);
 			//deploymentStatus.getDeployment().setInputStream(inputStream);
 			deploymentStatus.setInputStream(inputStream);
-			LOGGER.trace("Deployment status of [" + deploymentStatus.getId() + "] and machineId ["+deploymentStatus.getMachineId()+"] continued with reading deployment key (S3 key) ["+ deploymentStatus.getDeployment().getName() +"] and organization id (S3 bucket name) [" + deploymentStatus.getDeployment().getClusterId() + "]. Connection to S3 has been established and inputstream ["+inputStream+"]found for software asset.");
+			LOGGER.trace("Deployment status of [" + deploymentStatus.getId() + "] and machineId ["+deploymentStatus.getMachineId()+"] continued with reading deployment key (S3 key) ["+ deploymentStatus.getDeployment().getName() +"] and organization id (S3 bucket name) [" + deploymentStatus.getDeployment().getClusterId() + "]. Connection to S3 has been established and inputstream found for software asset.");
 			
 			break;
 		}

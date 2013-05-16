@@ -95,28 +95,6 @@ public class PeriodicCloudDeployerReader implements ItemReader<DeploymentStatus>
 			//LOGGER.debug("There are [" + deployments.size() + "] deployment  for organization ["+instance.getOrganizationid()+"]. Processing instance <"+instance.getInstanceId()+">.");
 			
 			for (Deployment deployment : deployments) {
-	
-/*
-				// TODO - check if deployment is undeployed/to be undeployed
-				// TODO - check if deployment is deleted/to be deleted
-				if (deployment.getState()==DeployerService.DEPLOYMENT_STATE_UNDEPLOY) {
-					// check if all deploymentstatuses are already handled and update deployment state if so
-					// deployerService.
-
-					LOGGER.debug("Deployment with UNDEPLOY status found. DeploymentId ["+deployment.getId()+"]. Processing instance <"+instance.getInstanceId()+">.");
-					
-					// set all deploymentStatuses for DEPLOYED AND NOT_DEPLOYED to DEPLOYMENT_STATE_UNDEPLOY 
-					deployerService.updateDeploymentStatusStatesFromToByDeploymentId(DeploymentStatus.DeploymentState.DEPLOYED, 
-							DeploymentStatus.DeploymentState.UNDEPLOY, deployment.getId());
-					LOGGER.debug("DeploymentStatuses in state DEPLOYED for deployment ["+deployment.getId()+"] updated to UNDEPLOY.");
-
-					// it should be safe to update NOT_DEPLOYED states straight to UNDEPLOYED
-					deployerService.updateDeploymentStatusStatesFromToByDeploymentId(DeploymentStatus.DeploymentState.NOT_DEPLOYED, 
-							DeploymentStatus.DeploymentState.UNDEPLOYED, deployment.getId());				
-					LOGGER.debug("DeploymentStatuses in state NOT_DEPLOYED for deployment ["+deployment.getId()+"] updated to UNDEPLOYED.");
-					
-				}
-*/
 				
 				// TODO: verify that deleted instances and clusters are taken into account in deploymentstatus processing
 				// when instance is deleted when cluster is also
