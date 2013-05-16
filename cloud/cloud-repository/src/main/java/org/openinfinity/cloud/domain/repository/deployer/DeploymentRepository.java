@@ -71,6 +71,22 @@ public interface DeploymentRepository {
 	Deployment loadById(int id);
 	
 	/**
+	 * Update deployment status object.
+	 */
+	void updateDeploymentStateById(int deploymentId, int state);
+
+	/**
+	 * Update deployment status object.
+	 */
+	void updateDeploymentStateByOrganizationIdAndName(int organizationId, String name, int state);
+	
+	/**
+	 * Update DeploymentStatus object states.
+	 */	
+	void updateDeploymentStatusStatesFromToByDeploymentId(int from, int to, int deploymentId);
+	
+	
+	/**
 	 * Deletes id based on <code>org.openinfinity.core.cloud.domain.Deployment</code> object.
 	 * 
 	 * @param deployment Represents the <code>org.openinfinity.core.cloud.domain.Deployment</code> object for deletion.

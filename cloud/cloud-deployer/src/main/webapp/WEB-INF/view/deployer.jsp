@@ -55,9 +55,9 @@ label {
 		<input id="instanceId" name="instanceId" type="hidden" />
 		<input id="organizationId" name="organizationId" type="hidden" />
 		<input id="clusterId" name="clusterId" type="hidden" />
-		<p id="phase">Choose organization for deployment (1/6 steps).</p>
+		<p id="phase">Choose organization for deployment (1/6 steps). TEST</p>
 		<p id="organizations">
-		<b>Choose organization</b>
+		<b>Choose organization TEST</b>
 		<br /><br />
 		<c:forEach items="${organizationMap}" var="organization">
 			<input id="${organization.key}" name="${organization.key}" path="organizationSelection" type="checkbox" style="display:none;" value="1"/>
@@ -90,6 +90,7 @@ label {
 
 	<table id="deploymentTable"></table>
 	<div id="deploymentPager"></div>
+	<br /> <a href="#" id="undeploy_deployment">Undeploy deployment</a> <br /> <a href="#" id="delete_deployment">Delete deployment</a> <br />	
 	
 	<script type="text/javascript">
 	
@@ -172,6 +173,7 @@ label {
 		});
 
 		var deploymentColModel =[
+		    {name:'id',index:'id', width:70, align:"center"},
         	{name:'organization',index:'organization', width:120, align:"center"},
         	{name:'organizationId',index:'organization', width:90, align:"center"},
         	{name:'instance',index:'instance', width:100, align:"center"},
@@ -182,7 +184,7 @@ label {
         	{name:'state',index:'state', width:70, align:"center"},
         	{name:'formattedTime',index:'formattedTime', width:120, align:"center"}  
         ];
-		var deploymentColNames = ['organization', 'organizationId','instance', 'instanceId', 'cluster', 'clusterId', 'name', 'state', 'time'];
+		var deploymentColNames = ['id', 'organization', 'organizationId','instance', 'instanceId', 'cluster', 'clusterId', 'name', 'state', 'time'];
 		
 		function loadTable(){
 			jQuery("#deploymentTable").jqGrid({
@@ -190,7 +192,7 @@ label {
 				datatype: "json",
 				jsonReader : {
 					repeatitems : 	false,
-					id: 			"organizationId",
+					id: 			"id",
 					root : 			function(obj) {return obj.rows;},
 					page : 			function(obj) {return obj.page;},
 					total : 		function(obj) {return obj.total;},
@@ -206,12 +208,41 @@ label {
 				viewrecords: true,
 				sortorder: 'desc',
 				shrinkToFit:false,
+				ondblClickRow: function(id){ alert("You double click row with id: "+id);},				
 			   	caption: "Existing deployments"
 			});
-		$("#deploymentTable").jqGrid('navGrid','#deploymentPager',{edit:false,add:false,del:false});
+			$("#deploymentTable").jqGrid('navGrid','#deploymentPager',{edit:false,add:false,del:false});
+			jQuery("#undeploy_deployment").click( function(){ 
+				var id = jQuery("#deploymentTable").jqGrid('getGridParam','selrow'); 
+				if (id) { 
+ 				  	var ret = jQuery("#deploymentTable").jqGrid('getRowData',id); 
+ 				  	var name = ret.name;				  	
+					var url = '<portlet:resourceURL id="undeployDeployment"/>&deploymentName='+name+"&deploymentId="+id;
+					   $.getJSON(url, function(data) {
+						alert("Deployment <"+id+"> undeployed with name="+name+"..."); 
+					   });				
+				} else { 
+					alert("Please select row");
+				} 
+			}); 
+			jQuery("#delete_deployment").click( function(){ 
+				var id = jQuery("#deploymentTable").jqGrid('getGridParam','selrow'); 
+				if (id) { 
+					var ret = jQuery("#deploymentTable").jqGrid('getRowData',id); 
+					var url = '<portlet:resourceURL id="deleteDeployment"/>&deploymentId='+id;
+					   $.getJSON(url, function(data) {
+						alert("Delete not supported yet. Nothing done to deployment <"+id+">, name="+ret.name+"..."); 
+					   });				
+				} else { 
+					alert("Please select row");
+				} 
+			}); 
+			
+			
 		}
 		
 		loadTable();
+		
 	});
 	
 	function switchState(toState){

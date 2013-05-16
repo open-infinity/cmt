@@ -64,6 +64,12 @@ public class DeployerServiceImpl implements DeployerService {
 		deploymentRepository.store(deployment);
 		return deployment;
 	}
+
+	@Log
+	public Deployment loadDeploymentById(int deploymentId) {
+		return deploymentRepository.loadById(deploymentId);
+	}
+		
 	
 	@Log
 	public Collection<Deployment> loadDeployments() {
@@ -91,6 +97,23 @@ public class DeployerServiceImpl implements DeployerService {
 		Collection<Cluster> clusters = clusterRepository.getClusters(instanceId);
 		return Collections.unmodifiableCollection(clusters);
 	}
+	
+	@Log
+	public void updateDeploymentState(Deployment deployment) {
+		deploymentRepository.updateDeploymentStateById(deployment.getId(), deployment.getState());
+	}
+	
+	@Log
+	public void updateDeployment(Deployment deployment) {
+		// store should both handle add and update ?
+		//deploymentRepository.store(deployment);
+	}
+	
+	@Log
+	public void updateDeploymentStatusStatesFromToByDeploymentId(DeploymentStatus.DeploymentState from, DeploymentStatus.DeploymentState to, int deploymentId) {		
+		deploymentRepository.updateDeploymentStatusStatesFromToByDeploymentId(from.getValue(), to.getValue(), deploymentId);
+	}
+		
 	
 	@Log
 	public void rollback(Deployment deployment) {

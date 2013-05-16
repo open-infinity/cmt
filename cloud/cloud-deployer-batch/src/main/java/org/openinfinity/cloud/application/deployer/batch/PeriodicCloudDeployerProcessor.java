@@ -44,8 +44,24 @@ public class PeriodicCloudDeployerProcessor implements ItemProcessor<DeploymentS
 	DeployerService deployerService;
 	
 	public DeploymentStatus process(DeploymentStatus deploymentStatus) throws Exception {
-		if (deploymentStatus.getDeploymentState()!=DeploymentState.TERMINATED) {	// skip deployment to terminated machines, just leave for writer for updating state to db
-			LOGGER.info("Processing of deployment with deployment status [" + deploymentStatus.getId() + "] and machineId ["+deploymentStatus.getMachineId()+"] started.");
+		
+		switch (deploymentStatus.getDeploymentState()) {
+		case TERMINATED:
+			// skip deployment to terminated machines, just leave for writer for updating state to db
+			LOGGER.info("Processing of deployment with deployment status [" + deploymentStatus.getId() + "] and machineId ["+deploymentStatus.getMachineId()+"] started. State is TERMINATED, passing to writer without modifications.");						
+			break;
+		case UNDEPLOYED:
+			// skip undeployed machines, just leave for writer for updating state to db
+			LOGGER.info("Processing of deployment with deployment status [" + deploymentStatus.getId() + "] and machineId ["+deploymentStatus.getMachineId()+"] started. State is UNDEPLOYED, passing to writer without modifications.");			
+			break;
+		case UNDEPLOY:
+			// skip setting of inputstream for deployment statuses for undeployment
+			LOGGER.info("Processing of deployment with deployment status [" + deploymentStatus.getId() + "] and machineId ["+deploymentStatus.getMachineId()+"] started. State is UNDEPLOY, passing to writer without modifications.");			
+			break;
+
+		default:
+			// set inputstream for deployments
+			LOGGER.info("Processing of deployment with deployment status [" + deploymentStatus.getId() + "] and machineId ["+deploymentStatus.getMachineId()+"] started. Setting inputstream for deployment status.");
 			if (deploymentStatus.getDeployment().getInputStream()!=null) {
 				LOGGER.info("Beware! Stream is not null for deployment status [" + deploymentStatus.getId() + "] and machineId ["+deploymentStatus.getMachineId()+"] started. Skipping opening.");
 				return deploymentStatus;
@@ -56,9 +72,27 @@ public class PeriodicCloudDeployerProcessor implements ItemProcessor<DeploymentS
 			InputStream inputStream = deployerService.load(bucketName, key);
 			//deploymentStatus.getDeployment().setInputStream(inputStream);
 			deploymentStatus.setInputStream(inputStream);
-			LOGGER.trace("Deployment status of [" + deploymentStatus.getId() + "] and machineId ["+deploymentStatus.getMachineId()+"] continued with reading deployment key (S3 key) ["+ deploymentStatus.getDeployment().getName() +"] and organization id (S3 bucket name) [" + deploymentStatus.getDeployment().getClusterId() + "]. Connection to S3 has been established and inputstream found for software asset.");
-		}	
+			LOGGER.trace("Deployment status of [" + deploymentStatus.getId() + "] and machineId ["+deploymentStatus.getMachineId()+"] continued with reading deployment key (S3 key) ["+ deploymentStatus.getDeployment().getName() +"] and organization id (S3 bucket name) [" + deploymentStatus.getDeployment().getClusterId() + "]. Connection to S3 has been established and inputstream ["+inputStream+"]found for software asset.");
+			
+			break;
+		}
 		return deploymentStatus;		
+		
+//		if (deploymentStatus.getDeploymentState()!=DeploymentState.TERMINATED) {	
+//			LOGGER.info("Processing of deployment with deployment status [" + deploymentStatus.getId() + "] and machineId ["+deploymentStatus.getMachineId()+"] started.");
+//			if (deploymentStatus.getDeployment().getInputStream()!=null) {
+//				LOGGER.info("Beware! Stream is not null for deployment status [" + deploymentStatus.getId() + "] and machineId ["+deploymentStatus.getMachineId()+"] started. Skipping opening.");
+//				return deploymentStatus;
+//			}
+//			String bucketName = "" + deploymentStatus.getDeployment().getClusterId();
+//			String key = deploymentStatus.getDeployment().getName();
+//			LOGGER.debug("Deployment status of [" + deploymentStatus.getId() + "] and machineId ["+deploymentStatus.getMachineId()+"] continued with reading deployment key (S3 key) ["+ deploymentStatus.getDeployment().getName() +"] and organization id (S3 bucket name) [" + deploymentStatus.getDeployment().getClusterId() + "].");
+//			InputStream inputStream = deployerService.load(bucketName, key);
+//			//deploymentStatus.getDeployment().setInputStream(inputStream);
+//			deploymentStatus.setInputStream(inputStream);
+//			LOGGER.trace("Deployment status of [" + deploymentStatus.getId() + "] and machineId ["+deploymentStatus.getMachineId()+"] continued with reading deployment key (S3 key) ["+ deploymentStatus.getDeployment().getName() +"] and organization id (S3 bucket name) [" + deploymentStatus.getDeployment().getClusterId() + "]. Connection to S3 has been established and inputstream found for software asset.");
+//		}	
+//		return deploymentStatus;		
 		
 	}	
 	

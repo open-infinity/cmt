@@ -55,7 +55,7 @@
 		<property name="fileSystemGroup" value="toas" />
 		<property name="pathToDeploymentDirectoryMap">
 			<map key-type="java.lang.String" value-type="java.lang.String">
-				<entry key="0" value="/opt/openinfinity/2.0.0/tomcat/deploy/"/>
+				<entry key="0" value="/opt/openinfinity/2.0.0/deploy/"/>
 				<entry key="1" value="/opt/openinfinity/2.0.0/tomcat/apache-tomcat-7.0.27/webapps"/>
 				<entry key="2" value="/opt/openinfinity/2.0.0/tomcat/webapps/"/>
 				<entry key="3" value="/opt/openinfinity/2.0.0/hadoop/"/>

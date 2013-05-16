@@ -99,6 +99,16 @@ public class DeployerController {
 	 * Rollback of deployment URL path.
 	 */
 	private static final String PATH_FOR_LOAD_DEPLYMENT_TABLE = "loadDeploymentTable";
+
+	/**
+	 * Undeployment URL path.
+	 */
+	private static final String PATH_FOR_UNDEPLOY = "undeployDeployment";
+	
+	/**
+	 * Delete deployment URL path.
+	 */
+	private static final String PATH_FOR_DEPLOYMENT_DELETE = "deleteDeployment";
 	
 	/**
 	 * Autowired field for <code>org.openinfinity.core.deployer.service.DeployerService</code>.
@@ -205,7 +215,69 @@ public class DeployerController {
 		//Map<Integer, String> clusterMap = new HashMap<Integer, String>();
 		//for (Cluster cluster : clusters) clusterMap.put(cluster.getId(), cluster.getName());
 		//SerializerUtil.jsonSerialize(response.getWriter(), clusterMap);
-	} 
+	}
+	
+	/**
+	 * Undeploys deployment 
+	 * 
+	 * TODO: 
+	 * 
+	 * @param deploymentModel Represents the MVC model including deployment information.
+	 * @throws Throwable Thrown when system level exception arises.
+	 */
+	@Log
+	@AuditTrail
+	@ResourceMapping(PATH_FOR_UNDEPLOY)
+	public void undeployDeploymentFromCluster(ResourceResponse response, @RequestParam("deploymentId") int deploymentId,
+			@RequestParam("deploymentName") String deploymentName) throws Exception {
+		System.out.println("UNDEPLOYING deployment. Deployment name <" + deploymentName+">, deploymentId=<"+deploymentId+">.");
+		
+		// verify current state
+		Deployment deployment = deployerService.loadDeploymentById(deploymentId);
+		//Deployment deployment = deployerService.loadDeploymentsForOrganization(organizationId);
+		if (deployment.getState()==DeployerService.DEPLOYMENT_STATE_DEPLOYED) {
+			// update deploymenstatuses state to db	here or in the reader - now in reader					
+			// deployment state should be updated to undeployed when all the deploymentstatuses are processed
+			// 		-can be done in reader
+			// update deployment state to be undeployed
+			deployment.setState(DeployerService.DEPLOYMENT_STATE_UNDEPLOY);
+			deployerService.updateDeploymentState(deployment);
+		} else {
+			// return alert
+			System.out.println("UNDEPLOYING deployment. Deployment <"+deploymentId+"> was not in DEPLOYED state. Nothing done.");			
+		}
+
+	} 	
+	
+	/**
+	 * Delete deployment 
+	 * 
+	 * TODO: 
+	 * 
+	 * @param deploymentModel Represents the MVC model including deployment information.
+	 * @throws Throwable Thrown when system level exception arises.
+	 */
+	@Log
+	@AuditTrail
+	@ResourceMapping(PATH_FOR_DEPLOYMENT_DELETE)
+	public void deleteDeployment(ResourceResponse response, @RequestParam("deploymentId") int deploymentId) throws Exception {
+		System.out.println("DELETING deployment: " + deploymentId+". NOT supported yet.");
+
+		// verify current state
+		
+		// only undeployed deployment can be deleted. otherwise return instruction to undeploy
+		Deployment deployment = deployerService.loadDeploymentById(deploymentId);
+		if (deployment.getState()==DeployerService.DEPLOYMENT_STATE_UNDEPLOYED) {
+			// deployment state should be updated to DELETED when all the deploymentstatuses are processed
+			// update deployment state to be undeployed
+			//deployment.setState(DeployerService.DEPLOYMENT_STATE_TO_BE_DELETED);
+			//deployerService.updateDeploymentState(deployment);
+		} else {
+			// need to be undeployed first
+		}
+		
+	} 	
+	
 	
 	/**
 	 * Deploys new application to backbone server.
@@ -224,7 +296,7 @@ public class DeployerController {
 		deployment.setName(deploymentModel.getName().toLowerCase().trim());
 		deployment.setInputStream(deploymentModel.getFileData().getInputStream());
 		deployerService.deploy(deployment);
-	}
+	}	
 	
 	/**
 	 * Loads deployment data
@@ -244,7 +316,21 @@ public class DeployerController {
 		for (Deployment deployment : deployments){
 			Instance instance = instanceService.getInstance(deployment.getInstanceId());
 			Cluster cluster = clusterService.getCluster(deployment.getClusterId());
-			if (instance == null || cluster == null) continue;
+			// only deployments for existing instances and clusters are currently returned. should we show those as undeployed
+			//if (instance == null || cluster == null) continue;
+			// update deployment status as undeployed if not that already
+			if (instance == null || cluster == null) {
+				if (deployment.getState()==DeployerService.DEPLOYMENT_STATE_DEPLOYED) {					
+					//deployment.setState(DeployerService.DEPLOYMENT_STATE_UNDEPLOYED);
+					// let's leave this for batch processing for now
+					continue;
+				}
+				else {
+					// show also deployments with no targets and not in deployed state 
+					// figure out how null instance and cluster should be shown and remove continue 
+					continue;
+				}
+			}
 			deploymentDataList.add(new DeploymentTableData(
 				deployment, 
 				OrganizationLocalServiceUtil.getOrganization(deployment.getOrganizationId()).getName(),
@@ -264,6 +350,7 @@ public class DeployerController {
 		JsonDataWrapper jdw = new JsonDataWrapper(page, totalPages, records, onePage);
 		SerializerUtil.jsonSerialize(response.getWriter(), jdw); 
 	} 
+		
 	
 	private Map<Long, String> loadOrganizationsAndSortByHierarchy(int userId) {
 		Map<Long, String> organizationMap = new HashMap<Long, String>(); 
