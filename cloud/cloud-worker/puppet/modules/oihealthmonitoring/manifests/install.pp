@@ -15,6 +15,5 @@ class oihealthmonitoring::install {
         ensure => installed,
         require => Class["oibasic"]
     }
-
 }
 
