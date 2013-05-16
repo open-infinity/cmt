@@ -278,7 +278,7 @@ public class HealthMonitoringServiceImpl implements HealthMonitoringService {
         T obj = null;
         try {
             //LOGGER.info("================================================");
-            //LOGGER.info("Now: {} : {}", System.currentTimeMillis(), source);
+            LOGGER.info("Now: {} : {}", System.currentTimeMillis(), source);
             //LOGGER.info("================================================");
             obj = mapper.readValue(source, expectedType);
         } catch (Exception e) {
@@ -374,11 +374,6 @@ public class HealthMonitoringServiceImpl implements HealthMonitoringService {
 				return n1.getFileModificationTime().compareTo(n2.getFileModificationTime());
 			}			
 		};
-		
-		//List<Notification> nonEmptyNotifications = finalNotificationResponse.getNotifications();
-		//for (Iterator<?> it = nonEmptyNotifications.iterator(); it.hasNext();)
-	    //    if ((it.next() == null)) it.remove();
-		//finalNotificationResponse.setNotifications(nonEmptyNotifications);
 		Collections.sort(finalNotificationResponse.getNotifications(), notificationsComparator);
 		Collections.reverse(finalNotificationResponse.getNotifications());
 		return finalNotificationResponse;
