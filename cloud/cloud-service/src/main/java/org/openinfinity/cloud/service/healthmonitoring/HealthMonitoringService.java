@@ -62,7 +62,6 @@ public interface HealthMonitoringService {
      * @param metricType Metric type.
      * @return All available boundaries for every metric that belongs to selected metric type.
      */
-	 // Nishant: Changed to add the sourceName parameter in the method call.
     MetricBoundariesResponse getMetricBoundaries(String hostName,String metricType);
 
     GroupListResponse getGroupList();

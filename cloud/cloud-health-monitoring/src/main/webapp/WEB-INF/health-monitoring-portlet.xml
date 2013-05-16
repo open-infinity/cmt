@@ -20,16 +20,16 @@
         http://www.springframework.org/schema/mvc 
         http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd">
         
+	<context:property-placeholder location="
+		classpath:/META-INF/properties/EucaCredentials.properties,
+		classpath:/META-INF/properties/infrastructure.properties,
+		classpath:/META-INF/properties/system.properties,
+		classpath:/META-INF/properties/healthmonitoring.properties" />
+	
 	<import resource="classpath*:/META-INF/spring/cloud-context-util.xml" />
 	<import resource="classpath*:/META-INF/spring/cloud-context-core.xml" />
 	<import resource="classpath*:/META-INF/spring/cloud-context-repository.xml" /> 
 	<import resource="classpath*:/META-INF/spring/cloud-context-service.xml" />
-
-	<context:property-placeholder
-		location="classpath:/META-INF/properties/system.properties,
-		classpath:/META-INF/properties/core.properties,
-		classpath:/META-INF/properties/repository.properties,
-		classpath:/META-INF/properties/infrastructure.properties" />
 		
 	<context:component-scan base-package="org.openinfinity.cloud.application.healthmonitoring" />
 

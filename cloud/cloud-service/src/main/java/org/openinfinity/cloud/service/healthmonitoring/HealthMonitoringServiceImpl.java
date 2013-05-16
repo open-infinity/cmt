@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.HttpClient;
@@ -79,7 +80,7 @@ public class HealthMonitoringServiceImpl implements HealthMonitoringService {
 	private static final String CONTEXT_PATH = "monitoring";
 	private static final String PROTOCOL = "http://";
     
-    private Map<Integer,String> clusterMasterMap = new HashMap<Integer,String>();
+	private Map<Integer,String> clusterMasterMap = new ConcurrentHashMap<Integer,String>();
 	private List<Machine> badMachines = new ArrayList<Machine>();
 	private List <Cluster> badClusters = new ArrayList<Cluster>();
     private Map<String,String> groupMachineMap = new HashMap<String,String>();
@@ -129,7 +130,8 @@ public class HealthMonitoringServiceImpl implements HealthMonitoringService {
     						for(Node node : allNodes) { 
     							if (!groupMachineMap.containsKey(node.getGroupName()))
     								groupMachineMap.put(node.getGroupName(),machine.getDnsName());
-    							hostnameIpMap.put(node.getNodeName(), node.getIpAddress());
+    							//hostnameIpMap.put(node.getNodeName(), node.getIpAddress());
+    							hostnameIpMap.put(node.getNodeName(), machine.getDnsName());
     						}                   
     						break;
     					} else {
@@ -317,10 +319,13 @@ public class HealthMonitoringServiceImpl implements HealthMonitoringService {
     public GroupListResponse getGroupList() {
     	GroupListResponse finalGroupListResponse = new GroupListResponse();
 		finalGroupListResponse.setGroups(new HashMap<String, Set<String>>());
-		Collection<String> masterMachines = clusterMasterMap.values();
+
+		Collection<String> masterMachines =new ArrayList<String>();
+        for (String machine:clusterMasterMap.values()){
+            masterMachines.add(machine);
+        }
+        
 		for(String sourceName : masterMachines) {
-			// Nishant : Create request builder object dynamically for the machine for which group and host name listing is required.
-			//****************************************************
 	        String url = getRequestBuilder(sourceName).buildGroupListRequest(new Request());
 	        String response = HttpHelper.executeHttpRequest(client, url);
 			
@@ -342,7 +347,11 @@ public class HealthMonitoringServiceImpl implements HealthMonitoringService {
     	NotificationResponse finalNotificationResponse = new NotificationResponse();
     	List<Notification> notifications = new ArrayList<Notification>(); 	
     	finalNotificationResponse.setNotifications(notifications);
-		Collection<String> masterMachines = clusterMasterMap.values();
+    	
+    	Collection<String> masterMachines=new ArrayList<String>();
+        for (String machine:clusterMasterMap.values()){
+            masterMachines.add(machine);
+        }
 		for(String sourceName : masterMachines) {
 	    	// Nishant : Create request builder object dynamically for the machine for which notifications are required.
 			//****************************************************
@@ -362,10 +371,14 @@ public class HealthMonitoringServiceImpl implements HealthMonitoringService {
 			@Override
 			public int compare(Notification n1, Notification n2) {
 				// TODO Auto-generated method stub
-				return n1.getTime().compareTo(n2.getTime());
-			}
-			
+				return n1.getFileModificationTime().compareTo(n2.getFileModificationTime());
+			}			
 		};
+		
+		//List<Notification> nonEmptyNotifications = finalNotificationResponse.getNotifications();
+		//for (Iterator<?> it = nonEmptyNotifications.iterator(); it.hasNext();)
+	    //    if ((it.next() == null)) it.remove();
+		//finalNotificationResponse.setNotifications(nonEmptyNotifications);
 		Collections.sort(finalNotificationResponse.getNotifications(), notificationsComparator);
 		Collections.reverse(finalNotificationResponse.getNotifications());
 		return finalNotificationResponse;

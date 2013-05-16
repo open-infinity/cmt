@@ -1,7 +1,6 @@
 export TOAS_HOST_GROUP='<%=host_group%>'
-export TOAS_COMMUNICATION_IFACE='<%=communication_iface%>'
 export TOAS_HEALTH_MONITORING_ROOT=<%=toas_monitoring_root%>
 export TOAS_COLLECTD_ROOT='<%=toas_collectd_root%>'
-
+export TOAS_RRD_HTTP_SERVER_ROOT='<%=toas_rrd_http_server_root%>'
 export JAVA_HOME='<%=java_home%>'
 
