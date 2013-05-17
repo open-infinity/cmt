@@ -16,10 +16,13 @@
 package org.openinfinity.cloud.domain.repository.deployer;
 
 import java.io.InputStream;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.jets3t.service.Constants;
 import org.jets3t.service.S3Service;
+import org.jets3t.service.ServiceException;
 import org.jets3t.service.impl.rest.httpclient.RestS3Service;
 import org.jets3t.service.model.S3Bucket;
 import org.jets3t.service.model.S3Object;
@@ -94,5 +97,65 @@ public class BucketRepositoryJets3tImpl implements BucketRepository {
 		}
 		return inputStream;
 	}
+	
+
+	/**
+	 * Delete object
+	 */
+	public void deleteObject(String bucketName, String key) {
+		
+		try {
+			simpleStorageService = new RestS3Service(new ProviderCredentialsImpl(accesskeyid, secretkey));		
+			simpleStorageService.deleteObject(bucketName, key);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			ExceptionUtil.throwSystemException(e.getMessage(), ExceptionLevel.ERROR, BucketRepository.EXCEPTION_MESSAGE_CONNECTION_FAILURE);			
+		}
+	}
+	
+	/**
+	 * Delete all objects and bucket
+	 */	
+	public void deleteBucketAndObjects(String bucketName, List <String> keyList) {
+		try {
+			// if versioning is used need to check how to delete all versions
+			// Check bucket versioning status for the bucket
+			//S3BucketVersioningStatus versioningStatus = simpleStorageService.getBucketVersioningStatus(vBucketName);			
+			//simpleStorageService.suspendBucketVersioning(bucketName);
+			// Delete all the objects in the bucket	
+			for (String key : keyList) {
+				simpleStorageService.deleteObject(bucketName,key);			
+			}
+	
+			// Now that the bucket is empty, you can delete it. If you try to delete your bucket before it is empty, it will fail.
+			simpleStorageService.deleteBucket(bucketName);
+			//System.out.println("Deleted bucket " + testBucket.getName());		
+			
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			ExceptionUtil.throwSystemException(e.getMessage(), ExceptionLevel.ERROR, BucketRepository.EXCEPTION_MESSAGE_CONNECTION_FAILURE);						
+		}			
+	}
+	
+	
+	/**
+	 * Update object
+	 */
+	public void updateObject(String bucketName, String key, String version) {
+		try {
+			// Enable versioning for a bucket.
+			//simpleStorageService.enableBucketVersioning(vBucketName);
+			//S3Object versionedObject = new S3Object(key, version);
+			//simpleStorageService.putObject(bucketName, versionedObject);
+		
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			ExceptionUtil.throwSystemException(e.getMessage(), ExceptionLevel.ERROR, BucketRepository.EXCEPTION_MESSAGE_CONNECTION_FAILURE);						
+		}
+	}
+	
 	
 }

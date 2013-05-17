@@ -58,6 +58,15 @@ public interface DeployerService {
 	Deployment deploy(Deployment deployment);
 
 	/**
+	 * Delete deployment<code>org.openinfinity.core.cloud.deployer.domain.Deployment</code>. Deletes binary of deployment, leaves the bucket 
+	 * 
+	 * @param deployment Represents the data of the platform.
+	 * @return <code>org.openinfinity.core.cloud.deployer.domain.Deployment</code> Represents the actual reference to deployment metadata.
+	 */
+	void deleteObject(Deployment deployment);
+	
+	
+	/**
 	 * Loads Deployment <code>org.openinfinity.core.cloud.deployer.domain.Deployment</code> by deployment id
 	 * 
 	 * @param deploymentid Id of deployment.

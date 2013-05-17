@@ -236,9 +236,9 @@ public class DeployerController {
 		Deployment deployment = deployerService.loadDeploymentById(deploymentId);
 		//Deployment deployment = deployerService.loadDeploymentsForOrganization(organizationId);
 		if (deployment.getState()==DeployerService.DEPLOYMENT_STATE_DEPLOYED) {
-			// update deploymenstatuses state to db	here or in the reader - now in reader					
+			// deploymenstatuses processed uin reader
 			// deployment state should be updated to undeployed when all the deploymentstatuses are processed
-			// 		-can be done in reader
+			// 		-done in reader
 			// update deployment state to be undeployed
 			deployment.setState(DeployerService.DEPLOYMENT_STATE_UNDEPLOY);
 			deployerService.updateDeploymentState(deployment);
@@ -261,7 +261,7 @@ public class DeployerController {
 	@AuditTrail
 	@ResourceMapping(PATH_FOR_DEPLOYMENT_DELETE)
 	public void deleteDeployment(ResourceResponse response, @RequestParam("deploymentId") int deploymentId) throws Exception {
-		System.out.println("DELETING deployment: " + deploymentId+". NOT supported yet.");
+		System.out.println("DELETING deployment: <"+deploymentId+">.");
 
 		// verify current state
 		
@@ -272,8 +272,11 @@ public class DeployerController {
 			// update deployment state to be undeployed
 			//deployment.setState(DeployerService.DEPLOYMENT_STATE_TO_BE_DELETED);
 			//deployerService.updateDeploymentState(deployment);
+			// just deletes object in walrus and updates deployment state immediately 
+			deployerService.deleteObject(deployment);
 		} else {
 			// need to be undeployed first
+			// TODO: implement response handling
 		}
 		
 	} 	

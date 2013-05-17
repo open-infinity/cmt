@@ -123,7 +123,7 @@ public class PeriodicCloudDeployerReader implements ItemReader<DeploymentStatus>
 				
 
 				// examine machines in the cluster
-				// add new machines to deploymentStatuses
+				// add new machines to deploymentStatuses (if not loadbalancers or for deployments in undeployed states)
 				// add machines with NOT_DEPLOYED status to deploymentStatuses
 				// check machines with DEPLOYED status
 				// 		add machines with old deployment timestamp to deploymentStatuses
@@ -216,13 +216,17 @@ public class PeriodicCloudDeployerReader implements ItemReader<DeploymentStatus>
 				
 				// now machine collection contains only machines that did not exist in deploymentStatuses
 				// add machines in cluster not found in DeploymentStatuses
-				//for (Machine machine: machinesInCluster) {						
 				for (Machine machine: machinesToBeCompared) {						
 					// if no deploymentStatuses found for machine it is probably new machine or new deployment
 					// new deploymentstatus added
 					// TODO: need to remove loadbalancers
 					if (machine.getType().equals("loadbalancer")) {
-						LOGGER.info("Skipping (NEW) machine [" + machine.getId() + "] of type loadbalancer");							
+						LOGGER.debug("Skipping (NEW) machine [" + machine.getId() + "] of type loadbalancer");							
+						continue;
+					}
+					// take deployment state into account (no deployment to undeployed or other machines)
+					if (deployment.getState()!=DeployerService.DEPLOYMENT_STATE_DEPLOYED && deployment.getState()!=DeployerService.DEPLOYMENT_STATE_NOT_DEPLOYED) {
+						LOGGER.debug("Skipping (NEW) machine [" + machine.getId() + "] for deployment <"+deployment.getId()+"> in state <"+deployment.getState()+">.");							
 						continue;
 					}
 					LOGGER.info("Undeployed (NEW) machine [" + machine.getId() + "] of Deployment ["+deployment.getId()+"]");
@@ -232,7 +236,29 @@ public class PeriodicCloudDeployerReader implements ItemReader<DeploymentStatus>
 					newDeploymentStatus.setMachineId(machine.getId());
 					deploymentStatuses.add(newDeploymentStatus); 					
 				}
-								
+				
+				
+				// update states deployment states UNDEPLOY, TO_BE_DEPLOYED, TO_BE_DELETED to final state 
+				// if no deploymentstatuses found for deployment state update anymore it can be finished
+				if (deploymentStatuses.isEmpty()) {
+					switch(deployment.getState()) {
+						case DeployerService.DEPLOYMENT_STATE_NOT_DEPLOYED:
+							// if deploying is also done is stages update for deployed should be here
+						break;
+						case DeployerService.DEPLOYMENT_STATE_UNDEPLOY:
+							// now all machines (deploymentStatuses) should be undeployed
+							deployment.setState(DeployerService.DEPLOYMENT_STATE_UNDEPLOYED);
+							deployerService.updateDeploymentState(deployment);
+						break;
+						case DeployerService.DEPLOYMENT_STATE_TO_BE_DELETED:
+							deployment.setState(DeployerService.DEPLOYMENT_STATE_DELETED);
+							deployerService.updateDeploymentState(deployment);
+						break;
+						case DeployerService.DEPLOYMENT_STATE_ERROR:
+							// TODO: error state no used yet
+						break;							
+					}
+				}
 			}
 		}
 		return deploymentStatuses;

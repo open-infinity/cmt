@@ -18,6 +18,10 @@ package org.openinfinity.cloud.domain.repository.deployer;
 import java.io.InputStream;
 import java.util.Map;
 
+import org.jets3t.service.impl.rest.httpclient.RestS3Service;
+import org.openinfinity.cloud.util.credentials.ProviderCredentialsImpl;
+import org.openinfinity.core.exception.ExceptionLevel;
+import org.openinfinity.core.util.ExceptionUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
@@ -71,5 +75,11 @@ public class BucketRepositoryAWSImpl implements BucketRepository {
 	public InputStream load(String bucketName, String key) {
 		return simpleStorageService.getObject(bucketName, key).getObjectContent();
 	}
-
+	
+	/**
+	 * Delete object
+	 */
+	public void deleteObject(String bucketName, String key) {		
+		simpleStorageService.deleteObject(bucketName, key);
+	}
 }

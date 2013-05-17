@@ -55,9 +55,9 @@ label {
 		<input id="instanceId" name="instanceId" type="hidden" />
 		<input id="organizationId" name="organizationId" type="hidden" />
 		<input id="clusterId" name="clusterId" type="hidden" />
-		<p id="phase">Choose organization for deployment (1/6 steps). TEST</p>
+		<p id="phase">Choose organization for deployment (1/6 steps).</p>
 		<p id="organizations">
-		<b>Choose organization TEST</b>
+		<b>Choose organization</b>
 		<br /><br />
 		<c:forEach items="${organizationMap}" var="organization">
 			<input id="${organization.key}" name="${organization.key}" path="organizationSelection" type="checkbox" style="display:none;" value="1"/>
@@ -90,7 +90,7 @@ label {
 
 	<table id="deploymentTable"></table>
 	<div id="deploymentPager"></div>
-	<br /> <a href="#" id="undeploy_deployment">Undeploy deployment</a> <br /> <a href="#" id="delete_deployment">Delete deployment</a> <br />	
+	<br><br/> <a href="#" id="undeploy_deployment">Undeploy deployment</a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="#" id="delete_deployment">Delete deployment</a> <br />	
 	
 	<script type="text/javascript">
 	
@@ -229,10 +229,14 @@ label {
 				var id = jQuery("#deploymentTable").jqGrid('getGridParam','selrow'); 
 				if (id) { 
 					var ret = jQuery("#deploymentTable").jqGrid('getRowData',id); 
-					var url = '<portlet:resourceURL id="deleteDeployment"/>&deploymentId='+id;
-					   $.getJSON(url, function(data) {
-						alert("Delete not supported yet. Nothing done to deployment <"+id+">, name="+ret.name+"..."); 
-					   });				
+					if(ret.state==11) {
+						var url = '<portlet:resourceURL id="deleteDeployment"/>&deploymentId='+id;
+						   $.getJSON(url, function(data) {
+							alert("Deployment <"+id+"> deleted with name="+ret.name+"..."); 
+						   });				
+					} else {
+						alert("Please undeploy first");						
+					}
 				} else { 
 					alert("Please select row");
 				} 

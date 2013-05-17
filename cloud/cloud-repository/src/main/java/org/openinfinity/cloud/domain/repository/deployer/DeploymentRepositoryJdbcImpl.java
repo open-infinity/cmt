@@ -43,7 +43,8 @@ import org.springframework.util.Assert;
  * @since 1.0.0
  */
 @Repository
-public class DeploymentRepositoryJdbcImpl implements DeploymentRepository {
+public class DeploymentRepositoryJdbcImpl implements
+DeploymentRepository {
 
 	/**
 	 * Represents the JDBC template util.
@@ -59,8 +60,14 @@ public class DeploymentRepositoryJdbcImpl implements DeploymentRepository {
 	 * Represents the SQL script for updating the state of the Deployment object.
 	 */
 	//private static final String UPDATE_SQL = "UPDATE DEPLOYMENT SET STATE = 0 AND ORGANIZATION_ID = ?, INSTANCE_ID = ?, CLUSTER_ID = ? WHERE STATE = 1";
-	private static final String UPDATE_SQL = "UPDATE DEPLOYMENT SET STATE = 0  WHERE NAME = ? AND ORGANIZATION_ID = ? AND INSTANCE_ID = ? AND CLUSTER_ID = ?";
+	private static final String UPDATE_STATE_0_SQL = "UPDATE DEPLOYMENT SET STATE = 0  WHERE NAME = ? AND ORGANIZATION_ID = ? AND INSTANCE_ID = ? AND CLUSTER_ID = ?";
 
+	
+	/**
+	 * Represents the SQL script for storing Deployment object.
+	 */
+	private static final String UPDATE_DEPLOYMENT_SQL = "UPDATE DEPLOYMENT SET STATE=? AND ORGANIZATION_ID=? AND INSTANCE_ID=? AND CLUSTER_ID=? AND LOCATION=? AND NAME=? WHERE ID=?";
+	
 	/**
 	 * Represents the SQL script for updating the state of the Deployment object.
 	 */
@@ -100,7 +107,7 @@ public class DeploymentRepositoryJdbcImpl implements DeploymentRepository {
 	/**
 	 * Represents the SQL script for for updating Deployment object state.
 	 */
-	private static final String UPDATE_STATUS_BY_DEPLOYMENT_ID = "UPDATE DEPLOYMENT SET STATE=? WHERE DEPLOYMENT_ID = ? AND NAME = ?";
+	private static final String UPDATE_STATE_BY_DEPLOYMENT_ID = "UPDATE DEPLOYMENT SET STATE=? WHERE DEPLOYMENT_ID = ? AND NAME = ?";
 	
 	
 	/**
@@ -148,7 +155,8 @@ public class DeploymentRepositoryJdbcImpl implements DeploymentRepository {
 	@AuditTrail
 	//@Transactional(isolation=Isolation.REPEATABLE_READ)
 	public Deployment store(Deployment deployment) {
-		jdbcTemplate.update(UPDATE_SQL, deployment.getName(), deployment.getOrganizationId(), deployment.getInstanceId(), deployment.getClusterId());
+		// Update existing deployment with same name and target not necessary if bucket versioning is used
+		//jdbcTemplate.update(UPDATE_STATE_0_SQL, deployment.getName(), deployment.getOrganizationId(), deployment.getInstanceId(), deployment.getClusterId());
 		jdbcTemplate.update(STORE_SQL, 1, deployment.getOrganizationId(), deployment.getInstanceId(), deployment.getClusterId(), deployment.getLocation(), deployment.getName());
 		deployment.setId(jdbcTemplate.queryForInt(LOAD_LAST_UPDATED_ID));
 		return deployment;
@@ -222,6 +230,18 @@ public class DeploymentRepositoryJdbcImpl implements DeploymentRepository {
 		// FIXME
 		return null;
 	}
+		
+	/**
+	 * Updates <code>org.openinfinity.core.cloud.domain.Deployment</code> to registry.
+	 * 
+	 * @param deployment Represents the deployment information.
+	 */
+	@AuditTrail
+	//@Transactional(isolation=Isolation.REPEATABLE_READ)
+	public void updateDeployment(Deployment deployment) {
+		jdbcTemplate.update(UPDATE_DEPLOYMENT_SQL, deployment.getState(), deployment.getOrganizationId(), deployment.getInstanceId(), deployment.getClusterId(), deployment.getLocation(), deployment.getName(), deployment.getId());
+	}
+	
 	
 	// TODO: remove this if not used
 	/**

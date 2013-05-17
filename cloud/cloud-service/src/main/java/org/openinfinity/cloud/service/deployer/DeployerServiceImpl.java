@@ -63,8 +63,18 @@ public class DeployerServiceImpl implements DeployerService {
 		deployment.setLocation(location);
 		deploymentRepository.store(deployment);
 		return deployment;
-	}
+	} 
 
+	@Log
+	public void deleteObject(Deployment deployment) {
+		bucketRepository.deleteObject(""+deployment.getClusterId(), deployment.getName());
+		// no mid-state used. if DeploymentStatuses need to be set to DELETED use mid state and implement batch processing
+		// deployment.setState(DeployerService.DEPLOYMENT_STATE_DELETED);
+		// deploymentRepository.store(deployment);
+		deploymentRepository.updateDeploymentStateById(deployment.getId(), DeployerService.DEPLOYMENT_STATE_DELETED);
+	}
+	
+	
 	@Log
 	public Deployment loadDeploymentById(int deploymentId) {
 		return deploymentRepository.loadById(deploymentId);
