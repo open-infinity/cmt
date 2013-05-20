@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 the original author or authors.
+ * Copyright (c) 2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,9 +25,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.HttpClient;
+import org.apache.log4j.Logger;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.openinfinity.cloud.domain.AbstractResponse;
 import org.openinfinity.cloud.domain.Cluster;
@@ -47,11 +51,6 @@ import org.openinfinity.cloud.service.healthmonitoring.HealthMonitoringServiceIm
 import org.openinfinity.cloud.service.healthmonitoring.Request;
 import org.openinfinity.cloud.service.healthmonitoring.RequestBuilder;
 import org.openinfinity.cloud.util.http.HttpHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
 
 /**
  * 
@@ -59,6 +58,7 @@ import org.springframework.stereotype.Service;
  * @author Ilkka Leinonen
  * @author Timo Saarinen
  * @author Nishant Gupta
+ * @author Vedran Bartonicek
  */
 @Service("healthMonitoringService")
 public class HealthMonitoringServiceImpl implements HealthMonitoringService {
@@ -73,12 +73,12 @@ public class HealthMonitoringServiceImpl implements HealthMonitoringService {
     private HttpClient client;
 
     @Value("${connTimeout}")
-	private String connTimeout = "1000";
-    
-    private static final Logger LOGGER = LoggerFactory.getLogger(HealthMonitoringServiceImpl.class);
+	private String connTimeout;
+   
 	private static final int RRD_PORT = 8181;
 	private static final String CONTEXT_PATH = "monitoring";
 	private static final String PROTOCOL = "http://";
+	private static final String HM_GROUPNAME_PREFIX = "cluster_";
     
 	private Map<Integer,String> clusterMasterMap = new ConcurrentHashMap<Integer,String>();
 	private List<Machine> badMachines = new ArrayList<Machine>();
@@ -86,9 +86,13 @@ public class HealthMonitoringServiceImpl implements HealthMonitoringService {
     private Map<String,String> groupMachineMap = new HashMap<String,String>();
     private Map<String,String> hostnameIpMap = new HashMap<String,String>();
     private long previousClusterCheckTime = 0L;
-// Nishant: Removed the autowired bean and create dynamically based on cluster content
-//    @Autowired
-//    private RequestBuilder requestBuilder;
+    
+    // Nishant: Removed the autowired bean and create dynamically based on cluster content
+    //    @Autowired
+    //    private RequestBuilder requestBuilder;
+    // FIXME: it is wastefull to every time create a new RequestBuilder -> use again the autowired
+    
+    private static final Logger LOG = Logger.getLogger(HealthMonitoringServiceImpl.class.getName());
 
 
     @Override
@@ -97,25 +101,21 @@ public class HealthMonitoringServiceImpl implements HealthMonitoringService {
     	List<Node> inactiveNodes = new ArrayList<Node>();
     	client.getParams().setIntParameter("http.connection.timeout", new Integer(this.connTimeout)); 	
     	NodeListResponse finalNodeResponse = new NodeListResponse();
-    	// Nishant : Get all clusters using ClusterService as a Collection and iterate through it
     	Collection<Cluster> clusters = clusterService.getClusters();
     	long timeElapsed = (System.currentTimeMillis() - previousClusterCheckTime)/1000;
     	for (Cluster cluster : clusters) {
     		if(!badClusters.contains(cluster) || timeElapsed >= 120) {
     			int clusterId = cluster.getId();
-    			// Nishant : Get all machines in the cluster using MachineService as a Collection and iterate through it
     			Collection<Machine> machinesInCluster = machineService.getMachinesInCluster(clusterId);
     			for(Machine machine : machinesInCluster) {
     				if(!badMachines.contains(machine)) {
     					List<Node> allNodes = new ArrayList<Node>();
-    					// Nishant : Create request builder object dynamically for each machine in the cluster.
     					String url = getRequestBuilder(machine.getDnsName()).buildHostListRequest(new Request());
     					String response = HttpHelper.executeHttpRequest(client, url);
-    					LOGGER.info("--------------------Request for machine "+machine.getDnsName()+" = " +url);
-    					LOGGER.info("--------------------getHostList response for machine "+machine.getDnsName()+" = " +response);
+    					LOG.debug("Request for machine "+machine.getDnsName()+" = " +url);
+    					LOG.debug("getHostList response for machine "+machine.getDnsName()+" = " +response);
     					NodeListResponse nodeResponse = toObject(response, NodeListResponse.class);
-    					// Nishant: Check the node response on port 8181. Add to the consolidated list if status is OK.
-    					if(nodeResponse.getResponseStatus() == AbstractResponse.STATUS_OK) {
+    					if(nodeResponse != null && nodeResponse.getResponseStatus() == AbstractResponse.STATUS_OK) {
     						if (nodeResponse.getActiveNodes() != null) {
     							activeNodes.addAll(nodeResponse.getActiveNodes());
     							allNodes.addAll(nodeResponse.getActiveNodes());
@@ -130,12 +130,11 @@ public class HealthMonitoringServiceImpl implements HealthMonitoringService {
     						for(Node node : allNodes) { 
     							if (!groupMachineMap.containsKey(node.getGroupName()))
     								groupMachineMap.put(node.getGroupName(),machine.getDnsName());
-    							//hostnameIpMap.put(node.getNodeName(), node.getIpAddress());
     							hostnameIpMap.put(node.getNodeName(), machine.getDnsName());
     						}                   
     						break;
     					} else {
-    						LOGGER.info("!!!!Machine:"+machine.getDnsName()+" is not responding!!!!!!!!!!!");
+    						LOG.debug("Machine:"+machine.getDnsName()+" is not responding");
     						badMachines.add(machine);
     						clusterMasterMap.remove(clusterId);
     					}
@@ -145,11 +144,11 @@ public class HealthMonitoringServiceImpl implements HealthMonitoringService {
     			if(badMachines.containsAll(machinesInCluster)) {
     				badMachines.removeAll(machinesInCluster);
     				badClusters.add(cluster);
-    				LOGGER.info("!!!!Cluster:"+clusterId+"(Name:"+cluster.getName()+"LBDNS:"+cluster.getLbDns()+") is not responding!!!!!!!");
+    				LOG.debug("Cluster:"+clusterId+"(Name:"+cluster.getName()+"LBDNS:"+cluster.getLbDns()+") is not responding");
     			}
     			if(badClusters.contains(cluster)) {
     				previousClusterCheckTime = System.currentTimeMillis();
-    				LOGGER.info("!!!!Checking for bad cluster:"+clusterId+"(Name:"+cluster.getName()+"LBDNS:"+cluster.getLbDns()+") at "+new Date());
+    				LOG.debug("Checking for bad cluster:"+clusterId+"(Name:"+cluster.getName()+"LBDNS:"+cluster.getLbDns()+") at "+new Date());
     			}
     		}
     	}
@@ -161,10 +160,11 @@ public class HealthMonitoringServiceImpl implements HealthMonitoringService {
     	}
     	if (finalNodeResponse.getInactiveNodes() != null) {
     		Collections.sort(finalNodeResponse.getInactiveNodes());
-    	}  
+    	}
+    	LOG.debug("getHostList exit");
     	return finalNodeResponse;
     }
-
+    
     @Override
     public MetricTypesResponse getMetricTypes(Request request) {
         MetricTypesResponse response = null;
@@ -186,13 +186,13 @@ public class HealthMonitoringServiceImpl implements HealthMonitoringService {
             if (response.getMetricTypes() != null) {
                 Collections.sort(response.getMetricTypes());
             }
-    		LOGGER.info("--------------------Request for machine "+url);
+    		LOG.debug("Request for machine "+url);
         } else {
         	response = new MetricTypesResponse();
             response.setResponseStatus(AbstractResponse.STATUS_PARAM_FAIL);
         }
 
-        LOGGER.info("--------------------Returning final MetricTypesResponse = " +response.getMetricTypes());
+        LOG.debug("Returning final MetricTypesResponse = " +response.getMetricTypes());
         return response;
     }
 
@@ -217,12 +217,12 @@ public class HealthMonitoringServiceImpl implements HealthMonitoringService {
             if (response.getMetricNames() != null) {
                 Collections.sort(response.getMetricNames());
             }
-    		LOGGER.info("--------------------Request for machine "+url);
+    		LOG.debug("Request for machine "+url);
         } else {
             response = new MetricNamesResponse();
             response.setResponseStatus(AbstractResponse.STATUS_PARAM_FAIL);
         }
-        LOGGER.info("--------------------Returning final MetricNamesResponse = " +response.getMetricNames());
+        LOG.debug("Returning final MetricNamesResponse = " +response.getMetricNames());
         return response;
     }
 
@@ -248,13 +248,31 @@ public class HealthMonitoringServiceImpl implements HealthMonitoringService {
                             metricNames, startTime, endTime, 100L));
             String responseStr = HttpHelper.executeHttpRequest(client, url);
             response = toObject(responseStr, HealthStatusResponse.class);
-    		LOGGER.info("--------------------Request for machine "+url);
+    		LOG.debug("Request for machine "+url);
         } else {
             response = new HealthStatusResponse();
             response.setResponseStatus(AbstractResponse.STATUS_PARAM_FAIL);
         }
         return response;
     }
+    
+    @Override
+    public HealthStatusResponse getClusterHealthStatus(Machine machine, String metricType, String[] metricNames, Date date) {
+        HealthStatusResponse response = null;
+        if (StringUtils.isNotBlank(metricType) && ArrayUtils.isNotEmpty(metricNames) && machine != null) { 
+            String groupName = HM_GROUPNAME_PREFIX + machine.getClusterId();
+            String url = getRequestBuilder(machine.getDnsName()).buildHealthStatusRequest(
+                new Request(groupName, Request.SOURCE_GROUP, metricType, metricNames, date, date, 100L));
+            String responseStr = HttpHelper.executeHttpRequest(client, url);
+            response = toObject(responseStr, HealthStatusResponse.class);
+            LOG.debug("Request for machine "+url);
+        } else {
+            response = new HealthStatusResponse();
+            response.setResponseStatus(AbstractResponse.STATUS_PARAM_FAIL);
+        }
+        return response;
+    }
+    
 
     @Override
     public String getHealthStatus() {
@@ -268,21 +286,21 @@ public class HealthMonitoringServiceImpl implements HealthMonitoringService {
                 newInstance = expectedType.newInstance();
                 newInstance.setResponseStatus(AbstractResponse.STATUS_RRD_FAIL);
             } catch (InstantiationException e) {
-                LOGGER.error(e.getMessage(), e);
+                LOG.error(e.getMessage(), e);
             } catch (IllegalAccessException e) {
-                LOGGER.error(e.getMessage(), e);
+                LOG.error(e.getMessage(), e);
             }
             return newInstance;
         }
         ObjectMapper mapper = new ObjectMapper();
         T obj = null;
         try {
-            //LOGGER.info("================================================");
-            LOGGER.info("Now: {} : {}", System.currentTimeMillis(), source);
-            //LOGGER.info("================================================");
+            //LOG.debug("================================================");
+            LOG.debug("Now: " +  System.currentTimeMillis() + " source:" + source);
+            //LOG.debug("================================================");
             obj = mapper.readValue(source, expectedType);
         } catch (Exception e) {
-            LOGGER.error("Exception occured while converting from String to Object. ", e);
+            LOG.error("Exception occured while converting from String to Object. ", e);
         }
 
         return obj;
@@ -306,12 +324,12 @@ public class HealthMonitoringServiceImpl implements HealthMonitoringService {
         	url = getRequestBuilder(hostName).buildMetricBoundariesRequest(new Request(sourceName, metricType));
             String responseStr = HttpHelper.executeHttpRequest(client, url);
             response = toObject(responseStr, MetricBoundariesResponse.class);
-    		LOGGER.info("--------------------Request for machine "+url);
+    		LOG.debug("Request for machine "+url);
         } else {
             response = new MetricBoundariesResponse();
             response.setResponseStatus(AbstractResponse.STATUS_PARAM_FAIL);
         }
-        LOGGER.info("--------------------Returning final getMetricBoundaries = " +response.getBoundaries());
+        LOG.debug("Returning final getMetricBoundaries = " +response.getBoundaries());
         return response;
     }
 
@@ -332,9 +350,9 @@ public class HealthMonitoringServiceImpl implements HealthMonitoringService {
 	        GroupListResponse groupListResponse = toObject(response, GroupListResponse.class);
 	        if(groupListResponse.getGroups() != null)
 	        	finalGroupListResponse.getGroups().putAll(groupListResponse.getGroups());
-			LOGGER.info("--------------------Request for machine "+url);
+			LOG.debug("Request for machine "+url);
 		}
-		LOGGER.info("--------------------Returning final GroupListResponse = " +finalGroupListResponse.getGroups());
+		LOG.debug("Returning final GroupListResponse = " +finalGroupListResponse.getGroups());
 		if(finalGroupListResponse.getGroups().isEmpty()) {
 			finalGroupListResponse.setResponseStatus(AbstractResponse.STATUS_PARAM_FAIL);
 			return finalGroupListResponse;
@@ -357,8 +375,8 @@ public class HealthMonitoringServiceImpl implements HealthMonitoringService {
 			//****************************************************
 	        String url = getRequestBuilder(sourceName).buildNotificationsRequest(startTime, endTime);
 	        String response = HttpHelper.executeHttpRequest(client, url);
-			LOGGER.info("--------------------Request for machine "+url);
-			LOGGER.info("--------------------Returning NotificationResponse = " +response);    
+			LOG.debug("Request for machine "+url);
+			LOG.debug("Returning NotificationResponse = " +response);    
 	        NotificationResponse notificationResponse = toObject(response, NotificationResponse.class);
 	        if(notificationResponse.getNotifications() != null)
 	        	finalNotificationResponse.getNotifications().addAll(notificationResponse.getNotifications());
