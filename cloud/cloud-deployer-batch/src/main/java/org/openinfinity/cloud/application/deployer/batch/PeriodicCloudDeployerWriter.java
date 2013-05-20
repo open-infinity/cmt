@@ -133,6 +133,8 @@ public class PeriodicCloudDeployerWriter implements ItemWriter<DeploymentStatus>
 	public void write(List<? extends DeploymentStatus> deploymentStatuses) throws Exception {
 		LOGGER.info("Processing total of [" + deploymentStatuses.size() + "] deployments in writer.");
 		for (DeploymentStatus deploymentStatus : deploymentStatuses) {
+			
+			// just update TERMINATED deploymentStatus states to db
 			if (deploymentStatus.getDeploymentState()==DeploymentState.TERMINATED) {
 				LOGGER.debug("Processing deploymentStatus with [" + deploymentStatus.getId() + "] and machineId ["+deploymentStatus.getMachineId()+"]. State TERMINATED, storing status.");				
 				try {
@@ -142,6 +144,7 @@ public class PeriodicCloudDeployerWriter implements ItemWriter<DeploymentStatus>
 				}
 				continue;				
 			}
+						
 			Key key = keyService.getKeyByInstanceId(deploymentStatus.getDeployment().getInstanceId());
 			Machine machine = machineService.getMachine(deploymentStatus.getMachineId());
 			LOGGER.debug("Processing machine with id [" + machine.getId() + "] with instance id [" + machine.getInstanceId() + "].");
@@ -150,6 +153,55 @@ public class PeriodicCloudDeployerWriter implements ItemWriter<DeploymentStatus>
 			
 			int type = cluster.getType();
 			String deploymentDirectory = pathToDeploymentDirectoryMap.get(new Integer(type));
+			
+
+			// Remove applications in UNDEPLOY state
+			if (deploymentStatus.getDeploymentState()==DeploymentState.UNDEPLOY) {
+				Collection<String> commands = new ArrayList<String>();
+				// Application updeployment  is platform specific
+				switch (type) {
+				case 5:	// BAS platform					
+					commands.add("su toas -c 'rm " + deploymentDirectory + deploymentStatus.getDeployment().getName() + ".war'");				
+					LOGGER.debug("Executing remote commands in machine with id [" + machine.getId() + "] .");
+					SSHGateway.executeRemoteCommands(
+							key.getSecret_key().getBytes(), 
+							null,
+							machine.getDnsName(), 
+							deploymentHostPort, 
+							username, 
+							"",
+							commands);					
+					deploymentStatus.setDeploymentState(DeploymentState.UNDEPLOYED);
+					break;					
+				case 0:	// Portal platform										
+					// Portal applications are deployed to tomcat webapps from portal hot deployment directory
+					commands.add("su toas -c 'rm " + pathToDeploymentDirectoryMap.get(5) + deploymentStatus.getDeployment().getName() + ".war'");				
+					commands.add("su toas -c 'rm -r " + pathToDeploymentDirectoryMap.get(5) + deploymentStatus.getDeployment().getName() + "'");				
+					LOGGER.debug("Executing remote commands in machine with id [" + machine.getId() + "] .");
+					SSHGateway.executeRemoteCommands(
+							key.getSecret_key().getBytes(), 
+							null,
+							machine.getDnsName(), 
+							deploymentHostPort, 
+							username, 
+							"",
+							commands);					
+					deploymentStatus.setDeploymentState(DeploymentState.UNDEPLOYED);
+					break;
+				default:
+					LOGGER.debug("WARNING! Undeployment not supported for platform type ["+type+"]. Deployment status with id [" + deploymentStatus.getId() + "]  set to ERROR.");					
+					deploymentStatus.setDeploymentState(DeploymentState.ERROR);
+					break;
+				}
+				LOGGER.debug("Updating deployment status with id [" + deploymentStatus.getId() + "] as UNDEPLOYED.");
+				deployerService.storeDeploymentStatus(deploymentStatus);				
+				continue;
+			} else if (deploymentStatus.getDeploymentState()==DeploymentState.UNDEPLOYED) {
+				LOGGER.debug("Already UNDEPLOYED status in writer. Storing deployment status with id [" + deploymentStatus.getId() + "] as UNDEPLOYED.");
+				deployerService.storeDeploymentStatus(deploymentStatus);								
+			}
+			
+			
 			LOGGER.debug("Pushing deployment to machine with id [" + machine.getId() + "] for deployment directory [" + deploymentDirectory + "] with artifact named [" + deploymentStatus.getDeployment().getName() + "]. to cluster type<"+type+">");	
 //			SSHGateway.pushToServer(
 //					key.getSecret_key().getBytes(), 

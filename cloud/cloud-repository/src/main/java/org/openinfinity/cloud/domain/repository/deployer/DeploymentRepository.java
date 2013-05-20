@@ -69,6 +69,30 @@ public interface DeploymentRepository {
 	 * @return <code>org.openinfinity.core.cloud.domain.Deployment</code> Represents the object fetched from registry based on deployment id.
 	 */
 	Deployment loadById(int id);
+
+	/**
+	 * Updates <code>org.openinfinity.core.cloud.domain.Deployment</code> to registry.
+	 * 
+	 * @param deployment Represents the deployment information.
+	 * 
+	 */
+	void updateDeployment(Deployment deployment);
+	
+	/**
+	 * Update deployment status object.
+	 */
+	void updateDeploymentStateById(int deploymentId, int state);
+
+	/**
+	 * Update deployment status object.
+	 */
+	void updateDeploymentStateByOrganizationIdAndName(int organizationId, String name, int state);
+	
+	/**
+	 * Update DeploymentStatus object states.
+	 */	
+	void updateDeploymentStatusStatesFromToByDeploymentId(int from, int to, int deploymentId);
+	
 	
 	/**
 	 * Deletes id based on <code>org.openinfinity.core.cloud.domain.Deployment</code> object.

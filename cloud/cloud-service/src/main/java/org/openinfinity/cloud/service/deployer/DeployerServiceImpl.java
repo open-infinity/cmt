@@ -63,7 +63,23 @@ public class DeployerServiceImpl implements DeployerService {
 		deployment.setLocation(location);
 		deploymentRepository.store(deployment);
 		return deployment;
+	} 
+
+	@Log
+	public void deleteObject(Deployment deployment) {
+		bucketRepository.deleteObject(""+deployment.getClusterId(), deployment.getName());
+		// no mid-state used. if DeploymentStatuses need to be set to DELETED use mid state and implement batch processing
+		// deployment.setState(DeployerService.DEPLOYMENT_STATE_DELETED);
+		// deploymentRepository.store(deployment);
+		deploymentRepository.updateDeploymentStateById(deployment.getId(), DeployerService.DEPLOYMENT_STATE_DELETED);
 	}
+	
+	
+	@Log
+	public Deployment loadDeploymentById(int deploymentId) {
+		return deploymentRepository.loadById(deploymentId);
+	}
+		
 	
 	@Log
 	public Collection<Deployment> loadDeployments() {
@@ -91,6 +107,23 @@ public class DeployerServiceImpl implements DeployerService {
 		Collection<Cluster> clusters = clusterRepository.getClusters(instanceId);
 		return Collections.unmodifiableCollection(clusters);
 	}
+	
+	@Log
+	public void updateDeploymentState(Deployment deployment) {
+		deploymentRepository.updateDeploymentStateById(deployment.getId(), deployment.getState());
+	}
+	
+	@Log
+	public void updateDeployment(Deployment deployment) {
+		// store should both handle add and update ?
+		//deploymentRepository.store(deployment);
+	}
+	
+	@Log
+	public void updateDeploymentStatusStatesFromToByDeploymentId(DeploymentStatus.DeploymentState from, DeploymentStatus.DeploymentState to, int deploymentId) {		
+		deploymentRepository.updateDeploymentStatusStatesFromToByDeploymentId(from.getValue(), to.getValue(), deploymentId);
+	}
+		
 	
 	@Log
 	public void rollback(Deployment deployment) {
