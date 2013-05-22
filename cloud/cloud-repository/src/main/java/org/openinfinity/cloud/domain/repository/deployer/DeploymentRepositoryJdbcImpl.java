@@ -62,16 +62,31 @@ DeploymentRepository {
 	//private static final String UPDATE_SQL = "UPDATE DEPLOYMENT SET STATE = 0 AND ORGANIZATION_ID = ?, INSTANCE_ID = ?, CLUSTER_ID = ? WHERE STATE = 1";
 	private static final String UPDATE_STATE_0_SQL = "UPDATE DEPLOYMENT SET STATE = 0  WHERE NAME = ? AND ORGANIZATION_ID = ? AND INSTANCE_ID = ? AND CLUSTER_ID = ?";
 
+	/**
+	 * Represents the SQL script for updating the state of the Deployment object.
+	 */
+	private static final String UPDATE_STATE_1_SQL = "UPDATE DEPLOYMENT SET STATE = ?  WHERE NAME = ? AND ORGANIZATION_ID = ? AND INSTANCE_ID = ? AND CLUSTER_ID = ? AND STATE=1";
+	
+	/**
+	 * Represents the SQL script for updating the state of the Deployment object.
+	 */
+	private static final String UPDATE_STATE_1_TO_10_SQL = "UPDATE DEPLOYMENT SET STATE = 10  WHERE NAME = ? AND ORGANIZATION_ID = ? AND INSTANCE_ID = ? AND CLUSTER_ID = ? AND STATE=1";
 	
 	/**
 	 * Represents the SQL script for storing Deployment object.
 	 */
-	private static final String UPDATE_DEPLOYMENT_SQL = "UPDATE DEPLOYMENT SET STATE=? AND ORGANIZATION_ID=? AND INSTANCE_ID=? AND CLUSTER_ID=? AND LOCATION=? AND NAME=? WHERE ID=?";
+	private static final String UPDATE_DEPLOYMENT_SQL = "UPDATE DEPLOYMENT SET STATE=?, ORGANIZATION_ID=?, INSTANCE_ID=?, CLUSTER_ID=?, LOCATION=?, NAME=? WHERE ID=?";
 	
 	/**
 	 * Represents the SQL script for updating the state of the Deployment object.
 	 */
 	private static final String UPDATE_DEPLOYMENT_STATE_BY_ID_SQL = "UPDATE DEPLOYMENT SET STATE = ?  WHERE ID=?";
+
+	/**
+	 * Represents the SQL script for updating the state of the Deployment object.
+	 */
+	private static final String UPDATE_DEPLOYMENT_LOCATION_AND_STATE = "UPDATE DEPLOYMENT SET LOCATION = ?, STATE = ?  WHERE ID=?";
+	
 	
 	/**
 	 * Represents the SQL script for storing Deployment object.
@@ -88,6 +103,12 @@ DeploymentRepository {
 	 * Represents the SQL script for loading all Deployment object.
 	 */
 	private static final String LOAD_ALL_FOR_ORG_SQL = "SELECT * FROM DEPLOYMENT WHERE ORGANIZATION_ID = ?";
+
+	/**
+	 * Represents the SQL script for loading Deployment objects based on organization, instance, cluster and name.
+	 */
+	private static final String LOAD_BY_ORG_INST_CLUS_NAME_SQL = "SELECT * FROM DEPLOYMENT WHERE ORGANIZATION_ID = ? AND INSTANCE_ID = ? AND CLUSTER_ID = ? AND NAME = ?";
+	
 	
 	/**
 	 * Represents the SQL script for loading all Deployment objects with cluster id.
@@ -163,6 +184,46 @@ DeploymentRepository {
 	}
 
 	/**
+	 * Stores new deployment <code>org.openinfinity.core.cloud.domain.Deployment</code> to registry
+	 * and updates existing deployment in NOT_DEPLOYED-CREATED state with same name and target to state NOT_DEPLOYED
+	 * 
+	 * @param deployment Represents the deployment information.
+	 * @return Deployment Represents the created object with unique id.
+	 */
+	@AuditTrail
+	public Deployment storeAndUpdate(Deployment deployment) {
+		jdbcTemplate.update(UPDATE_STATE_1_TO_10_SQL, deployment.getName(), deployment.getOrganizationId(), deployment.getInstanceId(), deployment.getClusterId());		
+		jdbcTemplate.update(STORE_SQL, 1, deployment.getOrganizationId(), deployment.getInstanceId(), deployment.getClusterId(), deployment.getLocation(), deployment.getName());
+		deployment.setId(jdbcTemplate.queryForInt(LOAD_LAST_UPDATED_ID));
+		return deployment;		
+	}
+	
+	/**
+	 * Updates deployment <code>org.openinfinity.core.cloud.domain.Deployment</code>  location and to DEPLOYED state 
+	 * 
+	 * @param deployment Represents the deployment information.
+	 * @return Deployment Represents the created object with unique id.
+	 */
+	@AuditTrail
+	public void updateLocationAndState(Deployment deployment) {
+		jdbcTemplate.update(UPDATE_DEPLOYMENT_LOCATION_AND_STATE, deployment.getLocation(), deployment.getState(), deployment.getId());		
+	}
+	
+	/**
+	 * Updates existing deployment <code>org.openinfinity.core.cloud.domain.Deployment</code>  in DEPLOYED state 
+	 * with same name and target to state NOT_DEPLOYED to registry
+	 * 
+	 * @param deployment Represents the deployment information.
+	 * @return Deployment Represents the created object with unique id.
+	 */
+	@AuditTrail
+	public void updateExistingDeployedDeploymentState(Deployment deployment, int newState) {
+		jdbcTemplate.update(UPDATE_STATE_1_SQL, newState, deployment.getName(), deployment.getOrganizationId(), deployment.getInstanceId(), deployment.getClusterId());		
+		deployment.setState(newState);
+	}
+
+	
+	/**
 	 * Update deployment status object.
 	 */
 	@AuditTrail
@@ -230,6 +291,14 @@ DeploymentRepository {
 		// FIXME
 		return null;
 	}
+	
+	
+	@AuditTrail
+	public Collection<Deployment> loadByOrgInstClusName(long organizationId, int instanceId, int clusterId, String name) {
+		Collection<Deployment> deployments = jdbcTemplate.query(LOAD_BY_ORG_INST_CLUS_NAME_SQL, new Object[]{organizationId, instanceId, clusterId, name}, new DeploymentRowMapper());
+		return Collections.unmodifiableCollection(deployments);				
+	}
+	
 		
 	/**
 	 * Updates <code>org.openinfinity.core.cloud.domain.Deployment</code> to registry.

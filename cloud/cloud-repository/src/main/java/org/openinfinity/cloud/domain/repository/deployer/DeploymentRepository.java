@@ -37,6 +37,33 @@ public interface DeploymentRepository {
 	 * @return Deployment Represents the created object with unique id.
 	 */
 	Deployment store(Deployment deployment);
+
+	/**
+	 * Stores new deployment <code>org.openinfinity.core.cloud.domain.Deployment</code> to registry
+	 * and updates existing deployment in NOT_DEPLOYED-CREATED state with same name and target to state NOT_DEPLOYED
+	 * 
+	 * @param deployment Represents the deployment information.
+	 * @return Deployment Represents the created object with unique id.
+	 */
+	Deployment storeAndUpdate(Deployment deployment);
+
+	/**
+	 * Updates deployment <code>org.openinfinity.core.cloud.domain.Deployment</code>  location and to DEPLOYED state 
+	 * 
+	 * @param deployment Represents the deployment information.
+	 * @return Deployment Represents the created object with unique id.
+	 */
+	void updateLocationAndState(Deployment deployment);
+	
+	
+	/**
+	 * Updates existing deployment <code>org.openinfinity.core.cloud.domain.Deployment</code>  in DEPLOYED state 
+	 * with same name and target to defined state to registry
+	 * 
+	 * @param deployment Represents the deployment information.
+	 * @param newState Represents the state to be updated to.
+	 */
+	void updateExistingDeployedDeploymentState(Deployment deployment, int newState);
 	
 	/**
 	 * Returns all <code>org.openinfinity.core.cloud.domain.Deployment</code> objects based on organization id.
@@ -70,6 +97,16 @@ public interface DeploymentRepository {
 	 */
 	Deployment loadById(int id);
 
+	/**
+	 * Returns <code>org.openinfinity.core.cloud.domain.Deployment</code> based on deployment id.
+	 * 
+	 * @param id
+	 * @return <code>org.openinfinity.core.cloud.domain.Deployment</code> Represents the object fetched from registry based on deployment id.
+	 * @return Collection<Deployment> Represents the objects fetched from registry based on instanceid, organizationId, clusterid and deployment name.
+	 */
+	Collection<Deployment> loadByOrgInstClusName(long organizationId, int instanceId, int clusterId, String name);
+	
+	
 	/**
 	 * Updates <code>org.openinfinity.core.cloud.domain.Deployment</code> to registry.
 	 * 

@@ -90,7 +90,7 @@ label {
 
 	<table id="deploymentTable"></table>
 	<div id="deploymentPager"></div>
-	<br><br/> <a href="#" id="undeploy_deployment">Undeploy deployment</a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="#" id="delete_deployment">Delete deployment</a> <br />	
+	<br><br/> <a href="#" id="undeploy_deployment">Undeploy deployment</a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="#" id="redeploy_deployment">Redeploy deployment</a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="#" id="delete_deployment">Delete deployment</a> <br />	
 	
 	<script type="text/javascript">
 	
@@ -225,6 +225,25 @@ label {
 					alert("Please select row");
 				} 
 			}); 
+			$("#deploymentTable").jqGrid('navGrid','#deploymentPager',{edit:false,add:false,del:false});
+			jQuery("#redeploy_deployment").click( function(){ 
+				var id = jQuery("#deploymentTable").jqGrid('getGridParam','selrow'); 
+				if (id) { 
+					var ret = jQuery("#deploymentTable").jqGrid('getRowData',id); 
+					if(ret.state==1) {
+						alert("Deployment <"+ret.name+"> with id <"+id+"> already deployed.");						
+					} else if (ret.state==11) {
+						var url = '<portlet:resourceURL id="redeployDeployment"/>&deploymentId='+id;
+						   $.getJSON(url, function(data) {
+							alert("Deployment <"+id+"> redeployed with name="+ret.name+"..."); 
+						   });				
+					} else {
+						alert("Please select undeployed deployment.");						
+					}					
+				} else { 
+					alert("Please select row");
+				} 
+			}); 			
 			jQuery("#delete_deployment").click( function(){ 
 				var id = jQuery("#deploymentTable").jqGrid('getGridParam','selrow'); 
 				if (id) { 

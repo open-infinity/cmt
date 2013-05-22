@@ -140,7 +140,7 @@ public class PeriodicCloudDeployerReader implements ItemReader<DeploymentStatus>
 				
 				
 				for (DeploymentStatus deploymentStatus : deployedMachines) {																	
-					LOGGER.info("Processing deployment for deployment status id [" + deployment.getId() + "] and deployment state of [" + deploymentStatus.getDeploymentState() + "].");						
+					LOGGER.info("Processing deployment for deploymentStatus id [" + deployment.getId() + "] and deploymentStatus state of [" + deploymentStatus.getDeploymentState() + "].");						
 					deploymentStatus.setDeployment(deployment);
 					
 					// TODO - check if deployment is undeployed/to be undeployed
@@ -168,8 +168,13 @@ public class PeriodicCloudDeployerReader implements ItemReader<DeploymentStatus>
 							break;
 							// do nothing for terminated machines case TERMINATED and UNDEPLOYED. Not added for processing
 						}						
-					}
-									
+					} 
+					
+					// test
+					
+							
+					// test
+					
 					boolean deploymentStatusMachineMissingFromClusterMachines = true;  // machine does not exist in cluster anymore
 				
 					for (Machine machine: machinesInCluster) {
@@ -199,6 +204,15 @@ public class PeriodicCloudDeployerReader implements ItemReader<DeploymentStatus>
 								case DEPLOYED: 
 									verifyTimeStampAndAddDeploymentInformation(deploymentStatuses, deploymentStatus, deployment); 
 									LOGGER.info("Deployed machine [" + machine.getId() + "] of Deployment ["+deployment.getId()+"]. Timestamp verified.");									
+								break;
+								case UNDEPLOYED:
+									// handle redeployment
+									// TODO: verify this does not mix something else
+									if (deployment.getState()==DeployerService.DEPLOYMENT_STATE_DEPLOYED) {
+										LOGGER.info("Set for redeploy machine [" + machine.getId() + "] of Deployment ["+deployment.getId()+"]");										
+										deploymentStatus.setDeploymentState(DeploymentState.NOT_DEPLOYED);
+										deploymentStatuses.add(deploymentStatus);
+									}
 								break;
 								// do nothing for terminated machines case TERMINATED and UNDEPLOYED. Not added for processing
 							}

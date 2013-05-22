@@ -33,6 +33,7 @@ import org.openinfinity.cloud.application.deployer.model.DeploymentTableData;
 import org.openinfinity.cloud.application.deployer.model.OrganizationTreeModel;
 import org.openinfinity.cloud.domain.Cluster;
 import org.openinfinity.cloud.domain.Deployment;
+import org.openinfinity.cloud.domain.DeploymentStatus.DeploymentState;
 import org.openinfinity.cloud.domain.Instance;
 import org.openinfinity.cloud.service.administrator.ClusterService;
 import org.openinfinity.cloud.service.administrator.InstanceService;
@@ -109,6 +110,11 @@ public class DeployerController {
 	 * Delete deployment URL path.
 	 */
 	private static final String PATH_FOR_DEPLOYMENT_DELETE = "deleteDeployment";
+
+	/**
+	 * Redeployment deployment URL path.
+	 */
+	private static final String PATH_FOR_REDEPLOY = "redeployDeployment";
 	
 	/**
 	 * Autowired field for <code>org.openinfinity.core.deployer.service.DeployerService</code>.
@@ -215,6 +221,70 @@ public class DeployerController {
 		//Map<Integer, String> clusterMap = new HashMap<Integer, String>();
 		//for (Cluster cluster : clusters) clusterMap.put(cluster.getId(), cluster.getName());
 		//SerializerUtil.jsonSerialize(response.getWriter(), clusterMap);
+		
+		// rollback could be supported using walrus versioning
+		// this means that versioning need to be enabled for bucket and taken into account in other operations too
+		// versioningid may be required to be added for model if not only rollback to previous version is not supported
+		// need to take care of removal of old versions
+		// rollback only for deploymenstatuses in state deployed?
+	}
+
+	/**
+	 * Redeploys earlier version.
+	 * 
+	 * @param response
+	 * @param deploymentId
+	 * @throws Exception
+	 */
+	@Log
+	@AuditTrail
+	@ResourceMapping(PATH_FOR_REDEPLOY)
+	public void redeployDeployment(ResourceResponse response, @RequestParam("deploymentId") int deploymentId) throws Exception {
+		System.out.println("Redeploying deployment: " + deploymentId);
+		//Collection<Cluster> clusters = deployerService.rollback(deployment).getClusters()(deploymentId);
+		//Map<Integer, String> clusterMap = new HashMap<Integer, String>();
+		//for (Cluster cluster : clusters) clusterMap.put(cluster.getId(), cluster.getName());
+		//SerializerUtil.jsonSerialize(response.getWriter(), clusterMap);
+		
+		// rollback could be supported using walrus versioning
+		// this means that versioning need to be enabled for bucket and taken into account in other operations too
+		// versioningid may be required to be added for model if not only rollback to previous version is not supported
+		// need to take care of removal of old versions
+		// rollback only for deploymenstatuses in state deployed?
+		
+		// verify current state
+		Deployment deployment = deployerService.loadDeploymentById(deploymentId);
+		//Deployment deployment = deployerService.loadDeploymentsForOrganization(organizationId);
+		if (deployment.getState()==DeployerService.DEPLOYMENT_STATE_UNDEPLOYED) {
+			// deploymenstatuses processed in reader
+			// deployment state should be updated to undeployed when all the deploymentstatuses are processed
+			// 		-done in reader
+			// update deployment state to be undeployed
+			Collection<Deployment> deployments = deployerService.loadDeploymentsForClusterWithName(deployment);
+			
+			for (Deployment oldDeployment : deployments) {
+				// handle existing deployed deployment 
+				if (oldDeployment.getState()==DeployerService.DEPLOYMENT_STATE_DEPLOYED) {
+					//oldDeployment.setState(DeployerService.DEPLOYMENT_STATE_UNDEPLOY);
+					//deployerService.updateDeploymentState(oldDeployment);					
+					// Updated directly to undeployed since otherwise may undeploy redeployed deployment
+					// also deploymentStatuses updated in controller for the same reason
+					// redeployment will anyway replace old deployment
+					oldDeployment.setState(DeployerService.DEPLOYMENT_STATE_UNDEPLOY);
+					deployerService.updateDeploymentState(oldDeployment);										
+					deployerService.updateDeploymentStatusStatesFromToByDeploymentId(DeploymentState.UNDEPLOYED, DeploymentState.DEPLOYED, oldDeployment.getId());
+				}
+			}
+			
+			
+			deployment.setState(DeployerService.DEPLOYMENT_STATE_DEPLOYED);
+			deployerService.updateDeploymentState(deployment);
+			// TODO: handle deploymentStatuses?
+		} else {
+			// return alert
+			System.out.println("UNDEPLOYING deployment. Deployment <"+deploymentId+"> was not in DEPLOYED state. Nothing done.");			
+		}
+		
 	}
 	
 	/**
@@ -236,7 +306,7 @@ public class DeployerController {
 		Deployment deployment = deployerService.loadDeploymentById(deploymentId);
 		//Deployment deployment = deployerService.loadDeploymentsForOrganization(organizationId);
 		if (deployment.getState()==DeployerService.DEPLOYMENT_STATE_DEPLOYED) {
-			// deploymenstatuses processed uin reader
+			// deploymenstatuses processed in reader
 			// deployment state should be updated to undeployed when all the deploymentstatuses are processed
 			// 		-done in reader
 			// update deployment state to be undeployed

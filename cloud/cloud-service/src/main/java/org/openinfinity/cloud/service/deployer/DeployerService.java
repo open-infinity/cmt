@@ -22,6 +22,7 @@ import org.openinfinity.cloud.domain.Deployment;
 import org.openinfinity.cloud.domain.DeploymentStatus;
 import org.openinfinity.cloud.domain.Instance;
 import org.openinfinity.cloud.domain.Cluster;
+import org.openinfinity.core.annotation.Log;
 
 /**
  * Deployer interface for deploying new applications inside a cloud environment.
@@ -99,6 +100,10 @@ public interface DeployerService {
 	 */
 	Collection<Deployment> loadDeployments(int page, int rows);
 
+	@Log
+	public Collection<Deployment> loadDeploymentsForClusterWithName(Deployment deployment);
+	
+	
 	/** NEW
 	 * Updates deployment state <code>org.openinfinity.core.cloud.deployer.domain.Deployment</code> object.
 	 *  

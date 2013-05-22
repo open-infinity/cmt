@@ -132,7 +132,9 @@ public class PeriodicCloudDeployerWriter implements ItemWriter<DeploymentStatus>
 	@Override
 	public void write(List<? extends DeploymentStatus> deploymentStatuses) throws Exception {
 		LOGGER.info("Processing total of [" + deploymentStatuses.size() + "] deployments in writer.");
+		
 		for (DeploymentStatus deploymentStatus : deploymentStatuses) {
+			LOGGER.info("Processing write of deployment <"+deploymentStatus.getDeployment().getId()+"> deploymentStatus [" + deploymentStatus.getId() + "] in state <"+deploymentStatus.getDeploymentState()+"> and machineId ["+deploymentStatus.getMachineId()+"] started.");
 			
 			// just update TERMINATED deploymentStatus states to db
 			if (deploymentStatus.getDeploymentState()==DeploymentState.TERMINATED) {

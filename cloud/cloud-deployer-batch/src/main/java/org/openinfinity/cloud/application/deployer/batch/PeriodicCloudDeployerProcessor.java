@@ -44,6 +44,7 @@ public class PeriodicCloudDeployerProcessor implements ItemProcessor<DeploymentS
 	DeployerService deployerService;
 	
 	public DeploymentStatus process(DeploymentStatus deploymentStatus) throws Exception {
+		LOGGER.info("Processing of deployment <"+deploymentStatus.getDeployment().getId()+"> deploymentStatus [" + deploymentStatus.getId() + "] in state <"+deploymentStatus.getDeploymentState()+"> and machineId ["+deploymentStatus.getMachineId()+"] started. Setting inputstream for deploymentStatus.");
 		
 		switch (deploymentStatus.getDeploymentState()) {
 		case TERMINATED:
@@ -61,13 +62,15 @@ public class PeriodicCloudDeployerProcessor implements ItemProcessor<DeploymentS
 
 		default:
 			// set inputstream for deployments
-			LOGGER.info("Processing of deployment with deployment status [" + deploymentStatus.getId() + "] and machineId ["+deploymentStatus.getMachineId()+"] started. Setting inputstream for deployment status.");
+			LOGGER.info("Processing of deploymentStatus [" + deploymentStatus.getId() + "] in state <"+deploymentStatus.getDeploymentState()+">. Setting inputstream for deploymentStatus.");
 			if (deploymentStatus.getDeployment().getInputStream()!=null) {
 				LOGGER.info("Beware! Stream is not null for deployment status [" + deploymentStatus.getId() + "] and machineId ["+deploymentStatus.getMachineId()+"] started. Skipping opening.");
 				return deploymentStatus;
 			}
 			String bucketName = "" + deploymentStatus.getDeployment().getClusterId();
-			String key = deploymentStatus.getDeployment().getName();
+			//String key = deploymentStatus.getDeployment().getName();
+			// location contains deployment id specific name
+			String key = deploymentStatus.getDeployment().getLocation();
 			LOGGER.debug("Deployment status of [" + deploymentStatus.getId() + "] and machineId ["+deploymentStatus.getMachineId()+"] continued with reading deployment key (S3 key) ["+ deploymentStatus.getDeployment().getName() +"] and organization id (S3 bucket name) [" + deploymentStatus.getDeployment().getClusterId() + "].");
 			InputStream inputStream = deployerService.load(bucketName, key);
 			//deploymentStatus.getDeployment().setInputStream(inputStream);
