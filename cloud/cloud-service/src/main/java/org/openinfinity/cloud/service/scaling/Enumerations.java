@@ -29,7 +29,7 @@ public final class Enumerations{
 		SCALE_OUT,
 		HARMONIZED,
 		SYSTEM_DISASTER_PANIC,
-		NOT_DEFINED;
+		RULE_NOT_DEFINED;
 	}
 	
 	public enum ScalingPolicy {

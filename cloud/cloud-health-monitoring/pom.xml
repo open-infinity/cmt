@@ -180,11 +180,7 @@
 	            </extension>
         	</extensions>
         	
-		<resources>
-			<!-- standard Maven folder -->
-			<resource>
-				<directory>src/main/resources</directory>
-			</resource>
+		<resources>	
 			<resource>
 				<directory>.</directory>
 				<includes>
@@ -196,12 +192,10 @@
 				<directory>src/main/java</directory>
 				<filtering>true</filtering>
 			</resource>
-			
 			<resource>
                 <directory>src/main/resources</directory>
                 <filtering>true</filtering>
             </resource>
-            	
 			<resource>
 				<directory>src/test/java</directory>
 				<includes>

@@ -90,7 +90,7 @@ public class HealthMonitoringServiceImpl implements HealthMonitoringService {
     // Nishant: Removed the autowired bean and create dynamically based on cluster content
     //    @Autowired
     //    private RequestBuilder requestBuilder;
-    // FIXME: it is wastefull to every time create a new RequestBuilder -> use again the autowired
+    // FIXME: it is wasteful to every time create a new RequestBuilder -> use again the autowired
     
     private static final Logger LOG = Logger.getLogger(HealthMonitoringServiceImpl.class.getName());
 
@@ -140,7 +140,6 @@ public class HealthMonitoringServiceImpl implements HealthMonitoringService {
     					}
     				}
     			}
-    			// All machines in cluster have gone bad.
     			if(badMachines.containsAll(machinesInCluster)) {
     				badMachines.removeAll(machinesInCluster);
     				badClusters.add(cluster);
@@ -152,7 +151,6 @@ public class HealthMonitoringServiceImpl implements HealthMonitoringService {
     			}
     		}
     	}
-    	// Nishant : Create the final node list response of all clusters and return after sorting
     	finalNodeResponse.setActiveNodes(activeNodes);
     	finalNodeResponse.setInactiveNodes(inactiveNodes);
     	if (finalNodeResponse.getActiveNodes() != null) {
@@ -169,11 +167,7 @@ public class HealthMonitoringServiceImpl implements HealthMonitoringService {
     public MetricTypesResponse getMetricTypes(Request request) {
         MetricTypesResponse response = null;
         if (StringUtils.isNotBlank(request.getSourceName())) {
-    		// Nishant : Create request builder object dynamically for the machine or group for which metric types is required.
-			// If the souce name is present in groupMachine map then the request is for a group and the HTTP request will be 
-			// sent to the corresponding machine.
-			//****************************************************
-        	String sourceName = "";
+    		String sourceName = "";
         	if(groupMachineMap.get(request.getSourceName()) != null){
         		sourceName = groupMachineMap.get(request.getSourceName());
         	} else {
@@ -200,11 +194,7 @@ public class HealthMonitoringServiceImpl implements HealthMonitoringService {
     public MetricNamesResponse getMetricNames(Request request) {
         MetricNamesResponse response = null;
         if (StringUtils.isNotBlank(request.getSourceName()) && StringUtils.isNotBlank(request.getMetricType())) {
-    		// Nishant : Create request builder object dynamically for the machine or group for which metric names is required.
-			// If the souce name is present in groupMachine map then the request is for a group and the HTTP request will be 
-			// sent to the corresponding machine.
-			//****************************************************       	
-        	String sourceName = "";
+    		String sourceName = "";
         	if(groupMachineMap.get(request.getSourceName()) != null){
         		sourceName = groupMachineMap.get(request.getSourceName());
         	} else {
@@ -232,19 +222,14 @@ public class HealthMonitoringServiceImpl implements HealthMonitoringService {
         HealthStatusResponse response = null;
         if (StringUtils.isNotBlank(sourceName) && StringUtils.isNotBlank(metricType)
                 && ArrayUtils.isNotEmpty(metricNames)) {
-    		// Nishant : Create request builder object dynamically for the machine or group for which health status is required.
-			// If the souce name is present in groupMachine map then the request is for a group and the HTTP request will be 
-			// sent to the corresponding machine.
-			//****************************************************       
         	String hostName = "";
         	if(groupMachineMap.get(sourceName)  != null ){
         		hostName = groupMachineMap.get(sourceName);
         	} else {
         		hostName = hostnameIpMap.get(sourceName);
-        	}  
-        	
-        	String url =
-            		getRequestBuilder(hostName).buildHealthStatusRequest(new Request(sourceName, sourceType, metricType,
+        	}  	
+        	String url = getRequestBuilder(hostName).buildHealthStatusRequest(
+        	new Request(sourceName, sourceType, metricType,
                             metricNames, startTime, endTime, 100L));
             String responseStr = HttpHelper.executeHttpRequest(client, url);
             response = toObject(responseStr, HealthStatusResponse.class);
@@ -256,6 +241,7 @@ public class HealthMonitoringServiceImpl implements HealthMonitoringService {
         return response;
     }
     
+    // FIXME: this function needs refactoring  - there is lot of repeating code around.
     @Override
     public HealthStatusResponse getClusterHealthStatus(Machine machine, String metricType, String[] metricNames, Date date) {
         HealthStatusResponse response = null;
@@ -264,7 +250,10 @@ public class HealthMonitoringServiceImpl implements HealthMonitoringService {
             String url = getRequestBuilder(machine.getDnsName()).buildHealthStatusRequest(
                 new Request(groupName, Request.SOURCE_GROUP, metricType, metricNames, date, date, 100L));
             String responseStr = HttpHelper.executeHttpRequest(client, url);
+            
+            // FIXME: handling in case that response is of type error
             response = toObject(responseStr, HealthStatusResponse.class);
+            
             LOG.debug("Request for machine "+url);
         } else {
             response = new HealthStatusResponse();

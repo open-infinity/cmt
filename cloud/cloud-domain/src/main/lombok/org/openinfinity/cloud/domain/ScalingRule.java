@@ -62,11 +62,11 @@ public class ScalingRule implements Serializable {
 	
 	@NonNull 
 	@NotScript
-	private int maxClusterCpuLoadPercentage;
+	private float maxLoad;
 	
 	@NonNull 
 	@NotScript
-	private int minClusterCpuLoadPercentage;
+	private float minLoad;
 		
 	@NonNull
 	@NotScript

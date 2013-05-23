@@ -648,7 +648,7 @@ var instanceManager = {
 			o.jqClusterSizeRangeSlider.slider({
 				range: true,
 				min: 0,
-				max: 100,
+				max: 20,
 				values: [ 15, 60 ],
 				slide: function( event, ui) {
 					o.clusterSizeRange.text(setRangeText(ui));

@@ -17,8 +17,13 @@
 package org.openinfinity.cloud.service.scaling;
 
 import java.util.Collection;
-
+import java.util.Date;
+import java.sql.Timestamp;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.stereotype.Service;
 import org.openinfinity.cloud.domain.Job;
 import org.openinfinity.cloud.domain.ScalingRule;
 import org.openinfinity.cloud.service.scaling.Enumerations.ScalingBalance;
@@ -28,10 +33,6 @@ import org.openinfinity.cloud.service.administrator.MachineService;
 import org.openinfinity.core.exception.BusinessViolationException;
 import org.openinfinity.core.util.ExceptionUtil;
 import org.openinfinity.core.util.IOUtil;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
-import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.stereotype.Service;
 
 /**
  * Service interface implementation of the automated provisioning business rules.
@@ -64,15 +65,15 @@ public class ScalingRuleServiceImpl implements ScalingRuleService {
 		}
 		catch(EmptyResultDataAccessException dae){
 			LOG.warn("Scaling rule not defined for the cluster");
-			return ScalingBalance.NOT_DEFINED;
+			return ScalingBalance.RULE_NOT_DEFINED;
 		}
 	}
 
-	public void validateInput(float cpuLoad, int clusterId) {
-		if (cpuLoad < 0.0 || cpuLoad >= 100.0) {
-			throw new BusinessViolationException("CPU percentage is not valid: [" + cpuLoad + "]");
+	public void validateInput(float load, int clusterId) {
+		if (load < 0.0 ) {
+			throw new BusinessViolationException("Load is not valid: [" + load + "]");
 		}
-		if (clusterId < 0 || clusterId >= Integer.MAX_VALUE) {
+		if (clusterId < 0) {
 			throw new BusinessViolationException("Cluster id is not valid: [" + clusterId + "]");
 		}
 	}
@@ -81,30 +82,91 @@ public class ScalingRuleServiceImpl implements ScalingRuleService {
 		int clusterSize = machineService.getMachinesInCluster(clusterId).size();
 		int maxMachines = rule.getMaxNumberOfMachinesPerCluster();
 		int minMachines = rule.getMinNumberOfMachinesPerCluster();
-		int maxLoad = rule.getMaxClusterCpuLoadPercentage();
-		int minLoad = rule.getMinClusterCpuLoadPercentage();
-
-		logParameters(clusterSize, maxMachines, minMachines, maxLoad, minLoad, load, clusterId);
-		ScalingBalance scalingBalance = ScalingBalance.NOT_DEFINED;
+		float maxLoad = rule.getMaxLoad();
+		float minLoad = rule.getMinLoad();
+        float a = 0.01f;
+		LOG.debug ("executeBusinessLogic() Parameters: clusterId = " + clusterId
+                + " load = " + load 
+                + " maxMachines = "  + maxMachines
+                + " minMachines = "  + minMachines
+                + " maxLoad = "  + maxLoad
+                + " minLoad = "  + minLoad
+                + " clusterSize = "  + clusterSize
+                + " a = "  + a);
+		
+		ScalingBalance scalingBalance = ScalingBalance.RULE_NOT_DEFINED;
 		
 		boolean isScalingOngoing = false;
 		int jobId = rule.getJobId();
+		Job job = null;
 		// Initially blank rule has jobId == -1
 		if (jobId != -1) { 
-			Job job = jobService.getJob(jobId);
+			job = jobService.getJob(jobId);
 			if (job != null){
 				int jobStatus = job.getJobStatus();
 				if (jobStatus == JobService.CLOUD_JOB_CREATED || jobStatus == JobService.CLOUD_JOB_STARTED)
 					isScalingOngoing = true;
 			} 	
 		}
+		// TODO: it wound be better to check if the machine is running, but
+		// that too woul dnot promise that the services are actualy up.
+		// So again it would be needed to include some delay after the 
+		// new machine comes into "running" state
 		
 		if (!rule.isPeriodicScalingOn() || isScalingOngoing) 
-			LOG.debug("Cluster" +  clusterId + "can't be autoscaled");
+			LOG.debug("Cluster" +  clusterId + "can't be scaled");
+		
+		// Range OK
 		else if (clusterSize < maxMachines && clusterSize > minMachines ) {
-			if (maxLoad <= load )  scalingBalance =  ScalingBalance.SCALE_OUT;
-			else if (minLoad > load) scalingBalance =  ScalingBalance.SCALE_IN;
-			else scalingBalance = ScalingBalance.HARMONIZED;
+			
+		    // Try scaling out if possible
+		    if (maxLoad <= load ) {
+		        // There was no scaling ever done for this cluster, scale out.
+		        if (job == null) {
+		            scalingBalance =  ScalingBalance.SCALE_OUT;
+		        }
+		        // There was a scaling job. Check when it ended.
+		        // If it ended long enough time ago, scale out.
+		        else{
+		            
+		            // FIXME: repeating code -> function
+		            Timestamp jobEndTimestamp = job.getEndTime();
+                    Date now = new Date();
+                    Timestamp ts = new Timestamp(now.getTime() - 500);
+                    LOG.debug ("ts.getTime()=" + ts.getTime() + 
+                               " jobEndTimestamp.getTime= " + jobEndTimestamp.getTime() );
+                    
+                    if (ts.after(jobEndTimestamp))
+                        scalingBalance =  ScalingBalance.SCALE_OUT; 
+                    else
+                        scalingBalance =  ScalingBalance.HARMONIZED; 
+		        }         
+		    }
+		    
+            // Try scaling in if possible
+			else if (minLoad > load){
+			    if (job == null) 
+			        scalingBalance =  ScalingBalance.SCALE_IN;
+			    else{
+			       
+			        // get time - done
+			        Timestamp jobEndTimestamp = job.getEndTime();
+			        Date now = new Date();
+			        Timestamp ts = new Timestamp(now.getTime() - 30);
+			        LOG.debug ("ts.getTime()=" + ts.getTime() +  
+			                   " jobEndTimestamp.getTime= " + jobEndTimestamp.getTime() );
+			        
+			        if (ts.after(jobEndTimestamp))
+			            scalingBalance =  ScalingBalance.SCALE_IN;
+			        else 
+			            scalingBalance = ScalingBalance.HARMONIZED;
+			    }		    
+			    
+			}
+		    
+		    // Load in range, do nothing
+			else 
+			    scalingBalance = ScalingBalance.HARMONIZED;
 		} 
 		else if (clusterSize == maxMachines && load > maxLoad) 
 			scalingBalance = ScalingBalance.SYSTEM_DISASTER_PANIC;
@@ -112,16 +174,6 @@ public class ScalingRuleServiceImpl implements ScalingRuleService {
 		
 		LOG.debug ("applyScalingRule() return = " + scalingBalance.name());
 		return scalingBalance;
-	}
-	
-	private void logParameters(int clusterSize, int maxMachines, int minMachines, int maxLoad, int minLoad, float load, int clusterId){
-		LOG.debug ("executeBusinessLogic() Parameters: clusterId = " + clusterId
-				+ " load = " + load 
-				+ " maxMachines = "  + maxMachines
-				+ " minMachines = "  + minMachines
-				+ " maxLoad = "  + maxLoad
-				+ " minLoad = "  + minLoad
-				+ " clusterSize = "  + clusterSize);
 	}
 	
 	public void store (ScalingRule scalingRule){
@@ -148,4 +200,7 @@ public class ScalingRuleServiceImpl implements ScalingRuleService {
 		scalingRuleRepository.storeStateScheduledUnScaling(clusterId);
 	}
 	
+	public void storeJobId(int clusterId, int jobId){
+        scalingRuleRepository.storeJobId(clusterId, jobId);
+	}
 }

@@ -65,5 +65,10 @@ public interface ScalingRuleService {
 	 * Clears scaleIn flag
 	 */
 	void storeScalingInParameters(int clusterId);
+	
+	/**
+     * Update job id.
+     */
+    void storeJobId(int clusterId, int jobId);
 
 }

@@ -15,7 +15,10 @@
         http://www.springframework.org/schema/task
         http://www.springframework.org/schema/task/spring-task-3.0.xsd">
        
-    <context:property-placeholder location="classpath:/META-INF/properties/system.properties, classpath:/META-INF/properties/infrastructure.properties" />  
+    <context:property-placeholder location="classpath:/system.properties,
+                                            classpath:/infrastructure.properties,
+                                            classpath:/EucaCredentials.properties,
+                                            classpath:/healthmonitoring.properties" />  
         		    
 	<import resource="classpath*:/META-INF/spring/cloud-context-util.xml" />
 	<import resource="classpath*:/META-INF/spring/cloud-context-core.xml" />
@@ -23,7 +26,16 @@
 	<import resource="classpath*:/META-INF/spring/cloud-context-service.xml" />
 	<import resource="classpath*:/META-INF/spring/periodic-scaler-context.xml" />
 	<import resource="classpath*:/META-INF/spring/scheduled-scaler-context.xml" />
-		
+	
+	<!--
+	 <context:component-scan base-package="org.openinfinity">
+        <context:exclude-filter type="regex" expression="org.openinfinity.cloud.domain.repository.deployer.*.*" />
+        <context:exclude-filter type="regex" expression="org.openinfinity.cloud.service.deployer.*.*" /> 
+        <context:exclude-filter type="regex" expression="org.openinfinity.cloud.application.worker.*.*" />  
+        <context:exclude-filter type="regex" expression="org.openinfinity.cloud.application.admin.*.*" />   
+    </context:component-scan>
+    -->
+    	
 	<bean id="txManager" 
 	    class="org.springframework.jdbc.datasource.DataSourceTransactionManager"
 		p:dataSource-ref="cloudDataSource" /> 	
@@ -66,7 +78,7 @@
 			<batch:tasklet transaction-manager="txManager"
 				start-limit="3">
 				<batch:chunk reader="periodicScalerItemReader" processor="periodicScalerItemProcessor"
-					writer="autoscalerItemWriter" commit-interval="100" retry-limit="3">
+					writer="periodicScalerItemWriter" commit-interval="100" retry-limit="3">
 					<batch:retryable-exception-classes>
                     	<batch:include class="org.springframework.dao.OptimisticLockingFailureException" />
                         <batch:include class="org.springframework.dao.DeadlockLoserDataAccessException" />

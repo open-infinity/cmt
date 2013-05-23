@@ -333,12 +333,7 @@ public class ClusterController {
 			}
 			// TODO: do not overwrite old rules with NULL or undefined values if new rule is not specified. 
 			// TODO: use state instead 2 flags:scale_in, scale_out
-			/*boolean scaleOut = false;
-			boolean scaleIn = true;
-			if(cluster.getNumberOfMachines() > machineCount){
-				scaleOut = true;
-				scaleIn = false;
-			}*/
+
 			scalingRuleService.store(new ScalingRule(
 				clusterId, 
 				periodicScallingOn,
@@ -353,20 +348,7 @@ public class ClusterController {
 				clusterSizeNew,
 				0,								//original cluster size 
 				jobId));  						
-			/*
-			 * TODO:Vedran is there another(better) way to do batch processing where input is coming from multiple tables?
-			 * 
-			 * 	Options I could see:
-			 * 	a) add redundant columns (instance_id, cloud_type, zone) to scaling_rules_tbl 
-			 * 	b) break batch chunk processing my not using JdbcCursorItemReader
-			 * 	c) make some db queries from processor -> suboptimal use of chunking support.
-			 * 	d) drop the need for needed parameters and fetch them from worker?
-			 * 	e) ?? in ItemReader use somehow a sql query that uses join??
-			 * 	f) ??
-			 * 	Finally, c) looked the best, and I went on to implement it.
-			 * 
-			*/
-					
+						
 		} catch (Exception e) {
 			LOG.error("Error setting up the service: "+e.getMessage());
 			response.setProperty(ResourceResponse.HTTP_STATUS_CODE, AdminGeneral.HTTP_ERROR_CODE_SERVER_ERROR);
@@ -458,8 +440,8 @@ public class ClusterController {
 			scalingRuleData.put("periodic", scalingRule.isPeriodicScalingOn());
 			scalingRuleData.put("minMachines", scalingRule.getMinNumberOfMachinesPerCluster());
 			scalingRuleData.put("maxMachines", scalingRule.getMaxNumberOfMachinesPerCluster());
-			scalingRuleData.put("minLoad", scalingRule.getMinClusterCpuLoadPercentage());
-			scalingRuleData.put("maxLoad", scalingRule.getMaxClusterCpuLoadPercentage());
+			scalingRuleData.put("minLoad", scalingRule.getMinLoad());
+			scalingRuleData.put("maxLoad", scalingRule.getMaxLoad());
 			scalingRuleData.put("scheduled", scalingRule.isScheduledScalingOn());
 			scalingRuleData.put("periodFrom", scalingRule.getPeriodFrom().getTime());
 			scalingRuleData.put("periodTo", scalingRule.getPeriodTo().getTime());

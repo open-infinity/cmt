@@ -213,7 +213,7 @@ public class MachineController {
 		}
 		Collection<Reservation> resList = ec2.describeInstances(instanceList);
 		if (resList != null) {
-			LOG.info("Describe returnet "+resList.size()+" reservations");
+			LOG.info("Describe returned "+resList.size()+" reservations");
 			Iterator<Reservation> r = resList.iterator();
 			while (r.hasNext()) {
 				Reservation tempR = r.next();
