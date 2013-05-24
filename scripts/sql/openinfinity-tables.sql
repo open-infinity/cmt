@@ -1,3 +1,6 @@
+CREATE DATABASE openinfinity;
+USE openinfinity;
+
 CREATE TABLE `BATCH_JOB_EXECUTION` (
   `JOB_EXECUTION_ID` bigint(20) NOT NULL,
   `VERSION` bigint(20) DEFAULT NULL,
