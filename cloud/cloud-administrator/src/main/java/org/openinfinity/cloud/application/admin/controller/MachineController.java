@@ -108,7 +108,8 @@ public class MachineController {
 		}
 		EC2Wrapper ec2 = new EC2Wrapper();
 		if(toasInstance.getCloudType() == InstanceService.CLOUD_TYPE_AMAZON) {
-			// TODO
+			ec2.setEndpoint(ec2EndPoint);
+			ec2.init(eucaCredentials, toasInstance.getCloudType());
 		} else if(toasInstance.getCloudType() == InstanceService.CLOUD_TYPE_EUCALYPTUS) {
 			ec2.setEndpoint(ec2EndPoint);
 			ec2.init(eucaCredentials, toasInstance.getCloudType());
@@ -175,7 +176,8 @@ public class MachineController {
 		
 		EC2Wrapper ec2 = new EC2Wrapper();
 		if(toasInstance.getCloudType() == InstanceService.CLOUD_TYPE_AMAZON) {
-			// TODO
+			ec2.setEndpoint(ec2EndPoint);
+			ec2.init(eucaCredentials, toasInstance.getCloudType());
 		} else if(toasInstance.getCloudType() == InstanceService.CLOUD_TYPE_EUCALYPTUS) {
 			ec2.setEndpoint(ec2EndPoint);
 			ec2.init(eucaCredentials, toasInstance.getCloudType());

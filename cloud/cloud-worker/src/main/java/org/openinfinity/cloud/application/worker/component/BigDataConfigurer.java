@@ -81,9 +81,25 @@ public class BigDataConfigurer implements Configurer {
 		Key k = keyService.getKeyByInstanceId(instance.getInstanceId());
 		Machine managementMachine = machineService.getClusterManagementMachine(m.getClusterId());
 		
-		Pattern successPattern = Pattern.compile("status=\"(\\w+)\"");
+		int maxWaitForRunning = 96;
+		while(!m.getState().equals("running") && maxWaitForRunning > 0) {
+			LOG.info(threadName+": Waiting instance "+m.getInstanceId()+" to be at 'running' state. Waiting for "+maxWaitForRunning+" times");
+			try {
+				Thread.sleep(5000);
+			} catch (InterruptedException e) {
+				LOG.error(threadName+": Someone interrupted my sleep! How rude! "+e.getMessage());
+			}
+			m = machineService.getMachine(m.getId());
+			maxWaitForRunning--;
+		}
 		
-		command = "/usr/bin/puppet agent --test --no-daemonize --onetime --certname ";
+		Pattern successPattern = Pattern.compile("status=\"(\\w+)\"");
+		if(m.getCloud() == InstanceService.CLOUD_TYPE_AMAZON) {
+			command = "/usr/bin/sudo /usr/bin/puppet agent --test --no-daemonize --onetime --certname ";
+		} else {
+			command = "/usr/bin/puppet agent --test --no-daemonize --onetime --certname ";
+		}
+		
 		command += instance.getInstanceId()+"_";
 		command += m.getClusterId()+"_";
 		command += m.getId()+"_";
@@ -94,13 +110,23 @@ public class BigDataConfigurer implements Configurer {
 			machineService.updateMachineConfigure(m.getId(), MachineService.MACHINE_CONFIGURE_ERROR);
 			return;
 		}
-		command = "/bin/hostname "+m.getName();
+		if(m.getCloud() == InstanceService.CLOUD_TYPE_AMAZON) {
+			command = "/usr/bin/sudo /bin/hostname "+m.getName();
+		} else {
+			command = "/bin/hostname "+m.getName();
+		}
+		
 		output = sshRunCommand(m, command, k);
 		if(output == null) {
 			machineService.updateMachineConfigure(m.getId(), MachineService.MACHINE_CONFIGURE_ERROR);
 			return;
 		}
-		command = "/opt/bigdata/bin/attach-node.py --xml --role="+m.getType()+" "+m.getName()+" "+m.getPrivateDnsName();
+		if(m.getCloud() == InstanceService.CLOUD_TYPE_AMAZON) {
+			command = "/usr/bin/sudo /opt/bigdata/bin/attach-node.py --xml --role="+m.getType()+" "+m.getName()+" "+m.getPrivateDnsName();
+		} else {
+			command = "/opt/bigdata/bin/attach-node.py --xml --role="+m.getType()+" "+m.getName()+" "+m.getPrivateDnsName();
+		}
+		
 		output = sshRunCommand(managementMachine, command, k);
 		if(output == null) {
 			machineService.updateMachineConfigure(m.getId(), MachineService.MACHINE_CONFIGURE_ERROR);
@@ -129,8 +155,55 @@ public class BigDataConfigurer implements Configurer {
 		String threadName = Thread.currentThread().getName();
 		
 		boolean connectOK = false;
-		int x = 30;
+		int x = 60;
+		
 		while(!connectOK) {
+			x--;
+			Socket s = null;
+			if(m.getDnsName().startsWith("euca-0-0-0-0") || m.getDnsName().startsWith("0.0.0.0")) {
+				LOG.info("Machine dnsname not yet set correctly by eucalyptus, waiting for a moment");
+				try {
+					Thread.sleep(3000);
+				} catch (InterruptedException e) {
+					LOG.error(threadName+": Someone interrupted my sleep! How rude! "+e.getMessage());
+				}
+				m = machineService.getMachine(m.getId());
+			} else {
+				try {
+					s = new Socket();
+					s.setReuseAddress(true);
+					LOG.debug(threadName + ": Trying to connect machine " + m.getId() + ", address: " + m.getDnsName());
+					SocketAddress sa = new InetSocketAddress(m.getDnsName(), 22);
+					s.connect(sa, 3000);
+					connectOK = true;
+					LOG.info(threadName + ": Connected OK to the instance " + m.getInstanceId());
+				} catch (IOException e) {
+					if (x == 0) {
+						machineService.updateMachineConfigure(m.getId(), MachineService.MACHINE_CONFIGURE_ERROR);
+						return retVal;
+					}
+					LOG.info(threadName + ": Got IO exception connecting to ssh port, trying for " + x
+							+ " more times...");
+					LOG.info(threadName + ": Updating machine info");
+					m = machineService.getMachine(m.getId());
+					try {
+						Thread.sleep(3000);
+					} catch (InterruptedException ex) {
+						LOG.error(threadName + ": Someone interrupted my sleep! How rude! " + e.getMessage());
+					}
+				} finally {
+					if (s != null) {
+						try {
+							s.close();
+						} catch (IOException e) {
+							LOG.error(threadName + ": Error closing socket");
+						}
+					}
+				}
+			}
+		}
+		
+	/*	while(!connectOK) {
 			x--;
 			Socket s = null;
 			try {
@@ -163,14 +236,14 @@ public class BigDataConfigurer implements Configurer {
 					}
 				}
 			}
-		}
+		} */
 		
 		byte[] privkey = key.getSecret_key().getBytes();
 		final byte[] emptyPassPhrase = new byte[0];
 		JSch jsch = new JSch();
 		try {
-			jsch.addIdentity("root", privkey, null, emptyPassPhrase);
-			Session session = jsch.getSession("root", m.getDnsName(), 22);
+			jsch.addIdentity(m.getUserName(), privkey, null, emptyPassPhrase);
+			Session session = jsch.getSession(m.getUserName(), m.getDnsName(), 22);
 			Properties config = new Properties();
 			config.put("StrictHostKeyChecking", "no");
 			session.setConfig(config);
@@ -180,6 +253,7 @@ public class BigDataConfigurer implements Configurer {
 			
 			LOG.info(threadName+": Running command: '"+command+"'");
 			Channel channel = session.openChannel("exec");
+			((ChannelExec) channel).setPty(true);
 			((ChannelExec) channel).setCommand(command);
 			channel.setInputStream(null);
 			InputStream in = channel.getInputStream();

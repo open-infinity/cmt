@@ -212,7 +212,7 @@ public class MachineConfigurer implements Configurer {
 			session.connect();
 			String command = null;
 			if(m.getCloud() == InstanceService.CLOUD_TYPE_AMAZON) {
-				command = "sudo /usr/bin/puppet agent --test --no-daemonize --onetime --certname ";
+				command = "/usr/bin/sudo /usr/bin/puppet agent --test --no-daemonize --onetime --certname ";
 			} else {
 				command = "/usr/bin/puppet agent --test --no-daemonize --onetime --certname ";
 			}
@@ -226,6 +226,7 @@ public class MachineConfigurer implements Configurer {
 			
 			LOG.info(threadName+": Running command: '"+command+"'");
 			Channel channel = session.openChannel("exec");
+			((ChannelExec) channel).setPty(true);
 			((ChannelExec) channel).setCommand(command);
 			channel.setInputStream(null);
 			InputStream in = channel.getInputStream();

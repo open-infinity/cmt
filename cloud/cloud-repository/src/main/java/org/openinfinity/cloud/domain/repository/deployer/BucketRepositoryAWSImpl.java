@@ -19,6 +19,7 @@ import java.io.InputStream;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
@@ -44,8 +45,11 @@ public class BucketRepositoryAWSImpl implements BucketRepository {
 	private String endpoint = "http://localhost:8080";
 	
 	@Autowired
-	public BucketRepositoryAWSImpl(AWSCredentials credentials) throws Throwable {
-		simpleStorageService = new AmazonS3Client(credentials);
+	@Qualifier("cloudCredentials")
+	private AWSCredentials eucaCredentials;
+	
+	public BucketRepositoryAWSImpl() throws Throwable {
+		simpleStorageService = new AmazonS3Client(eucaCredentials);
 		simpleStorageService.setEndpoint(endpoint);
 	}
 	

@@ -49,6 +49,7 @@ import com.amazonaws.services.ec2.model.DescribeVolumesResult;
 import com.amazonaws.services.ec2.model.DetachVolumeRequest;
 import com.amazonaws.services.ec2.model.DisassociateAddressRequest;
 import com.amazonaws.services.ec2.model.Instance;
+import com.amazonaws.services.ec2.model.IpPermission;
 import com.amazonaws.services.ec2.model.KeyPair;
 import com.amazonaws.services.ec2.model.Placement;
 import com.amazonaws.services.ec2.model.Reservation;
@@ -57,6 +58,7 @@ import com.amazonaws.services.ec2.model.RunInstancesRequest;
 import com.amazonaws.services.ec2.model.RunInstancesResult;
 import com.amazonaws.services.ec2.model.Tag;
 import com.amazonaws.services.ec2.model.TerminateInstancesRequest;
+import com.amazonaws.services.ec2.model.UserIdGroupPair;
 import com.amazonaws.services.elasticloadbalancing.AmazonElasticLoadBalancing;
 import com.amazonaws.services.elasticloadbalancing.AmazonElasticLoadBalancingClient;
 import com.amazonaws.services.elasticloadbalancing.model.CreateAppCookieStickinessPolicyRequest;
@@ -207,11 +209,21 @@ public class EC2Wrapper {
 	public void authorizeIPs(String securityGroupName, String cidrIp, Integer fromPort, Integer toPort, String protocol) {
 		try {
 			AuthorizeSecurityGroupIngressRequest request = new AuthorizeSecurityGroupIngressRequest();
+			IpPermission perm = new IpPermission();
+			perm.setFromPort(fromPort);
+			perm.setToPort(toPort);
+			perm.setIpProtocol(protocol);
+			List<String> ipRanges = new ArrayList<String>();
+			ipRanges.add(cidrIp);
+			perm.setIpRanges(ipRanges);
+			List<IpPermission> permList = new ArrayList<IpPermission>();
+			permList.add(perm);
 			request.setGroupName(securityGroupName);
-			request.setFromPort(fromPort);
-			request.setToPort(toPort);
-			request.setCidrIp(cidrIp);
-			request.setIpProtocol(protocol);
+			//request.setFromPort(fromPort);
+			//request.setToPort(toPort);
+			//request.setCidrIp(cidrIp);
+			//request.setIpProtocol(protocol);
+			request.setIpPermissions(permList);
 			ec2.authorizeSecurityGroupIngress(request);
 		} catch (Exception e) {
 			String message = e.getMessage();
@@ -223,16 +235,57 @@ public class EC2Wrapper {
 	public void authorizeGroup(String securityGroupName, String sourceGroupName, String sourceGroupOwner, Integer fromPort, Integer toPort, String protocol) {
 		try {
 			AuthorizeSecurityGroupIngressRequest request = new AuthorizeSecurityGroupIngressRequest();
+			UserIdGroupPair pair = new UserIdGroupPair();
+			pair.setGroupName(sourceGroupName);
+			pair.setUserId(sourceGroupOwner);
+			List<UserIdGroupPair> idList = new ArrayList<UserIdGroupPair>();
+			idList.add(pair);
+			IpPermission perm = new IpPermission();
+			perm.setUserIdGroupPairs(idList);
+			perm.setFromPort(fromPort);
+			perm.setToPort(toPort);
+			perm.setIpProtocol(protocol);
+			List<IpPermission> permList = new ArrayList<IpPermission>();
+			permList.add(perm);
+			request.setIpPermissions(permList);
+			
 			request.setGroupName(securityGroupName);
-			request.setFromPort(fromPort);
-			request.setToPort(toPort);
-			request.setSourceSecurityGroupName(sourceGroupName);
-			request.setSourceSecurityGroupOwnerId(sourceGroupOwner);
-			request.setIpProtocol(protocol);
+			//request.setFromPort(fromPort);
+			//request.setToPort(toPort);
+			//request.setSourceSecurityGroupName(sourceGroupName);
+			//request.setSourceSecurityGroupOwnerId(sourceGroupOwner);
+			//request.setIpProtocol(protocol);
 			ec2.authorizeSecurityGroupIngress(request);
 		} catch (Exception e) {
 			String message = e.getMessage();
 			LOG.error("Could not set authorized IP:s to security group: "+message);
+			ExceptionUtil.throwSystemException(message, e);
+		}
+	}
+	
+	public void revokeGroup(String securityGroupName, String sourceGroupName, String sourceGroupOwner, Integer fromPort, Integer toPort, String protocol) {
+		try {
+			RevokeSecurityGroupIngressRequest request = new RevokeSecurityGroupIngressRequest();
+			UserIdGroupPair pair = new UserIdGroupPair();
+			pair.setGroupName(sourceGroupName);
+			pair.setUserId(sourceGroupOwner);
+			List<UserIdGroupPair> idList = new ArrayList<UserIdGroupPair>();
+			idList.add(pair);
+			IpPermission perm = new IpPermission();
+			perm.setUserIdGroupPairs(idList);
+			perm.setFromPort(fromPort);
+			perm.setToPort(toPort);
+			perm.setIpProtocol(protocol);
+			List<IpPermission> permList = new ArrayList<IpPermission>();
+			permList.add(perm);
+			request.setIpPermissions(permList);
+
+			request.setGroupName(securityGroupName);
+			ec2.revokeSecurityGroupIngress(request);
+		} catch (Exception e) {
+			String message = e.getMessage();
+			LOG.error("Could not set authorized IP:s to security group: "
+					+ message);
 			ExceptionUtil.throwSystemException(message, e);
 		}
 	}
