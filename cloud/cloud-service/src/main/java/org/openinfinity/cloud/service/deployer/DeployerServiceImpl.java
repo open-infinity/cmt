@@ -37,6 +37,7 @@ import org.springframework.stereotype.Service;
  * Deployer interface implementation for deploying new applications inside a cloud environment.
  * 
  * @author Ilkka Leinonen
+ * @author Tommi Siitonen
  * @version 1.0.0
  * @since 1.0.0
  */
@@ -58,11 +59,65 @@ public class DeployerServiceImpl implements DeployerService {
 
 	@Log
 	public Deployment deploy(Deployment deployment) {
-		String location = bucketRepository.createBucket(deployment.getInputStream(), ""+deployment.getClusterId(), deployment.getName(), new HashMap<String, String>());
+		// For supporting rollback bucket objects need to be named to be uniquely and old versions stored in db with NOT_DEPLOYED state
+		
+		// we need new deployment id for location? location need to be stored also
+		
+		deployment.setLocation("not_in_walrus"); 
+		//  if previous DEPLOYED deployment (target and name) exists it will be updated to UNDEPLOYED
+		// this will update deploymenstatuses and actually remove old application from target cluster machines
+		deploymentRepository.storeAndUpdate(deployment);
+		String location = bucketRepository.createBucket(deployment.getInputStream(), ""+deployment.getClusterId(), deployment.getName()+"-"+deployment.getId(), new HashMap<String, String>());
 		deployment.setLocation(location);
-		deploymentRepository.store(deployment);
+		deployment.setState(DEPLOYMENT_STATE_DEPLOYED);
+		deploymentRepository.updateLocationAndState(deployment);
 		return deployment;
+				
+		//String location = bucketRepository.createBucket(deployment.getInputStream(), ""+deployment.getClusterId(), deployment.getName(), new HashMap<String, String>());
+		//deployment.setLocation(location);
+		//deploymentRepository.store(deployment);
+		//return deployment;
+	} 
+	
+	@Log
+	public Deployment redeploy(Deployment deployment) {
+		// For supporting rollback bucket objects need to be named to be uniquely and old versions stored in db with NOT_DEPLOYED state
+
+		// update current deployed deployment to undeploy and redeployed to deploy
+		// TODO: verify deploymentstatuses handling in reader
+		
+		//  if previous DEPLOYED deployment (target and name) exists it will be updated to UNDEPLOY
+		deploymentRepository.updateExistingDeployedDeploymentState(deployment, DEPLOYMENT_STATE_UNDEPLOY);
+		// we could update state to UNDEPLOYED and deploymentStatuses to undeployed as well since current
+		// deployment will be replaced
+		
+		deployment.setState(DEPLOYMENT_STATE_DEPLOYED);
+		deploymentRepository.updateLocationAndState(deployment);
+		return deployment;
+				
+		//String location = bucketRepository.createBucket(deployment.getInputStream(), ""+deployment.getClusterId(), deployment.getName(), new HashMap<String, String>());
+		//deployment.setLocation(location);
+		//deploymentRepository.store(deployment);
+		//return deployment;
+	}	
+	
+	
+
+	@Log
+	public void deleteObject(Deployment deployment) {
+		bucketRepository.deleteObject(""+deployment.getClusterId(), deployment.getName());
+		// no mid-state used. if DeploymentStatuses need to be set to DELETED use mid state and implement batch processing
+		// deployment.setState(DeployerService.DEPLOYMENT_STATE_DELETED);
+		// deploymentRepository.store(deployment);
+		deploymentRepository.updateDeploymentStateById(deployment.getId(), DeployerService.DEPLOYMENT_STATE_DELETED);
 	}
+	
+	
+	@Log
+	public Deployment loadDeploymentById(int deploymentId) {
+		return deploymentRepository.loadById(deploymentId);
+	}
+		
 	
 	@Log
 	public Collection<Deployment> loadDeployments() {
@@ -73,6 +128,12 @@ public class DeployerServiceImpl implements DeployerService {
 	public Collection<Deployment> loadDeploymentsForOrganization(long organizationId) {
 		return deploymentRepository.loadAllForOrganization(organizationId);
 	}
+	
+	@Log
+	public Collection<Deployment> loadDeploymentsForClusterWithName(Deployment deployment) {
+		return deploymentRepository.loadByOrgInstClusName(deployment.getOrganizationId(), deployment.getInstanceId(), deployment.getClusterId(), deployment.getName());
+	}
+	
 	
 	@Log
 	public Collection<Deployment> loadDeployments(int page, int rows){
@@ -92,8 +153,26 @@ public class DeployerServiceImpl implements DeployerService {
 	}
 	
 	@Log
+	public void updateDeploymentState(Deployment deployment) {
+		deploymentRepository.updateDeploymentStateById(deployment.getId(), deployment.getState());
+	}
+	
+	@Log
+	public void updateDeployment(Deployment deployment) {
+		// store should both handle add and update ?
+		//deploymentRepository.store(deployment);
+	}
+	
+	@Log
+	public void updateDeploymentStatusStatesFromToByDeploymentId(DeploymentStatus.DeploymentState from, DeploymentStatus.DeploymentState to, int deploymentId) {		
+		deploymentRepository.updateDeploymentStatusStatesFromToByDeploymentId(from.getValue(), to.getValue(), deploymentId);
+	}
+		
+	
+	@Log
 	public void rollback(Deployment deployment) {
 		// TODO Auto-generated method stub	
+		// fetch deployment with id in object name and update deployment statuses. also deploy need changes
 	}
 
 	@Log
@@ -109,7 +188,11 @@ public class DeployerServiceImpl implements DeployerService {
 
 	@Override
 	public Collection<DeploymentStatus> loadDeploymentStatusesForCluster(int clusterId) {
-		return deploymentRepository.loadDeploymentStatuses(clusterId);
+		return deploymentRepository.loadDeploymentStatusesByClusterId(clusterId);
 	}
-
+	
+	@Override
+	public Collection<DeploymentStatus> loadDeploymentStatusesForDeployment(int deploymentId) {
+		return deploymentRepository.loadDeploymentStatusesByDeploymentId(deploymentId);
+	}	
 }

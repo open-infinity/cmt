@@ -51,16 +51,7 @@ public class PeriodicScalerLauncher {
 		
 	@Log
 	public void launch() throws Exception {
-		LOG.debug("Launch enter");
-		AbstractResponse healthMonGroups = null;
-		AbstractResponse finalNodeResponse = null;
-
-		finalNodeResponse = healthMonitoringService.getHostList();
-		healthMonGroups = healthMonitoringService.getGroupList();
-        LOG.debug("------------finalNodeResponse = " + finalNodeResponse.getResponseStatus());
-
-		healthMonGroups.getResponseStatus();
-        LOG.debug("------------healthMonGroups = " + healthMonGroups.getResponseStatus());
+		LOG.debug("launch() enter");
 		JobExecution exec = jobLauncher.run(job, new JobParametersBuilder().addLong("p_time", System.currentTimeMillis()).toJobParameters());
 		LOG.debug(exec.getExitStatus());
 	}

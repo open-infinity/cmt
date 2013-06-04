@@ -20,6 +20,7 @@ import java.util.Map;
 
 import org.openinfinity.cloud.domain.GroupListResponse;
 import org.openinfinity.cloud.domain.HealthStatusResponse;
+import org.openinfinity.cloud.domain.Machine;
 import org.openinfinity.cloud.domain.MetricBoundariesResponse;
 import org.openinfinity.cloud.domain.MetricNamesResponse;
 import org.openinfinity.cloud.domain.MetricTypesResponse;
@@ -54,6 +55,9 @@ public interface HealthMonitoringService {
     HealthStatusResponse getHealthStatus(String hostName, String sourceType, String metricType, String[] metricNames,
                                          Date startTime, Date endTime);
 
+    HealthStatusResponse getClusterHealthStatus(Machine machine, String metricType,
+            String[] metricNames, Date date);
+    
     String getHealthStatus();
 
     /**
@@ -62,7 +66,6 @@ public interface HealthMonitoringService {
      * @param metricType Metric type.
      * @return All available boundaries for every metric that belongs to selected metric type.
      */
-	 // Nishant: Changed to add the sourceName parameter in the method call.
     MetricBoundariesResponse getMetricBoundaries(String hostName,String metricType);
 
     GroupListResponse getGroupList();

@@ -15,7 +15,6 @@
  */
 package org.openinfinity.cloud.domain.repository.scaling;
 
-import java.sql.Timestamp;
 import java.util.Collection;
 
 import org.openinfinity.cloud.domain.ScalingRule;
@@ -24,6 +23,7 @@ import org.openinfinity.cloud.domain.ScalingRule;
  * Repository interface for storing scaling rules of the cluster.
  * 
  * @author Ilkka Leinonen
+ * @author Vedran Bartonicek
  *
  * @version 1.0.0
  * @since 1.0.0
@@ -34,12 +34,12 @@ public interface ScalingRuleRepository {
 	 * Stores  scaling rule autoscaling settings into repository. If  rule for a given cluster already exists,
 	 * updates existing rule. Otherwise creates a new rule for the cluster.
 	 */
-	void store (ScalingRule scalingRule);
+	void store(ScalingRule scalingRule);
 	
 	/**
 	 * Loads <code>org.openinfinity.cloud.domain.ScalingRule</code> based on the cluster id.
 	 */
-	ScalingRule loadByClusterId (int clusterId);
+	ScalingRule loadByClusterId(int clusterId);
 	
 	/**
 	 * Deletes scaling rule by id.
@@ -52,13 +52,18 @@ public interface ScalingRuleRepository {
 	Collection<ScalingRule> loadAll();
 	
 	/**
-	 * Stores original cluster size, changes state
+	 * Stores original cluster size, changes state.
 	 */
 	void storeStateScheduledScaling(int numberOfMachines, int clusterId);
 	
 	/**
-	 * Changes state
+	 * Changes state.
 	 */
 	void storeStateScheduledUnScaling(int clusterId);
+	
+	/**
+     * Update job id.
+     */
+	void storeJobId(int clusterId, int jobId);
 	
 }

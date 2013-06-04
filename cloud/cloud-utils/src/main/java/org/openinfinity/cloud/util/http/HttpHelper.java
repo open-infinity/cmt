@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 the original author or authors.
+ * Copyright (c) 2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,9 +21,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.util.EntityUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import org.apache.log4j.Logger;
 import java.io.IOException;
 
 /**
@@ -36,7 +34,7 @@ import java.io.IOException;
 public class HttpHelper {
 
     private static final String EXCEPTION_WHILE_EXECUTING_HTTP_REQUEST = "Exception while executing http request";
-    private static final Logger LOGGER = LoggerFactory.getLogger(HttpHelper.class);
+    private static final Logger LOG = Logger.getLogger(HttpHelper.class.getName());
 
     public static String executeHttpRequest(HttpClient client, String url) {
         HttpUriRequest request = new HttpGet(url);
@@ -45,11 +43,11 @@ public class HttpHelper {
             HttpResponse response = client.execute(request);
             return EntityUtils.toString(response.getEntity());
         } catch (ClientProtocolException e) {
-            LOGGER.warn(EXCEPTION_WHILE_EXECUTING_HTTP_REQUEST +"----" +e.getMessage());
+            LOG.warn(EXCEPTION_WHILE_EXECUTING_HTTP_REQUEST +"----" +e.getMessage());
         } catch (IOException e) {
-            LOGGER.warn(EXCEPTION_WHILE_EXECUTING_HTTP_REQUEST +"----" +e.getMessage());
+            LOG.warn(EXCEPTION_WHILE_EXECUTING_HTTP_REQUEST +"----" +e.getMessage());
         } catch (Exception e) {
-            LOGGER.warn(EXCEPTION_WHILE_EXECUTING_HTTP_REQUEST +"----" +e.getMessage());
+            LOG.warn(EXCEPTION_WHILE_EXECUTING_HTTP_REQUEST +"----" +e.getMessage());
         }
         return null;
     }

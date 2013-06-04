@@ -21,7 +21,6 @@ import javax.portlet.RenderResponse;
 
 import org.apache.log4j.Logger;
 import org.openinfinity.cloud.util.LiferayService;
-import org.openinfinity.cloud.util.LiferayServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;

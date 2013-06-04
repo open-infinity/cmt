@@ -1,0 +1,2 @@
+<% cluster_member_data.each do |member_data|%><%=member_data%> <%=host_group%>
+<% end %>

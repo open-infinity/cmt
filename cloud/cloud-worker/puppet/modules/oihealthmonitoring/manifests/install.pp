@@ -1,19 +1,19 @@
 class oihealthmonitoring::install {
-# Cronie is installed by oibackup
-#    package { ["cronie"]:
-#        ensure => installed,
-#    }
+    package { ["Pound"]:
+        ensure => installed,
+	require => Class["oibasic"]
+    }
+    package { ["nodechecker"]:
+        ensure => installed,
+	require => Class["oibasic"]
+    }
     package { ["collectd"]:
-        ensure => "5.0.1-0",
-	require => Class["oibasic"]
-    }
-    package { ["balance"]:
         ensure => installed,
-	require => Class["oibasic"]
+        require => Class["oibasic"]
     }
-    package { ["oi-healthmonitoring"]:
+    package { ["rrd-http-server"]:
         ensure => installed,
-	require => Class["oibasic"]
+        require => Class["oibasic"]
     }
 }
 

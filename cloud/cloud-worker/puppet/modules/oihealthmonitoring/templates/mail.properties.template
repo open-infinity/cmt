@@ -1,5 +1,0 @@
-mail.host=<%=mail_host%>
-mail.from=<%=mail_from%>
-mailSenderCronExpression=<%=mail_sender_cron_expression%>
-defaultMailRecepient=<%=default_mail_recepient%>
-

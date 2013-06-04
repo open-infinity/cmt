@@ -36,7 +36,6 @@ import org.openinfinity.cloud.domain.CloudProvider;
 import org.openinfinity.cloud.domain.Cluster;
 import org.openinfinity.cloud.domain.ClusterType;
 import org.openinfinity.cloud.domain.Instance;
-import org.openinfinity.cloud.domain.InstanceParameter;
 import org.openinfinity.cloud.domain.Job;
 import org.openinfinity.cloud.domain.Key;
 import org.openinfinity.cloud.service.administrator.*;

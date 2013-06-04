@@ -20,9 +20,13 @@ defaults
 
 frontend main *:80
 	default_backend bas
+	
+#frontend main_ssl
+#        bind 0.0.0.0:443 ssl crt /opt/certificates/example.pem #prefer-server-ciphers
+#        default_backend bas	
 
-frontend stats *:8080
-	default_backend stats
+#frontend stats *:8080
+#	default_backend stats
 
 backend bas
 	balance leastconn
@@ -32,8 +36,8 @@ backend bas
 	<% i = i +1 %>
 	<% end %>
 
-backend stats
-	stats enable
-	stats uri /stats
-	stats realm Haproxy\ Statistics
-	stats auth haproxy:toashaproxy
+#backend stats
+#	stats enable
+#	stats uri /stats
+#	stats realm Haproxy\ Statistics
+#	stats auth haproxy:toashaproxy

@@ -46,9 +46,6 @@ import org.openinfinity.cloud.domain.repository.scaling.ScalingRuleRowMapper;
 @Repository
 public class ScalingRuleRepositoryImpl implements ScalingRuleRepository {
 
-	/**
-	 * Represents the SQL script for inserting ScalingRule object.
-	 */
 	private static final String INSERT =
 		"insert into scaling_rule_tbl (" +
 		"cluster_id, " 		+
@@ -57,73 +54,51 @@ public class ScalingRuleRepositoryImpl implements ScalingRuleRepository {
 		"scaling_state," 	+
 		"max_machines, " 	+
 		"min_machines, " 	+
-		"max_cpu_load, " 	+
-		"min_cpu_load, " 	+
+		"max_load, " 	+
+		"min_load, " 	+
 		"period_from, " 	+
 		"period_to," 		+
 		"size_new, " 		+
 		"size_original, " 	+
 		"job_id)" 			+
-		" values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"; //13*?
-	
-	/**
-	 * Represents the SQL parameters for update command 
-	 */		
+		" values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"; 
+		
 	private static final String UPDATE =
 		"periodic = ?, "		+ 
 		"scheduled = ?,"		+
 		"scaling_state = ?,"	+
 		"max_machines = ?, "	+
 		"min_machines = ?, " 	+
-		"max_cpu_load = ?, " 	+
-		"min_cpu_load = ?, " 	+
+		"max_load = ?, " 	+
+		"min_load = ?, " 	+
 		"period_from = ?, " 	+
 		"period_to = ?, " 		+
 		"size_new = ?, " 		+
 		"size_original = ?, "   +
 		"job_id = ?";		
 	
-	private static final String UPDATE_SCHEDULED_SCALING =
+	private static final String UPDATE_SCHEDULED_SCALING_OUT =
 		"update scaling_rule_tbl set " 	+
 		"scaling_state = ?, " 			+
 		"size_original = ? " 			+
 		"where cluster_id = ?";
 	
-	private static final String UPDATE_SCHEDULED_UNSCALING =
+	private static final String UPDATE_SCHEDULED_SCALING_IN =
 		"update scaling_rule_tbl set "	+
 		"scheduled = ?, " 				+	
 		"scaling_state = ? " 			+
 		"where cluster_id = ?";
 					
-	/**
-	 * Represents the SQL script for inserting or updating ScalingRule object
-	 * if it already exists.
-	 */
 	private static final String UPSERT = INSERT + " on duplicate key update " + UPDATE;
 	
-	/**
-	 * Represents the SQL script for storing ScalingRule object.
-	 */
 	private static final String LOAD_BY_CLUSTER_ID = "select * from scaling_rule_tbl where cluster_id = ?";
 	
-	/**
-	 * Represents the SQL script for loading all ScalingRule objects.
-	 */
 	private static final String LOAD_ALL = "select * from scaling_rule_tbl";
 	
-	/**
-	 * Represents the SQL script for deleting ScalingRule object.
-	 */
 	private static final String DELETE_BY_ID = "delete from scaling_rule_tbl where cluster_id = ?";
 	
-	/**
-	 * Represents the SQL script for fetching last inserted id of the ScalingRule object.
-	 */
-	public static String LOAD_LAST_UPDATED_ID = "select last_insert_id()";
+	private static String UPDATE_JOB_ID = "update scaling_rule_tbl set job_id = ? where cluster_id = ?";
 	
-	/**
-	 * Represents the JDBC template util.
-	 */
 	private JdbcTemplate jdbcTemplate;
 	
 	@Autowired
@@ -146,8 +121,8 @@ public class ScalingRuleRepositoryImpl implements ScalingRuleRepository {
 				ps.setInt(4, scalingRule.getScheduledScalingState());
 				ps.setInt(5, scalingRule.getMaxNumberOfMachinesPerCluster()); 
 				ps.setInt(6, scalingRule.getMinNumberOfMachinesPerCluster());
-				ps.setInt(7, scalingRule.getMaxClusterCpuLoadPercentage());
-				ps.setInt(8, scalingRule.getMinClusterCpuLoadPercentage());
+				ps.setFloat(7, scalingRule.getMaxLoad());
+				ps.setFloat(8, scalingRule.getMinLoad());
 				ps.setTimestamp(9, scalingRule.getPeriodFrom()); 
 				ps.setTimestamp(10, scalingRule.getPeriodTo());
 				ps.setInt(11, scalingRule.getClusterSizeNew());
@@ -159,8 +134,8 @@ public class ScalingRuleRepositoryImpl implements ScalingRuleRepository {
 				ps.setInt(16, scalingRule.getScheduledScalingState());
 				ps.setInt(17, scalingRule.getMaxNumberOfMachinesPerCluster()); 
 				ps.setInt(18, scalingRule.getMinNumberOfMachinesPerCluster());
-				ps.setInt(19, scalingRule.getMaxClusterCpuLoadPercentage());
-				ps.setInt(20, scalingRule.getMinClusterCpuLoadPercentage());
+				ps.setFloat(19, scalingRule.getMaxLoad());
+				ps.setFloat(20, scalingRule.getMinLoad());
 				ps.setTimestamp(21, scalingRule.getPeriodFrom()); 
 				ps.setTimestamp(22, scalingRule.getPeriodTo());
 				ps.setInt(23, scalingRule.getClusterSizeNew());
@@ -189,7 +164,7 @@ public class ScalingRuleRepositoryImpl implements ScalingRuleRepository {
 
 	@AuditTrail
 	public void storeStateScheduledScaling(final int numberOfMachines, final int clusterId){
-		jdbcTemplate.update( UPDATE_SCHEDULED_SCALING, new PreparedStatementSetter() {
+		jdbcTemplate.update(UPDATE_SCHEDULED_SCALING_OUT, new PreparedStatementSetter() {
 			public void setValues(PreparedStatement ps) throws SQLException {	
 				ps.setInt(1, 2); 
 				ps.setInt(2, numberOfMachines);
@@ -200,7 +175,7 @@ public class ScalingRuleRepositoryImpl implements ScalingRuleRepository {
 		
 	@AuditTrail
 	public void storeStateScheduledUnScaling(final int clusterId){
-		jdbcTemplate.update( UPDATE_SCHEDULED_UNSCALING, new PreparedStatementSetter() {
+		jdbcTemplate.update(UPDATE_SCHEDULED_SCALING_IN, new PreparedStatementSetter() {
 			public void setValues(PreparedStatement ps) throws SQLException {	
 				ps.setBoolean(1, false); 
 				ps.setInt(2, 0); 
@@ -208,5 +183,15 @@ public class ScalingRuleRepositoryImpl implements ScalingRuleRepository {
 			}
 		});
 	}
+	
+	@AuditTrail
+    public void storeJobId(final int clusterId, final int jobId){
+        jdbcTemplate.update(UPDATE_JOB_ID, new PreparedStatementSetter() {
+            public void setValues(PreparedStatement ps) throws SQLException {   
+                ps.setInt(1, jobId); 
+                ps.setInt(2, clusterId); 
+            }
+        });
+    }
 	
 }

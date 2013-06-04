@@ -51,4 +51,13 @@ public interface BucketRepository {
 	 */
 	InputStream load(String bucketName, String key);
 	
+	
+	/**
+	 * Deletes object in a bucket bucket.
+	 * @param bucketName Defines the name of the bucket.
+	 * @param key Defines the name of the object stored inside the bucket.
+	 */
+	void deleteObject(String bucketName, String key);
+	
+	
 }

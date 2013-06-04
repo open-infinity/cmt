@@ -27,11 +27,14 @@
 				<configuration><failOnMissingWebXml>false</failOnMissingWebXml></configuration>
 				<version>2.2</version>
 			</plugin>
+			
+			<!--  
 			<plugin>
 				<groupId>org.apache.maven.wagon</groupId>
 				<artifactId>wagon-provider-api</artifactId>
 				<version>2.2</version>
 			</plugin>
+			-->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -167,11 +170,17 @@
 				</executions>
 			</plugin>
 		</plugins>
-		<resources>
-			<!-- standard Maven folder -->
-			<resource>
-				<directory>src/main/resources</directory>
-			</resource>
+		
+		<extensions>
+            <!-- maven wagon supports use of scp/sftp to transfer files -->
+	            <extension>
+	                <groupId>org.apache.maven.wagon</groupId>
+	                <artifactId>wagon-ssh</artifactId>
+	                <version>1.0</version>
+	            </extension>
+        	</extensions>
+        	
+		<resources>	
 			<resource>
 				<directory>.</directory>
 				<includes>
@@ -183,6 +192,10 @@
 				<directory>src/main/java</directory>
 				<filtering>true</filtering>
 			</resource>
+			<resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
 			<resource>
 				<directory>src/test/java</directory>
 				<includes>
