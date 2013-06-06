@@ -15,6 +15,7 @@
  */
 package org.openinfinity.cloud.application.deployer.batch;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.openinfinity.cloud.domain.Deployment;
@@ -40,6 +41,7 @@ public class PeriodicStagingAreaWriter implements ItemWriter<Deployment>{
 	@Log
 	@Override
 	public void write(List<? extends Deployment> deployments) throws Exception {
+		Collections.sort(deployments);
 		for (Deployment deployment : deployments) {
 			deployerService.deploy(deployment);
 		}
