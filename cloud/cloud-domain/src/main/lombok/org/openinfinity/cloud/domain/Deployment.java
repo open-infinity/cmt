@@ -20,9 +20,10 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.sql.Timestamp;
 
-import org.openinfinity.core.annotation.NotScript;
-
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import org.openinfinity.core.annotation.NotScript;
 
 /**
  * Deployment domain object
@@ -37,7 +38,9 @@ import lombok.Data;
  */
 
 @Data
-public class Deployment implements Serializable {
+@NoArgsConstructor
+public class Deployment implements Serializable, Comparable<Deployment> {
+	
 	private static final long serialVersionUID = -5063856729744786978L;
 	
 	@NotScript
@@ -58,11 +61,14 @@ public class Deployment implements Serializable {
 	private InputStream inputStream;
 	@NotScript
 	private Timestamp deploymentTimestamp;
-	
+	@NotScript
 	private String type;
+	@NotScript
 	private String cloudInstance;
 	
-	
+	private Long localTimeStamp;
+
+	// FIXME: What is this?? -ILe
 	public Deployment (Deployment d){
 		id = d.getId();
 		state = d.getState();
@@ -74,6 +80,9 @@ public class Deployment implements Serializable {
 		inputStream = d.getInputStream();	
 		deploymentTimestamp = d.getDeploymentTimestamp();
 	}
-	
-	public Deployment(){}
+
+	@Override
+	public int compareTo(Deployment o) {
+		return Long.valueOf(this.localTimeStamp).compareTo(Long.valueOf(o.localTimeStamp));
+	}
 }
