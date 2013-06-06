@@ -209,21 +209,26 @@ public class EC2Wrapper {
 	public void authorizeIPs(String securityGroupName, String cidrIp, Integer fromPort, Integer toPort, String protocol) {
 		try {
 			AuthorizeSecurityGroupIngressRequest request = new AuthorizeSecurityGroupIngressRequest();
-			IpPermission perm = new IpPermission();
-			perm.setFromPort(fromPort);
-			perm.setToPort(toPort);
-			perm.setIpProtocol(protocol);
-			List<String> ipRanges = new ArrayList<String>();
-			ipRanges.add(cidrIp);
-			perm.setIpRanges(ipRanges);
-			List<IpPermission> permList = new ArrayList<IpPermission>();
-			permList.add(perm);
+			
+			if(this.cloudType == InstanceService.CLOUD_TYPE_EUCALYPTUS) {
+				request.setFromPort(fromPort);
+				request.setToPort(toPort);
+				request.setCidrIp(cidrIp);
+				request.setIpProtocol(protocol);
+			} else {
+
+				IpPermission perm = new IpPermission();
+				perm.setFromPort(fromPort);
+				perm.setToPort(toPort);
+				perm.setIpProtocol(protocol);
+				List<String> ipRanges = new ArrayList<String>();
+				ipRanges.add(cidrIp);
+				perm.setIpRanges(ipRanges);
+				List<IpPermission> permList = new ArrayList<IpPermission>();
+				permList.add(perm);
+				request.setIpPermissions(permList);
+			}
 			request.setGroupName(securityGroupName);
-			//request.setFromPort(fromPort);
-			//request.setToPort(toPort);
-			//request.setCidrIp(cidrIp);
-			//request.setIpProtocol(protocol);
-			request.setIpPermissions(permList);
 			ec2.authorizeSecurityGroupIngress(request);
 		} catch (Exception e) {
 			String message = e.getMessage();
@@ -235,26 +240,30 @@ public class EC2Wrapper {
 	public void authorizeGroup(String securityGroupName, String sourceGroupName, String sourceGroupOwner, Integer fromPort, Integer toPort, String protocol) {
 		try {
 			AuthorizeSecurityGroupIngressRequest request = new AuthorizeSecurityGroupIngressRequest();
-			UserIdGroupPair pair = new UserIdGroupPair();
-			pair.setGroupName(sourceGroupName);
-			pair.setUserId(sourceGroupOwner);
-			List<UserIdGroupPair> idList = new ArrayList<UserIdGroupPair>();
-			idList.add(pair);
-			IpPermission perm = new IpPermission();
-			perm.setUserIdGroupPairs(idList);
-			perm.setFromPort(fromPort);
-			perm.setToPort(toPort);
-			perm.setIpProtocol(protocol);
-			List<IpPermission> permList = new ArrayList<IpPermission>();
-			permList.add(perm);
-			request.setIpPermissions(permList);
-			
+			if(this.cloudType == InstanceService.CLOUD_TYPE_EUCALYPTUS) {
+				request.setFromPort(fromPort);
+				request.setToPort(toPort);
+				request.setSourceSecurityGroupName(sourceGroupName);
+				request.setSourceSecurityGroupOwnerId(sourceGroupOwner);
+				request.setIpProtocol(protocol);
+			} else {
+
+				UserIdGroupPair pair = new UserIdGroupPair();
+				pair.setGroupName(sourceGroupName);
+				pair.setUserId(sourceGroupOwner);
+				List<UserIdGroupPair> idList = new ArrayList<UserIdGroupPair>();
+				idList.add(pair);
+				IpPermission perm = new IpPermission();
+				perm.setUserIdGroupPairs(idList);
+				perm.setFromPort(fromPort);
+				perm.setToPort(toPort);
+				perm.setIpProtocol(protocol);
+				List<IpPermission> permList = new ArrayList<IpPermission>();
+				permList.add(perm);
+				request.setIpPermissions(permList);
+			}
 			request.setGroupName(securityGroupName);
-			//request.setFromPort(fromPort);
-			//request.setToPort(toPort);
-			//request.setSourceSecurityGroupName(sourceGroupName);
-			//request.setSourceSecurityGroupOwnerId(sourceGroupOwner);
-			//request.setIpProtocol(protocol);
+			
 			ec2.authorizeSecurityGroupIngress(request);
 		} catch (Exception e) {
 			String message = e.getMessage();
