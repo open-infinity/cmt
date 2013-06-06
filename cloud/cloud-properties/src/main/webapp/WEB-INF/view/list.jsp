@@ -49,15 +49,6 @@
 		});
 	}
 
-	$('#prop-organization').change() {
-		$.ajax({
-			type: "POST",
-			url: "<portlet:resourceURL id="setOrganization"/>",
-			data: { organizationId: event.target.id }
-		}).done(function( msg ) {
-		});			
-	}
-	
 	$(document).ready(function() {		
 		// Add row event handler
 		$("#propAdd").on('click', function(event) {
@@ -70,19 +61,29 @@
 		<c:forEach var="prop" items="${props}">
 		_add_row(row_num++, '${prop.key}', '${prop.value}');	
 		</c:forEach>
+
+		$('#propOrganization').change(function(event) {
+			$.ajax({
+				type: "POST",
+				url: '<portlet:resourceURL id="changeOrganization"/>',
+				data: { organizationId: event.target.id }
+			}).done(function( msg ) {
+			});			
+		});
+
 	});
 
 </script>
 
 <div>Organization: 
-	<select class="prop-organization" name="organization">
+	<select class="prop-organization" name="organization" id="propOrganization">
 		<c:forEach var="org" items="${organizations}">
 			<option value="${org.organizationId}">${org.name}</option>
 		</c:forEach>
 	</select>
 </div>	 
 	 
-<p>[<a rhef="#" id="propAdd">add</a>]</p>
+<p>[<a rhef="#" id="propAdd">add+</a>]</p>
 
 <div class="prop-table" id="prop-table">
 	<div class="prop-row">

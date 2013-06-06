@@ -9,7 +9,7 @@
 -->		
 		<instanceable>true</instanceable>
 		<remoteable>true</remoteable> <!-- CH8 -->
-		<header-portlet-css>/css/centralizedproperties.css</header-portlet-css>
+		<header-portlet-css>/css/cloud-properties.css</header-portlet-css>
 		<header-portlet-javascript>/js/jquery-1.7.2.js</header-portlet-javascript>
 <!-- 	<header-portlet-javascript>/js/jquery.jeditable.js</header-portlet-javascript> -->
 		<header-portlet-javascript>/js/jquery.jeditable.mini.js</header-portlet-javascript>
