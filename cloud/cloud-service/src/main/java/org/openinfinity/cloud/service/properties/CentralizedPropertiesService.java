@@ -33,23 +33,24 @@ public interface CentralizedPropertiesService {
 	public SharedProperty store(SharedProperty prop);
 
 	/**
-	 * Rename the given property
+	 * Load a property by key. Key and value fields of the sample is ignored.
 	 */
-	public void rename(String organizationId, String oldkey, String newkey);
+	public Collection<SharedProperty> loadAll(SharedProperty sample);
 
 	/**
-	 * Load a property by key.
+	 * Load a property by key. Value of the sample is ignored.
 	 */
-	public SharedProperty loadByKey(String organizationId, String key);
+	public SharedProperty load(SharedProperty sample);
 
 	/**
-	 * Load all shared properties from the database.
+	 * Delete the property by key. Value field is ignored.
+	 * @return true if found, false if not
 	 */
-	public Collection<SharedProperty> loadAll(List<String> organizationIds);
-
+	public boolean delete(SharedProperty prop);
+	
 	/**
-	 * Delete the property by key.
+	 * Change key part of the given property.
+	 * @return true if found, false if not 
 	 */
-	public boolean deleteByKey(String organizationId, String key);
+	public boolean rename(SharedProperty prop, String newkey);
 }
-

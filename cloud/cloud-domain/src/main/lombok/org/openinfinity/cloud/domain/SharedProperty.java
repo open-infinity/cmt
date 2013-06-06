@@ -16,46 +16,65 @@
 
 package org.openinfinity.cloud.domain;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import lombok.NonNull;
+import lombok.AllArgsConstructor;
+import lombok.ToString;
+
 /**
  * Represents a key-value pair, also known as a shared property, in cloud_properties_tbl table.
  * 
  * @author Timo Saarinen
  */
-public class SharedProperty {
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
+@EqualsAndHashCode
+public final class SharedProperty {
+	@NonNull 
 	private String organizationId;
+	
+	private String instanceId;
+	
+	private String clusterId;
+	
 	private String key;
+	
 	private String value;
-
-	public SharedProperty() {
-	}
 	
 	public SharedProperty(String organizationId, String key, String value) {
-		this.key = key;
-		this.value = value;
-	}
-	
-	public String getKey() {
-		return key;
-	}
-	public void setKey(String key) {
-		this.key = key;
-	}
-	public String getValue() {
-		return value;
-	}
-	public void setValue(String value) {
-		this.value = value;
-	}
-	
-	public String toString() {
-		return key + ": " + value + " (orgid=" + organizationId + ")";
-	}
-
-	public String getOrganizationId() {
-		return organizationId;
-	}
-
-	public void setOrganizationId(String organizationId) {
 		this.organizationId = organizationId;
+		this.key = key;
+		this.value = value;
 	}
+
+/* POIS VAAN ROHKEASTI	
+	public boolean equals(Object o) {
+		SharedProperty p = (SharedProperty) o;
+		if (o != null) {
+			return eq(organizationId, p.organizationId)
+					&& eq(instanceId, p.instanceId)
+					&& eq(clusterId, p.clusterId)
+					&& eq(key, p.key)
+					&& eq(value, p.value);
+		}
+		return false;
+	}
+	
+	private static boolean eq(String a, String b) {
+		if (a == null && b == null) {
+			return true;
+		} else if (a == null && b != null) {
+			return false;
+		} else if (a != null && b == null) {
+			return false;
+		} else {
+			return a.equals(b);
+		}
+	}
+*/	
 }

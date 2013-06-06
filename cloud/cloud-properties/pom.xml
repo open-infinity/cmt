@@ -25,6 +25,42 @@
     </prerequisites>
 
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>2.2</version>
+            </plugin>
+			<plugin>
+				<groupId>org.projectlombok</groupId>
+				<artifactId>lombok-maven-plugin</artifactId>
+				<version>0.10.8.0</version>
+			</plugin>
+        </plugins>
+        <extensions>
+            <!-- maven wagon supports use of scp/sftp to transfer files -->
+            <extension>
+                <groupId>org.apache.maven.wagon</groupId>
+                <artifactId>wagon-ssh</artifactId>
+                <version>1.0</version>
+            </extension>
+        </extensions>
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+                <filtering>true</filtering>
+            </testResource>
+        </testResources>
+    </build>
+
+<!-- 
+    <build>
         <plugins>
             <plugin>
                 <groupId>com.liferay.maven.plugins</groupId>
@@ -50,27 +86,23 @@
 				<groupId>org.projectlombok</groupId>
 				<artifactId>lombok-maven-plugin</artifactId>
 				<version>0.10.8.0</version>
-<!-- 				
-				<dependencies>
-					<dependency>
-						<groupId>sun.jdk</groupId>
-						<artifactId>tools</artifactId>
-						<version>1.6</version>
-						<scope>system</scope>
-						<systemPath>${JAVA.HOME}/lib/tools.jar</systemPath>
-					</dependency>
-				</dependencies>
--->				
 			</plugin>
         </plugins>
+        <testResources>
+           <testResource>
+               <directory>src/test/resources</directory>
+               <filtering>true</filtering>
+           </testResource>
+       </testResources>
     </build>
+-->    
 
     <dependencies>
     <!-- 
         <dependency>
             <groupId>org.openinfinity</groupId>
             <artifactId>open-infinity-core</artifactId>
-            <version>1.0.0-RELEASE</version>
+            <version>1.1.0-RELEASE</version>
         </dependency>
      -->
 
@@ -223,6 +255,18 @@
             </exclusions>
         </dependency>
 
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <version>${springframework.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
 		
         <!--Liferay dependencies-->
 		<dependency>
@@ -241,7 +285,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.10</version>
+            <version>4.11</version>
             <scope>test</scope>
         </dependency>
 
@@ -251,6 +295,13 @@
             <version>1.9.0</version>
             <scope>test</scope>
         </dependency>
+        
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>5.1.24</version>
+			<scope>test</scope>
+		</dependency>
 
 <!-- 
         <dependency>

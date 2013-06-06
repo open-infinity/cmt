@@ -19,6 +19,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -47,13 +48,17 @@ import org.springframework.stereotype.Service;
 public class CentralizedPropertiesRepositoryJdbcImpl implements CentralizedPropertiesRepository {
 
 	private static final Logger logger = Logger.getLogger(CentralizedPropertiesRepositoryJdbcImpl.class.getName());
-	
-	private static final String STORE_SQL = "insert into cloud_properties_tbl (key_column, value_column, organization_id) values (:key, :value, :orgid)";
-	private static final String UPDATE_SQL = "update cloud_properties_tbl set key_column = :key, value_column = :value where key_column = :key and organization_id = :orgid";
-	private static final String LOAD_BY_KEY = "select * from cloud_properties_tbl where key_column = :key and organization_id = :orgid";
-	private static final String COUNT_BY_KEY = "select count(*) from cloud_properties_tbl where key_column = :key and organization_id in (:orgids)";
-	private static final String LOAD_ALL_SQL = "select * from cloud_properties_tbl where organization_id in (:orgids)";
-	private static final String DELETE_BY_KEY = "delete from cloud_properties_tbl where key_column = :key and organization_id in (:orgids)";
+
+	// See create_tables.sql for more information
+	private static final String WHERE = "where key_column = :key and organization_id = :orgid and instance_id = :insid and cluster_id = :clid";
+	private static final String WHERE2 = "where organization_id = :orgid and instance_id = :insid and cluster_id = :clid";
+	private static final String STORE_SQL = "insert into properties_tbl (organization_id, instance_id, cluster_id, key_column, value_column, changed_last_update) " + 
+												"values (:orgid, :insid, :clid, :key, :value, CURRENT_TIMESTAMP)";
+	private static final String UPDATE_SQL = "update properties_tbl set key_column = :key, value_column = :value, changed_last_update = CURRENT_TIMESTAMP " + WHERE;
+	private static final String LOAD_BY_KEY = "select * from properties_tbl " + WHERE;
+	private static final String COUNT_BY_KEY = "select count(*) from properties_tbl " + WHERE;
+	private static final String LOAD_ALL_SQL = "select * from properties_tbl " + WHERE2;
+	private static final String DELETE_BY_KEY = "delete from properties_tbl " + WHERE;
 
 	private NamedParameterJdbcTemplate jdbcTemplate;
 
@@ -67,7 +72,10 @@ public class CentralizedPropertiesRepositoryJdbcImpl implements CentralizedPrope
 	public SharedProperty store(SharedProperty prop) {
 		MapSqlParameterSource map = new MapSqlParameterSource();
 		map.addValue("key", prop.getKey());
+		map.addValue("value", prop.getValue());
 		map.addValue("orgid", prop.getOrganizationId());
+		map.addValue("insid", prop.getInstanceId());
+		map.addValue("clid", prop.getClusterId());
 		int n = jdbcTemplate.queryForInt(COUNT_BY_KEY, map);
 		if (n == 0) {
 			map.addValue("value", prop.getValue());
@@ -79,19 +87,23 @@ public class CentralizedPropertiesRepositoryJdbcImpl implements CentralizedPrope
 	}
 	
 	@Override
-	public Collection<SharedProperty> loadAll(List<String> organizationIds) {
+	public Collection<SharedProperty> loadAll(SharedProperty prop) {
 		MapSqlParameterSource map = new MapSqlParameterSource();
-		map.addValue("orgids", organizationIds);
+		map.addValue("orgid", prop.getOrganizationId());
+		map.addValue("insid", prop.getInstanceId());
+		map.addValue("clid", prop.getClusterId());
 		Collection<SharedProperty> props = jdbcTemplate.query(LOAD_ALL_SQL, map, new SharedPropertyRowMapper());
 		return Collections.unmodifiableCollection(props);
 	}
 	
 	@Override
-	public SharedProperty loadByKey(String organizationId, String key) {
+	public SharedProperty load(SharedProperty prop) {
 		try {
 			MapSqlParameterSource map = new MapSqlParameterSource();
-			map.addValue("key", key);
-			map.addValue("orgid", organizationId);
+			map.addValue("orgid", prop.getOrganizationId());
+			map.addValue("insid", prop.getInstanceId());
+			map.addValue("clid", prop.getClusterId());
+			map.addValue("key", prop.getKey());
 			SharedProperty p = (SharedProperty) jdbcTemplate.queryForObject(LOAD_BY_KEY, map, new SharedPropertyRowMapper());
 			return p;
 		} catch (org.springframework.dao.EmptyResultDataAccessException e) {
@@ -101,20 +113,23 @@ public class CentralizedPropertiesRepositoryJdbcImpl implements CentralizedPrope
 	}
 	
 	@Override
-	public boolean deleteByKey(String organizationId, String key) {
+	public boolean delete(SharedProperty prop) {
 		MapSqlParameterSource map = new MapSqlParameterSource();
-		map.addValue("key", key);
-		map.addValue("orgid", organizationId);
+		map.addValue("orgid", prop.getOrganizationId());
+		map.addValue("insid", prop.getInstanceId());
+		map.addValue("clid", prop.getClusterId());
+		map.addValue("key", prop.getKey());
 		int n = jdbcTemplate.update(DELETE_BY_KEY, map);
 		return (n >= 1); 
 	}
 	
 	private class SharedPropertyRowMapper implements RowMapper<SharedProperty> {
-
 		@Override
 		public SharedProperty mapRow(ResultSet resultSet, int rowNum) throws SQLException {
 			SharedProperty p = new SharedProperty();
 			p.setOrganizationId(resultSet.getString("ORGANIZATION_ID"));
+			p.setInstanceId(resultSet.getString("INSTANCE_ID"));
+			p.setClusterId(resultSet.getString("CLUSTER_ID"));
 			p.setKey(resultSet.getString("KEY_COLUMN"));
 			p.setValue(resultSet.getString("VALUE_COLUMN"));
 			return p;
