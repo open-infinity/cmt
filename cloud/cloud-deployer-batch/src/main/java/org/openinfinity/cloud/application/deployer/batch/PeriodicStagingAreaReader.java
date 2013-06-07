@@ -17,9 +17,6 @@ package org.openinfinity.cloud.application.deployer.batch;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import org.openinfinity.cloud.util.filesystem.FileUtil;
