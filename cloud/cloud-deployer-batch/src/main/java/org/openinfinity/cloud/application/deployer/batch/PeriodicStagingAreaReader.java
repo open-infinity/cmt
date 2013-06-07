@@ -17,6 +17,9 @@ package org.openinfinity.cloud.application.deployer.batch;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.openinfinity.cloud.util.filesystem.FileUtil;
@@ -39,7 +42,7 @@ public class PeriodicStagingAreaReader implements ItemReader<File> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(PeriodicStagingAreaReader.class);
 	
-	@Value("${awsaccesskeyid}")
+	@Value("${stagingArea}")
 	private String stagingArea;
 	
 	private int index = 0;
@@ -52,6 +55,7 @@ public class PeriodicStagingAreaReader implements ItemReader<File> {
 		File stagingAreaDirectory = new File(stagingArea);
 		if (stagingAreaDirectory.isDirectory() && stagingAreaFiles.isEmpty()) {
 			FileUtil.findFilesRecursively(stagingAreaDirectory, stagingAreaFiles);
+			stagingAreaFiles = FileUtil.sortByLastModifiedTimestamp(stagingAreaFiles);
 			LOGGER.trace("Initializing reader finished. [" + stagingAreaFiles.size() + "] deployments loaded.");			
 		}
 		if (index < stagingAreaFiles.size()) {
@@ -65,5 +69,7 @@ public class PeriodicStagingAreaReader implements ItemReader<File> {
 			return null;
 		}	
 	}
+
+	
 
 }

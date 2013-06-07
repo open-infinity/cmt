@@ -17,6 +17,8 @@ package org.openinfinity.cloud.application.deployer.batch;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.openinfinity.cloud.domain.Deployment;
 import org.openinfinity.core.annotation.Log;
@@ -34,21 +36,22 @@ import org.springframework.stereotype.Component;
  * @since 1.2.0
  */
 @Component("periodicStagingAreaProcessor")
-public class PeriodicStagingAreaProcessor implements ItemProcessor<File, Deployment> {
+public class PeriodicStagingAreaProcessor implements ItemProcessor<File, Map<Deployment, File>> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(PeriodicStagingAreaProcessor.class);
 	
-	@Value("${awsaccesskeyid}")
+	@Value("${stagingArea}")
 	private String stagingArea;
 	
 	@Log
 	@Override
-	public Deployment process(File file) throws Exception {
+	public Map<Deployment, File> process(File file) throws Exception {
 		return parseMetadataFromDirectoriesAndCreateDeployments(file);
 	}
 	
-	public Deployment parseMetadataFromDirectoriesAndCreateDeployments(File file) throws Exception {
-		//<stagingarea>/<cloud>/<orgnization>/<instance>/<cluster>/<type>/<name>/<artifact>
+	public Map<Deployment, File> parseMetadataFromDirectoriesAndCreateDeployments(File file) throws Exception {
+		// <platform-version>/? , <action> or .delete file?
+		// <stagingarea>/<cloud>/<orgnization>/<instance>/<cluster>/<type>/<name>/<artifact>
 		int directoryIndex = 0;
 		String path = file.getAbsolutePath();
 		LOGGER.debug("Original absolute directory path: " + path);
@@ -63,7 +66,9 @@ public class PeriodicStagingAreaProcessor implements ItemProcessor<File, Deploym
 		deployment.setName(metadata[directoryIndex++]);
 		deployment.setLocalTimeStamp(file.lastModified());
 		deployment.setInputStream(new FileInputStream(file));
-		return deployment;
+		Map<Deployment, File> map = new HashMap<Deployment, File>();
+		map.put(deployment, file);
+		return map;
 	}
 	
 }

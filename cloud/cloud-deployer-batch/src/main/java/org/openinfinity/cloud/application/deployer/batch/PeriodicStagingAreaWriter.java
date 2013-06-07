@@ -15,8 +15,9 @@
  */
 package org.openinfinity.cloud.application.deployer.batch;
 
-import java.util.Collections;
+import java.io.File;
 import java.util.List;
+import java.util.Map;
 
 import org.openinfinity.cloud.domain.Deployment;
 import org.openinfinity.cloud.service.deployer.DeployerService;
@@ -33,17 +34,23 @@ import org.springframework.stereotype.Component;
  * @since 1.2.0
  */
 @Component("periodicStagingAreaWriter")
-public class PeriodicStagingAreaWriter implements ItemWriter<Deployment>{
+public class PeriodicStagingAreaWriter implements ItemWriter<Map<Deployment, File>> {
 
 	@Autowired
 	private DeployerService deployerService;
 	
 	@Log
 	@Override
-	public void write(List<? extends Deployment> deployments) throws Exception {
-		Collections.sort(deployments);
-		for (Deployment deployment : deployments) {
-			deployerService.deploy(deployment);
+	public void write(List<? extends Map<Deployment, File>> deploymentsAndFiles) throws Exception {
+		for (Map<Deployment, File> deploymentAndFile : deploymentsAndFiles) {
+			for (Map.Entry<Deployment, File> entry : deploymentAndFile.entrySet()) {
+				Deployment deployment = entry.getKey();
+				File file = entry.getValue();
+				deployerService.deploy(deployment);
+				if (file.exists()) {
+					file.delete();
+				}
+			}	
 		}
 	}
 
