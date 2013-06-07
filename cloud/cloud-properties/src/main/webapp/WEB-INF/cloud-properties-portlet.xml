@@ -21,7 +21,7 @@
         http://www.springframework.org/schema/aop
         http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
         ">
-	
+
 	<import resource="classpath*:/META-INF/spring/cloud-context-util.xml" />
 	<import resource="classpath*:/META-INF/spring/cloud-context-core.xml" />
 	<import resource="classpath*:/META-INF/spring/cloud-context-repository.xml" />

@@ -27,11 +27,30 @@ import org.openinfinity.cloud.domain.SharedProperty;
  */
 public interface CentralizedPropertiesRepository {
 
+	/**
+	 * Inserts or updates the given property in the database.
+	 * @param prop
+	 * @return Returns the given property as it is.
+	 */
 	public SharedProperty store(SharedProperty prop);
+
+	/**
+	 * Returns all the properties matching the sample. Value part it ignored.
+	 */
+	public Collection<SharedProperty> loadAll(SharedProperty sample);
 	
-	public Collection<SharedProperty> loadAll(List<String> organizationIds);
-	
-	public SharedProperty loadByKey(String organizationIds, String key);
-	
-	public boolean deleteByKey(String organizationId, String key);
+	/**
+	 * Load the property using the given given property as a sample. 
+	 * The value part will be ignored.
+	 * @param prop Sample property used as part of queries
+	 * @return New property created based on the sample and the value
+	 */
+	public SharedProperty load(SharedProperty sample);
+
+	/**
+	 * Delete the given property from database. The value part will be ignored.
+	 * @param sample Identifies the property to be deleted
+	 * @return true if the property was found, false if not
+	 */
+	public boolean delete(SharedProperty sample);
 }

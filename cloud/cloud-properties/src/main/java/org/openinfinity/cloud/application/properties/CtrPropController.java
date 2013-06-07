@@ -66,15 +66,29 @@ public class CtrPropController {
 	@Qualifier("centralizedPropertiesService")
 	private CentralizedPropertiesService service;
 	
+	private String currentOrganizationId;
+	private String currentInstanceId;
+	private String currentClusterId;
+
+	/**
+	 * Returns a SharedProperty object, which contains the current ids set from UI.
+	 * Key is set according to the given parameters.
+	 */
+	private SharedProperty currentSharedProperty(String key) {
+		SharedProperty p = new SharedProperty();
+		p.setOrganizationId(currentOrganizationId);
+		p.setInstanceId(currentInstanceId);
+		p.setClusterId(currentClusterId);
+		p.setKey(key);
+		return p;
+	}
+	
 	@RenderMapping
 	public String showView(RenderRequest renderRequest, RenderResponse renderResponse, Model model) throws Throwable {
 		try {
 			
-			/* FIXME
 			List<SharedProperty> props = new LinkedList<SharedProperty>();
 			
-			props.addAll(service.loadAll());
-
 			// Ossi:
 			// Eli tuo getOrganizations() antaa vaan ne organisaatiot jotka käyttäjälle 
 			// on laitettu, tolla suborganizations jutulla saa myös sitten kaikki 
@@ -95,12 +109,18 @@ public class CtrPropController {
 			SortedSet<Organization> combined = new TreeSet<Organization>();
 			combined.addAll(organizationList);
 			combined.addAll(subOrganizationList);
+
+			// Query properties
+			List<String> organization_ids = new LinkedList<String>();
+			organization_ids.add(currentOrganizationId); // TODO: sub-organizations too
+			props.addAll(service.loadAll(currentSharedProperty(null)));
 			
 			// Add attributes to the model
 			model.addAttribute("props", props);
 			model.addAttribute("user", user);
 			model.addAttribute("organizations", combined);
-		*/
+			model.addAttribute("organizationId", currentOrganizationId);
+
 			return "list";
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -114,11 +134,53 @@ public class CtrPropController {
 			@RequestParam("organizationId") String organizationId) throws Exception 
 	{
 		logger.info("changeOrganization: organizationId=" + organizationId);
-		
-		response.setContentType("text/plain");
-		PrintWriter pw = new PrintWriter(response.getWriter());
-		pw.print("");
-		pw.flush();
+
+		// Save the value
+		currentOrganizationId = organizationId;
+
+		// Response
+		if (response != null) {
+			response.setContentType("text/plain");
+			PrintWriter pw = new PrintWriter(response.getWriter());
+			pw.print("");
+			pw.flush();
+		}
+	}
+
+	@ResourceMapping("changeInstance")
+	public void changeInstance(ResourceRequest request, ResourceResponse response, 
+			@RequestParam("instanceId") String instanceId) throws Exception 
+	{
+		logger.info("changeInstance: instanceId=" + instanceId);
+
+		// Save the value
+		currentInstanceId = instanceId;
+
+		// Response
+		if (response != null) {
+			response.setContentType("text/plain");
+			PrintWriter pw = new PrintWriter(response.getWriter());
+			pw.print("");
+			pw.flush();
+		}
+	}
+
+	@ResourceMapping("changePlatform")
+	public void changePlatform(ResourceRequest request, ResourceResponse response, 
+			@RequestParam("platformId") String platformId) throws Exception 
+	{
+		logger.info("changePlatform: platformId=" + platformId);
+
+		// Save the value
+		currentInstanceId = platformId;
+
+		// Response
+		if (response != null) {
+			response.setContentType("text/plain");
+			PrintWriter pw = new PrintWriter(response.getWriter());
+			pw.print("");
+			pw.flush();
+		}
 	}
 
 	@ResourceMapping("changePropertyKey")
@@ -129,33 +191,41 @@ public class CtrPropController {
 	{
 		logger.info("changeKey: id=" + id + " key=" + newkey + " oldkey=" + oldkey);
 
-		/* FIXME
-		if ((newkey != null && !newkey.equals(oldkey)) && service.loadByKey(newkey) == null) {
-			// Create a new object if key is given
-			if ("".equals(oldkey)) {
-				SharedProperty p = new SharedProperty(newkey, "-");
-				service.store(p);
-			}
+		if (currentOrganizationId != null) {
+			if ((newkey != null && !newkey.equals(oldkey)) && service.load(currentSharedProperty(newkey)) == null) {
+				// Create a new object if key is given
+				if ("".equals(oldkey)) {
+					SharedProperty p = new SharedProperty(currentOrganizationId, newkey, "-");
+					service.store(p);
+				}
+		
+				// Handle content
+				if (response != null) {
+					response.setContentType("text/html");
+					PrintWriter pw = new PrintWriter(response.getWriter());
+					pw.print(newkey);
+					pw.flush();
+					service.rename(currentSharedProperty(oldkey), newkey);
+				}
+				
+				// Delete the database object if the key is cleared
+				if ("".equals(newkey)) {
+					service.delete(currentSharedProperty(oldkey));
+				}
+			} else {
+				logger.warn("changeKey: non unique key: " + newkey);
 	
-			// Handle content
-			response.setContentType("text/html");
-			PrintWriter pw = new PrintWriter(response.getWriter());
-			pw.print(newkey);
-			pw.flush();
-			service.rename(oldkey, newkey);
-			
-			// Delete the database object if the key is cleared
-			if ("".equals(newkey)) {
-				service.deleteByKey(oldkey);
+				// Non-unique keys are not allowed
+				if (response != null) {
+					response.setContentType("text/html");
+					PrintWriter pw = new PrintWriter(response.getWriter());
+					pw.print(oldkey);
+					pw.flush();
+				}
 			}
 		} else {
-			// Non-unique keys are not allowed
-			response.setContentType("text/html");
-			PrintWriter pw = new PrintWriter(response.getWriter());
-			pw.print(oldkey);
-			pw.flush();
+			logger.warn("changeKey: organization id not chosen");
 		}
-		*/
 	}
 
 	@ResourceMapping("savePropertyValue")
@@ -165,18 +235,18 @@ public class CtrPropController {
 			@RequestParam("value") String value) throws Exception 
 	{
 		logger.info("saveProperty: id=" + id + " key=" + key + " value=" + value);
-		/* FIXME
 		if (!("".equals(key))) {
-			response.setContentType("text/html");
-			PrintWriter pw = new PrintWriter(response.getWriter());
-			pw.print(value);
-			pw.flush();
+			if (response != null) {
+				response.setContentType("text/html");
+				PrintWriter pw = new PrintWriter(response.getWriter());
+				pw.print(value);
+				pw.flush();
+			}
 
 			// Save value to db
-			SharedProperty p = new SharedProperty(key, value);
+			SharedProperty p = new SharedProperty(currentOrganizationId, key, value);
 			service.store(p);
 		}
-		*/
 	}
 
 	@ResourceMapping("deleteProperty")
@@ -185,13 +255,13 @@ public class CtrPropController {
 			@RequestParam("key") String key) throws Exception 
 	{
 		logger.info("deleteProperty: id=" + id + " key=" + key);
-		/* FIXME
-		response.setContentType("text/html");
-		PrintWriter pw = new PrintWriter(response.getWriter());
-		pw.print(key);
-		pw.flush();
-		service.deleteByKey(key);
-		*/
+		if (response != null) {
+			response.setContentType("text/html");
+			PrintWriter pw = new PrintWriter(response.getWriter());
+			pw.print(key);
+			pw.flush();
+		}
+		service.delete(currentSharedProperty(key));
 	}
 
 }

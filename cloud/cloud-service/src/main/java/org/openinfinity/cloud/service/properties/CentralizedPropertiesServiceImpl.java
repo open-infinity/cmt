@@ -42,35 +42,29 @@ public class CentralizedPropertiesServiceImpl implements CentralizedPropertiesSe
 		return repository.store(prop);
 	}
 
-	@Override
-	public void rename(String organizationId, String oldkey, String newkey) {
-		if ("".equals(oldkey)) {
-			SharedProperty p = new SharedProperty(organizationId, newkey, "");
-			store(p);
-		} else {
-			SharedProperty p = repository.loadByKey(organizationId, oldkey);
-			if (p != null) {
-				repository.deleteByKey(organizationId, oldkey);
-				p.setKey(newkey);
-				store(p);
-			} else {
-				rename(organizationId, "", newkey);
-			}
-		}
+	public Collection<SharedProperty> loadAll(SharedProperty sample) {
+		return repository.loadAll(sample);
 	}
 
 	@Override
-	public SharedProperty loadByKey(String organizationId, String key) {
-		return repository.loadByKey(organizationId, key);
+	public SharedProperty load(SharedProperty prop) {
+		return repository.load(prop);
+	}
+
+	@Override
+	public boolean delete(SharedProperty p) {
+		return repository.delete(p);
+	}
+
+	@Override
+	public boolean rename(SharedProperty prop, String newkey) {
+		SharedProperty old = repository.load(prop);
+		if (repository.delete(prop)) {
+			old.setKey(newkey);
+			repository.store(old);
+			return true;
+		}
+		return false;
 	}
 	
-	@Override
-	public Collection<SharedProperty> loadAll(List<String> organizationIds) {
-		return repository.loadAll(organizationIds);
-	}
-	
-	@Override
-	public boolean deleteByKey(String organizationId, String key) {
-		return repository.deleteByKey(organizationId, key);
-	}
 }

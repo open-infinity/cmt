@@ -18,4 +18,4 @@
 
 <portlet:defineObjects />
 
-This is the <b>centralizedproperties</b>.
+This is <b>Cloud Properties</b>.
