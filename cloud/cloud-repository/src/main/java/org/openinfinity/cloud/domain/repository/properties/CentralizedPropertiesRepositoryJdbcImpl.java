@@ -19,23 +19,19 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.HashMap;
 
 import javax.sql.DataSource;
 
+import org.apache.log4j.Logger;
+import org.openinfinity.cloud.domain.SharedProperty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
-import org.springframework.util.Assert;
-
-import org.apache.log4j.Logger;
-import org.openinfinity.cloud.domain.SharedProperty;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
 /**
  * Repository layer of Centralized Properties.
@@ -57,9 +53,10 @@ public class CentralizedPropertiesRepositoryJdbcImpl implements CentralizedPrope
 	private static final String UPDATE_SQL = "update properties_tbl set key_column = :key, value_column = :value, changed_last_update = CURRENT_TIMESTAMP " + WHERE;
 	private static final String LOAD_BY_KEY = "select * from properties_tbl " + WHERE;
 	private static final String COUNT_BY_KEY = "select count(*) from properties_tbl " + WHERE;
-	private static final String LOAD_ALL_SQL = "select * from properties_tbl " + WHERE2;
+	private static final String LOAD_ALL_SQL = "select * from properties_tbl";
+	private static final String LOAD_ALL_SQL_WHERE = "select * from properties_tbl " + WHERE2;
 	private static final String DELETE_BY_KEY = "delete from properties_tbl " + WHERE;
-
+	
 	private NamedParameterJdbcTemplate jdbcTemplate;
 
 	@Autowired
@@ -92,7 +89,13 @@ public class CentralizedPropertiesRepositoryJdbcImpl implements CentralizedPrope
 		map.addValue("orgid", prop.getOrganizationId());
 		map.addValue("insid", prop.getInstanceId());
 		map.addValue("clid", prop.getClusterId());
-		Collection<SharedProperty> props = jdbcTemplate.query(LOAD_ALL_SQL, map, new SharedPropertyRowMapper());
+		Collection<SharedProperty> props = jdbcTemplate.query(LOAD_ALL_SQL_WHERE, map, new SharedPropertyRowMapper());
+		return Collections.unmodifiableCollection(props);
+	}
+	
+	@Override
+	public Collection<SharedProperty> loadAll() {
+		Collection<SharedProperty> props = jdbcTemplate.query(LOAD_ALL_SQL, new HashMap(), new SharedPropertyRowMapper());
 		return Collections.unmodifiableCollection(props);
 	}
 	

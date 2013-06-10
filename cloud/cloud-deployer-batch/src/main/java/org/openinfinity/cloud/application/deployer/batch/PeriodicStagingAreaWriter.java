@@ -21,9 +21,13 @@ import java.util.Map;
 
 import org.openinfinity.cloud.domain.Deployment;
 import org.openinfinity.cloud.service.deployer.DeployerService;
+import org.openinfinity.cloud.util.filesystem.FileUtil;
 import org.openinfinity.core.annotation.Log;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
@@ -36,6 +40,11 @@ import org.springframework.stereotype.Component;
 @Component("periodicStagingAreaWriter")
 public class PeriodicStagingAreaWriter implements ItemWriter<Map<Deployment, File>> {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(PeriodicStagingAreaReader.class);
+	
+	@Value("${stagingArea}")
+	private String stagingArea;
+	
 	@Autowired
 	private DeployerService deployerService;
 	
@@ -47,9 +56,11 @@ public class PeriodicStagingAreaWriter implements ItemWriter<Map<Deployment, Fil
 				Deployment deployment = entry.getKey();
 				File file = entry.getValue();
 				deployerService.deploy(deployment);
-				if (file.exists()) {
-					file.delete();
-				}
+				String path = file.getAbsolutePath();
+				LOGGER.debug("Original absolute directory path: " + path);
+				path = path.replace(stagingArea, "");
+				LOGGER.debug("Relative directory path: " + path);
+				FileUtil.removeAllRecursively(file.getAbsolutePath());
 			}	
 		}
 	}
