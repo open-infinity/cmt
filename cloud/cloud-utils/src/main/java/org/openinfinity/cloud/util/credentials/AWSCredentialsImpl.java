@@ -31,10 +31,10 @@ import com.amazonaws.auth.AWSCredentials;
 //@ImportResource("classpath*:/META-INF/spring/cloud-util-properties-config.xml")
 public class AWSCredentialsImpl implements AWSCredentials {
 
-	@Value("${awsaccesskeyid}")
+	@Value("${eucaaccesskeyid}")
 	private String aWSAccessKeyId;
 	
-	@Value("${awssecretkey}")
+	@Value("${eucasecretkey}")
 	private String aWSSecretKey;
 	
 	@Override
