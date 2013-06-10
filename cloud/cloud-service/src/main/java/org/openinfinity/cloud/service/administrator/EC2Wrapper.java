@@ -49,6 +49,7 @@ import com.amazonaws.services.ec2.model.DescribeVolumesResult;
 import com.amazonaws.services.ec2.model.DetachVolumeRequest;
 import com.amazonaws.services.ec2.model.DisassociateAddressRequest;
 import com.amazonaws.services.ec2.model.Instance;
+import com.amazonaws.services.ec2.model.IpPermission;
 import com.amazonaws.services.ec2.model.KeyPair;
 import com.amazonaws.services.ec2.model.Placement;
 import com.amazonaws.services.ec2.model.Reservation;
@@ -57,6 +58,7 @@ import com.amazonaws.services.ec2.model.RunInstancesRequest;
 import com.amazonaws.services.ec2.model.RunInstancesResult;
 import com.amazonaws.services.ec2.model.Tag;
 import com.amazonaws.services.ec2.model.TerminateInstancesRequest;
+import com.amazonaws.services.ec2.model.UserIdGroupPair;
 import com.amazonaws.services.elasticloadbalancing.AmazonElasticLoadBalancing;
 import com.amazonaws.services.elasticloadbalancing.AmazonElasticLoadBalancingClient;
 import com.amazonaws.services.elasticloadbalancing.model.CreateAppCookieStickinessPolicyRequest;
@@ -89,12 +91,14 @@ public class EC2Wrapper {
 		
 	public EC2Wrapper(){}
 	
-	public EC2Wrapper(String aEndpoint, int aCloudType, AWSCredentials eucaCredentials){
+	public EC2Wrapper(String aEndpoint, int aCloudType, AWSCredentials credentials){
 		if(aCloudType == InstanceService.CLOUD_TYPE_AMAZON) {
-			this.init(eucaCredentials, aCloudType);
+			//endpoint = "ec2.eu-west-1.amazonaws.com";
+			endpoint = aEndpoint;
+			this.init(credentials, aCloudType);
 		} else if(aCloudType == InstanceService.CLOUD_TYPE_EUCALYPTUS) {
 			endpoint = aEndpoint;
-			this.init(eucaCredentials, aCloudType);
+			this.init(credentials, aCloudType);
 		}
 		cloudType = aCloudType;	
 	}
@@ -114,7 +118,7 @@ public class EC2Wrapper {
 				if (cloudType == CLOUD_TYPE_AMAZON) {
 					LOG.info("Credentials: "+credentials.getAWSAccessKeyId()+", "+credentials.getAWSSecretKey());
 					ec2 = new AmazonEC2Client(credentials);
-					ec2.setEndpoint("ec2.eu-west-1.amazonaws.com");
+					ec2.setEndpoint(endpoint);
 				} else if (cloudType == CLOUD_TYPE_EUCALYPTUS) {
 					LOG.info("Credentials: "+credentials.getAWSAccessKeyId()+", "+credentials.getAWSSecretKey());
 					ec2 = new AmazonEC2Client(credentials);
@@ -205,11 +209,26 @@ public class EC2Wrapper {
 	public void authorizeIPs(String securityGroupName, String cidrIp, Integer fromPort, Integer toPort, String protocol) {
 		try {
 			AuthorizeSecurityGroupIngressRequest request = new AuthorizeSecurityGroupIngressRequest();
+			
+			if(this.cloudType == InstanceService.CLOUD_TYPE_EUCALYPTUS) {
+				request.setFromPort(fromPort);
+				request.setToPort(toPort);
+				request.setCidrIp(cidrIp);
+				request.setIpProtocol(protocol);
+			} else {
+
+				IpPermission perm = new IpPermission();
+				perm.setFromPort(fromPort);
+				perm.setToPort(toPort);
+				perm.setIpProtocol(protocol);
+				List<String> ipRanges = new ArrayList<String>();
+				ipRanges.add(cidrIp);
+				perm.setIpRanges(ipRanges);
+				List<IpPermission> permList = new ArrayList<IpPermission>();
+				permList.add(perm);
+				request.setIpPermissions(permList);
+			}
 			request.setGroupName(securityGroupName);
-			request.setFromPort(fromPort);
-			request.setToPort(toPort);
-			request.setCidrIp(cidrIp);
-			request.setIpProtocol(protocol);
 			ec2.authorizeSecurityGroupIngress(request);
 		} catch (Exception e) {
 			String message = e.getMessage();
@@ -221,16 +240,61 @@ public class EC2Wrapper {
 	public void authorizeGroup(String securityGroupName, String sourceGroupName, String sourceGroupOwner, Integer fromPort, Integer toPort, String protocol) {
 		try {
 			AuthorizeSecurityGroupIngressRequest request = new AuthorizeSecurityGroupIngressRequest();
+			if(this.cloudType == InstanceService.CLOUD_TYPE_EUCALYPTUS) {
+				request.setFromPort(fromPort);
+				request.setToPort(toPort);
+				request.setSourceSecurityGroupName(sourceGroupName);
+				request.setSourceSecurityGroupOwnerId(sourceGroupOwner);
+				request.setIpProtocol(protocol);
+			} else {
+
+				UserIdGroupPair pair = new UserIdGroupPair();
+				pair.setGroupName(sourceGroupName);
+				pair.setUserId(sourceGroupOwner);
+				List<UserIdGroupPair> idList = new ArrayList<UserIdGroupPair>();
+				idList.add(pair);
+				IpPermission perm = new IpPermission();
+				perm.setUserIdGroupPairs(idList);
+				perm.setFromPort(fromPort);
+				perm.setToPort(toPort);
+				perm.setIpProtocol(protocol);
+				List<IpPermission> permList = new ArrayList<IpPermission>();
+				permList.add(perm);
+				request.setIpPermissions(permList);
+			}
 			request.setGroupName(securityGroupName);
-			request.setFromPort(fromPort);
-			request.setToPort(toPort);
-			request.setSourceSecurityGroupName(sourceGroupName);
-			request.setSourceSecurityGroupOwnerId(sourceGroupOwner);
-			request.setIpProtocol(protocol);
+			
 			ec2.authorizeSecurityGroupIngress(request);
 		} catch (Exception e) {
 			String message = e.getMessage();
 			LOG.error("Could not set authorized IP:s to security group: "+message);
+			ExceptionUtil.throwSystemException(message, e);
+		}
+	}
+	
+	public void revokeGroup(String securityGroupName, String sourceGroupName, String sourceGroupOwner, Integer fromPort, Integer toPort, String protocol) {
+		try {
+			RevokeSecurityGroupIngressRequest request = new RevokeSecurityGroupIngressRequest();
+			UserIdGroupPair pair = new UserIdGroupPair();
+			pair.setGroupName(sourceGroupName);
+			pair.setUserId(sourceGroupOwner);
+			List<UserIdGroupPair> idList = new ArrayList<UserIdGroupPair>();
+			idList.add(pair);
+			IpPermission perm = new IpPermission();
+			perm.setUserIdGroupPairs(idList);
+			perm.setFromPort(fromPort);
+			perm.setToPort(toPort);
+			perm.setIpProtocol(protocol);
+			List<IpPermission> permList = new ArrayList<IpPermission>();
+			permList.add(perm);
+			request.setIpPermissions(permList);
+
+			request.setGroupName(securityGroupName);
+			ec2.revokeSecurityGroupIngress(request);
+		} catch (Exception e) {
+			String message = e.getMessage();
+			LOG.error("Could not set authorized IP:s to security group: "
+					+ message);
 			ExceptionUtil.throwSystemException(message, e);
 		}
 	}

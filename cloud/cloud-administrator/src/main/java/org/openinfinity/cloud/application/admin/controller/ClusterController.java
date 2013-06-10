@@ -156,7 +156,8 @@ public class ClusterController {
 			if(lb == null) ExceptionUtil.throwApplicationException("No load balancer found for cluster:" + clusterId);
 			EC2Wrapper ec2 = new EC2Wrapper();
 			if(tapInstance.getCloudType() == InstanceService.CLOUD_TYPE_AMAZON) {
-				// TODO
+				ec2.setEndpoint(ec2EndPoint);
+				ec2.init(eucaCredentials, tapInstance.getCloudType());
 			} else if(tapInstance.getCloudType() == InstanceService.CLOUD_TYPE_EUCALYPTUS) {
 				ec2.setEndpoint(ec2EndPoint);
 				ec2.init(eucaCredentials, tapInstance.getCloudType());
@@ -184,7 +185,8 @@ public class ClusterController {
 			ElasticIP eip = arService.getClustersElasticIP(clusterId);
 			EC2Wrapper ec2 = new EC2Wrapper();
 			if (tapInstance.getCloudType() == InstanceService.CLOUD_TYPE_AMAZON) {
-				// TODO
+				ec2.setEndpoint(ec2EndPoint);
+				ec2.init(eucaCredentials, tapInstance.getCloudType());
 			} else if (tapInstance.getCloudType() == InstanceService.CLOUD_TYPE_EUCALYPTUS) {
 				ec2.setEndpoint(ec2EndPoint);
 				ec2.init(eucaCredentials, tapInstance.getCloudType());
@@ -224,6 +226,8 @@ public class ClusterController {
 			// TODO this can go to util function
 			EC2Wrapper ec2 = new EC2Wrapper();
 			if(tapInstance.getCloudType() == InstanceService.CLOUD_TYPE_AMAZON) {
+				ec2.setEndpoint(ec2EndPoint);
+				ec2.init(eucaCredentials, tapInstance.getCloudType());
 			} else if(tapInstance.getCloudType() == InstanceService.CLOUD_TYPE_EUCALYPTUS) {
 				ec2.setEndpoint(ec2EndPoint);
 				ec2.init(eucaCredentials, tapInstance.getCloudType());
@@ -253,7 +257,8 @@ public class ClusterController {
 			
 			EC2Wrapper ec2 = new EC2Wrapper();
 			if(tapInstance.getCloudType() == InstanceService.CLOUD_TYPE_AMAZON) {
-				// TODO
+				ec2.setEndpoint(ec2EndPoint);
+				ec2.init(eucaCredentials, tapInstance.getCloudType());
 			} else if(tapInstance.getCloudType() == InstanceService.CLOUD_TYPE_EUCALYPTUS) {
 				ec2.setEndpoint(ec2EndPoint);
 				ec2.init(eucaCredentials, tapInstance.getCloudType());
@@ -284,7 +289,8 @@ public class ClusterController {
 		}
 		EC2Wrapper ec2 = new EC2Wrapper();
 		if(tapInstance.getCloudType() == InstanceService.CLOUD_TYPE_AMAZON) {
-			// TODO
+			ec2.setEndpoint(ec2EndPoint);
+			ec2.init(eucaCredentials, tapInstance.getCloudType());
 		} else if(tapInstance.getCloudType() == InstanceService.CLOUD_TYPE_EUCALYPTUS) {
 			ec2.setEndpoint(ec2EndPoint);
 			ec2.init(eucaCredentials, tapInstance.getCloudType());

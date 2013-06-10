@@ -88,14 +88,14 @@ public class AuthorizationRoutingServiceImpl implements AuthorizationRoutingServ
 					AuthorizationRoute ip = i.next();
 					ec2.authorizeIPs(cluster.getSecurityGroupName(), ip.getCidrIp(), ip.getFromPort(), ip.getToPort(), ip.getProtocol());
 				} */
-				Collection<String> groupList = authorizedRoutingRepository.getAllSecurityGroupsInInstance(cluster.getInstanceId());
+			/*	Collection<String> groupList = authorizedRoutingRepository.getAllSecurityGroupsInInstance(cluster.getInstanceId());
 				Iterator<String> i = groupList.iterator();
 				while(i.hasNext()) {
 					String group = i.next();
 					if(!group.equals(cluster.getSecurityGroupName())) {
 						ec2.authorizeGroup(cluster.getSecurityGroupName(), group, securityGroupOwner, 0, 65535, "tcp");
 					}
-				}
+				} */
 			}
 		} else if(cluster.getPublished() == CLUSTER_STATUS_PRIVATE) {
 			if(newPubStatus == CLUSTER_STATUS_PUBLIC) {
@@ -116,14 +116,14 @@ public class AuthorizationRoutingServiceImpl implements AuthorizationRoutingServ
 					AuthorizationRoute ip = i.next();
 					ec2.authorizeIPs(cluster.getSecurityGroupName(), ip.getCidrIp(), ip.getFromPort(), ip.getToPort(), ip.getProtocol());
 				} */
-				Collection<String> groupList = authorizedRoutingRepository.getAllSecurityGroupsInInstance(cluster.getInstanceId());
+			/*	Collection<String> groupList = authorizedRoutingRepository.getAllSecurityGroupsInInstance(cluster.getInstanceId());
 				Iterator<String> i = groupList.iterator();
 				while(i.hasNext()) {
 					String group = i.next();
 					if(!group.equals(cluster.getSecurityGroupName())) {
 						ec2.authorizeGroup(cluster.getSecurityGroupName(), group, securityGroupOwner, 0, 65535, "tcp");
 					}
-				}
+				} */
 			}
 		}
 		

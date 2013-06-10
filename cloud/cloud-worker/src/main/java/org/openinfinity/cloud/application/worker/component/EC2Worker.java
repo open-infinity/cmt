@@ -104,6 +104,10 @@ public class EC2Worker implements Worker {
 	private AWSCredentials eucaCredentials;
 	
 	@Autowired
+	@Qualifier("amazonCredentials")
+	private AWSCredentials amazonCredentials;
+	
+	@Autowired
 	@Qualifier("multicastAddressService")
 	private MulticastAddressService maService;
 	
@@ -232,10 +236,13 @@ public class EC2Worker implements Worker {
 		String threadName = Thread.currentThread().getName();
 		LOG.debug(threadName+": EC2Worker:deleteInstance starting");
 		EC2Wrapper ec2 = new EC2Wrapper();
-		String endPoint = PropertyManager.getProperty("cloudadmin.worker.eucalyptus.endpoint");
+		
 		if(job.getCloud() == InstanceService.CLOUD_TYPE_AMAZON) {
-			// TODO
+			String endPoint = PropertyManager.getProperty("cloudadmin.worker.amazon.endpoint");
+			ec2.setEndpoint(endPoint);
+			ec2.init(amazonCredentials, job.getCloud());
 		} else if(job.getCloud() == InstanceService.CLOUD_TYPE_EUCALYPTUS) {
+			String endPoint = PropertyManager.getProperty("cloudadmin.worker.eucalyptus.endpoint");
 			ec2.setEndpoint(endPoint);
 			ec2.init(eucaCredentials, job.getCloud());
 		}
@@ -267,6 +274,13 @@ public class EC2Worker implements Worker {
 							LOG.error("Error removing elastic IP "+eIP.getIpAddress()+" from cluster "+c.getId());
 						}
 						arService.freeElasticIP(eIP);
+					}
+					
+					if(job.getCloud() == InstanceService.CLOUD_TYPE_AMAZON) {
+						String cmtGroup = PropertyManager.getProperty("cloudadmin.worker.cmt.securitygroup.amazon");
+						String securityGroupOwner = PropertyManager.getProperty("cloudadmin.worker.amazon.securitygroup.owner");
+						ec2.revokeGroup(cmtGroup, c.getSecurityGroupName(), securityGroupOwner, 0, 65535, "tcp");
+						ec2.revokeGroup(cmtGroup, c.getSecurityGroupName(), securityGroupOwner, 0, 65535, "udp");
 					}
 					Collection<Machine> machines = machineService.getMachinesInCluster(c.getId());
 					ArrayList<com.amazonaws.services.elasticloadbalancing.model.Instance> instanceL = new ArrayList<com.amazonaws.services.elasticloadbalancing.model.Instance>();
@@ -505,9 +519,11 @@ public class EC2Worker implements Worker {
 		
 		LOG.debug(threadName+": EC2Worker:createNewInstance starting");
 		String endPoint = PropertyManager.getProperty("cloudadmin.worker.eucalyptus.endpoint");
+		String amazonEndPoint = PropertyManager.getProperty("cloudadmin.worker.amazon.endpoint");
 		EC2Wrapper ec2 = new EC2Wrapper();
 		if(job.getCloud() == InstanceService.CLOUD_TYPE_AMAZON) {
-			// TODO
+			ec2.setEndpoint(amazonEndPoint);
+			ec2.init(amazonCredentials, job.getCloud());
 		} else if(job.getCloud() == InstanceService.CLOUD_TYPE_EUCALYPTUS) {
 			ec2.setEndpoint(endPoint);
 			ec2.init(eucaCredentials, job.getCloud());
@@ -789,11 +805,11 @@ public class EC2Worker implements Worker {
 					machineTmp.setType("shard");
 				}
 			} 
-			int maxWait = 20;
+			int maxWait = 60;
 			while (tempInstance.getPrivateDnsName().equals("0.0.0.0") && maxWait > 0) {
 				LOG.info(threadName + ": Cloud not get IP address yet, waiting for a moment");
 				try {
-					Thread.sleep(1000);
+					Thread.sleep(3000);
 				} catch (InterruptedException e) {
 					LOG.error(threadName + ": Something interrupted my sleep: " + e.getMessage());
 				}
@@ -847,9 +863,11 @@ public class EC2Worker implements Worker {
 		
 		LOG.debug(threadName+": EC2Worker::createBigDataService starting");
 		String endPoint = PropertyManager.getProperty("cloudadmin.worker.eucalyptus.endpoint");
+		String amazonEndPoint = PropertyManager.getProperty("cloudadmin.worker.amazon.endpoint");
 		EC2Wrapper ec2 = new EC2Wrapper();
 		if(job.getCloud() == InstanceService.CLOUD_TYPE_AMAZON) {
-			// TODO
+			ec2.setEndpoint(amazonEndPoint);
+			ec2.init(amazonCredentials, job.getCloud());
 		} else if(job.getCloud() == InstanceService.CLOUD_TYPE_EUCALYPTUS) {
 			ec2.setEndpoint(endPoint);
 			ec2.init(eucaCredentials, job.getCloud());
@@ -870,9 +888,24 @@ public class EC2Worker implements Worker {
 		
 		clusterService.updateCluster(cluster);
 	//	ec2.authorizeIPs(cluster.getSecurityGroupName(), "0.0.0.0/0", 22, 22, "tcp");
-		String adminPortalAddress = PropertyManager.getProperty("cloudadmin.worker.adminportal.address");
-		ec2.authorizeIPs(cluster.getSecurityGroupName(), adminPortalAddress+"/32", 22, 22, "tcp");
-		ec2.authorizeIPs(cluster.getSecurityGroupName(), adminPortalAddress+"/32", 8181, 8181, "tcp");
+		if(job.getCloud() == InstanceService.CLOUD_TYPE_EUCALYPTUS) {
+			String adminPortalAddress = PropertyManager.getProperty("cloudadmin.worker.adminportal.address");
+			ec2.authorizeIPs(cluster.getSecurityGroupName(), adminPortalAddress+"/32", 22, 22, "tcp");
+			ec2.authorizeIPs(cluster.getSecurityGroupName(), adminPortalAddress+"/32", 8181, 8181, "tcp");
+		} else if(job.getCloud() == InstanceService.CLOUD_TYPE_AMAZON) {
+		//	String adminPortalAddress = PropertyManager.getProperty("cloudadmin.worker.adminportal.address.amazon");
+		//	ec2.authorizeIPs(cluster.getSecurityGroupName(), adminPortalAddress+"/32", 22, 22, "tcp");
+		//	ec2.authorizeIPs(cluster.getSecurityGroupName(), adminPortalAddress+"/32", 8181, 8181, "tcp");
+			String cmtGroup = PropertyManager.getProperty("cloudadmin.worker.cmt.securitygroup.amazon");
+			String securityGroupOwner = PropertyManager.getProperty("cloudadmin.worker.amazon.securitygroup.owner");
+			ec2.authorizeGroup(cluster.getSecurityGroupName(), cmtGroup, securityGroupOwner, 22, 22, "tcp");
+			ec2.authorizeGroup(cluster.getSecurityGroupName(), cmtGroup, securityGroupOwner, 8181, 8181, "tcp");
+			ec2.authorizeGroup(cluster.getSecurityGroupName(), cluster.getSecurityGroupName(), securityGroupOwner, 0, 65535, "tcp");
+			ec2.authorizeGroup(cluster.getSecurityGroupName(), cluster.getSecurityGroupName(), securityGroupOwner, 0, 65535, "udp");
+			ec2.authorizeGroup(cmtGroup, cluster.getSecurityGroupName(), securityGroupOwner, 0, 65535, "tcp");
+			ec2.authorizeGroup(cmtGroup, cluster.getSecurityGroupName(), securityGroupOwner, 0, 65535, "udp");
+		}
+		
 		List<String> securityGroups = new ArrayList<String>();
 		securityGroups.add(cluster.getSecurityGroupName());
 		
@@ -889,7 +922,7 @@ public class EC2Worker implements Worker {
 		machine.setInstanceId(machineInstance.getInstanceId());
 		machine.setType("manager");
 		machine.setConfigured(MachineService.MACHINE_CONFIGURE_STARTED);
-		int maxWait = 60;
+		int maxWait = 100;
 		while((machineInstance.getPrivateDnsName().equals("0.0.0.0") || machineInstance.getPrivateDnsName().equals("euca-0-0-0-0")) && maxWait > 0) {
 			LOG.info(threadName+": Could not get IP address yet, waiting for a moment");
 			try {
@@ -900,16 +933,36 @@ public class EC2Worker implements Worker {
 			maxWait--;
 			machineInstance = ec2.describeInstance(machineInstance.getInstanceId());
 		}
+		int maxWaitForRunning = 96;
+		while(!machineInstance.getState().getName().equals("running") && maxWaitForRunning > 0) {
+			LOG.info(threadName+": Waiting instance "+machineInstance.getInstanceId()+" to be at 'running' state. Waiting for "+maxWaitForRunning+" times");
+			try {
+				Thread.sleep(5000);
+			} catch (InterruptedException e) {
+				LOG.error(threadName+": Someone interrupted my sleep! How rude! "+e.getMessage());
+			}
+			machineInstance = ec2.describeInstance(machineInstance.getInstanceId());
+			maxWaitForRunning--;
+		}
 		LOG.debug(threadName+": Private dns name: "+machineInstance.getPrivateDnsName());
 		LOG.debug(threadName+": Private IP address: "+machineInstance.getPrivateIpAddress());
 		machine.setDnsName(machineInstance.getPublicDnsName());
 		machine.setPrivateDnsName(machineInstance.getPrivateDnsName());
 		machine.setState(machineInstance.getState().getName());
 		machine.setClusterId(cluster.getId());
-		machine.setUserName("root");
+		if(job.getCloud() == InstanceService.CLOUD_TYPE_AMAZON) {
+			machine.setUserName("ec2-user");
+		} else {
+			machine.setUserName("root");
+		}
 		machine.setRunning(1);
 		machineService.addMachine(machine);
-		String command = "/usr/bin/puppet agent --test --no-daemonize --onetime --certname ";
+		String command = null;
+		if(job.getCloud() == InstanceService.CLOUD_TYPE_AMAZON) {
+			command = "/usr/bin/sudo /usr/bin/puppet agent --test --no-daemonize --onetime --certname ";
+		} else {
+			command = "/usr/bin/puppet agent --test --no-daemonize --onetime --certname ";
+		}
 		command += job.getInstanceId()+"_";
 		command += cluster.getId()+"_";
 		command += machine.getId()+"_";
@@ -922,9 +975,17 @@ public class EC2Worker implements Worker {
 			return -1;
 		}
 		if(type == ClusterService.CLUSTER_TYPE_BIGDATA) {
-			command = "/opt/bigdata/bin/initialize.py hbase";
+			if(job.getCloud() == InstanceService.CLOUD_TYPE_AMAZON) {
+				command = "/usr/bin/sudo /opt/bigdata/bin/initialize.py hbase";
+			} else {
+				command = "/opt/bigdata/bin/initialize.py hbase";
+			}
 		} else {
-			command = "/opt/bigdata/bin/initialize.py mongodb";
+			if(job.getCloud() == InstanceService.CLOUD_TYPE_AMAZON) {
+				command = "/usr/bin/sudo /opt/bigdata/bin/initialize.py mongodb";
+			} else {
+				command = "/opt/bigdata/bin/initialize.py mongodb";
+			}
 		}
 		output = sshRunCommand(machine, command, key);
 		if(output == null) {
@@ -934,10 +995,13 @@ public class EC2Worker implements Worker {
 		machine.setConfigured(MachineService.MACHINE_CONFIGURE_READY);
 		machineService.updateMachineConfigure(machine.getId(), MachineService.MACHINE_CONFIGURE_READY);
 	
-		
 		// Lets get the roles for whole cluster
 		LOG.info(threadName+": Lets get the roles for the cluster");
-		command = "/opt/bigdata/bin/ask-roles.py --xml "+cluster.getNumberOfMachines();
+		if(job.getCloud() == InstanceService.CLOUD_TYPE_AMAZON) {
+			command = "/usr/bin/sudo /opt/bigdata/bin/ask-roles.py --xml "+cluster.getNumberOfMachines();
+		} else {
+			command = "/opt/bigdata/bin/ask-roles.py --xml "+cluster.getNumberOfMachines();
+		}
 		output = sshRunCommand(machine, command, key);
 		if(output == null) {
 			machineService.updateMachineConfigure(machine.getId(), MachineService.MACHINE_CONFIGURE_ERROR);
@@ -1035,7 +1099,7 @@ public class EC2Worker implements Worker {
 			}
 			maxWait = 60;
 			
-			while ((tempInstance.getPrivateDnsName().equals("0.0.0.0") || tempInstance.getPrivateDnsName().equals("euca-0-0-0-0")) && maxWait > 0) {
+			while ((tempInstance.getPrivateDnsName() == null || tempInstance.getPrivateDnsName().equals("null") || tempInstance.getPrivateDnsName().equals("0.0.0.0") || tempInstance.getPrivateDnsName().equals("euca-0-0-0-0")) && maxWait > 0) {
 				LOG.info(threadName + ": Cloud not get IP address yet, waiting for a moment");
 				try {
 					Thread.sleep(3000);
@@ -1064,14 +1128,18 @@ public class EC2Worker implements Worker {
 			machineTmp.setPrivateDnsName(tempInstance.getPrivateDnsName());
 			machineTmp.setState(tempInstance.getState().getName());
 			machineTmp.setClusterId(cluster.getId());
-			machineTmp.setUserName("root");
+			if(job.getCloud() == InstanceService.CLOUD_TYPE_AMAZON) {
+				machineTmp.setUserName("ec2-user");
+			} else {
+				machineTmp.setUserName("root");
+			}
 			machineTmp.setConfigured(MachineService.DATA_MACHINE_CONFIGURE_NOT_STARTED);
 			machineTmp.setRunning(1);
 			machineService.addMachine(machineTmp);
 			y++;
 		}
 		
-		Collection<Cluster> clusterList = clusterService.getClusters(job.getInstanceId());
+	/*	Collection<Cluster> clusterList = clusterService.getClusters(job.getInstanceId());
 		Iterator<Cluster> k = clusterList.iterator();
 		while(k.hasNext()) {
 			Cluster c = k.next();
@@ -1081,8 +1149,30 @@ public class EC2Worker implements Worker {
 				AuthorizationRoute ip = i.next();
 				ec2.authorizeIPs(c.getSecurityGroupName(), ip.getCidrIp(), ip.getFromPort(), ip.getToPort(), ip.getProtocol());
 			}
-		}
+		} */
 		
+		String securityGroupOwner = null;
+		if(job.getCloud() == InstanceService.CLOUD_TYPE_AMAZON) {
+			securityGroupOwner = PropertyManager.getProperty("cloudadmin.worker.amazon.securitygroup.owner");
+		} else {
+			securityGroupOwner = PropertyManager.getProperty("cloudadmin.worker.eucalyptus.securitygroup.owner");
+		}
+		Collection<Cluster> clusterList = clusterService.getClusters(job.getInstanceId());
+		Iterator<Cluster> k = clusterList.iterator();
+		while(k.hasNext()) {
+			Cluster c = k.next();
+		
+			Collection<String> groupList = arService.getAllSecurityGroupsInInstance(c.getInstanceId());
+			Iterator<String> i = groupList.iterator();
+			while(i.hasNext()) {
+				String group = i.next();
+				if(!group.equals(c.getSecurityGroupName())) {
+					ec2.authorizeGroup(c.getSecurityGroupName(), group, securityGroupOwner, 0, 65535, "tcp");
+					ec2.authorizeGroup(c.getSecurityGroupName(), group, securityGroupOwner, 0, 65535, "udp");
+				}
+			}
+		}
+		 
 		return 1;
 	}
 	
@@ -1091,8 +1181,55 @@ public class EC2Worker implements Worker {
 		String threadName = Thread.currentThread().getName();
 		
 		boolean connectOK = false;
-		int x = 30;
+		int x = 60;
+		
 		while(!connectOK) {
+			x--;
+			Socket s = null;
+			if(m.getDnsName().startsWith("euca-0-0-0-0") || m.getDnsName().startsWith("0.0.0.0")) {
+				LOG.info("Machine dnsname not yet set correctly by eucalyptus, waiting for a moment");
+				try {
+					Thread.sleep(3000);
+				} catch (InterruptedException e) {
+					LOG.error(threadName+": Someone interrupted my sleep! How rude! "+e.getMessage());
+				}
+				m = machineService.getMachine(m.getId());
+			} else {
+				try {
+					s = new Socket();
+					s.setReuseAddress(true);
+					LOG.debug(threadName + ": Trying to connect machine " + m.getId() + ", address: " + m.getDnsName());
+					SocketAddress sa = new InetSocketAddress(m.getDnsName(), 22);
+					s.connect(sa, 3000);
+					connectOK = true;
+					LOG.info(threadName + ": Connected OK to the instance " + m.getInstanceId());
+				} catch (IOException e) {
+					if (x == 0) {
+						machineService.updateMachineConfigure(m.getId(), MachineService.MACHINE_CONFIGURE_ERROR);
+						return retVal;
+					}
+					LOG.info(threadName + ": Got IO exception connecting to ssh port, trying for " + x
+							+ " more times...");
+					LOG.info(threadName + ": Updating machine info");
+					m = machineService.getMachine(m.getId());
+					try {
+						Thread.sleep(3000);
+					} catch (InterruptedException ex) {
+						LOG.error(threadName + ": Someone interrupted my sleep! How rude! " + e.getMessage());
+					}
+				} finally {
+					if (s != null) {
+						try {
+							s.close();
+						} catch (IOException e) {
+							LOG.error(threadName + ": Error closing socket");
+						}
+					}
+				}
+			}
+		}
+		
+	/*	while(!connectOK) {
 			x--;
 			Socket s = null;
 			try {
@@ -1125,14 +1262,14 @@ public class EC2Worker implements Worker {
 					}
 				}
 			}
-		}
+		} */
 		
 		byte[] privkey = key.getSecret_key().getBytes();
 		final byte[] emptyPassPhrase = new byte[0];
 		JSch jsch = new JSch();
 		try {
-			jsch.addIdentity("root", privkey, null, emptyPassPhrase);
-			Session session = jsch.getSession("root", m.getDnsName(), 22);
+			jsch.addIdentity(m.getUserName(), privkey, null, emptyPassPhrase);
+			Session session = jsch.getSession(m.getUserName(), m.getDnsName(), 22);
 			Properties config = new Properties();
 			config.put("StrictHostKeyChecking", "no");
 			session.setConfig(config);
@@ -1142,6 +1279,7 @@ public class EC2Worker implements Worker {
 			
 			LOG.info(threadName+": Running command: '"+command+"'");
 			Channel channel = session.openChannel("exec");
+			((ChannelExec) channel).setPty(true);
 			((ChannelExec) channel).setCommand(command);
 			channel.setInputStream(null);
 			InputStream in = channel.getInputStream();
@@ -1303,7 +1441,13 @@ public class EC2Worker implements Worker {
 			}
 			
 		}
-		String securityGroupOwner = PropertyManager.getProperty("cloudadmin.worker.eucalyptus.securitygroup.owner");
+		String securityGroupOwner = null;
+		if (job.getCloud() == InstanceService.CLOUD_TYPE_AMAZON) {
+			securityGroupOwner = PropertyManager.getProperty("cloudadmin.worker.amazon.securitygroup.owner");
+		} else {
+			securityGroupOwner = PropertyManager.getProperty("cloudadmin.worker.eucalyptus.securitygroup.owner");
+		}
+		
 		Collection<Cluster> clusterList = clusterService.getClusters(job.getInstanceId());
 		Iterator<Cluster> k = clusterList.iterator();
 		while(k.hasNext()) {
@@ -1337,22 +1481,44 @@ public class EC2Worker implements Worker {
 		cluster.setSecurityGroupId(securityGroupId);
 		cluster.setSecurityGroupName(securityGroupName);
 		clusterService.updateCluster(cluster);
-		String adminPortalAddress = PropertyManager.getProperty("cloudadmin.worker.adminportal.address");
-	//	ec2.authorizeIPs(cluster.getSecurityGroupName(), "0.0.0.0/0", 22, 22, "tcp");
-		ec2.authorizeIPs(cluster.getSecurityGroupName(), adminPortalAddress+"/32", 22, 22, "tcp");
-		ec2.authorizeIPs(cluster.getSecurityGroupName(), adminPortalAddress+"/32", 8181, 8181, "tcp");
+		if (cloud == InstanceService.CLOUD_TYPE_AMAZON) {
+			//String adminPortalAddress = PropertyManager.getProperty("cloudadmin.worker.adminportal.address.amazon");
+			//	ec2.authorizeIPs(cluster.getSecurityGroupName(), "0.0.0.0/0", 22, 22, "tcp");
+			String cmtGroup = PropertyManager.getProperty("cloudadmin.worker.cmt.securitygroup.amazon");
+			String securityGroupOwner = PropertyManager.getProperty("cloudadmin.worker.amazon.securitygroup.owner");
+			//ec2.authorizeIPs(cluster.getSecurityGroupName(), adminPortalAddress+"/32", 22, 22, "tcp");
+			//ec2.authorizeIPs(cluster.getSecurityGroupName(), adminPortalAddress+"/32", 8181, 8181, "tcp");
+			ec2.authorizeGroup(cluster.getSecurityGroupName(), cmtGroup, securityGroupOwner, 22, 22, "tcp");
+			ec2.authorizeGroup(cluster.getSecurityGroupName(), cmtGroup, securityGroupOwner, 8181, 8181, "tcp");
+			ec2.authorizeGroup(cluster.getSecurityGroupName(), cluster.getSecurityGroupName(), securityGroupOwner, 0, 65535, "tcp");
+			ec2.authorizeGroup(cluster.getSecurityGroupName(), cluster.getSecurityGroupName(), securityGroupOwner, 0, 65535, "udp");
+			ec2.authorizeGroup(cmtGroup, cluster.getSecurityGroupName(), securityGroupOwner, 0, 65535, "tcp");
+			ec2.authorizeGroup(cmtGroup, cluster.getSecurityGroupName(), securityGroupOwner, 0, 65535, "udp");
+		} else if(cloud == InstanceService.CLOUD_TYPE_EUCALYPTUS) {
+			String adminPortalAddress = PropertyManager.getProperty("cloudadmin.worker.adminportal.address");
+			//	ec2.authorizeIPs(cluster.getSecurityGroupName(), "0.0.0.0/0", 22, 22, "tcp");
+			ec2.authorizeIPs(cluster.getSecurityGroupName(), adminPortalAddress+"/32", 22, 22, "tcp");
+			ec2.authorizeIPs(cluster.getSecurityGroupName(), adminPortalAddress+"/32", 8181, 8181, "tcp");
+		}
 		List<String> securityGroups = new ArrayList<String>();
 		securityGroups.add(cluster.getSecurityGroupName());
 		List<com.amazonaws.services.ec2.model.Instance> instances = new ArrayList<com.amazonaws.services.ec2.model.Instance>();
 		if(needsLoadBalancer != null && needsLoadBalancer.equalsIgnoreCase("yes")) {
 			if (cloud == InstanceService.CLOUD_TYPE_AMAZON) {
-				String lbDns = ec2.createLoadBalancer(cluster.getLbName(), zone, key);
+			/* Maybe in the future	String lbDns = ec2.createLoadBalancer(cluster.getLbName(), zone, key);
 				if (lbDns == null) {
 					throw new WorkerException("Error creating load balancer for service " + service);
 				}
 				cluster.setLbDns(lbDns);
 				ec2.setAppCookieStickiness("JSESSIONID", "JavaSessionPolicy", cluster.getLbName());
-				ec2.setLoadBalancerPoliciesOfListener("JavaSessionPolicy", cluster.getLbName(), 80);
+				ec2.setLoadBalancerPoliciesOfListener("JavaSessionPolicy", cluster.getLbName(), 80); */
+				/* currently just use the same instance based balancing as in euca */
+				Reservation reservation = ec2.createInstance(imageId(cloud, service, 0), 1, key, zone, "m1.small", securityGroups);
+				if(reservation == null) {
+					ec2.deleteSecurityGroup(cluster.getSecurityGroupName());
+					throw new WorkerException("Error creating virtual machines for service "+service);
+				}
+				instances.addAll(reservation.getInstances());
 			} else {
 				//cluster.setNumberOfMachines(cluster.getNumberOfMachines()+1);
 				
@@ -1432,7 +1598,11 @@ public class EC2Worker implements Worker {
 			machine.setPrivateDnsName(tempInstance.getPrivateDnsName());
 			machine.setState(tempInstance.getState().getName());
 			machine.setClusterId(cluster.getId());
-			machine.setUserName("root");
+			if (cloud == InstanceService.CLOUD_TYPE_AMAZON) {
+				machine.setUserName("ec2-user");
+			} else {
+				machine.setUserName("root");
+			}
 			machine.setConfigured(0);
 			machine.setRunning(1);
 			
