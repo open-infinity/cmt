@@ -112,7 +112,7 @@ public class CtrPropController {
 
 			// Query properties
 			List<String> organization_ids = new LinkedList<String>();
-			organization_ids.add(currentOrganizationId); // TODO: sub-organizations too
+			//organization_ids.add(currentOrganizationId); // TODO: sub-organizations too
 			props.addAll(service.loadAll(currentSharedProperty(null)));
 			
 			// Add attributes to the model
