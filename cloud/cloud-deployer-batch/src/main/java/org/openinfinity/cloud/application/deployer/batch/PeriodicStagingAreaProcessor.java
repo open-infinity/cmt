@@ -51,7 +51,7 @@ public class PeriodicStagingAreaProcessor implements ItemProcessor<File, Map<Dep
 	
 	public Map<Deployment, File> parseMetadataFromDirectoriesAndCreateDeployments(File file) throws Exception {
 		// <platform-version>/? , <action> or .delete file?
-		// <stagingarea>/<cloud>/<orgnization>/<instance>/<cluster>/<type>/<name>/<artifact>
+		// <stagingarea>/<availability-zone>/<orgnization>/<instance>/<cluster>/<type>/<name>/<artifact>
 		int directoryIndex = 0;
 		String path = file.getAbsolutePath();
 		LOGGER.debug("Original absolute directory path: " + path);
@@ -59,7 +59,7 @@ public class PeriodicStagingAreaProcessor implements ItemProcessor<File, Map<Dep
 		LOGGER.debug("Relative directory path: " + path);
 		String[] metadata = path.split(File.separator);
 		Deployment deployment = new Deployment();
-		deployment.setCloudInstance(metadata[directoryIndex]);
+		deployment.setAvailabilityZone(Integer.parseInt(metadata[directoryIndex]));
 		deployment.setInstanceId(Integer.parseInt(metadata[directoryIndex++]));
 		deployment.setClusterId(Integer.parseInt(metadata[directoryIndex++]));
 		deployment.setType(metadata[directoryIndex++]);

@@ -27,6 +27,7 @@ import org.apache.log4j.Logger;
 import org.openinfinity.cloud.domain.SharedProperty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -56,13 +57,17 @@ public class CentralizedPropertiesRepositoryJdbcImpl implements CentralizedPrope
 	private static final String LOAD_ALL_SQL = "select * from properties_tbl";
 	private static final String LOAD_ALL_SQL_WHERE = "select * from properties_tbl " + WHERE2;
 	private static final String DELETE_BY_KEY = "delete from properties_tbl " + WHERE;
+	private static final String LOAD_DISTINCT_SHARED_PROPERTIES_CLUSTERS_SQL = "SELECT DISTINCT organization_id, cloud_id, instance_id, cluster_id FROM properties_tbl";
 	
-	private NamedParameterJdbcTemplate jdbcTemplate;
+	
+	private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+	private JdbcTemplate jdbcTemplate;
 
 	@Autowired
 	public CentralizedPropertiesRepositoryJdbcImpl(@Qualifier("cloudDataSource") DataSource dataSource) {
 		Assert.notNull(dataSource, "Please define datasource for deployer repository.");
-		jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
+		namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
+		jdbcTemplate = new JdbcTemplate(dataSource);
 	}
 
 	@Override
@@ -73,12 +78,12 @@ public class CentralizedPropertiesRepositoryJdbcImpl implements CentralizedPrope
 		map.addValue("orgid", prop.getOrganizationId());
 		map.addValue("insid", prop.getInstanceId());
 		map.addValue("clid", prop.getClusterId());
-		int n = jdbcTemplate.queryForInt(COUNT_BY_KEY, map);
+		int n = namedParameterJdbcTemplate.queryForInt(COUNT_BY_KEY, map);
 		if (n == 0) {
 			map.addValue("value", prop.getValue());
-			jdbcTemplate.update(STORE_SQL, map);
+			namedParameterJdbcTemplate.update(STORE_SQL, map);
 		} else {
-			jdbcTemplate.update(UPDATE_SQL, map);
+			namedParameterJdbcTemplate.update(UPDATE_SQL, map);
 		}
 		return prop;
 	}
@@ -89,13 +94,19 @@ public class CentralizedPropertiesRepositoryJdbcImpl implements CentralizedPrope
 		map.addValue("orgid", prop.getOrganizationId());
 		map.addValue("insid", prop.getInstanceId());
 		map.addValue("clid", prop.getClusterId());
-		Collection<SharedProperty> props = jdbcTemplate.query(LOAD_ALL_SQL_WHERE, map, new SharedPropertyRowMapper());
+		Collection<SharedProperty> props = namedParameterJdbcTemplate.query(LOAD_ALL_SQL_WHERE, map, new SharedPropertyRowMapper());
 		return Collections.unmodifiableCollection(props);
 	}
 	
 	@Override
 	public Collection<SharedProperty> loadAll() {
-		Collection<SharedProperty> props = jdbcTemplate.query(LOAD_ALL_SQL, new HashMap(), new SharedPropertyRowMapper());
+		Collection<SharedProperty> props = jdbcTemplate.query(LOAD_ALL_SQL, new SharedPropertyRowMapper());
+		return Collections.unmodifiableCollection(props);
+	}
+	
+	@Override
+	public Collection<SharedProperty> loadKnownSharedPropertyDeployments() {
+		Collection<SharedProperty> props = jdbcTemplate.query(LOAD_DISTINCT_SHARED_PROPERTIES_CLUSTERS_SQL, new SharedPropertyRowMapper());
 		return Collections.unmodifiableCollection(props);
 	}
 	
@@ -107,7 +118,7 @@ public class CentralizedPropertiesRepositoryJdbcImpl implements CentralizedPrope
 			map.addValue("insid", prop.getInstanceId());
 			map.addValue("clid", prop.getClusterId());
 			map.addValue("key", prop.getKey());
-			SharedProperty p = (SharedProperty) jdbcTemplate.queryForObject(LOAD_BY_KEY, map, new SharedPropertyRowMapper());
+			SharedProperty p = (SharedProperty) namedParameterJdbcTemplate.queryForObject(LOAD_BY_KEY, map, new SharedPropertyRowMapper());
 			return p;
 		} catch (org.springframework.dao.EmptyResultDataAccessException e) {
 			logger.warn("Failed to load shared property by key: " + e.getMessage());
@@ -122,7 +133,7 @@ public class CentralizedPropertiesRepositoryJdbcImpl implements CentralizedPrope
 		map.addValue("insid", prop.getInstanceId());
 		map.addValue("clid", prop.getClusterId());
 		map.addValue("key", prop.getKey());
-		int n = jdbcTemplate.update(DELETE_BY_KEY, map);
+		int n = namedParameterJdbcTemplate.update(DELETE_BY_KEY, map);
 		return (n >= 1); 
 	}
 	
@@ -130,13 +141,12 @@ public class CentralizedPropertiesRepositoryJdbcImpl implements CentralizedPrope
 		@Override
 		public SharedProperty mapRow(ResultSet resultSet, int rowNum) throws SQLException {
 			SharedProperty p = new SharedProperty();
-			p.setOrganizationId(resultSet.getString("ORGANIZATION_ID"));
-			p.setInstanceId(resultSet.getString("INSTANCE_ID"));
-			p.setClusterId(resultSet.getString("CLUSTER_ID"));
+			p.setOrganizationId(resultSet.getInt("ORGANIZATION_ID"));
+			p.setInstanceId(resultSet.getInt("INSTANCE_ID"));
+			p.setClusterId(resultSet.getInt("CLUSTER_ID"));
 			p.setKey(resultSet.getString("KEY_COLUMN"));
 			p.setValue(resultSet.getString("VALUE_COLUMN"));
 			return p;
 		}
-	
 	}
 }

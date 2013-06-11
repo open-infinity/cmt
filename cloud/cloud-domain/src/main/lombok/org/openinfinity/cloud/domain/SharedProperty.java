@@ -16,12 +16,14 @@
 
 package org.openinfinity.cloud.domain;
 
+import java.util.Date;
+
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import lombok.NonNull;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
 /**
@@ -32,25 +34,34 @@ import lombok.ToString;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@RequiredArgsConstructor
 @ToString
 @EqualsAndHashCode
 public final class SharedProperty {
+	
+	@NonNull
+	private int availabilityZone;
+	
 	@NonNull 
-	private String organizationId;
+	private int organizationId;
 	
-	private String instanceId;
+	@NonNull
+	private int instanceId;
 	
-	private String clusterId;
+	@NonNull
+	private int clusterId;
 	
 	private String key;
 	
 	private String value;
 	
-	public SharedProperty(String organizationId, String key, String value) {
-		this.organizationId = organizationId;
-		this.key = key;
-		this.value = value;
-	}
+	private Date timestamp;
+	
+//	public SharedProperty(int organizationId, int key, int value) {
+//		this.organizationId = organizationId;
+//		this.key = key;
+//		this.value = value;
+//	}
 
 /* POIS VAAN ROHKEASTI	
 	public boolean equals(Object o) {
