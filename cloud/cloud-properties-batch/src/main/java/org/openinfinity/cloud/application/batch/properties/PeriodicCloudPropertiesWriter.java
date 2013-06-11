@@ -19,10 +19,10 @@ import java.io.File;
 import java.util.List;
 import java.util.Map;
 
-import org.codehaus.plexus.util.IOUtil;
 import org.openinfinity.cloud.domain.Deployment;
 import org.openinfinity.cloud.service.deployer.DeployerService;
 import org.openinfinity.cloud.util.filesystem.FileUtil;
+import org.openinfinity.core.util.IOUtil;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -47,7 +47,7 @@ public class PeriodicCloudPropertiesWriter implements ItemWriter<Map<File, Deplo
 				File file = entry.getKey();
 				Deployment deployment = entry.getValue();
 				deployerService.deploy(deployment);
-				IOUtil.close(deployment.getInputStream());
+				IOUtil.closeStream(deployment.getInputStream());
 				FileUtil.removeAllRecursively(file.getPath());
 			}	
 		}
