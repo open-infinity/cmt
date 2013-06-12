@@ -24,12 +24,13 @@ package org.openinfinity.cloud.service.scaling;
  * @since 1.0.0
  */
 public final class Enumerations{
-	public enum ScalingBalance {
+	public enum ScalingState {
 		SCALE_IN,
 		SCALE_OUT,
 		HARMONIZED,
 		SYSTEM_DISASTER_PANIC,
-		RULE_NOT_DEFINED;
+		RULE_NOT_DEFINED,
+		SCALING_ONGOING;
 	}
 	
 	public enum ScalingPolicy {

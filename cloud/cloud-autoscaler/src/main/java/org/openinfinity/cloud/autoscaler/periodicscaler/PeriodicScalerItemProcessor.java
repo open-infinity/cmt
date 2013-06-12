@@ -36,7 +36,7 @@ import org.openinfinity.cloud.service.administrator.InstanceService;
 import org.openinfinity.cloud.service.administrator.JobService;
 import org.openinfinity.cloud.service.administrator.MachineService;
 import org.openinfinity.cloud.service.healthmonitoring.HealthMonitoringService;
-import org.openinfinity.cloud.service.scaling.Enumerations.ScalingBalance;
+import org.openinfinity.cloud.service.scaling.Enumerations.ScalingState;
 import org.openinfinity.cloud.service.scaling.ScalingRuleService;
 import org.openinfinity.core.exception.SystemException;
 import org.openinfinity.core.util.ExceptionUtil;
@@ -98,13 +98,13 @@ public class PeriodicScalerItemProcessor implements ItemProcessor<Machine, Job> 
         float load = getClusterLoad(machine);
         if (load == -1) return null;
         Job job = null;
-        ScalingBalance scalingBalance = scalingRuleService.calculateScalingBalance(load, machine.getClusterId());
+        ScalingState scalingState = scalingRuleService.calculateScalingState(load, machine.getClusterId());
         Cluster cluster = clusterService.getCluster(machine.getClusterId());
         if (cluster == null) {
             LOG.error("Cluster fetching failed.");
             return job;
         }
-        switch (scalingBalance) {
+        switch (scalingState) {
             case SCALE_OUT: 
                 return createJob(machine, cluster, 1);
             case SCALE_IN:  

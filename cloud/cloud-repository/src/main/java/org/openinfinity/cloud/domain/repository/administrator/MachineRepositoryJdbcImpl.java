@@ -42,6 +42,7 @@ import org.springframework.util.Assert;
  
  * @author Ossi Hämäläinen
  * @author Ilkka Leinonen
+ * @author Vedran Bartonicek
  * @version 1.0.0 Initial version
  * @since 1.0.0
  */
@@ -49,8 +50,9 @@ import org.springframework.util.Assert;
 @Repository("machineRepository")
 public class MachineRepositoryJdbcImpl implements MachineRepository {
 	
-	private static final Logger LOG = Logger.getLogger(MachineRepositoryJdbcImpl.class.getName());
-	
+    private static final String GET_ALL_CLUSTER_MACHINES_EXCEPT_TYPE = 
+        "select * from machine_tbl where machine_cluster_id = ? and machine_type != ?";
+    	
 	@Autowired
 	RowMapper<Machine> machineRowMapper;
 	
@@ -95,7 +97,29 @@ public class MachineRepositoryJdbcImpl implements MachineRepository {
 		List<Machine> machines = this.jdbcTemplate.query("select * from machine_tbl where machine_cluster_id = ?", new Object[] {clusterId}, machineRowMapper);
 		return machines;
 	}
+	
+	@AuditTrail
+    public List<Machine> getMachinesInClusterExceptType(int clusterId, String machineType) {
+        List<Machine> machines = this.jdbcTemplate.query(GET_ALL_CLUSTER_MACHINES_EXCEPT_TYPE, 
+                                                         new Object[] {clusterId, machineType},
+                                                         machineRowMapper);
+        return machines;
+    }
 
+    public List<Machine> getMachinesInClusterNotConfigured(int clusterId) {
+        List<Machine> machines = this.jdbcTemplate.query("select * from machine_tbl where machine_cluster_id = ? and machine_configured != 3",
+                                                         new Object[] {clusterId}, machineRowMapper);
+        //@AuditTrail removed to avoid exception being caught, logged and rethrown
+        // Result validation done below instead:
+        if ( machines.isEmpty() ){
+            return null;
+        }else if ( machines.size() > 0 ) { 
+            return machines;
+        }
+        return null;
+    }
+	
+	
 	@AuditTrail
 	public List<Machine> getMachinesNeedingConfigure() {
 		List<Machine> machines = this.jdbcTemplate.query("select * from machine_tbl where machine_configured = 0", machineRowMapper);

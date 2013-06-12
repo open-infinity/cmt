@@ -93,7 +93,7 @@ public class Job {
 		if(this.services != null && this.services.length() > 0) {
 			this.services += ",";
 		}
-		this.services += service+","+numberOfMachines;
+		this.services += service + "," + numberOfMachines;
 	}
 	
 	public void addService(String service, int numberOfMachines, int machineSize) {
