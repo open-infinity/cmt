@@ -107,7 +107,7 @@ public class MachineRepositoryJdbcImpl implements MachineRepository {
 		List<Machine> machines = this.jdbcTemplate.query(
 				"select * from machine_tbl where " +
 				"(machine_state = 'pending' or machine_state = 'shutting-down' or TIMESTAMPDIFF(MINUTE, machine_last_update, NOW()) >= 5) " +
-				"and machine_cloud_type = ?", new Object[] {cloudType}, machineRowMapper);
+				"and machine_cloud_type = ? and active = 1", new Object[] {cloudType}, machineRowMapper);
 		return machines;
 	}
 
