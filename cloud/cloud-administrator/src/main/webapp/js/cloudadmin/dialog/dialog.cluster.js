@@ -132,8 +132,8 @@
 					outData['machineCount'] 			= $("#mb_manual_scale_slider").mbgetVal();
 					outData['minSize'] 					= $("#jq_cluster_size_range_slider").slider("values", 0);
 					outData['maxSize'] 					= $("#jq_cluster_size_range_slider").slider("values", 1);
-					outData['downscaleCpuThreshold'] 	= $("#jq_cpu_load_thresholds_slider").slider("values", 0);
-					outData['upscaleCpuThreshold'] 		= $("#jq_cpu_load_thresholds_slider").slider("values", 1);
+					outData['downscaleThreshold'] 	    = $("#jq_load_thresholds_slider").slider("values", 0);
+					outData['upscaleThreshold'] 		= $("#jq_load_thresholds_slider").slider("values", 1);
 					outData['scalePeriodFrom'] 			= getDateTimePickerValue($("#scale_scheduler_datetime_picker_from"));
 					outData['scalePeriodTo'] 			= getDateTimePickerValue($("#scale_scheduler_datetime_picker_to"));
 					outData['scheduledClusterSize'] 	= $("#mb_scheduled_size_slider").mbgetVal();

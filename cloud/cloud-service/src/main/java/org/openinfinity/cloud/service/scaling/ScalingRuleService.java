@@ -34,7 +34,7 @@ public interface ScalingRuleService {
 	/**
 	 * Calculates scaling balance state based on scaling rules for the cluster
 	 */
-	ScalingState calculateScalingState(float cpuPercentage, int clusterId);
+	ScalingState calculateScalingState(float load, int clusterId);
 	
 	/**
 	 * Stores the scaling rule into a repository.

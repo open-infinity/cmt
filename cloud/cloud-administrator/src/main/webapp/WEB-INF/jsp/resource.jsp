@@ -186,7 +186,7 @@ dialogRes.setResource({
 					<div class="jq_slider"></div>
 				</div>					
 				<div class="cpu_load_range_select_slider">
-					<div class="scale_cluster_label scale_cluster_range_label">CPU load thresholds:</div>
+					<div class="scale_cluster_label scale_cluster_range_label">System load range:</div>
 					<div class="range_select_display"></div>
 					<div class="jq_slider"></div>
 				</div>

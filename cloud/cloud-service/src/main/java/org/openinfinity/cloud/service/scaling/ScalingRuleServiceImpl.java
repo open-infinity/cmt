@@ -56,11 +56,11 @@ public class ScalingRuleServiceImpl implements ScalingRuleService {
 	JobService jobService;
 	
 	@Override
-	public ScalingState calculateScalingState(float cpuLoad, int clusterId) {
-		validateInput(cpuLoad, clusterId);
+	public ScalingState calculateScalingState(float load, int clusterId) {
+		validateInput(load, clusterId);
 		try{
 			ScalingRule scalingRule = scalingRuleRepository.loadByClusterId(clusterId);
-			return applyScalingRule(cpuLoad, clusterId, scalingRule);
+			return applyScalingRule(load, clusterId, scalingRule);
 		}
 		catch(EmptyResultDataAccessException dae){
 			LOG.warn("Scaling rule not defined for the cluster");
