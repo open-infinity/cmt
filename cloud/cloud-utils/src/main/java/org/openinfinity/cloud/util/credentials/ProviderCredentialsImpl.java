@@ -34,7 +34,7 @@ import org.springframework.context.annotation.Profile;
 public class ProviderCredentialsImpl extends ProviderCredentials {
 
 	
-	public ProviderCredentialsImpl(@Value("${accesskeyid}") String accessKey, @Value("${secretkey}") String secretKey) {
+	public ProviderCredentialsImpl(@Value("${eucaaccesskeyid}") String accessKey, @Value("${eucasecretkey}") String secretKey) {
 		super(accessKey, secretKey);
 	}
 

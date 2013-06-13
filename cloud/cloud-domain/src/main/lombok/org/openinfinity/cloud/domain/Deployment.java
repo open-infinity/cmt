@@ -48,6 +48,8 @@ public class Deployment implements Serializable, Comparable<Deployment> {
 	@NotScript
 	private int state;
 	@NotScript
+	private int availabilityZone;
+	@NotScript
 	private long organizationId;
 	@NotScript
 	private int instanceId;
@@ -63,8 +65,6 @@ public class Deployment implements Serializable, Comparable<Deployment> {
 	private Timestamp deploymentTimestamp;
 	@NotScript
 	private String type;
-	@NotScript
-	private String cloudInstance;
 	
 	private Long localTimeStamp;
 

@@ -38,6 +38,13 @@ public interface CentralizedPropertiesService {
 	public Collection<SharedProperty> loadAll(SharedProperty sample);
 
 	/**
+	 * Loads all properties.
+	 */
+	public Collection<SharedProperty> loadAll();	
+	
+	public Collection<SharedProperty> loadKnownSharedPropertyDeployments();
+	
+	/**
 	 * Load a property by key. Value of the sample is ignored.
 	 */
 	public SharedProperty load(SharedProperty sample);

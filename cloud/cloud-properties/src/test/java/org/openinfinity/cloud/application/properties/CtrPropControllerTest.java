@@ -41,10 +41,10 @@ public class CtrPropControllerTest {
 
 	private SharedProperty currentSharedProperty(String key) {
 		SharedProperty p = new SharedProperty();
-		p.setOrganizationId(ORGANIZATION_ID);
+		/*p.setOrganizationId(ORGANIZATION_ID);
 		p.setInstanceId(INSTANCE_ID);
 		p.setClusterId(CLUSTER_ID);
-		p.setKey(key);
+		p.setKey(key);*/
 		return p;
 	}
 	
@@ -87,11 +87,11 @@ public class CtrPropControllerTest {
 		ps = service.loadAll(p);
 		assertEquals(ps.size(), 2);
 
-		p.setInstanceId(null);
+		//p.setInstanceId(null);
 		ps = service.loadAll(p);
 		assertEquals(ps.size(), 2);
 
-		p.setClusterId(null);
+		//p.setClusterId(null);
 		ps = service.loadAll(p);
 		assertEquals(ps.size(), 2);
 

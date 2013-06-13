@@ -26,6 +26,7 @@
 		<module>cloud-datasource-manager</module>
 		<module>cloud-worker</module>
 		<module>cloud-health-monitoring</module>
+		<module>cloud-properties-batch</module>
 	</modules>
 	<dependencies>
 		<dependency>

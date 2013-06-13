@@ -16,10 +16,11 @@
 package org.openinfinity.cloud.service.properties;
 
 import java.util.Collection;
-import java.util.List;
 
 import org.openinfinity.cloud.domain.SharedProperty;
 import org.openinfinity.cloud.domain.repository.properties.CentralizedPropertiesRepository;
+import org.openinfinity.core.annotation.AuditTrail;
+import org.openinfinity.core.annotation.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,7 @@ import org.springframework.stereotype.Service;
  * Service layer of Centralized Properties.
  * 
  * @author Timo Saarinen
+ * @author Ilkka Leinonen
  */
 @Service(value="centralizedPropertiesService")
 @Qualifier("centralizedPropertiesService")
@@ -37,26 +39,38 @@ public class CentralizedPropertiesServiceImpl implements CentralizedPropertiesSe
 	@Qualifier("centralizedPropertiesRepository")
 	private CentralizedPropertiesRepository repository;
 	
-	@Override
+	@Log
+	@AuditTrail
 	public SharedProperty store(SharedProperty prop) {
 		return repository.store(prop);
 	}
 
+	@Log
+	@AuditTrail
 	public Collection<SharedProperty> loadAll(SharedProperty sample) {
 		return repository.loadAll(sample);
 	}
+	
+	@Log
+	@AuditTrail
+	public Collection<SharedProperty> loadAll() {
+		return repository.loadAll();
+	}
 
-	@Override
+	@Log
+	@AuditTrail
 	public SharedProperty load(SharedProperty prop) {
 		return repository.load(prop);
 	}
 
-	@Override
+	@Log
+	@AuditTrail
 	public boolean delete(SharedProperty p) {
 		return repository.delete(p);
 	}
 
-	@Override
+	@Log
+	@AuditTrail
 	public boolean rename(SharedProperty prop, String newkey) {
 		SharedProperty old = repository.load(prop);
 		if (repository.delete(prop)) {
@@ -65,6 +79,11 @@ public class CentralizedPropertiesServiceImpl implements CentralizedPropertiesSe
 			return true;
 		}
 		return false;
+	}
+
+	@Override
+	public Collection<SharedProperty> loadKnownSharedPropertyDeployments() {
+		return repository.loadKnownSharedPropertyDeployments();
 	}
 	
 }

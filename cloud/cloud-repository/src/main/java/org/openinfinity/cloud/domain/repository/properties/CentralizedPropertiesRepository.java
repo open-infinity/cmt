@@ -41,6 +41,8 @@ public interface CentralizedPropertiesRepository {
 	
 	public Collection<SharedProperty> loadAll();
 	
+	public Collection<SharedProperty> loadKnownSharedPropertyDeployments();
+	
 	/**
 	 * Load the property using the given given property as a sample. 
 	 * The value part will be ignored.

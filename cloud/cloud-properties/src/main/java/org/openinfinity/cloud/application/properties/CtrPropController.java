@@ -66,9 +66,9 @@ public class CtrPropController {
 	@Qualifier("centralizedPropertiesService")
 	private CentralizedPropertiesService service;
 	
-	private String currentOrganizationId;
-	private String currentInstanceId;
-	private String currentClusterId;
+	private int currentOrganizationId;
+	private int currentInstanceId;
+	private int currentClusterId;
 
 	/**
 	 * Returns a SharedProperty object, which contains the current ids set from UI.
@@ -112,7 +112,7 @@ public class CtrPropController {
 
 			// Query properties
 			List<String> organization_ids = new LinkedList<String>();
-			organization_ids.add(currentOrganizationId); // TODO: sub-organizations too
+			//organization_ids.add(currentOrganizationId); // TODO: sub-organizations too
 			props.addAll(service.loadAll(currentSharedProperty(null)));
 			
 			// Add attributes to the model
@@ -136,7 +136,7 @@ public class CtrPropController {
 		logger.info("changeOrganization: organizationId=" + organizationId);
 
 		// Save the value
-		currentOrganizationId = organizationId;
+		// FIXME: currentOrganizationId = organizationId;
 
 		// Response
 		if (response != null) {
@@ -154,7 +154,7 @@ public class CtrPropController {
 		logger.info("changeInstance: instanceId=" + instanceId);
 
 		// Save the value
-		currentInstanceId = instanceId;
+		// FIXME: currentInstanceId = instanceId;
 
 		// Response
 		if (response != null) {
@@ -172,7 +172,7 @@ public class CtrPropController {
 		logger.info("changePlatform: platformId=" + platformId);
 
 		// Save the value
-		currentInstanceId = platformId;
+		// FIXME: currentInstanceId = platformId;
 
 		// Response
 		if (response != null) {
@@ -191,7 +191,8 @@ public class CtrPropController {
 	{
 		logger.info("changeKey: id=" + id + " key=" + newkey + " oldkey=" + oldkey);
 
-		if (currentOrganizationId != null) {
+		/*FIXME
+		 * if (currentOrganizationId != null) {
 			if ((newkey != null && !newkey.equals(oldkey)) && service.load(currentSharedProperty(newkey)) == null) {
 				// Create a new object if key is given
 				if ("".equals(oldkey)) {
@@ -225,7 +226,7 @@ public class CtrPropController {
 			}
 		} else {
 			logger.warn("changeKey: organization id not chosen");
-		}
+		}*/
 	}
 
 	@ResourceMapping("savePropertyValue")
@@ -244,8 +245,8 @@ public class CtrPropController {
 			}
 
 			// Save value to db
-			SharedProperty p = new SharedProperty(currentOrganizationId, key, value);
-			service.store(p);
+			//FIXME: SharedProperty p = new SharedProperty(currentOrganizationId, key, value);
+			//service.store(p);
 		}
 	}
 
