@@ -28,6 +28,7 @@ import org.openinfinity.cloud.domain.Machine;
  * @author Ilkka Leinonen
  * @author Ossi Hämäläinen
  * @author Juha-Matti Sironen
+ * @author Vedran Bartonicek
  * @version 1.0.0 Initial version
  * @since 1.0.0
  */
@@ -50,6 +51,10 @@ public interface MachineService {
 	Collection<Machine> getMachines(int offset, int rows, int instanceId);
 	
 	Collection<Machine> getMachinesInCluster(int clusterId);
+	
+	Collection<Machine> getMachinesInClusterExceptType(int clusterId, String machineType);
+	
+    Collection<Machine> getMachinesInClusterNotConfigured(int clusterId);
 	
 	Collection<Machine> getMachinesNeedingConfigure();
 	
@@ -82,5 +87,7 @@ public interface MachineService {
 	Collection<Machine> searchMachines(int projectId);
 
 	Machine getClusterManagementMachine(int clusterId);
+	
+	boolean allMachinesInClusterConfigured(int clusterId);
 
 }

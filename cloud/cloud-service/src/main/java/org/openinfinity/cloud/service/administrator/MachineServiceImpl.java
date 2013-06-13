@@ -34,6 +34,7 @@ import org.springframework.stereotype.Service;
  * @author Ilkka Leinonen
  * @author Ossi Hämäläinen
  * @author Juha-Matti Sironen
+ * @author Vedran Bartonicek
  * @version 1.0.0 Initial version
  * @since 1.0.0
  */
@@ -80,6 +81,16 @@ public class MachineServiceImpl implements MachineService {
 		return machineRepository.getMachinesInCluster(clusterId);
 	}
 
+	@Log
+	public List<Machine> getMachinesInClusterExceptType(int clusterId, String machineType) {
+        return machineRepository.getMachinesInClusterExceptType(clusterId, machineType);
+    } 
+	
+	@Log
+    public List<Machine> getMachinesInClusterNotConfigured(int clusterId) {
+        return machineRepository.getMachinesInClusterNotConfigured(clusterId);
+    } 
+	   
 	@Log
 	public void removeMachine(int id) {
 		machineRepository.removeMachine(id);
@@ -148,5 +159,18 @@ public class MachineServiceImpl implements MachineService {
 	public Collection<Machine> getMachinesNeedingUpdate(int cloudType) {
 		return machineRepository.getMachinesNeedingUpdate(cloudType);
 	}
+
+   @Log
+    public boolean allMachinesInClusterConfigured(int clusterId) {
+       try {
+           int size = machineRepository.getMachinesInClusterNotConfigured(clusterId).size();
+           boolean allConfigured = size > 0 ? false : true;
+           return allConfigured;
+       } catch (Exception e) {
+           // TODO: what to do here? It is not desirable to log or re-throw exceptions in most cases.
+           // HOw to make difference between 0 results and error?
+           return true;
+       }
+    } 
 
 }
