@@ -666,7 +666,7 @@ public class EC2Worker implements Worker {
 					}
 					LOG.info(threadName + ": Private dns name: " + tempInstance.getPrivateDnsName());
 					LOG.info(threadName + ": Private IP address: " + tempInstance.getPrivateIpAddress());
-					AuthorizationRoute ip = new AuthorizationRoute();
+				/*	AuthorizationRoute ip = new AuthorizationRoute();
 					if (tempInstance.getPrivateIpAddress() == null) {
 						ip.setCidrIp(tempInstance.getPrivateDnsName() + "/32");
 					} else {
@@ -678,7 +678,7 @@ public class EC2Worker implements Worker {
 					ip.setToPort(65535);
 					ip.setProtocol("tcp");
 					ip.setSecurityGroupName(cluster.getSecurityGroupName());
-					arService.addIP(ip);
+					arService.addIP(ip); */
 					machine.setDnsName(tempInstance.getPublicDnsName());
 					machine.setPrivateDnsName(tempInstance.getPrivateDnsName());
 					machine.setState(tempInstance.getState().getName());
