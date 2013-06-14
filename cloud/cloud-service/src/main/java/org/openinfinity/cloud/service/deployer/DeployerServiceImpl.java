@@ -134,6 +134,10 @@ public class DeployerServiceImpl implements DeployerService {
 		return deploymentRepository.loadByOrgInstClusName(deployment.getOrganizationId(), deployment.getInstanceId(), deployment.getClusterId(), deployment.getName());
 	}
 	
+	@Log
+	public Collection<Deployment> loadNewerDeploymentsForClusterWithNameInDeployedState(Deployment deployment) {
+		return deploymentRepository.loadByOrgInstClusNameDeployedNewer(deployment);
+	}
 	
 	@Log
 	public Collection<Deployment> loadDeployments(int page, int rows){

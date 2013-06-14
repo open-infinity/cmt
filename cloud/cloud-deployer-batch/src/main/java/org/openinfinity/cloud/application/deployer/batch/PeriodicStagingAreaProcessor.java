@@ -32,6 +32,7 @@ import org.springframework.stereotype.Component;
  * Periodic processor for deployed artifacts in the staging area to create <code>Deployment</code> in the staging area.
  * 
  * @author Ilkka Leinonen
+ * @author Tommi Siitonen
  * @version 1.0.0
  * @since 1.2.0
  */
@@ -52,18 +53,27 @@ public class PeriodicStagingAreaProcessor implements ItemProcessor<File, Map<Dep
 	public Map<Deployment, File> parseMetadataFromDirectoriesAndCreateDeployments(File file) throws Exception {
 		// <platform-version>/? , <action> or .delete file?
 		// <stagingarea>/<availability-zone>/<orgnization>/<instance>/<cluster>/<type>/<name>/<artifact>
-		int directoryIndex = 0;
+		int directoryIndex = 1;
 		String path = file.getAbsolutePath();
 		LOGGER.debug("Original absolute directory path: " + path);
 		path = path.replace(stagingArea, "");
 		LOGGER.debug("Relative directory path: " + path);
 		String[] metadata = path.split(File.separator);
+		
+		LOGGER.debug("AvailabilityZone: " + metadata[directoryIndex]);		
+		LOGGER.debug("OrganizationId: " + metadata[directoryIndex+1]);		
+		LOGGER.debug("InstanceId: " + metadata[directoryIndex+2]);
+		LOGGER.debug("ClusterId: " + metadata[directoryIndex+3]);
+		LOGGER.debug("Type: " + metadata[directoryIndex+4]);
+		LOGGER.debug("Name: " + metadata[directoryIndex+5]);
+		
 		Deployment deployment = new Deployment();
 		deployment.setAvailabilityZone(Integer.parseInt(metadata[directoryIndex]));
-		deployment.setInstanceId(Integer.parseInt(metadata[directoryIndex++]));
-		deployment.setClusterId(Integer.parseInt(metadata[directoryIndex++]));
-		deployment.setType(metadata[directoryIndex++]);
-		deployment.setName(metadata[directoryIndex++]);
+		deployment.setOrganizationId(Integer.parseInt(metadata[++directoryIndex]));
+		deployment.setInstanceId(Integer.parseInt(metadata[++directoryIndex]));
+		deployment.setClusterId(Integer.parseInt(metadata[++directoryIndex]));
+		deployment.setType(metadata[++directoryIndex]);
+		deployment.setName(metadata[++directoryIndex]);
 		deployment.setLocalTimeStamp(file.lastModified());
 		deployment.setInputStream(new FileInputStream(file));
 		Map<Deployment, File> map = new HashMap<Deployment, File>();

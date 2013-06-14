@@ -54,7 +54,7 @@ DeploymentRepository {
 	/**
 	 * Represents the SQL script for storing Deployment object.
 	 */
-	private static final String STORE_SQL = "INSERT INTO DEPLOYMENT (STATE, ORGANIZATION_ID, INSTANCE_ID, CLUSTER_ID, LOCATION, NAME) values (?, ?, ?, ?, ?, ?)";
+	private static final String STORE_SQL = "INSERT INTO DEPLOYMENT (STATE, ORGANIZATION_ID, INSTANCE_ID, CLUSTER_ID, LOCATION, NAME, TYPE) values (?, ?, ?, ?, ?, ?, ?)";
 	
 	/**
 	 * Represents the SQL script for updating the state of the Deployment object.
@@ -75,7 +75,7 @@ DeploymentRepository {
 	/**
 	 * Represents the SQL script for storing Deployment object.
 	 */
-	private static final String UPDATE_DEPLOYMENT_SQL = "UPDATE DEPLOYMENT SET STATE=?, ORGANIZATION_ID=?, INSTANCE_ID=?, CLUSTER_ID=?, LOCATION=?, NAME=? WHERE ID=?";
+	private static final String UPDATE_DEPLOYMENT_SQL = "UPDATE DEPLOYMENT SET STATE=?, ORGANIZATION_ID=?, INSTANCE_ID=?, CLUSTER_ID=?, LOCATION=?, NAME=?, TYPE=? WHERE ID=?";
 	
 	/**
 	 * Represents the SQL script for updating the state of the Deployment object.
@@ -109,6 +109,12 @@ DeploymentRepository {
 	 */
 	private static final String LOAD_BY_ORG_INST_CLUS_NAME_SQL = "SELECT * FROM DEPLOYMENT WHERE ORGANIZATION_ID = ? AND INSTANCE_ID = ? AND CLUSTER_ID = ? AND NAME = ?";
 	
+	/**
+	 * Represents the SQL script for loading Deployment objects based on organization, instance, cluster and name.
+	 */
+	private static final String LOAD_BY_ORG_INST_CLUS_NAME_STATE_DEPLOYED_NEWER_SQL = 
+			"SELECT * FROM DEPLOYMENT WHERE ORGANIZATION_ID = ? AND INSTANCE_ID = ? AND CLUSTER_ID = ? AND NAME = ? AND STATE=1 AND CUR_TIMESTAMP>?  ORDER BY CUR_TIMESTAMP DESC";
+
 	
 	/**
 	 * Represents the SQL script for loading all Deployment objects with cluster id.
@@ -178,7 +184,7 @@ DeploymentRepository {
 	public Deployment store(Deployment deployment) {
 		// Update existing deployment with same name and target not necessary if bucket versioning is used
 		//jdbcTemplate.update(UPDATE_STATE_0_SQL, deployment.getName(), deployment.getOrganizationId(), deployment.getInstanceId(), deployment.getClusterId());
-		jdbcTemplate.update(STORE_SQL, 1, deployment.getOrganizationId(), deployment.getInstanceId(), deployment.getClusterId(), deployment.getLocation(), deployment.getName());
+		jdbcTemplate.update(STORE_SQL, 1, deployment.getOrganizationId(), deployment.getInstanceId(), deployment.getClusterId(), deployment.getLocation(), deployment.getName(), deployment.getType());
 		deployment.setId(jdbcTemplate.queryForInt(LOAD_LAST_UPDATED_ID));
 		return deployment;
 	}
@@ -193,7 +199,7 @@ DeploymentRepository {
 	@AuditTrail
 	public Deployment storeAndUpdate(Deployment deployment) {
 		jdbcTemplate.update(UPDATE_STATE_1_TO_10_SQL, deployment.getName(), deployment.getOrganizationId(), deployment.getInstanceId(), deployment.getClusterId());		
-		jdbcTemplate.update(STORE_SQL, 1, deployment.getOrganizationId(), deployment.getInstanceId(), deployment.getClusterId(), deployment.getLocation(), deployment.getName());
+		jdbcTemplate.update(STORE_SQL, 1, deployment.getOrganizationId(), deployment.getInstanceId(), deployment.getClusterId(), deployment.getLocation(), deployment.getName(), deployment.getType());
 		deployment.setId(jdbcTemplate.queryForInt(LOAD_LAST_UPDATED_ID));
 		return deployment;		
 	}
@@ -299,7 +305,15 @@ DeploymentRepository {
 		return Collections.unmodifiableCollection(deployments);				
 	}
 	
-		
+	@AuditTrail
+	public Collection<Deployment> loadByOrgInstClusNameDeployedNewer(Deployment deployment) {
+		Collection<Deployment> deployments = jdbcTemplate.query(LOAD_BY_ORG_INST_CLUS_NAME_STATE_DEPLOYED_NEWER_SQL, new Object[]{deployment.getOrganizationId(), deployment.getInstanceId(), 
+				deployment.getClusterId(), deployment.getName(), deployment.getDeploymentTimestamp()}, new DeploymentRowMapper());
+		return Collections.unmodifiableCollection(deployments);				
+		//return deployments.iterator().next();				
+	}
+
+	
 	/**
 	 * Updates <code>org.openinfinity.core.cloud.domain.Deployment</code> to registry.
 	 * 
@@ -308,7 +322,7 @@ DeploymentRepository {
 	@AuditTrail
 	//@Transactional(isolation=Isolation.REPEATABLE_READ)
 	public void updateDeployment(Deployment deployment) {
-		jdbcTemplate.update(UPDATE_DEPLOYMENT_SQL, deployment.getState(), deployment.getOrganizationId(), deployment.getInstanceId(), deployment.getClusterId(), deployment.getLocation(), deployment.getName(), deployment.getId());
+		jdbcTemplate.update(UPDATE_DEPLOYMENT_SQL, deployment.getState(), deployment.getOrganizationId(), deployment.getInstanceId(), deployment.getClusterId(), deployment.getLocation(), deployment.getName(), deployment.getType(), deployment.getId());
 	}
 	
 	
@@ -378,6 +392,7 @@ DeploymentRepository {
 			deployment.setClusterId(resultSet.getInt("CLUSTER_ID"));
 			deployment.setLocation(resultSet.getString("LOCATION"));
 			deployment.setName(resultSet.getString("NAME"));
+			deployment.setType(resultSet.getString("TYPE"));
 			deployment.setDeploymentTimestamp(resultSet.getTimestamp("cur_timestamp"));
 			return deployment;
 		}

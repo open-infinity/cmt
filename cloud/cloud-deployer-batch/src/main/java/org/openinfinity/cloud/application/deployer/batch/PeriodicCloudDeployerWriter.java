@@ -18,8 +18,10 @@ package org.openinfinity.cloud.application.deployer.batch;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.openinfinity.cloud.domain.DeploymentStatus;
 import org.openinfinity.cloud.domain.DeploymentStatus.DeploymentState;
@@ -57,6 +59,12 @@ public class PeriodicCloudDeployerWriter implements ItemWriter<DeploymentStatus>
 	//@Value("${pathToDeploymentDirectoryMap}")
 	//@Autowired(required=true)
 	Map<Integer, String> pathToDeploymentDirectoryMap;
+	
+	Map<String, String> deploymentDirectoryMap;
+	Map<String, String> unDeploymentDirectoryMap;
+	Map<String, String> deploymentCommandsMap;
+	Map<String, String> unDeploymentCommandsMap;
+	
 	
 	@Value("${deploymentHostPort}")
 	int deploymentHostPort;
@@ -101,6 +109,22 @@ public class PeriodicCloudDeployerWriter implements ItemWriter<DeploymentStatus>
 		this.pathToDeploymentDirectoryMap = pathToDeploymentDirectoryMap;
 	}
 
+	
+	public void setDeploymentDirectoryMap(Map<String, String> deploymentDirectoryMap) {
+		this.deploymentDirectoryMap = deploymentDirectoryMap;
+	}
+	public void setUnDeploymentDirectoryMap(Map<String, String> unDeploymentDirectoryMap) {
+		this.unDeploymentDirectoryMap = unDeploymentDirectoryMap;
+	}
+	public void setDeploymentCommandsMap(Map<String, String> deploymentCommandsMap) {
+		this.deploymentCommandsMap = deploymentCommandsMap;
+	}
+	public void setUnDeploymentCommandsMap(Map<String, String> unDeploymentCommandsMap) {
+		this.unDeploymentCommandsMap = unDeploymentCommandsMap;
+	}
+
+	
+	
 	public void setDeploymentHostPort(int deploymentHostPort) {
 		this.deploymentHostPort = deploymentHostPort;
 	}
@@ -129,13 +153,17 @@ public class PeriodicCloudDeployerWriter implements ItemWriter<DeploymentStatus>
 		this.instanceService = instanceService;
 	}
 
+
+	
 	@Override
 	public void write(List<? extends DeploymentStatus> deploymentStatuses) throws Exception {
+		
 		LOGGER.info("Processing total of [" + deploymentStatuses.size() + "] deployments in writer.");
 		
 		for (DeploymentStatus deploymentStatus : deploymentStatuses) {
-			LOGGER.info("Processing write of deployment <"+deploymentStatus.getDeployment().getId()+"> deploymentStatus [" + deploymentStatus.getId() + "] in state <"+deploymentStatus.getDeploymentState()+"> and machineId ["+deploymentStatus.getMachineId()+"] started.");
 			
+			LOGGER.info("Processing write of deployment <"+deploymentStatus.getDeployment().getId()+"> deploymentStatus [" + deploymentStatus.getId() + "] in state <"+deploymentStatus.getDeploymentState()+"> and machineId ["+deploymentStatus.getMachineId()+"] started.");
+						
 			// just update TERMINATED deploymentStatus states to db
 			if (deploymentStatus.getDeploymentState()==DeploymentState.TERMINATED) {
 				LOGGER.debug("Processing deploymentStatus with [" + deploymentStatus.getId() + "] and machineId ["+deploymentStatus.getMachineId()+"]. State TERMINATED, storing status.");				
@@ -154,47 +182,62 @@ public class PeriodicCloudDeployerWriter implements ItemWriter<DeploymentStatus>
 			LOGGER.debug("Processing deploymentStatus with [" + deploymentStatus.getId() + "] and machineId ["+deploymentStatus.getMachineId()+"] with deployment id [" + deploymentStatus.getDeployment().getId() + "] for cluster <"+cluster.getId()+">.");
 			
 			int type = cluster.getType();
-			String deploymentDirectory = pathToDeploymentDirectoryMap.get(new Integer(type));
+			// TODO - to get clusterTypeName ClusterType repository and service need to be updated
+			// String clusterType = clusterTypeService.getClusterTypeById(int type).getName();
 			
+			
+			String deploymentDirectory = deploymentDirectoryMap.get(type+"-"+deploymentStatus.getDeployment().getType());
+			String unDeploymentDirectory = unDeploymentDirectoryMap.get(type+"-"+deploymentStatus.getDeployment().getType());
 
-			// Remove applications in UNDEPLOY state
+			//LOGGER.debug("DeploymentDirectory: "+ deploymentDirectory);
+			//LOGGER.debug("UndeploymentDirectory: "+ unDeploymentDirectory);
+			
+			
+//			Replace command configuration with predefined set of dynamic parameters provided to be used in commands:
+//			${deploymentDirectory}
+//			${unDeploymentDirectory}
+//			${deploymentName}
+//			${deploymentType} 
+//			${targetIp}
+//			${targetClusterLBIp}
+//			${fileSystemUser}
+//			${fileSystemGroup}
+			Map <String, String> replacePatterns = new HashMap<String, String>();
+			replacePatterns.put("#%deploymentDirectory%#", deploymentDirectory);
+			replacePatterns.put("#%unDeploymentDirectory%#", unDeploymentDirectory);
+			replacePatterns.put("#%deploymentDirectory%#", deploymentDirectory);
+			replacePatterns.put("#%deploymentName%#", deploymentStatus.getDeployment().getName());
+			replacePatterns.put("#%deploymentType%#", deploymentStatus.getDeployment().getType()+"");
+			replacePatterns.put("#%targetIp%#", machine.getDnsName());
+			replacePatterns.put("#%targetClusterLBIp%#", cluster.getLbDns());
+			replacePatterns.put("#%fileSystemUser%#", fileSystemUser);
+			replacePatterns.put("#%fileSystemGroup%#", fileSystemGroup);
+			//LOGGER.debug("ReplacePatternsMap is:");
+			//listMap(replacePatterns);
+
+			
+			// Handle applications in UNDEPLOY state			
 			if (deploymentStatus.getDeploymentState()==DeploymentState.UNDEPLOY) {
-				Collection<String> commands = new ArrayList<String>();
+				
+				//Collection<String> commands = new ArrayList<String>();
 				// Application updeployment  is platform specific
-				switch (type) {
-				case 5:	// BAS platform					
-					commands.add("su toas -c 'rm " + deploymentDirectory + deploymentStatus.getDeployment().getName() + ".war'");				
-					LOGGER.debug("Executing remote commands in machine with id [" + machine.getId() + "] .");
-					SSHGateway.executeRemoteCommands(
-							key.getSecret_key().getBytes(), 
-							null,
-							machine.getDnsName(), 
-							deploymentHostPort, 
-							username, 
-							"",
-							commands);					
-					deploymentStatus.setDeploymentState(DeploymentState.UNDEPLOYED);
-					break;					
-				case 0:	// Portal platform										
-					// Portal applications are deployed to tomcat webapps from portal hot deployment directory
-					commands.add("su toas -c 'rm " + pathToDeploymentDirectoryMap.get(5) + deploymentStatus.getDeployment().getName() + ".war'");				
-					commands.add("su toas -c 'rm -r " + pathToDeploymentDirectoryMap.get(5) + deploymentStatus.getDeployment().getName() + "'");				
-					LOGGER.debug("Executing remote commands in machine with id [" + machine.getId() + "] .");
-					SSHGateway.executeRemoteCommands(
-							key.getSecret_key().getBytes(), 
-							null,
-							machine.getDnsName(), 
-							deploymentHostPort, 
-							username, 
-							"",
-							commands);					
-					deploymentStatus.setDeploymentState(DeploymentState.UNDEPLOYED);
-					break;
-				default:
-					LOGGER.debug("WARNING! Undeployment not supported for platform type ["+type+"]. Deployment status with id [" + deploymentStatus.getId() + "]  set to ERROR.");					
-					deploymentStatus.setDeploymentState(DeploymentState.ERROR);
-					break;
-				}
+				//listMap(unDeploymentCommandsMap);
+				
+				Collection<String> commands = getCommands(unDeploymentCommandsMap, deploymentStatus.getDeployment().getType(), cluster.getType()+"", replacePatterns);
+				
+				LOGGER.debug("Executing undeployment remote commands in machine with id [" + machine.getId() + "] .");
+				//listCollection(commands);
+				
+				SSHGateway.executeRemoteCommands(
+						key.getSecret_key().getBytes(), 
+						null,
+						machine.getDnsName(), 
+						deploymentHostPort, 
+						username, 
+						"",
+						commands);					
+				
+				deploymentStatus.setDeploymentState(DeploymentState.UNDEPLOYED);
 				LOGGER.debug("Updating deployment status with id [" + deploymentStatus.getId() + "] as UNDEPLOYED.");
 				deployerService.storeDeploymentStatus(deploymentStatus);				
 				continue;
@@ -203,18 +246,12 @@ public class PeriodicCloudDeployerWriter implements ItemWriter<DeploymentStatus>
 				deployerService.storeDeploymentStatus(deploymentStatus);								
 			}
 			
+			// Handle DEPLOYMENTS
 			
+			// Pushing deployment
 			LOGGER.debug("Pushing deployment to machine with id [" + machine.getId() + "] for deployment directory [" + deploymentDirectory + "] with artifact named [" + deploymentStatus.getDeployment().getName() + "]. to cluster type<"+type+">");	
-//			SSHGateway.pushToServer(
-//					key.getSecret_key().getBytes(), 
-//					null,
-//					deploymentStatus.getDeployment().getInputStream(), 
-//					deploymentStatus.getDeployment().getName(), 
-//					machine.getDnsName(), 
-//					deploymentHostPort, 
-//					username, 
-//					"",
-//					deploymentDirectory+deploymentStatus.getDeployment().getName()+".war");
+						
+			// deploymentDirectory already platform specific
 			SSHGateway.pushToServer(
 					key.getSecret_key().getBytes(), 
 					null,
@@ -225,9 +262,15 @@ public class PeriodicCloudDeployerWriter implements ItemWriter<DeploymentStatus>
 					username, 
 					"",
 					deploymentDirectory+deploymentStatus.getDeployment().getName()+".war");			
-			Collection<String> commands = new ArrayList<String>();
-			commands.add("chown "+ fileSystemUser + "." + fileSystemGroup + " " + deploymentDirectory + deploymentStatus.getDeployment().getName() + ".*");
-			LOGGER.debug("Executing remote commands in machine with id [" + machine.getId() + "] .");
+			
+			// Executing PostPush commands
+			//listMap(deploymentCommandsMap);			
+			Collection<String> commands = getCommands(deploymentCommandsMap, deploymentStatus.getDeployment().getType(), cluster.getType()+"", replacePatterns);
+			
+			LOGGER.debug("Executing deployment remote commands in machine with id [" + machine.getId() + "] .");
+			
+			listCollection(commands);
+			
 			SSHGateway.executeRemoteCommands(
 					key.getSecret_key().getBytes(), 
 					null,
@@ -236,10 +279,59 @@ public class PeriodicCloudDeployerWriter implements ItemWriter<DeploymentStatus>
 					username, 
 					"",
 					commands);
+			
 			LOGGER.debug("Updating deployment status with id [" + deploymentStatus.getId() + "] as DEPLOYED.");
 			deploymentStatus.setDeploymentState(DeploymentState.DEPLOYED);
 			deployerService.storeDeploymentStatus(deploymentStatus);
 		}
 	}	
+		
+	private Collection<String> getCommands(Map <String, String> commandMap, String applicationType, String clusterType, Map<String, String> replacePatterns) {
+		Collection<String> commands = new ArrayList<String>();
+		int index=1;
+		String key = clusterType+"-"+applicationType+"."+index;
+		
+		while (deploymentCommandsMap.containsKey(key)) {
+			index++;
+			String command = commandMap.get(key);
+			LOGGER.debug("Fetched command with key:<"+key+">. Command: <"+command+">.");
+			commands.add(formatCommandParameters(command, replacePatterns));
+			key = clusterType+"-"+applicationType+"."+index;			
+		}
+		
+		return commands;
+	}
+	
+//	Replace command configuration with predefined set of dynamic parameters provided to be used in commands:
+//		${deploymentDirectory}
+//		${unDeploymentDirectory}
+//		${deploymentName}
+//		${deploymentType} 
+//		${targetIp}
+//		${targetClusterLBIp}
+//		${fileSystemUser}
+//		${fileSystemGroup}
+	private String formatCommandParameters(String command, Map<String, String> replacePatterns) {
+		LOGGER.debug("Unformatted command: <"+command+">.");
+		for (String key : replacePatterns.keySet()) {
+			command=command.replaceAll(Pattern.quote(key), replacePatterns.get(key));			
+		}  
+		LOGGER.debug("Formatted command: <"+command+">.");
+		return command;
+	}
+	
+	private void listMap(Map<String, String> map) {
+		for (String key : map.keySet()) {
+			LOGGER.debug("KEY: <"+key+">.");
+			LOGGER.debug("VALUE: <"+map.get(key)+">.");
+		}  		
+	}
+	
+	private void listCollection(Collection c) {
+		int i=0;
+		for (Object item : c) {
+			LOGGER.debug(i+++": < "+item+" >");					
+		}
+	}
 	
 }

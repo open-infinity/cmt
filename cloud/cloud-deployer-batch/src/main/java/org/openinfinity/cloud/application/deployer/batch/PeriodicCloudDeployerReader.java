@@ -96,6 +96,22 @@ public class PeriodicCloudDeployerReader implements ItemReader<DeploymentStatus>
 			
 			for (Deployment deployment : deployments) {
 				
+				// for supporting CI and staging area handling deployments with with same name and 
+				// more current timestamps should replace current deployments
+				//getDeploymentByClusteAndNameOrderByTimestamp
+				if (deployment.getState()==DeployerService.DEPLOYMENT_STATE_DEPLOYED) {
+					Collection<Deployment> newerDeployments = deployerService.loadNewerDeploymentsForClusterWithNameInDeployedState(deployment);
+					
+					// replace current deployment with new
+					if (!newerDeployments.isEmpty()) {
+						deployment.setState(DeployerService.DEPLOYMENT_STATE_UNDEPLOY);
+						//for (Deployment deploymentNew : newerDeployments) {
+						//	
+						//}						
+					}
+				}
+				
+				
 				// TODO: verify that deleted instances and clusters are taken into account in deploymentstatus processing
 				// when instance is deleted when cluster is also
 				

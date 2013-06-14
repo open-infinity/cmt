@@ -36,14 +36,19 @@ public class PeriodicCloudDeployerLauncher {
 
 	@Autowired
 	@Qualifier("cloudDeployerBatchJob")
-	private Job job;
+	private Job jobDeployer;
+
+	@Autowired
+	@Qualifier("cloudStagingAreaJob")
+	private Job jobStaging;
 	
 	@Autowired
 	private JobLauncher jobLauncher;
 		
 	@Log
 	public void launch() throws Exception {
-		jobLauncher.run(job, new JobParametersBuilder().addLong("s_time", System.currentTimeMillis()).toJobParameters());
+		jobLauncher.run(jobDeployer, new JobParametersBuilder().addLong("s_time", System.currentTimeMillis()).toJobParameters());
+		jobLauncher.run(jobStaging, new JobParametersBuilder().addLong("s_time", System.currentTimeMillis()).toJobParameters());
 	}
     
 }
