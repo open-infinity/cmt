@@ -572,8 +572,10 @@ public class EC2Worker implements Worker {
 		int clusterId = Integer.parseInt(services[0]);
 		LOG.info(threadName+": Cluster number: "+clusterId);
 		int machines = Integer.parseInt(services[1]);
+		LOG.info(threadName+": Machines after scaling should be: "+machines);
 		Cluster cluster = clusterService.getCluster(clusterId);
 		String service = ClusterService.SERVICE_NAME[cluster.getType()];
+		LOG.info(threadName+": Current size of the cluster: "+cluster.getNumberOfMachines());
 		if(cluster.getNumberOfMachines() > machines) {
 			int needToTerminate = cluster.getNumberOfMachines() - machines;
 			LOG.info(threadName+": Scaling down cluster "+clusterId+", terminating "+needToTerminate+" machines");
@@ -597,6 +599,7 @@ public class EC2Worker implements Worker {
 		        if (terminated < needToTerminate){
 					machineService.stopMachine(m.getId());
 					ec2.terminateInstance(m.getInstanceId());
+					LOG.debug(threadName+": Termingating machine "+m.getId()+" ("+m.getInstanceId()+")");
 					try {
 						usageService.stopVirtualMachineUsageMonitoring(oiInstance.getOrganizationid(), cluster.getType(), cluster.getId(), m.getId());
 					} catch (Exception e) {
@@ -666,7 +669,7 @@ public class EC2Worker implements Worker {
 					}
 					LOG.info(threadName + ": Private dns name: " + tempInstance.getPrivateDnsName());
 					LOG.info(threadName + ": Private IP address: " + tempInstance.getPrivateIpAddress());
-					AuthorizationRoute ip = new AuthorizationRoute();
+				/*	AuthorizationRoute ip = new AuthorizationRoute();
 					if (tempInstance.getPrivateIpAddress() == null) {
 						ip.setCidrIp(tempInstance.getPrivateDnsName() + "/32");
 					} else {
@@ -678,7 +681,7 @@ public class EC2Worker implements Worker {
 					ip.setToPort(65535);
 					ip.setProtocol("tcp");
 					ip.setSecurityGroupName(cluster.getSecurityGroupName());
-					arService.addIP(ip);
+					arService.addIP(ip); */
 					machine.setDnsName(tempInstance.getPublicDnsName());
 					machine.setPrivateDnsName(tempInstance.getPrivateDnsName());
 					machine.setState(tempInstance.getState().getName());

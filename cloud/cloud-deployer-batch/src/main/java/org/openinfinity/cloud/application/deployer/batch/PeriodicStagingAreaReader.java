@@ -49,6 +49,7 @@ public class PeriodicStagingAreaReader implements ItemReader<File> {
 	@Log
 	@Override
 	public File read() throws Exception {
+		LOGGER.debug("Reading files in staging area: "+stagingArea);
 		File stagingAreaDirectory = new File(stagingArea);
 		if (stagingAreaDirectory.isDirectory() && stagingAreaFiles.isEmpty()) {
 			FileUtil.findFilesRecursively(stagingAreaDirectory, stagingAreaFiles);
@@ -61,7 +62,7 @@ public class PeriodicStagingAreaReader implements ItemReader<File> {
 			return retValue;
 		} else {
 			LOGGER.trace("Reader finished, all items handled. Index is [" + index + "]. Returning null");			
-			stagingAreaFiles.clear();
+			//stagingAreaFiles.clear();
 			index = 0;
 			return null;
 		}	

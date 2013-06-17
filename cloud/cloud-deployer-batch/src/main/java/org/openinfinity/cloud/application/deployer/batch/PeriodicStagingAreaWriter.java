@@ -60,7 +60,8 @@ public class PeriodicStagingAreaWriter implements ItemWriter<Map<Deployment, Fil
 				LOGGER.debug("Original absolute directory path: " + path);
 				path = path.replace(stagingArea, "");
 				LOGGER.debug("Relative directory path: " + path);
-				FileUtil.removeAllRecursively(file.getAbsolutePath());
+				LOGGER.debug("Cleaning deployment: " + file.getAbsolutePath());
+				//FileUtil.removeAllRecursively(file.getAbsolutePath());
 			}	
 		}
 	}

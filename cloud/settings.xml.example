@@ -45,6 +45,8 @@
                         <s3.endpoint.http.port>8773</s3.endpoint.http.port>
                         <s3.endpoint.virtual.path>/Walrus</s3.endpoint.virtual.path>
 
+		        <staging.area>/staging/area</staging.area>
+
                         <bucket.endpoint>0.0.0.0:8773</bucket.endpoint>
                         <bucket.endpoint.port>8773</bucket.endpoint.port>
                         <bucket.virtualpath>/Walrus</bucket.virtualpath>

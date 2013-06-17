@@ -36,6 +36,7 @@
 		p:dataSource-ref="cloudDataSource"
 		p:transactionManager-ref="txManager" />
 	
+	
 	<bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher"
 		p:jobRepository-ref="jobRepository" />
 	
@@ -69,6 +70,59 @@
 		<property name="machineTypeService" ref="machineTypeService" />
 		<property name="clusterService" ref="clusterService" />
 		<property name="instanceService" ref="instanceService" />
+		
+		<property name="deploymentDirectoryMap">
+			<map key-type="java.lang.String" value-type="java.lang.String">
+				<entry key="portal-war" value="/opt/openinfinity/2.0.0/deploy/"/>
+				<entry key="portal-properties" value="/opt/data"/>
+				<entry key="bas-war" value="/opt/openinfinity/2.0.0/tomcat/webapps"/>
+				<entry key="bas-properties" value="/opt/data"/>
+				<entry key="5-war" value="/opt/openinfinity/2.0.0/tomcat/webapps"/>
+				<entry key="5-properties" value="/opt/data"/>
+				<entry key="mq-war" value="/opt/openinfinity/2.0.0/tomcat/webapps"/>
+				<entry key="mq-properties" value="/opt/data"/>
+			</map>
+		</property>
+		<property name="unDeploymentDirectoryMap">
+			<map key-type="java.lang.String" value-type="java.lang.String">
+				<entry key="portal-war" value="/opt/openinfinity/2.0.0/tomcat/webapps"/>
+				<entry key="portal-properties" value="/opt/data"/>
+				<entry key="bas-war" value="/opt/openinfinity/2.0.0/tomcat/webapps"/>
+				<entry key="bas-properties" value="/opt/data"/>
+				<entry key="5-war" value="/opt/openinfinity/2.0.0/tomcat/webapps"/>
+				<entry key="5-properties" value="/opt/data"/>
+				<entry key="mq-war" value="/opt/openinfinity/2.0.0/tomcat/webapps"/>
+				<entry key="mq-properties" value="/opt/data"/>
+			</map>
+		</property>
+
+		<property name="deploymentCommandsMap">
+			<map key-type="java.lang.String" value-type="java.lang.String">
+				<entry key="portal-war.1" value="chown #%fileSystemUser%#.#%fileSystemGroup%# #%deploymentDirectory%#/#%deploymentName%#.#%deploymentType%#"/>
+				<entry key="portal-properties.1" value="chown #%fileSystemUser%#.#%fileSystemGroup%# #%deploymentDirectory%#/#%deploymentName%#.#%deploymentType%#"/>
+				<entry key="bas-war.1" value="chown #%fileSystemUser%#.#%fileSystemGroup%# #%deploymentDirectory%#/#%deploymentName%#.#%deploymentType%#"/>
+				<entry key="bas-properties.1" value="chown #%fileSystemUser%#.#%fileSystemGroup%# #%deploymentDirectory%#/#%deploymentName%#.#%deploymentType%#"/>
+				<entry key="5-war.1" value="chown #%fileSystemUser%#.#%fileSystemGroup%# #%deploymentDirectory%#/#%deploymentName%#.#%deploymentType%#"/>
+				<entry key="5-properties.1" value="chown #%fileSystemUser%#.#%fileSystemGroup%# #%deploymentDirectory%#/#%deploymentName%#.#%deploymentType%#"/>
+				<entry key="mq-war.1" value="chown #%fileSystemUser%#.#%fileSystemGroup%# #%deploymentDirectory%#/#%deploymentName%#.#%deploymentType%#"/>
+				<entry key="mq-properties.1" value="chown #%fileSystemUser%#.#%fileSystemGroup%# #%deploymentDirectory%#/#%deploymentName%#.#%deploymentType%#"/>
+			</map>
+		</property>
+
+		<property name="unDeploymentCommandsMap">
+			<map key-type="java.lang.String" value-type="java.lang.String">
+				<entry key="portal-war.1" value="su toas -c 'rm  #%unDeploymentDirectory%#/#%deploymentName%#.#%deploymentType%#'"/>
+				<entry key="portal-war.2" value="su toas -c 'rm -r #%unDeploymentDirectory%#/#%deploymentName%#'"/>				
+				<entry key="portal-properties.1" value="su toas -c 'rm #%deploymentDirectory%#/#%deploymentName%#.#%deploymentType%#'"/>
+				<entry key="bas-war.1" value="su toas -c 'rm #%deploymentDirectory%#/#%deploymentName%#.#%deploymentType%#'"/>
+				<entry key="bas-properties.1" value="su toas -c 'rm #%deploymentDirectory%#/#%deploymentName%#.#%deploymentType%#'"/>
+				<entry key="5-war.1" value="su toas -c 'rm #%deploymentDirectory%#/#%deploymentName%#.#%deploymentType%#'"/>
+				<entry key="5-properties.1" value="su toas -c 'rm #%deploymentDirectory%#/#%deploymentName%#.#%deploymentType%#'"/>
+				<entry key="mq-war.1" value="su toas -c 'rm #%deploymentDirectory%#/#%deploymentName%#.#%deploymentType%#'"/>
+				<entry key="mq-properties.1" value="su toas -c 'rm #%deploymentDirectory%#/#%deploymentName%#.#%deploymentType%#'"/>
+			</map>
+		</property>
+		
 	</bean>
 	
 <!-- 	<bean id="periodicCloudDeployerWriter" class="org.openinfinity.cloud.application.deployer.batch.PeriodicCloudDeployerWriter"> -->
@@ -122,6 +176,33 @@
 <!-- 	    <task:scheduled ref="periodicCloudDeployerLauncher" method="launch" cron="*/10 * * * * ?"/> -->
 <!-- 	</task:scheduled-tasks> -->
 		
+	<!-- Use executor for asyncronous launching  -->
+	<!-- 
+	<bean id="taskExecutor"
+	  class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+	  <property name="corePoolSize" value="10"/>
+	  <property name="maxPoolSize" value="15"/>
+	</bean>
+	<batch:job id="cloudDeployerBatchJob">
+		<batch:step id="stepP1">
+			<batch:tasklet task-executor="taskExecutor" throttle-limit="10" transaction-manager="txManager"
+				start-limit="1">
+				<batch:chunk 
+					reader="periodicCloudDeployerReader" 
+					processor="periodicCloudDeployerProcessor"
+					writer="periodicCloudDeployerWriter" 
+					commit-interval="1" 
+					retry-limit="1">
+					<batch:retryable-exception-classes>
+                    	<batch:include class="org.springframework.dao.OptimisticLockingFailureException" />
+                        <batch:include class="org.springframework.dao.DeadlockLoserDataAccessException" />
+                    </batch:retryable-exception-classes>
+                </batch:chunk>
+			</batch:tasklet>
+		</batch:step>	
+	</batch:job>
+	 -->
+
 	<batch:job id="cloudDeployerBatchJob">
 		<batch:step id="stepP1">
 			<batch:tasklet transaction-manager="txManager"
@@ -140,10 +221,35 @@
 			</batch:tasklet>
 		</batch:step>	
 	</batch:job>
+	 
+	<batch:job id="cloudStagingAreaJob">
+		<batch:step id="stepSA1">
+			<batch:tasklet transaction-manager="txManager"
+				start-limit="1">
+				<batch:chunk 
+					reader="periodicStagingAreaReader" 
+					processor="periodicStagingAreaProcessor"
+					writer="periodicStagingAreaWriter" 
+					commit-interval="1" 
+					retry-limit="1">
+					<batch:retryable-exception-classes>
+                    	<batch:include class="org.springframework.dao.OptimisticLockingFailureException" />
+                        <batch:include class="org.springframework.dao.DeadlockLoserDataAccessException" />
+                    </batch:retryable-exception-classes>
+                </batch:chunk>
+			</batch:tasklet>
+		</batch:step>	
+	</batch:job>
+	
 	
 	<task:scheduled-tasks>  
 	    <task:scheduled ref="periodicCloudDeployerLauncher" method="launch" cron="*/20 * * * * ?"/>
 	</task:scheduled-tasks>
 		
-		
+	<!--  Refactoring writer execution expendability. Platform specific deploy classes  -->
+	<!-- Implemented with ssh command execution maps
+	<bean id="applicationContextProvider" class="org.openinfinity.cloud.application.deployer.batch.ApplicationContextProvider"></bean>	
+	<context:component-scan base-package="org.openinfinity.cloud.application.deployer.batch.executor" />
+	-->
+	
 </beans>

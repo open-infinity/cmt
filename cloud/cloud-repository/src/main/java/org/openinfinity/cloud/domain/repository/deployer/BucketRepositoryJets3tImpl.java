@@ -46,10 +46,10 @@ import org.springframework.stereotype.Repository;
 public class BucketRepositoryJets3tImpl implements BucketRepository {
 	private S3Service simpleStorageService;
 	
-	@Value("${accesskeyid}") 
+	@Value("${eucaaccesskeyid}") 
 	private String accesskeyid;
 	
-	@Value("${secretkey}") 
+	@Value("${eucasecretkey}") 
 	private String secretkey;
 
 	static {

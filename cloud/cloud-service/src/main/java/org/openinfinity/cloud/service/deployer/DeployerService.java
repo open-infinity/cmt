@@ -100,8 +100,10 @@ public interface DeployerService {
 	 */
 	Collection<Deployment> loadDeployments(int page, int rows);
 
-	@Log
 	public Collection<Deployment> loadDeploymentsForClusterWithName(Deployment deployment);
+
+	// TODO -  document this. for staging support
+	public Collection<Deployment> loadNewerDeploymentsForClusterWithNameInDeployedState(Deployment deployment);
 	
 	
 	/** NEW

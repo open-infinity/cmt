@@ -106,6 +106,14 @@ public interface DeploymentRepository {
 	 */
 	Collection<Deployment> loadByOrgInstClusName(long organizationId, int instanceId, int clusterId, String name);
 	
+	/**
+	 * Returns <code>org.openinfinity.core.cloud.domain.Deployment</code> based on deployment id.
+	 * 
+	 * @param deployment Represents the deployment information to be compared.
+	 * @return <code>org.openinfinity.core.cloud.domain.Deployment</code> Represents the object fetched from registry based on deployment id.
+	 * @return Collection<Deployment> Represents the objects fetched from registry based on instanceid, organizationId, clusterid and deployment name.
+	 */
+	Collection<Deployment> loadByOrgInstClusNameDeployedNewer(Deployment deployment);
 	
 	/**
 	 * Updates <code>org.openinfinity.core.cloud.domain.Deployment</code> to registry.
