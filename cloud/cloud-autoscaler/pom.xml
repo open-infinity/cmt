@@ -151,11 +151,11 @@
 			<artifactId>commons-httpclient</artifactId>
 			<version>3.1</version>
 		</dependency>
-<!--		<dependency>-->
-<!--			<groupId>com.atomikos</groupId>-->
-<!--			<artifactId>transactions-essentials-all</artifactId>-->
-<!--			<version>3.6.4</version>-->
-<!--		</dependency>-->
+        <dependency>
+            <groupId>commons-daemon</groupId>
+            <artifactId>commons-daemon</artifactId>
+            <version>1.0.10</version>
+        </dependency>
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-all</artifactId>
@@ -189,6 +189,16 @@
 	</dependencies>
 
 	<build>
+	   <resources>
+           <resource>
+               <directory>src/main/resources</directory>
+               <filtering>true</filtering>
+           </resource> 
+           <resource>
+               <directory>src/main/resources/META-INF</directory>
+               <filtering>true</filtering>
+           </resource> 
+        </resources>
 		<pluginManagement>
 			<plugins>
 				<plugin>
@@ -301,12 +311,6 @@
 				</executions>
 			</plugin>
 		</plugins>	
-		<resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-            </resource> 
-        </resources>
 	</build>
 	<repositories>
 		<repository>
