@@ -23,7 +23,6 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
-import org.hsqldb.lib.HashMap;
 import org.openinfinity.cloud.domain.Cluster;
 import org.openinfinity.cloud.domain.HealthStatusResponse;
 import org.openinfinity.cloud.domain.HealthStatusResponse.SingleHealthStatus;
@@ -83,8 +82,6 @@ public class PeriodicScalerItemProcessor implements ItemProcessor<Machine, Job> 
 	
 	@Override
 	public Job process(Machine machine) throws Exception {
-        LOG.debug("MACHINE public IP address: " + machine.getDnsName());
-		LOG.debug("CLUSTER ID: " + machine.getClusterId());
 		try {
 			return applyScalingRule(machine);
 		}
@@ -98,7 +95,8 @@ public class PeriodicScalerItemProcessor implements ItemProcessor<Machine, Job> 
         float load = getClusterLoad(machine);
         if (load == -1) return null;
         Job job = null;
-        ScalingState scalingState = scalingRuleService.calculateScalingState(load, machine.getClusterId());
+        ScalingState scalingState = 
+            scalingRuleService.calculateScalingState(load, machine.getClusterId());
         Cluster cluster = clusterService.getCluster(machine.getClusterId());
         if (cluster == null) {
             LOG.error("Cluster fetching failed.");
@@ -111,7 +109,8 @@ public class PeriodicScalerItemProcessor implements ItemProcessor<Machine, Job> 
                 return createJob(machine, cluster, -1);
             case SYSTEM_DISASTER_PANIC: ExceptionUtil.throwSystemException
                 ("Cluster scaling rules failed. Current CPU [" + load + "%] " +
-                 "load for cluster [" + machine.getClusterId() + "] is remarkable and cluster maximum limit has been reached.");
+                 "load for cluster [" + machine.getClusterId() + "] is + " +
+                 "remarkable and cluster maximum limit has been reached.");
         default:
             break;
         }
@@ -119,14 +118,17 @@ public class PeriodicScalerItemProcessor implements ItemProcessor<Machine, Job> 
     }
 	
 	// FIXME: exceptions handling
-	private float getClusterLoad(Machine machine) throws IOException, JsonParseException, 
-	                                                     JsonMappingException, SystemException {
+	private float getClusterLoad(Machine machine) throws IOException, 
+	    JsonParseException, JsonMappingException, SystemException {
+	    
 		Date now = new Date();
+		// FIXME: Tune this setting
 		Date earlier = new Date(now.getTime() - DELAY);
 		float load = -1;               
 		String[] metricName = {METRIC_RRD_FILE_LOAD};
 		HealthStatusResponse status = 
-		    healthMonitoringService.getClusterHealthStatus(machine, METRIC_TYPE_LOAD, metricName, earlier);	
+		    healthMonitoringService.getClusterHealthStatus(machine, METRIC_TYPE_LOAD, 
+		        metricName, earlier);	
 		
 		// FIXME: handle status return type for error situation
 		List<SingleHealthStatus> metrics =  status.getMetrics();
@@ -139,26 +141,19 @@ public class PeriodicScalerItemProcessor implements ItemProcessor<Machine, Job> 
 	        }
         }
         if (load == -1) {
-        	LOG.debug(MSG_HM_METRIC_NOT_AVAILABLE);
+        	LOG.warn(MSG_HM_METRIC_NOT_AVAILABLE);
         }
-        LOG.debug("Load = " + load);
 		return load;
 	}
 	
 	private Job createJob(Machine machine, Cluster cluster, int machinesGrowth) {
-	    //int clusterId = cluster.getId();
-	    //Date now = new Date();
-	    	    
-		// TODO set scalingrule
 		Instance instance = instanceService.getInstanceByMachineId(machine.getId());
 		Job job = null;		
 		job = new Job("scale_cluster",
 			cluster.getInstanceId(),
 			instance.getCloudType(),
 			JobService.CLOUD_JOB_CREATED,
-			instance.getZone());
-		// TODO: use a new Job constructor
-		job.addService(Integer.toString(cluster.getId()), cluster.getNumberOfMachines() + machinesGrowth);
+			instance.getZone());		job.addService(Integer.toString(cluster.getId()), cluster.getNumberOfMachines() + machinesGrowth);
 		return job;
 	}
 	
