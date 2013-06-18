@@ -16,7 +16,6 @@
 
 package org.openinfinity.cloud.autoscaler.periodicscaler;
 
-import org.apache.log4j.Logger;
 import org.openinfinity.cloud.service.healthmonitoring.HealthMonitoringService;
 import org.openinfinity.core.annotation.Log;
 import org.springframework.batch.core.Job;
@@ -36,8 +35,6 @@ import org.springframework.stereotype.Component;
 
 @Component("periodicScalerLauncher")
 public class PeriodicScalerLauncher {
-	private static final Logger LOG = Logger.getLogger(PeriodicScalerLauncher.class.getName());
-
 	@Autowired
 	@Qualifier("periodicJob")
 	private Job job;

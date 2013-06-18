@@ -440,7 +440,7 @@ public class ClusterController {
 		Map<String, Object> scalingRuleData = new HashMap<String, Object>();
 
 		try{
-			ScalingRule scalingRule = scalingRuleService.loadByClusterId(clusterId);
+			ScalingRule scalingRule = scalingRuleService.getRule(clusterId);
 			scalingRuleData.put("ruleDefined", true);
 			scalingRuleData.put("size", cluster.getNumberOfMachines());
 			scalingRuleData.put("periodic", scalingRule.isPeriodicScalingOn());

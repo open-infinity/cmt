@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.openinfinity.cloud.domain.Key;
 import org.openinfinity.cloud.domain.Machine;
 import org.openinfinity.cloud.domain.repository.administrator.MachineRepository;
 import org.openinfinity.core.annotation.Log;

@@ -37,6 +37,8 @@ import org.openinfinity.cloud.service.administrator.MachineService;
 import org.openinfinity.cloud.service.healthmonitoring.HealthMonitoringService;
 import org.openinfinity.cloud.service.scaling.Enumerations.ScalingState;
 import org.openinfinity.cloud.service.scaling.ScalingRuleService;
+import org.openinfinity.cloud.domain.ScalingRule;
+import org.openinfinity.core.exception.BusinessViolationException;
 import org.openinfinity.core.exception.SystemException;
 import org.openinfinity.core.util.ExceptionUtil;
 import org.springframework.batch.item.ItemProcessor;
@@ -76,7 +78,7 @@ public class PeriodicScalerItemProcessor implements ItemProcessor<Machine, Job> 
 	
 	@Autowired
 	ScalingRuleService scalingRuleService;
-	
+		
 	@Autowired
 	HealthMonitoringService healthMonitoringService;
 	
@@ -92,25 +94,34 @@ public class PeriodicScalerItemProcessor implements ItemProcessor<Machine, Job> 
 	}
 	
 	private Job applyScalingRule(Machine machine) throws IOException{
+        int clusterId = machine.getClusterId();
+	    ScalingRule rule = null; 
+        Cluster cluster = null;
+	    try{
+            rule = scalingRuleService.getRule(clusterId);
+            if (rule == null) return null;                
+            cluster = clusterService.getCluster(clusterId);
+        }
+        catch(BusinessViolationException bve){
+            if (rule == null) LOG.info("Rule not defined for cluster " + clusterId);
+            else if (cluster == null) LOG.error("Cluster " + clusterId + " fetching failed.");
+            return null;
+        }
         float load = getClusterLoad(machine);
         if (load == -1) return null;
-        Job job = null;
-        ScalingState scalingState = 
-            scalingRuleService.calculateScalingState(load, machine.getClusterId());
-        Cluster cluster = clusterService.getCluster(machine.getClusterId());
-        if (cluster == null) {
-            LOG.error("Cluster fetching failed.");
-            return job;
-        }
-        switch (scalingState) {
-            case SCALE_OUT: 
+        ScalingState state = scalingRuleService.calculateScalingState(rule, load, clusterId);
+        switch (state) {
+            case SCALING_OUT: 
                 return createJob(machine, cluster, 1);
-            case SCALE_IN:  
+            case SCALING_IN:  
                 return createJob(machine, cluster, -1);
-            case SYSTEM_DISASTER_PANIC: ExceptionUtil.throwSystemException
-                ("Cluster scaling rules failed. Current CPU [" + load + "%] " +
-                 "load for cluster [" + machine.getClusterId() + "] is + " +
-                 "remarkable and cluster maximum limit has been reached.");
+            case SCALING_NEEDED_BUT_IMPOSSIBLE: ExceptionUtil.throwSystemException
+                ("Cluster scaling failed. System load [" + load + "%] " +
+                 "for cluster [" + clusterId + "] is + too high, but " +
+                 "cluster maximum limit has been reached.");
+            case SCALING_DISABLED: 
+            case SCALING_SKIPPED:
+            case SCALING_NOT_NEEDED:
         default:
             break;
         }
@@ -153,7 +164,8 @@ public class PeriodicScalerItemProcessor implements ItemProcessor<Machine, Job> 
 			cluster.getInstanceId(),
 			instance.getCloudType(),
 			JobService.CLOUD_JOB_CREATED,
-			instance.getZone());		job.addService(Integer.toString(cluster.getId()), cluster.getNumberOfMachines() + machinesGrowth);
+			instance.getZone());		
+		job.addService(Integer.toString(cluster.getId()), cluster.getNumberOfMachines() + machinesGrowth);
 		return job;
 	}
 	

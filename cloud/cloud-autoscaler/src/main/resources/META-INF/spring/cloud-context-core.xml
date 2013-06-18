@@ -27,10 +27,8 @@
 
 	<bean id="auditTrailAspect" class="org.openinfinity.core.aspect.AuditTrailAspect" />
 
-	<bean id="logAspect" class="org.openinfinity.core.aspect.LogAspect">
-		<property name="defaultLogLevel" value="1" />	
-				<!-- property name="defaultLogLevel" value="${logging.level}" /-->		
-			
+	<bean id="logAspect" class="org.openinfinity.core.aspect.LogAspect">	
+	   <property name="defaultLogLevel" value="${logging.level}" />			
 	</bean>
 
 </beans>
