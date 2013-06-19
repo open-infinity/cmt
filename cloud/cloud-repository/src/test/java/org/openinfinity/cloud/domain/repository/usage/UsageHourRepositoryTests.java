@@ -60,6 +60,10 @@ public class UsageHourRepositoryTests {
 		expected.setMachineId(654321);
 		expected.setOrganizationId(organizationId);
 		expected.setPlatformId(2);
+		expected.setClusterTypeTitle("BAS Platform");
+		expected.setMachineTypeId(1); // Sizes of the machines in the cluster (see machine_type_tbl)
+		expected.setMachineTypeName("Medium"); // (see machine_type_tbl)
+		expected.setMachineTypeSpec("Cores: 2, RAM: 2GB, Disk: 10GB"); // (see machine_type_tbl)
 		expected.setVirtualMachineState(VirtualMachineState.STARTED);
 		usageHourRepository.store(expected);
 		Collection<UsageHour> usageHours = usageHourRepository.loadUsageHoursByOrganizationId(organizationId);
@@ -72,6 +76,10 @@ public class UsageHourRepositoryTests {
 		assertEquals(expected.getMachineId(), actual.getMachineId());
 		assertEquals(expected.getOrganizationId(), actual.getOrganizationId());
 		assertEquals(expected.getPlatformId(), actual.getPlatformId());
+		assertEquals(expected.getClusterTypeTitle(), actual.getClusterTypeTitle());
+		assertEquals(expected.getMachineTypeId(), actual.getMachineTypeId());
+		assertEquals(expected.getMachineTypeName(), actual.getMachineTypeName());
+		assertEquals(expected.getMachineTypeSpec(), actual.getMachineTypeSpec());
 		assertEquals(expected.getVirtualMachineState().getValue(), actual.getVirtualMachineState().getValue());
 		assertNotNull(actual.getTimeStamp());
 		assertNotSame(expected.getId(), actual.getId());	
@@ -85,6 +93,10 @@ public class UsageHourRepositoryTests {
 		expected.setMachineId(654321);
 		expected.setOrganizationId(organizationId);
 		expected.setPlatformId(2);
+		expected.setClusterTypeTitle("BAS Platform");
+		expected.setMachineTypeId(1); // Sizes of the machines in the cluster (see machine_type_tbl)
+		expected.setMachineTypeName("Medium"); // (see machine_type_tbl)
+		expected.setMachineTypeSpec("Cores: 2, RAM: 2GB, Disk: 10GB"); // (see machine_type_tbl)
 		expected.setVirtualMachineState(VirtualMachineState.STARTED);
 		usageHourRepository.store(expected);
 		DateTime startTime = new DateTime(1979, 4, 3, 12, 0, 0, 0);
@@ -99,6 +111,10 @@ public class UsageHourRepositoryTests {
 		assertEquals(expected.getMachineId(), actual.getMachineId());
 		assertEquals(expected.getOrganizationId(), actual.getOrganizationId());
 		assertEquals(expected.getPlatformId(), actual.getPlatformId());
+		assertEquals(expected.getClusterTypeTitle(), actual.getClusterTypeTitle());
+		assertEquals(expected.getMachineTypeId(), actual.getMachineTypeId());
+		assertEquals(expected.getMachineTypeName(), actual.getMachineTypeName());
+		assertEquals(expected.getMachineTypeSpec(), actual.getMachineTypeSpec());
 		assertEquals(expected.getVirtualMachineState().getValue(), actual.getVirtualMachineState().getValue());
 		assertNotNull(actual.getTimeStamp());
 		assertNotSame(expected.getId(), actual.getId());	
@@ -106,7 +122,7 @@ public class UsageHourRepositoryTests {
 	
 	@Test
 	public void givenKnownOrganizationIdAndTimePeriodWhenQueringStateModificationOfVirtualMachinesThenModificationMustBeAccessibleFromRepositoryInterfaceDuringDefinedTimePeriodAndCertainUptimeTimeSchedulesNeedsBeGiven() {
-		long startTimeMilliseconds = System.currentTimeMillis();
+		long startTimeMilliseconds = System.currentTimeMillis() - 1000; // Modify start time so the test doesn't fail occasionally
 		UsageHour usageHour = createUsageHour(startTimeMilliseconds, VirtualMachineState.STOPPED);
 		usageHourRepository.store(usageHour);
 		UsageHour usageHour0 = createUsageHour(startTimeMilliseconds, VirtualMachineState.STARTED);
@@ -152,14 +168,22 @@ public class UsageHourRepositoryTests {
 	}
 
 	private UsageHour createUsageHour(long startTimeMilliseconds, VirtualMachineState virtualMachineState) {
-		try { Thread.sleep(100); } catch (InterruptedException e) {}
+		sleep(100);
 		UsageHour usageHour = new UsageHour();
 		usageHour.setClusterId(123456);
 		usageHour.setMachineId(654321);
 		usageHour.setOrganizationId(startTimeMilliseconds);
 		usageHour.setPlatformId(2);
+		usageHour.setClusterTypeTitle("BAS Platform");
+		usageHour.setMachineTypeId(1); // Sizes of the machines in the cluster (see machine_type_tbl)
+		usageHour.setMachineTypeName("Medium"); // (see machine_type_tbl)
+		usageHour.setMachineTypeSpec("Cores: 2, RAM: 2GB, Disk: 10GB"); // (see machine_type_tbl)
 		usageHour.setVirtualMachineState(virtualMachineState);
 		return usageHour;
+	}
+	
+	private void sleep(int ms) {
+		try { Thread.sleep(ms); } catch (InterruptedException e) { e.printStackTrace(); }
 	}
 
 }

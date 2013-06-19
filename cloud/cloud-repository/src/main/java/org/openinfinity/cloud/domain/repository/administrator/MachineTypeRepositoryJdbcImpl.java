@@ -46,13 +46,15 @@ import java.util.List;
 class MachineTypeRepositoryJdbcImpl implements MachineTypeRepository{
 
 	private NamedParameterJdbcTemplate jdbcTemplate;
-	private DataSource dataSource;
 
+	private static final String SELECT_ALL = "SELECT * FROM MACHINE_TYPE_TBL";
+	
+	private static final String SELECT_BY_ID = "SELECT * FROM MACHINE_TYPE_TBL WHERE ID = :id";
+	
 	@Autowired
 	public MachineTypeRepositoryJdbcImpl(@Qualifier("cloudDataSource") DataSource ds) {
 		Assert.notNull(ds, "Please define datasource for machine repository.");
 		this.jdbcTemplate = new NamedParameterJdbcTemplate(ds);
-		this.dataSource = ds;
 	}
 		
 	@AuditTrail
@@ -61,6 +63,26 @@ class MachineTypeRepositoryJdbcImpl implements MachineTypeRepository{
 		parameters.addValue("orgNames", userOrganizations);
 		return jdbcTemplate.query("select distinct machine.* from machine_type_tbl as machine, acl_machine_type_tbl as acl " +
 				"where acl.org_name in (:orgNames) and acl.machine_type_id = machine.id order by machine.id", parameters, new MachineTypeWrapper());
+	}
+	
+	/**
+	 * Get all machine types available.
+	 * 
+	 * @return Collection of all machine types.
+	 */
+	public Collection<MachineType> getMachineTypes() {
+		return jdbcTemplate.query(SELECT_ALL, new MapSqlParameterSource(), new MachineTypeWrapper());
+	}
+	
+	/**
+	 * Get a machine type by id
+	 * 
+	 * @return selected machine type.
+	 */
+	public MachineType getMachineTypeById(int id) {
+		MapSqlParameterSource parameters = new MapSqlParameterSource();
+		parameters.addValue("id", id);
+		return jdbcTemplate.queryForObject(SELECT_BY_ID, parameters, new MachineTypeWrapper());
 	}
 
     private static final class MachineTypeWrapper implements RowMapper<MachineType> {

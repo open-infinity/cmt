@@ -3,9 +3,13 @@ package org.openinfinity.cloud.service.usage;
 import java.util.Collection;
 import java.util.Date;
 
+import org.openinfinity.cloud.domain.Cluster;
+import org.openinfinity.cloud.domain.MachineType;
 import org.openinfinity.cloud.domain.UsageHour;
 import org.openinfinity.cloud.domain.UsageHour.VirtualMachineState;
 import org.openinfinity.cloud.domain.UsagePeriod;
+import org.openinfinity.cloud.domain.repository.administrator.ClusterRepository;
+import org.openinfinity.cloud.domain.repository.administrator.MachineTypeRepository;
 import org.openinfinity.cloud.domain.repository.usage.UsageHourRepository;
 import org.openinfinity.core.annotation.AuditTrail;
 import org.openinfinity.core.annotation.Log;
@@ -25,15 +29,30 @@ public class UsageServiceImpl implements UsageService {
 	@Autowired
 	private UsageHourRepository usageRepository;
 	
+	@Autowired
+	private ClusterRepository clusterRepository;
+	
+	@Autowired
+	private MachineTypeRepository machineTypeRepository;
+	
 	@Log
 	@AuditTrail
 	public void startVirtualMachineUsageMonitoring(long organizationId, int platformId, int clusterId, int machineId) {
+		Cluster cluster = clusterRepository.getCluster(clusterId);
+		MachineType machineType = machineTypeRepository.getMachineTypeById(cluster.getMachineType());
+		
 		UsageHour usageHour = new UsageHour();
 		usageHour.setClusterId(clusterId);
 		usageHour.setMachineId(machineId);
 		usageHour.setOrganizationId(organizationId);
 		usageHour.setPlatformId(platformId);
 		usageHour.setVirtualMachineState(VirtualMachineState.STARTED);
+		// The cluster type title is copied also to cluster_tbl.cluster_name so take advantage of that
+		usageHour.setClusterTypeTitle(cluster.getName());
+		// Sizes of the machines in the cluster (see machine_type_tbl)
+		usageHour.setMachineTypeId(cluster.getMachineType());
+		usageHour.setMachineTypeName(machineType.getName()); // (see machine_type_tbl)
+		usageHour.setMachineTypeSpec(machineType.getSpecification()); // (see machine_type_tbl)
 		usageRepository.store(usageHour);
 	}
 	

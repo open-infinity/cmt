@@ -1,7 +1,27 @@
 /*
 NOTE THAT THIS SCRIPT HAS H2 VERSION IN H2 -FOLDER WHICH SHOULD BE KEPT IN SYNC WITH THIS FILE.
  */
+DROP TABLE IF EXISTS `acl_cluster_type_tbl`;
+DROP TABLE IF EXISTS `acl_cloud_provider_tbl`;
+DROP TABLE IF EXISTS `acl_availability_zone_tbl`;
+DROP TABLE IF EXISTS `acl_machine_type_tbl`;
+DROP TABLE IF EXISTS `availability_zone_tbl`;
+DROP TABLE IF EXISTS `cloud_provider_tbl`;
+DROP TABLE IF EXISTS `machine_type_tbl`;
+DROP TABLE IF EXISTS `instance_parameter_tbl`;
 DROP TABLE IF EXISTS `DEPLOYMENT`;
+DROP TABLE IF EXISTS `authorized_ip_tbl`;
+DROP TABLE IF EXISTS `cluster_tbl`;
+DROP TABLE IF EXISTS `elastic_ip_tbl`;
+DROP TABLE IF EXISTS `instance_tbl`;
+DROP TABLE IF EXISTS `job_tbl`;
+DROP TABLE IF EXISTS `key_tbl`;
+DROP TABLE IF EXISTS `machine_tbl`;
+DROP TABLE IF EXISTS `user_authorized_ip_tbl`;
+DROP TABLE IF EXISTS `scaling_rule_tbl`;
+DROP TABLE IF EXISTS `cluster_type_tbl`;
+DROP TABLE IF EXISTS `usage_hours_tbl`;
+DROP TABLE IF EXISTS `deployment_state_tbl`;
 
 CREATE TABLE `DEPLOYMENT` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -15,8 +35,6 @@ CREATE TABLE `DEPLOYMENT` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `authorized_ip_tbl`;
-
 CREATE TABLE `authorized_ip_tbl` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `instance_id` int(11) DEFAULT NULL,
@@ -28,8 +46,6 @@ CREATE TABLE `authorized_ip_tbl` (
   `to_port` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-
-DROP TABLE IF EXISTS `cluster_tbl`;
 
 CREATE TABLE `cluster_tbl` (
   `cluster_id` int(11) NOT NULL AUTO_INCREMENT,
@@ -46,10 +62,10 @@ CREATE TABLE `cluster_tbl` (
   `cluster_security_group_name` varchar(100) DEFAULT NULL,
   `cluster_multicast_address` varchar(50) DEFAULT NULL,
   `cluster_machine_type` tinyint(4) DEFAULT NULL,
+  `cluster_ebs_image_used` int(11) DEFAULT NULL,
+  `cluster_ebs_volumes_used` int(11) DEFAULT NULL,
   PRIMARY KEY (`cluster_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-
-DROP TABLE IF EXISTS `elastic_ip_tbl`;
 
 CREATE TABLE `elastic_ip_tbl` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -64,8 +80,6 @@ CREATE TABLE `elastic_ip_tbl` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `instance_tbl`;
-
 CREATE TABLE `instance_tbl` (
   `instance_id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) DEFAULT NULL,
@@ -77,8 +91,6 @@ CREATE TABLE `instance_tbl` (
   `instance_active` int(11) DEFAULT NULL,
   PRIMARY KEY (`instance_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-
-DROP TABLE IF EXISTS `job_tbl`;
 
 CREATE TABLE `job_tbl` (
   `job_id` int(11) NOT NULL AUTO_INCREMENT,
@@ -95,8 +107,6 @@ CREATE TABLE `job_tbl` (
   PRIMARY KEY (`job_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `key_tbl`;
-
 CREATE TABLE `key_tbl` (
   `key_id` int(11) NOT NULL AUTO_INCREMENT,
   `instance_id` int(11) DEFAULT NULL,
@@ -105,8 +115,6 @@ CREATE TABLE `key_tbl` (
   `key_name` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`key_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-
-DROP TABLE IF EXISTS `machine_tbl`;
 
 CREATE TABLE `machine_tbl` (
   `machine_id` int(11) NOT NULL AUTO_INCREMENT,
@@ -128,8 +136,6 @@ CREATE TABLE `machine_tbl` (
   PRIMARY KEY (`machine_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `user_authorized_ip_tbl`;
-
 CREATE TABLE `user_authorized_ip_tbl` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `instance_id` int(11) DEFAULT NULL,
@@ -141,8 +147,6 @@ CREATE TABLE `user_authorized_ip_tbl` (
   `to_port` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-DROP TABLE IF EXISTS `scaling_rule_tbl`;
 	
 CREATE TABLE `scaling_rule_tbl` (
   `cluster_id` int(11) NOT NULL,
@@ -160,8 +164,6 @@ CREATE TABLE `scaling_rule_tbl` (
   `job_id` int(11) NOT NULL,
   PRIMARY KEY (`cluster_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-DROP TABLE IF EXISTS `cluster_type_tbl`;
 	
 CREATE TABLE `cluster_type_tbl` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -176,15 +178,11 @@ CREATE TABLE `cluster_type_tbl` (
   `max_repl_machines` int(11) DEFAULT NULL,  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `cloud_provider_tbl`;
-
 CREATE TABLE `cloud_provider_tbl` (
   `id` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-DROP TABLE IF EXISTS `availability_zone_tbl`;
 
 CREATE TABLE `availability_zone_tbl` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -194,16 +192,12 @@ CREATE TABLE `availability_zone_tbl` (
   CONSTRAINT fk_zone_cloud FOREIGN KEY (cloud_id) REFERENCES cloud_provider_tbl(id)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `machine_type_tbl`;
-
 CREATE TABLE `machine_type_tbl` (
   `id` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
   `spec` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-DROP TABLE IF EXISTS `acl_cluster_type_tbl`;
 
 CREATE TABLE `acl_cluster_type_tbl` (
   `org_name` varchar(50) NOT NULL,
@@ -212,16 +206,12 @@ CREATE TABLE `acl_cluster_type_tbl` (
   CONSTRAINT fk_acl_cluster_type FOREIGN KEY (cluster_id) REFERENCES cluster_type_tbl(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `acl_cloud_provider_tbl`;
-
 CREATE TABLE `acl_cloud_provider_tbl` (
   `org_name` varchar(50) NOT NULL,
   `cloud_id` int(11) NOT NULL,
   PRIMARY KEY (`org_name`, `cloud_id`),
   CONSTRAINT fk_acl_cloud_provider FOREIGN KEY (cloud_id) REFERENCES cloud_provider_tbl(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-DROP TABLE IF EXISTS `acl_availability_zone_tbl`;
 
 CREATE TABLE `acl_availability_zone_tbl` (
   `org_name` varchar(50) NOT NULL,
@@ -230,16 +220,12 @@ CREATE TABLE `acl_availability_zone_tbl` (
   CONSTRAINT fk_acl_availability_zone FOREIGN KEY (zone_id) REFERENCES availability_zone_tbl(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `acl_machine_type_tbl`;
-
 CREATE TABLE `acl_machine_type_tbl` (
   `org_name` varchar(50) NOT NULL,
   `machine_type_id` int(11) NOT NULL,
   PRIMARY KEY (`org_name`, `machine_type_id`),
   CONSTRAINT fk_acl_machine_type FOREIGN KEY (machine_type_id) REFERENCES machine_type_tbl(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-DROP TABLE IF EXISTS `instance_parameter_tbl`;
 
 CREATE TABLE `instance_parameter_tbl` (
   `id` int(11) AUTO_INCREMENT,
@@ -250,20 +236,24 @@ CREATE TABLE `instance_parameter_tbl` (
   CONSTRAINT fk_instance FOREIGN KEY (instance_id) REFERENCES instance_tbl(instance_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `usage_hours_tbl`;
-
+-- cluster_type_title : duplicated from cluster_type_tbl.title
+-- machine_type_id : duplicated from cluster_tbl.cluster_machine_type
+-- machine_type_name : duplicated from machine_type_tbl.name
+-- machine_type_spec : duplicated from machine_type_tbl.spec
 create table `usage_hours_tbl` (
 	`id` bigint(20) not null auto_increment, 
 	`organization_id` bigint(20) not null, 
 	`cluster_id` bigint(20) not null, 
-	`platform_id` char(254) not null, 
+	`platform_id` char(254) not null,
+	`cluster_type_title` varchar(50) not null, 
 	`machine_id` char(254) not null, 
+	`machine_type_id` tinyint(4) not null,
+	`machine_type_name` varchar(255) not null,
+	`machine_type_spec` varchar(255) not null,
 	`state` int(11) not null, 
 	`cur_timestamp` timestamp not null default current_timestamp, 
 	primary key (`id`)
 );
-
-DROP TABLE IF EXISTS `deployment_state_tbl`;
 
 CREATE TABLE `deployment_state_tbl` (
   `id` int(11) NOT NULL AUTO_INCREMENT,

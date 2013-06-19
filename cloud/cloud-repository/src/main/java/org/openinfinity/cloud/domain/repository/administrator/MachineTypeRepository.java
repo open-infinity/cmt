@@ -16,7 +16,6 @@
 
 package org.openinfinity.cloud.domain.repository.administrator;
 
-import org.openinfinity.cloud.domain.ClusterType;
 import org.openinfinity.cloud.domain.MachineType;
 
 import java.util.Collection;
@@ -34,4 +33,8 @@ import java.util.List;
 public interface MachineTypeRepository {
 	
 	Collection<MachineType> getMachineTypes(List<String> userOrganizations);
+	
+	Collection<MachineType> getMachineTypes();
+	
+	MachineType getMachineTypeById(int id);
 }

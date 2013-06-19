@@ -44,12 +44,40 @@ public class UsageHour {
 	@NotNull
 	private int platformId;
 	
+	/*
+	 * Duplicated from cluster_type_tbl.title.
+	 */
+	@NotScript
+	@NotNull
+	private String clusterTypeTitle;
+	
 	@NotNull
 	private int clusterId;
 	
 	@NotScript
 	@NotNull
 	private int machineId;
+	
+	/*
+	 * Duplicated from cluster_tbl.cluster_machine_type.
+	 */
+	@NotScript
+	@NotNull
+	private int machineTypeId;
+	
+	/*
+	 * Duplicated from cluster_tbl.machine_type_tbl.name.
+	 */
+	@NotScript
+	@NotNull
+	private String machineTypeName;
+	
+	/*
+	 * Duplicated from cluster_tbl.machine_type_tbl.spec.
+	 */
+	@NotScript
+	@NotNull
+	private String machineTypeSpec;
 	
 	@NotNull
 	private Date timeStamp;

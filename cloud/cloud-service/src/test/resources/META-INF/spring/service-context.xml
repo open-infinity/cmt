@@ -14,6 +14,13 @@
  	
 	<context:property-placeholder location=
 	    "classpath*:system.properties" />
+	    
+	<context:component-scan base-package="org.openinfinity.cloud.service.usage" />
+	<context:component-scan base-package="org.openinfinity.cloud.domain.repository">
+	    <context:exclude-filter type="regex" expression="org.openinfinity.cloud.service.healthmonitoring.*.*" />
+	    <context:exclude-filter type="regex" expression="org.openinfinity.cloud.domain.repository.deployer.*.*" />
+	    <context:exclude-filter type="regex" expression="org.openinfinity.cloud.service.deployer.*.*" />
+	</context:component-scan>
     
     <bean id="cloudDataSource" class="org.apache.commons.dbcp.BasicDataSource" >
       <property name="driverClassName" value="${jdbc.driverClassName}"/>
@@ -22,23 +29,19 @@
       <property name="password" value="${jdbc.password}" />
     </bean>
 
-	<!-- Create tables for testing and populate with test data -->
+	<!--
+		Create tables for testing and populate with test data.
+		Refers to sql scripts located in the cloud-repository project.
+	 -->
     <jdbc:initialize-database data-source="cloudDataSource">
   		<jdbc:script location="${sql.script_location}"/>
-  		<jdbc:script location="classpath:sql/populate_tables.sql"/>
+  		<jdbc:script location="file://${user.dir}/../cloud-repository/src/test/resources/sql/populate_tables.sql"/>
 	</jdbc:initialize-database>
-    
+	
 	<bean id="txManager"
 		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
 		<property name="dataSource" ref="cloudDataSource" />
-	</bean> 
-	
-	<context:component-scan base-package="org.openinfinity.cloud.domain.repository">
-	    <context:exclude-filter type="regex" expression="org.openinfinity.cloud.service.healthmonitoring.*.*" />
-	    <context:exclude-filter type="regex" expression="org.openinfinity.cloud.domain.repository.deployer.*.*" />
-	    <context:exclude-filter type="regex" expression="org.openinfinity.cloud.service.deployer.*.*" />
-	    
-	</context:component-scan>
+	</bean>
 	
   	<tx:annotation-driven transaction-manager="txManager"/>
 		

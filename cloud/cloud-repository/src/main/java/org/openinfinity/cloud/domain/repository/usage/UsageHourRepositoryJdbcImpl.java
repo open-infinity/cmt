@@ -52,7 +52,17 @@ public class UsageHourRepositoryJdbcImpl implements UsageHourRepository {
 	/**
 	 * Represents the SQL script for storing usage hour information.
 	 */
-	private static final String STORE_SQL = "INSERT INTO usage_hours_tbl (organization_id, cluster_id, platform_id, machine_id, state) values (?, ?, ?, ?, ?)";
+	private static final String STORE_SQL = "INSERT INTO usage_hours_tbl" +
+			"(organization_id," +
+			"cluster_id," +
+			"platform_id," +
+			"cluster_type_title," +
+			"machine_id," +
+			"machine_type_id," +
+			"machine_type_name," +
+			"machine_type_spec," +
+			"state)" +
+			"values (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 	
 	/**
 	 * Represents the SQL script for loading usage hour information.
@@ -77,7 +87,16 @@ public class UsageHourRepositoryJdbcImpl implements UsageHourRepository {
 	
 	@AuditTrail
 	public void store(UsageHour usageHours) {
-		jdbcTemplate.update(STORE_SQL, usageHours.getOrganizationId(), usageHours.getClusterId(), usageHours.getPlatformId(), usageHours.getMachineId(), usageHours.getVirtualMachineState().getValue());
+		jdbcTemplate.update(STORE_SQL,
+				usageHours.getOrganizationId(),
+				usageHours.getClusterId(),
+				usageHours.getPlatformId(),
+				usageHours.getClusterTypeTitle(),
+				usageHours.getMachineId(),
+				usageHours.getMachineTypeId(),
+				usageHours.getMachineTypeName(),
+				usageHours.getMachineTypeSpec(),
+				usageHours.getVirtualMachineState().getValue());
 	}
 
 	@AuditTrail
@@ -106,7 +125,11 @@ public class UsageHourRepositoryJdbcImpl implements UsageHourRepository {
 			usageHour.setOrganizationId(resultSet.getLong("organization_id"));
 			usageHour.setClusterId(resultSet.getInt("cluster_id"));
 			usageHour.setPlatformId(resultSet.getInt("platform_id"));
+			usageHour.setClusterTypeTitle(resultSet.getString("cluster_type_title"));
 			usageHour.setMachineId(resultSet.getInt("machine_id"));
+			usageHour.setMachineTypeId(resultSet.getInt("machine_type_id"));
+			usageHour.setMachineTypeName(resultSet.getString("machine_type_name"));
+			usageHour.setMachineTypeSpec(resultSet.getString("machine_type_spec"));
 			usageHour.setVirtualMachineState(UsageHour.getVirtualMachineStateWithNumericValue(resultSet.getInt("state")));
 			usageHour.setTimeStamp(resultSet.getTimestamp("cur_timestamp"));
 			return usageHour;
