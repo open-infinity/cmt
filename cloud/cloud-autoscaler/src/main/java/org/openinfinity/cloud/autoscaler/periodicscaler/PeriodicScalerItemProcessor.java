@@ -38,7 +38,6 @@ import org.openinfinity.cloud.service.healthmonitoring.HealthMonitoringService;
 import org.openinfinity.cloud.service.scaling.Enumerations.ScalingState;
 import org.openinfinity.cloud.service.scaling.ScalingRuleService;
 import org.openinfinity.cloud.domain.ScalingRule;
-import org.openinfinity.core.exception.BusinessViolationException;
 import org.openinfinity.core.exception.SystemException;
 import org.openinfinity.core.util.ExceptionUtil;
 import org.springframework.batch.item.ItemProcessor;
@@ -65,7 +64,7 @@ public class PeriodicScalerItemProcessor implements ItemProcessor<Machine, Job> 
 	
 	private static final String METRIC_NAME_LOAD_MIDTERM = "midterm";
 		
-	private final int DELAY = 30000;
+	//private final int DELAY = 12000;
 
 	@Autowired
 	MachineService machineService;
@@ -88,7 +87,7 @@ public class PeriodicScalerItemProcessor implements ItemProcessor<Machine, Job> 
 			return applyScalingRule(machine);
 		}
 		catch(SystemException e){
-			e.printStackTrace();
+		    ExceptionUtil.throwBusinessViolationException(e.getMessage(), e);
 			return null;
 		}			
 	}
@@ -102,7 +101,7 @@ public class PeriodicScalerItemProcessor implements ItemProcessor<Machine, Job> 
             if (rule == null) return null;                
             cluster = clusterService.getCluster(clusterId);
         }
-        catch(BusinessViolationException bve){
+        catch(Exception e){
             if (rule == null) LOG.info("Rule not defined for cluster " + clusterId);
             else if (cluster == null) LOG.error("Cluster " + clusterId + " fetching failed.");
             return null;
@@ -115,10 +114,11 @@ public class PeriodicScalerItemProcessor implements ItemProcessor<Machine, Job> 
                 return createJob(machine, cluster, 1);
             case SCALING_IN:  
                 return createJob(machine, cluster, -1);
-            case SCALING_NEEDED_BUT_IMPOSSIBLE: ExceptionUtil.throwSystemException
-                ("Cluster scaling failed. System load [" + load + "%] " +
-                 "for cluster [" + clusterId + "] is + too high, but " +
-                 "cluster maximum limit has been reached.");
+            case SCALING_NEEDED_BUT_IMPOSSIBLE: 
+                ExceptionUtil.throwSystemException(
+                     "Cluster scaling failed. System load [" + load + "%] " +
+                     "for cluster [" + clusterId + "] is + too high, but " +
+                     "cluster maximum limit has been reached.");
             case SCALING_DISABLED: 
             case SCALING_SKIPPED:
             case SCALING_NOT_NEEDED:
@@ -128,33 +128,26 @@ public class PeriodicScalerItemProcessor implements ItemProcessor<Machine, Job> 
         return null;
     }
 	
-	// FIXME: exceptions handling
-	private float getClusterLoad(Machine machine) throws IOException, 
+	private float getClusterLoad(Machine machine) throws IOException, IndexOutOfBoundsException,  
 	    JsonParseException, JsonMappingException, SystemException {
 	    
-		Date now = new Date();
-		// FIXME: Tune this setting
-		Date earlier = new Date(now.getTime() - DELAY);
-		float load = -1;               
+		//Date earlier = new Date((new Date()).getTime() - DELAY);
 		String[] metricName = {METRIC_RRD_FILE_LOAD};
-		HealthStatusResponse status = 
-		    healthMonitoringService.getClusterHealthStatus(machine, METRIC_TYPE_LOAD, 
-		        metricName, earlier);	
 		
-		// FIXME: handle status return type for error situation
+		HealthStatusResponse status = 
+		    healthMonitoringService.getClusterHealthStatusLast(machine, METRIC_TYPE_LOAD, metricName, new Date());	
+		
 		List<SingleHealthStatus> metrics =  status.getMetrics();
         if (metrics.size() > 0){
 	        Map<String, List<RrdValue>> values = metrics.get(0).getValues();
 	        List<RrdValue> midtermLoadRrd = values.get(METRIC_NAME_LOAD_MIDTERM);
 	        if (midtermLoadRrd != null){        
     	        RrdValue midtermValue =  midtermLoadRrd.get(0);
-    	        load = midtermValue.getValue().floatValue();
+    	        return midtermValue.getValue().floatValue();
 	        }
         }
-        if (load == -1) {
-        	LOG.warn(MSG_HM_METRIC_NOT_AVAILABLE);
-        }
-		return load;
+        LOG.info(MSG_HM_METRIC_NOT_AVAILABLE);
+        return -1;
 	}
 	
 	private Job createJob(Machine machine, Cluster cluster, int machinesGrowth) {

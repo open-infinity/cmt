@@ -58,6 +58,9 @@ public interface HealthMonitoringService {
     HealthStatusResponse getClusterHealthStatus(Machine machine, String metricType,
             String[] metricNames, Date date);
     
+    HealthStatusResponse getClusterHealthStatusLast(Machine machine, String metricType,
+            String[] metricNames, Date date);
+    
     String getHealthStatus();
 
     /**
