@@ -40,7 +40,7 @@ import org.springframework.stereotype.Component;
 @Component("periodicStagingAreaWriter")
 public class PeriodicStagingAreaWriter implements ItemWriter<Map<Deployment, File>> {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(PeriodicStagingAreaReader.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(PeriodicStagingAreaWriter.class);
 	
 	@Value("${stagingArea}")
 	private String stagingArea;
@@ -62,6 +62,10 @@ public class PeriodicStagingAreaWriter implements ItemWriter<Map<Deployment, Fil
 				LOGGER.debug("Relative directory path: " + path);
 				LOGGER.debug("Cleaning deployment: " + file.getAbsolutePath());
 				//FileUtil.removeAllRecursively(file.getAbsolutePath());
+				FileUtil.remove(file.getAbsolutePath());
+				LOGGER.debug("Cleaning staging area: " + stagingArea+"/"+deployment.getAvailabilityZone());				
+				boolean wasEmpty = FileUtil.removeEmptyDirsRecursively(stagingArea+"/"+deployment.getAvailabilityZone());
+				LOGGER.debug("Cleaning staging area, was it empty?: "+wasEmpty);				
 			}	
 		}
 	}
