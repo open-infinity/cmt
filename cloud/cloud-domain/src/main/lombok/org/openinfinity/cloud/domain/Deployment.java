@@ -75,6 +75,7 @@ public class Deployment implements Serializable, Comparable<Deployment> {
 		organizationId = d.getOrganizationId();
 		instanceId = d.getInstanceId();
 		clusterId = d.getClusterId();
+		type = d.getType();
 		name = d.getName();
 		location = d.getLocation();
 		inputStream = d.getInputStream();	

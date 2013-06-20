@@ -10,6 +10,7 @@ CREATE TABLE `DEPLOYMENT` (
   `INSTANCE_ID` bigint(20) NOT NULL,
   `CLUSTER_ID` int(11) NOT NULL,
   `LOCATION` varchar(255) NOT NULL,
+  `TYPE` varchar(32) NOT NULL,
   `NAME` varchar(255) NOT NULL,
   `cur_timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
@@ -270,6 +271,6 @@ CREATE TABLE `deployment_state_tbl` (
   `deployment_id` int(11) NOT NULL,
   `machine_id` int(11) NOT NULL,
   `state` int(11) DEFAULT '0',
-  `cur_timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `cur_timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP  ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

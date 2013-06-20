@@ -146,7 +146,7 @@ DeploymentRepository {
 	/**
 	 * Represents the SQL script for updating deployment stated of the object.
 	 */
-	private static final String DEPLOYMENT_STATE_UPDATE_SQL = "update deployment_state_tbl set state = ? where id = ?";
+	private static final String DEPLOYMENT_STATE_UPDATE_SQL = "update deployment_state_tbl set state = ?, cur_timestamp = now() where id = ?";
 
 	/**
 	 * Represents the SQL script for inserting deployment stated of the object.
