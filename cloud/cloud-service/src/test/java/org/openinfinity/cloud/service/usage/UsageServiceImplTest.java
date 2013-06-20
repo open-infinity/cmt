@@ -97,6 +97,8 @@ public class UsageServiceImplTest {
 		assertEquals("Medium", usage1.getMachineTypeName());
 		assertEquals("Cores: 2, RAM: 2GB, Disk: 10GB",
 				usage1.getMachineTypeSpec());
+		assertEquals(0, usage1.getClusterEbsImageUsed());
+		assertEquals(0, usage1.getClusterEbsVolumesUsed());
 
 		// Case 2
 		endTime = new Date(System.currentTimeMillis() + 100);	// Current time,
@@ -118,6 +120,8 @@ public class UsageServiceImplTest {
 		assertEquals("Large", usage2.getMachineTypeName());
 		assertEquals("Cores: 4, RAM: 4GB, Disk: 10GB",
 				usage2.getMachineTypeSpec());
+		assertEquals(1, usage2.getClusterEbsImageUsed());
+		assertEquals(99, usage2.getClusterEbsVolumesUsed());
 
 	}
 }

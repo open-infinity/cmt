@@ -258,18 +258,20 @@ CREATE TABLE `instance_parameter_tbl` (
 DROP TABLE IF EXISTS `usage_hours_tbl`;
 
 create table `usage_hours_tbl` (
-	`id` bigint(20) not null auto_increment, 
-	`organization_id` bigint(20) not null, 
-	`cluster_id` bigint(20) not null, 
-	`platform_id` char(254) not null, 
-	`cluster_type_title` varchar(50) not null,
-	`machine_id` char(254) not null, 
-	`machine_type_id` tinyint(4) not null,
-	`machine_type_name` varchar(255) not null,
-	`machine_type_spec` varchar(255) not null,
-	`state` int(11) not null, 
-	`cur_timestamp` timestamp not null default current_timestamp, 
-	primary key (`id`)
+  `id` bigint(20) not null auto_increment, 
+  `organization_id` bigint(20) not null, 
+  `cluster_id` bigint(20) not null, 
+  `platform_id` char(254) not null, 
+  `cluster_type_title` varchar(50) not null,
+  `machine_id` char(254) not null, 
+  `machine_type_id` tinyint(4) not null,
+  `machine_type_name` varchar(255) not null,
+  `machine_type_spec` varchar(255) not null,
+  `cluster_ebs_image_used` int(11) default null,
+  `cluster_ebs_volumes_used` int(11) default null,
+  `state` int(11) not null, 
+  `cur_timestamp` timestamp not null default current_timestamp, 
+  primary key (`id`)
 );
 
 DROP TABLE IF EXISTS `deployment_state_tbl`;

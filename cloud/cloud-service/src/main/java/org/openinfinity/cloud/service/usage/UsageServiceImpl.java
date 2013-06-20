@@ -53,6 +53,8 @@ public class UsageServiceImpl implements UsageService {
 		usageHour.setMachineTypeId(cluster.getMachineType());
 		usageHour.setMachineTypeName(machineType.getName()); // (see machine_type_tbl)
 		usageHour.setMachineTypeSpec(machineType.getSpecification()); // (see machine_type_tbl)
+		usageHour.setClusterEbsImageUsed(cluster.getEbsImageUsed());
+		usageHour.setClusterEbsVolumesUsed(cluster.getEbsVolumesUsed());
 		usageRepository.store(usageHour);
 	}
 	

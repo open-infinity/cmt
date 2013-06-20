@@ -61,7 +61,6 @@ public class UsageHour {
 	/*
 	 * Duplicated from cluster_tbl.cluster_machine_type.
 	 */
-	@NotScript
 	@NotNull
 	private int machineTypeId;
 	
@@ -78,6 +77,16 @@ public class UsageHour {
 	@NotScript
 	@NotNull
 	private String machineTypeSpec;
+	
+	/*
+	 * Duplicated from cluster_tbl.cluster_ebs_image_used.
+	 */
+	private int clusterEbsImageUsed;
+	
+	/*
+	 * Duplicated from cluster_tbl.cluster_ebs_volumes_used.
+	 */
+	private int clusterEbsVolumesUsed;
 	
 	@NotNull
 	private Date timeStamp;

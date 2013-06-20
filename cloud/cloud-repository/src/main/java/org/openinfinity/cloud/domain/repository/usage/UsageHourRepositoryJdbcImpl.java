@@ -61,8 +61,10 @@ public class UsageHourRepositoryJdbcImpl implements UsageHourRepository {
 			"machine_type_id," +
 			"machine_type_name," +
 			"machine_type_spec," +
+			"cluster_ebs_image_used," +
+			"cluster_ebs_volumes_used," +
 			"state)" +
-			"values (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+			"values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 	
 	/**
 	 * Represents the SQL script for loading usage hour information.
@@ -96,6 +98,8 @@ public class UsageHourRepositoryJdbcImpl implements UsageHourRepository {
 				usageHours.getMachineTypeId(),
 				usageHours.getMachineTypeName(),
 				usageHours.getMachineTypeSpec(),
+				usageHours.getClusterEbsImageUsed(),
+				usageHours.getClusterEbsVolumesUsed(),
 				usageHours.getVirtualMachineState().getValue());
 	}
 
@@ -130,6 +134,8 @@ public class UsageHourRepositoryJdbcImpl implements UsageHourRepository {
 			usageHour.setMachineTypeId(resultSet.getInt("machine_type_id"));
 			usageHour.setMachineTypeName(resultSet.getString("machine_type_name"));
 			usageHour.setMachineTypeSpec(resultSet.getString("machine_type_spec"));
+			usageHour.setClusterEbsImageUsed(resultSet.getInt("cluster_ebs_image_used"));
+			usageHour.setClusterEbsVolumesUsed(resultSet.getInt("cluster_ebs_volumes_used"));
 			usageHour.setVirtualMachineState(UsageHour.getVirtualMachineStateWithNumericValue(resultSet.getInt("state")));
 			usageHour.setTimeStamp(resultSet.getTimestamp("cur_timestamp"));
 			return usageHour;
