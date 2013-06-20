@@ -366,6 +366,7 @@ public class DeployerController {
 		deployment.setClusterId(deploymentModel.getClusterId());
 		deployment.setInstanceId(deploymentModel.getInstanceId());
 		deployment.setOrganizationId(deploymentModel.getOrganizationId());
+		deployment.setType(deploymentModel.getType().toLowerCase().trim());		
 		deployment.setName(deploymentModel.getName().toLowerCase().trim());
 		deployment.setInputStream(deploymentModel.getFileData().getInputStream());
 		deployerService.deploy(deployment);

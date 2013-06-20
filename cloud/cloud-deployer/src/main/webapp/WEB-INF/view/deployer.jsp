@@ -19,6 +19,7 @@
  */
 
 @author Ilkka Leinonen
+@author Tommi Siitonen
 
 @version 1.0.0
 @since 1.0.0
@@ -30,6 +31,8 @@
 <%@ taglib uri="http://java.sun.com/portlet_2_0" prefix="portlet"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+
 
 <portlet:defineObjects />
 <portlet:actionURL var="action" />
@@ -55,7 +58,7 @@ label {
 		<input id="instanceId" name="instanceId" type="hidden" />
 		<input id="organizationId" name="organizationId" type="hidden" />
 		<input id="clusterId" name="clusterId" type="hidden" />
-		<p id="phase">Choose organization for deployment (1/6 steps).</p>
+		<p id="phase">Choose organization for deployment (1/7 steps).</p>
 		<p id="organizations">
 		<b>Choose organization</b>
 		<br /><br />
@@ -70,6 +73,12 @@ label {
         <p id="clusters">
            	<b>Choose cluster</b>
            	<p id="clustersForInstance">
+		<p id="type">
+			<form:label for="type" path="type"><b>Define type of the deployment</b>
+			</form:label>
+			<br />
+			<form:input path="type" />
+		</p>           	
 		<p id="deployment">
 			<form:label for="name" path="name"><b>Define name for the deployment</b>
 			</form:label>
@@ -90,11 +99,17 @@ label {
 
 	<table id="deploymentTable"></table>
 	<div id="deploymentPager"></div>
-	<br><br/> <a href="#" id="undeploy_deployment">Undeploy deployment</a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="#" id="redeploy_deployment">Redeploy deployment</a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="#" id="delete_deployment">Delete deployment</a> <br />	
+<!-- 	<br><br/> <a href="#" id="undeploy_deployment">Undeploy deployment</a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="#" id="redeploy_deployment">Redeploy deployment</a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="#" id="delete_deployment">Delete deployment</a> <br />	 -->
+	<fmt:setBundle basename="clouddeployer"/>
+	<div class="ui-button-bar">
+		<button id="undeploy_deployment"><fmt:message key="clouddeployer.mainview.button.undeployDeployment" /></button>
+		<button id="redeploy_deployment"><fmt:message key="clouddeployer.mainview.button.redeployDeployment" /></button>
+		<button id="delete_deployment"><fmt:message key="clouddeployer.mainview.button.deleteDeployment" /></button>
+	</div>
 	
 	<script type="text/javascript">
 	
-	var wizardStates = {init:0, organization:1, instance:2, cluster:3, deployment:4};
+	var wizardStates = {init:0, organization:1, instance:2, cluster:3, type:4, deployment:5};
 	Object.freeze(wizardStates);
 	var currentState = wizardStates.init;
 	
@@ -119,7 +134,7 @@ label {
 	 		   		$("#instancesForOrganization").html(clusters);
 	 		   		switchState(wizardStates.organization);
 	 				$("#organizationId").css({backgroundColor: 'green'});
-					$("#phase").html("Choose instance for deployment (2/6 steps).");
+					$("#phase").html("Choose instance for deployment (2/7 steps).");
 			   });		  	
 			});
 		<%
@@ -141,7 +156,7 @@ label {
 	 				});
 	 		   		$("#clustersForInstance").html(clusters);
 	 		   		switchState(wizardStates.instance);
-	 			$("#phase").html("Choose cluster for deployment (3/6 steps).");
+	 			$("#phase").html("Choose cluster for deployment (3/7 steps).");
 			   });	
 			}
 		});
@@ -151,19 +166,24 @@ label {
 			if (target.is("#clustersForInstance label")){
 				var clusterId = target.prev().attr("name");
 				$("#clusterId").attr("value", clusterId);
-				$("#phase").html("Choose name for deployment (4/6 steps).");
+				$("#phase").html("Choose type of deployment (4/7 steps).");
 	 		   	switchState(wizardStates.cluster);
 			}
+		});
+
+		$("#type").on('change', function(event) { 
+			$('#deployment').show("1000");
+			$("#phase").html("Choose name for deployment (5/7 steps).");
 		});
 		
 		$("#deployment").on('change', function(event) { 
 			$('#deployable').show("1000");
 			$('#fileData').show("1000");
-			$("#phase").html("Choose package for deployment (5/6 steps).");
+			$("#phase").html("Choose package for deployment (6/7 steps).");
 		});
 		
 		$("#fileData").on('change', function(event) { 
-			$("#phase").html("Deploy package (6/6 steps).");
+			$("#phase").html("Deploy package (7/7 steps).");
 			$('#submitButton').show("1000");
 		});
 			
@@ -173,18 +193,19 @@ label {
 		});
 
 		var deploymentColModel =[
-		    {name:'id',index:'id', width:70, align:"center"},
+		    {name:'id',index:'id', width:60, align:"center"},
         	{name:'organization',index:'organization', width:120, align:"center"},
-        	{name:'organizationId',index:'organization', width:90, align:"center"},
+        	{name:'organizationId',index:'organizationId', width:60, align:"center"},
         	{name:'instance',index:'instance', width:100, align:"center"},
-        	{name:'instanceId',index:'instanceId', width:80, align:"center"},
+        	{name:'instanceId',index:'instanceId', width:60, align:"center"},
         	{name:'cluster',index:'cluster', width:120, align:"center"},
-        	{name:'clusterId',index:'clusterId', width:80, align:"center"},
+        	{name:'clusterId',index:'clusterId', width:60, align:"center"},
+        	{name:'type',index:'type', width:90, align:"center"},
         	{name:'name',index:'name', width:120, align:"center"},
-        	{name:'state',index:'state', width:70, align:"center"},
+        	{name:'state',index:'state', width:60, align:"center"},
         	{name:'formattedTime',index:'formattedTime', width:120, align:"center"}  
         ];
-		var deploymentColNames = ['id', 'organization', 'organizationId','instance', 'instanceId', 'cluster', 'clusterId', 'name', 'state', 'time'];
+		var deploymentColNames = ['id', 'organization', 'organizationId','instance', 'instanceId', 'cluster', 'clusterId', 'type', 'name', 'state', 'time'];
 		
 		function loadTable(){
 			jQuery("#deploymentTable").jqGrid({
@@ -212,21 +233,21 @@ label {
 			   	caption: "Existing deployments"
 			});
 			$("#deploymentTable").jqGrid('navGrid','#deploymentPager',{edit:false,add:false,del:false});
-			jQuery("#undeploy_deployment").click( function(){ 
+			jQuery("#undeploy_deployment").button().click( function(){ 
 				var id = jQuery("#deploymentTable").jqGrid('getGridParam','selrow'); 
 				if (id) { 
  				  	var ret = jQuery("#deploymentTable").jqGrid('getRowData',id); 
  				  	var name = ret.name;				  	
 					var url = '<portlet:resourceURL id="undeployDeployment"/>&deploymentName='+name+"&deploymentId="+id;
 					   $.getJSON(url, function(data) {
-						alert("Deployment <"+id+"> undeployed with name="+name+"..."); 
+						alert("Deployment undeployed. Id: <"+id+">, Name: <"+ret.name+">");  
 					   });				
 				} else { 
 					alert("Please select row");
 				} 
 			}); 
 			$("#deploymentTable").jqGrid('navGrid','#deploymentPager',{edit:false,add:false,del:false});
-			jQuery("#redeploy_deployment").click( function(){ 
+			jQuery("#redeploy_deployment").button().click( function(){ 
 				var id = jQuery("#deploymentTable").jqGrid('getGridParam','selrow'); 
 				if (id) { 
 					var ret = jQuery("#deploymentTable").jqGrid('getRowData',id); 
@@ -235,7 +256,7 @@ label {
 					} else if (ret.state==11) {
 						var url = '<portlet:resourceURL id="redeployDeployment"/>&deploymentId='+id;
 						   $.getJSON(url, function(data) {
-							alert("Deployment <"+id+"> redeployed with name="+ret.name+"..."); 
+							alert("Deployment redeployed. Id: <"+id+">, Name: <"+ret.name+">");  
 						   });				
 					} else {
 						alert("Please select undeployed deployment.");						
@@ -244,20 +265,20 @@ label {
 					alert("Please select row");
 				} 
 			}); 			
-			jQuery("#delete_deployment").click( function(){ 
+			jQuery("#delete_deployment").button().click( function(){ 
 				var id = jQuery("#deploymentTable").jqGrid('getGridParam','selrow'); 
 				if (id) { 
 					var ret = jQuery("#deploymentTable").jqGrid('getRowData',id); 
 					if(ret.state==11) {
 						var url = '<portlet:resourceURL id="deleteDeployment"/>&deploymentId='+id;
 						   $.getJSON(url, function(data) {
-							alert("Deployment <"+id+"> deleted with name="+ret.name+"..."); 
+							alert("Deployment deleted. Id: <"+id+">, Name: <"+ret.name+">"); 
 						   });				
 					} else {
-						alert("Please undeploy first");						
+						alert("Please undeploy first.");						
 					}
 				} else { 
-					alert("Please select row");
+					alert("Please select row!");
 				} 
 			}); 
 			
@@ -292,7 +313,7 @@ label {
 		}
 		case wizardStates.cluster:{
 			if (currentState == wizardStates.instance){
-				$('#deployment').show("1000");
+				$('#type').show("1000");
 			}
 			else clearClusters();
 			break;
@@ -320,6 +341,7 @@ label {
 	function hideAll(){
 		$('#instances').hide();
 	    $('#clusters').hide();
+	    $('#type').hide();
 	    $('#deployment').hide();
 	   	$('#deployable').hide();
 	   	$('#fileData').hide();

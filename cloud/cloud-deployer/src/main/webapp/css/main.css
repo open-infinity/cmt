@@ -15,3 +15,8 @@
 	padding: 3px 15px;
 	border-radius: 10px;
 }
+
+.ui-button-bar {
+	padding-top: 10px;
+	clear: both;
+}
