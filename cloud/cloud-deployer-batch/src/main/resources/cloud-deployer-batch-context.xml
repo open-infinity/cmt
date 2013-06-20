@@ -49,7 +49,17 @@
 <!-- 	static final int CLUSTER_TYPE_NOSQL = 6; -->
 <!-- 	static final int CLUSTER_TYPE_IDENTITY_GATEWAY = 7; -->
 
+
+<!-- <bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor"> -->
+<!--      <property name="corePoolSize" value="5" /> -->
+<!--      <property name="maxPoolSize" value="10" /> -->
+<!--      <property name="queueCapacity" value="25" /> -->
+<!-- </bean> -->
+
+<!-- 	<bean id="periodicCloudDeployerWriter" class="org.openinfinity.cloud.application.deployer.batch.MultiThreadedPeriodicCloudDeployerWriter"> -->	
+<!-- 		<property name="taskExecutor" ref="taskExecutor" /> -->	
 	<bean id="periodicCloudDeployerWriter" class="org.openinfinity.cloud.application.deployer.batch.PeriodicCloudDeployerWriter">
+	
 		<property name="deploymentHostPort" value="22" />
 		<property name="username" value="root" />
 		<property name="fileSystemUser" value="toas" />
@@ -152,56 +162,6 @@
 <!-- 		<property name="instanceService" ref="instanceService" /> -->
 <!-- 	</bean> -->
 	
-<!-- 	ORIGINAL -->
-<!-- 	<batch:job id="cloudDeployerBatchJob"> -->
-<!-- 		<batch:step id="stepP1"> -->
-<!-- 			<batch:tasklet transaction-manager="txManager" -->
-<!-- 				start-limit="3"> -->
-<!-- 				<batch:chunk  -->
-<!-- 					reader="periodicCloudDeployerReader"  -->
-<!-- 					processor="periodicCloudDeployerProcessor" -->
-<!-- 					writer="periodicCloudDeployerWriter"  -->
-<!-- 					commit-interval="100"  -->
-<!-- 					retry-limit="3"> -->
-<!-- 					<batch:retryable-exception-classes> -->
-<!--                     	<batch:include class="org.springframework.dao.OptimisticLockingFailureException" /> -->
-<!--                         <batch:include class="org.springframework.dao.DeadlockLoserDataAccessException" /> -->
-<!--                     </batch:retryable-exception-classes> -->
-<!--                 </batch:chunk> -->
-<!-- 			</batch:tasklet> -->
-<!-- 		</batch:step>	 -->
-<!-- 	</batch:job> -->
-	
-<!-- 	<task:scheduled-tasks>   -->
-<!-- 	    <task:scheduled ref="periodicCloudDeployerLauncher" method="launch" cron="*/10 * * * * ?"/> -->
-<!-- 	</task:scheduled-tasks> -->
-		
-	<!-- Use executor for asyncronous launching  -->
-	<!-- 
-	<bean id="taskExecutor"
-	  class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
-	  <property name="corePoolSize" value="10"/>
-	  <property name="maxPoolSize" value="15"/>
-	</bean>
-	<batch:job id="cloudDeployerBatchJob">
-		<batch:step id="stepP1">
-			<batch:tasklet task-executor="taskExecutor" throttle-limit="10" transaction-manager="txManager"
-				start-limit="1">
-				<batch:chunk 
-					reader="periodicCloudDeployerReader" 
-					processor="periodicCloudDeployerProcessor"
-					writer="periodicCloudDeployerWriter" 
-					commit-interval="1" 
-					retry-limit="1">
-					<batch:retryable-exception-classes>
-                    	<batch:include class="org.springframework.dao.OptimisticLockingFailureException" />
-                        <batch:include class="org.springframework.dao.DeadlockLoserDataAccessException" />
-                    </batch:retryable-exception-classes>
-                </batch:chunk>
-			</batch:tasklet>
-		</batch:step>	
-	</batch:job>
-	 -->
 
 	<batch:job id="cloudDeployerBatchJob">
 		<batch:step id="stepP1">
@@ -221,6 +181,8 @@
 			</batch:tasklet>
 		</batch:step>	
 	</batch:job>
+	 
+
 	 
 	<batch:job id="cloudStagingAreaJob">
 		<batch:step id="stepSA1">

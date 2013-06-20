@@ -85,35 +85,27 @@ public class PeriodicCloudDeployerReader implements ItemReader<DeploymentStatus>
 	}
 	
 	private List<DeploymentStatus> loadDeployments() {
-		LOGGER.info("Deployment of software artifacts started.");
+		LOGGER.debug("Deployment of software artifacts started.");
 		Collection<Instance> activeInstances = instanceService.getAllActiveInstances();
-		LOGGER.info("There are total of [" + activeInstances.size() + "] active instances in the infrastructure.");
-		// Looping of instances not necessary?
+		LOGGER.debug("There are total of [" + activeInstances.size() + "] active instances in the infrastructure.");
+		// Looping of instances not necessary, still ensures that deployments to same instance are handled at tthe same chunks 
 		for (Instance instance : activeInstances) {
 			Collection<Deployment> deployments = deployerService.loadDeploymentsForOrganization(instance.getOrganizationid());
 			
-			//LOGGER.debug("There are [" + deployments.size() + "] deployment  for organization ["+instance.getOrganizationid()+"]. Processing instance <"+instance.getInstanceId()+">.");
-			
+		
 			for (Deployment deployment : deployments) {
 				
 				// for supporting CI and staging area handling deployments with with same name and 
 				// more current timestamps should replace current deployments
-				//getDeploymentByClusteAndNameOrderByTimestamp
 				if (deployment.getState()==DeployerService.DEPLOYMENT_STATE_DEPLOYED) {
 					Collection<Deployment> newerDeployments = deployerService.loadNewerDeploymentsForClusterWithNameInDeployedState(deployment);
 					
 					// replace current deployment with new
 					if (!newerDeployments.isEmpty()) {
 						deployment.setState(DeployerService.DEPLOYMENT_STATE_UNDEPLOY);
-						//for (Deployment deploymentNew : newerDeployments) {
-						//	
-						//}						
 					}
 				}
 				
-				
-				// TODO: verify that deleted instances and clusters are taken into account in deploymentstatus processing
-				// when instance is deleted when cluster is also
 				
 				// check if deployment is targeted for this instance
 				if (deployment.getInstanceId() != instance.getInstanceId()) {
@@ -249,7 +241,7 @@ public class PeriodicCloudDeployerReader implements ItemReader<DeploymentStatus>
 				for (Machine machine: machinesToBeCompared) {						
 					// if no deploymentStatuses found for machine it is probably new machine or new deployment
 					// new deploymentstatus added
-					// TODO: need to remove loadbalancers
+					// need to remove loadbalancers
 					if (machine.getType().equals("loadbalancer")) {
 						LOGGER.debug("Skipping (NEW) machine [" + machine.getId() + "] of type loadbalancer");							
 						continue;

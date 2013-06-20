@@ -194,14 +194,6 @@ public class PeriodicCloudDeployerWriter implements ItemWriter<DeploymentStatus>
 			
 			
 //			Replace command configuration with predefined set of dynamic parameters provided to be used in commands:
-//			${deploymentDirectory}
-//			${unDeploymentDirectory}
-//			${deploymentName}
-//			${deploymentType} 
-//			${targetIp}
-//			${targetClusterLBIp}
-//			${fileSystemUser}
-//			${fileSystemGroup}
 			Map <String, String> replacePatterns = new HashMap<String, String>();
 			replacePatterns.put("#%deploymentDirectory%#", deploymentDirectory);
 			replacePatterns.put("#%unDeploymentDirectory%#", unDeploymentDirectory);
@@ -225,7 +217,7 @@ public class PeriodicCloudDeployerWriter implements ItemWriter<DeploymentStatus>
 				
 				Collection<String> commands = getCommands(unDeploymentCommandsMap, deploymentStatus.getDeployment().getType(), cluster.getType()+"", replacePatterns);
 				
-				LOGGER.debug("Executing undeployment remote commands in machine with id [" + machine.getId() + "] .");
+				LOGGER.info("Executing undeployment remote commands in machine with id [" + machine.getId() + "] for deploymentStatus <"+deploymentStatus.getId()+">.");
 				//listCollection(commands);
 				
 				SSHGateway.executeRemoteCommands(
@@ -238,18 +230,18 @@ public class PeriodicCloudDeployerWriter implements ItemWriter<DeploymentStatus>
 						commands);					
 				
 				deploymentStatus.setDeploymentState(DeploymentState.UNDEPLOYED);
-				LOGGER.debug("Updating deployment status with id [" + deploymentStatus.getId() + "] as UNDEPLOYED.");
+				LOGGER.info("Updating deployment status with id [" + deploymentStatus.getId() + "] as UNDEPLOYED.");
 				deployerService.storeDeploymentStatus(deploymentStatus);				
 				continue;
 			} else if (deploymentStatus.getDeploymentState()==DeploymentState.UNDEPLOYED) {
-				LOGGER.debug("Already UNDEPLOYED status in writer. Storing deployment status with id [" + deploymentStatus.getId() + "] as UNDEPLOYED.");
+				LOGGER.info("Already UNDEPLOYED status in writer. Storing deployment status with id [" + deploymentStatus.getId() + "] as UNDEPLOYED.");
 				deployerService.storeDeploymentStatus(deploymentStatus);								
 			}
 			
 			// Handle DEPLOYMENTS
 			
 			// Pushing deployment
-			LOGGER.debug("Pushing deployment to machine with id [" + machine.getId() + "] for deployment directory [" + deploymentDirectory + "] with artifact named [" + deploymentStatus.getDeployment().getName() + "]. to cluster type<"+type+">");	
+			LOGGER.info("Pushing deployment to machine with id [" + machine.getId() + "] for deployment directory [" + deploymentDirectory + "] with artifact named [" + deploymentStatus.getDeployment().getName() + "]. to cluster type<"+type+">");	
 						
 			// deploymentDirectory already platform specific
 			SSHGateway.pushToServer(
@@ -261,7 +253,7 @@ public class PeriodicCloudDeployerWriter implements ItemWriter<DeploymentStatus>
 					deploymentHostPort, 
 					username, 
 					"",
-					deploymentDirectory+deploymentStatus.getDeployment().getName()+".war");			
+					deploymentDirectory+"/"+deploymentStatus.getDeployment().getName()+"."+deploymentStatus.getDeployment().getType());			
 			
 			// Executing PostPush commands
 			//listMap(deploymentCommandsMap);			
@@ -280,7 +272,7 @@ public class PeriodicCloudDeployerWriter implements ItemWriter<DeploymentStatus>
 					"",
 					commands);
 			
-			LOGGER.debug("Updating deployment status with id [" + deploymentStatus.getId() + "] as DEPLOYED.");
+			LOGGER.info("Updating deployment status with id [" + deploymentStatus.getId() + "] as DEPLOYED.");
 			deploymentStatus.setDeploymentState(DeploymentState.DEPLOYED);
 			deployerService.storeDeploymentStatus(deploymentStatus);
 		}
@@ -302,15 +294,7 @@ public class PeriodicCloudDeployerWriter implements ItemWriter<DeploymentStatus>
 		return commands;
 	}
 	
-//	Replace command configuration with predefined set of dynamic parameters provided to be used in commands:
-//		${deploymentDirectory}
-//		${unDeploymentDirectory}
-//		${deploymentName}
-//		${deploymentType} 
-//		${targetIp}
-//		${targetClusterLBIp}
-//		${fileSystemUser}
-//		${fileSystemGroup}
+	//	Replace command configuration with predefined set of dynamic parameters provided to be used in commands	
 	private String formatCommandParameters(String command, Map<String, String> replacePatterns) {
 		LOGGER.debug("Unformatted command: <"+command+">.");
 		for (String key : replacePatterns.keySet()) {
