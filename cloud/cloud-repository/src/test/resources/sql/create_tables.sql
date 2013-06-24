@@ -5,6 +5,9 @@ DROP TABLE IF EXISTS `acl_cluster_type_tbl`;
 DROP TABLE IF EXISTS `acl_cloud_provider_tbl`;
 DROP TABLE IF EXISTS `acl_availability_zone_tbl`;
 DROP TABLE IF EXISTS `acl_machine_type_tbl`;
+DROP TABLE IF EXISTS `instance_share_detail_tbl`;
+DROP TABLE IF EXISTS `instance_share_invoice_tbl`;
+DROP TABLE IF EXISTS `instance_share_tbl`;
 DROP TABLE IF EXISTS `availability_zone_tbl`;
 DROP TABLE IF EXISTS `cloud_provider_tbl`;
 DROP TABLE IF EXISTS `machine_type_tbl`;
@@ -266,4 +269,47 @@ CREATE TABLE `deployment_state_tbl` (
   `state` int(11) DEFAULT '0',
   `cur_timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- INVOICING TABLES
+
+CREATE TABLE `instance_share_tbl` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `instance_id` int(11) NOT NULL,
+  `period_start` datetime NOT NULL,  
+  `created_by` int(11) DEFAULT NULL,
+  `created` timestamp NOT NULL DEFAULT 0,
+  `modified_by` int(11) DEFAULT NULL,
+  `modified` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  CONSTRAINT fk_instance_share_instance_rule FOREIGN KEY (instance_id) REFERENCES instance_tbl(instance_id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE `instance_share_invoice_tbl` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `instance_share_id` int(11) NOT NULL,
+  `period_start` datetime NOT NULL,
+  `period_end` datetime NOT NULL,
+  `total_usage` int(11) NOT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `created` timestamp NOT NULL DEFAULT 0,
+  `modified_by` int(11) DEFAULT NULL,
+  `modified` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  CONSTRAINT fk_instance_share_invoice_instance_share_rule FOREIGN KEY (instance_share_id) REFERENCES instance_share_tbl(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE `instance_share_detail_tbl` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `instance_share_id` int(11) NOT NULL,
+  `cost_pool` char(10) NOT NULL,
+  `share_percent` decimal(5,2) NOT NULL,
+  `description` varchar(256) DEFAULT NULL,
+  `order_number` char(8) NOT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `created` timestamp NOT NULL DEFAULT 0,
+  `modified_by` int(11) DEFAULT NULL,
+  `modified` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  CONSTRAINT fk_instance_share_detail_instance_share_rule FOREIGN KEY (instance_share_id) REFERENCES instance_share_tbl(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

@@ -4,7 +4,31 @@ FOLLOWING PATCHES ARE REQUIRED:
 - REMOVE "ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8" STUFF
 - REMOVE "ON UPDATE CURRENT_TIMESTAMP" FROM LINES LIKE THIS: `cur_timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
  */
+
+DROP TABLE IF EXISTS `acl_cluster_type_tbl`;
+DROP TABLE IF EXISTS `acl_cloud_provider_tbl`;
+DROP TABLE IF EXISTS `acl_availability_zone_tbl`;
+DROP TABLE IF EXISTS `acl_machine_type_tbl`;
+DROP TABLE IF EXISTS `instance_share_detail_tbl`;
+DROP TABLE IF EXISTS `instance_share_invoice_tbl`;
+DROP TABLE IF EXISTS `instance_share_tbl`;
+DROP TABLE IF EXISTS `availability_zone_tbl`;
+DROP TABLE IF EXISTS `cloud_provider_tbl`;
+DROP TABLE IF EXISTS `machine_type_tbl`;
+DROP TABLE IF EXISTS `instance_parameter_tbl`;
 DROP TABLE IF EXISTS `DEPLOYMENT`;
+DROP TABLE IF EXISTS `authorized_ip_tbl`;
+DROP TABLE IF EXISTS `cluster_tbl`;
+DROP TABLE IF EXISTS `elastic_ip_tbl`;
+DROP TABLE IF EXISTS `instance_tbl`;
+DROP TABLE IF EXISTS `job_tbl`;
+DROP TABLE IF EXISTS `key_tbl`;
+DROP TABLE IF EXISTS `machine_tbl`;
+DROP TABLE IF EXISTS `user_authorized_ip_tbl`;
+DROP TABLE IF EXISTS `scaling_rule_tbl`;
+DROP TABLE IF EXISTS `cluster_type_tbl`;
+DROP TABLE IF EXISTS `usage_hours_tbl`;
+DROP TABLE IF EXISTS `deployment_state_tbl`;
 
 CREATE TABLE `DEPLOYMENT` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -18,8 +42,6 @@ CREATE TABLE `DEPLOYMENT` (
   PRIMARY KEY (`id`)
 );
 
-DROP TABLE IF EXISTS `authorized_ip_tbl`;
-
 CREATE TABLE `authorized_ip_tbl` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `instance_id` int(11) DEFAULT NULL,
@@ -31,8 +53,6 @@ CREATE TABLE `authorized_ip_tbl` (
   `to_port` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
 );
-
-DROP TABLE IF EXISTS `cluster_tbl`;
 
 CREATE TABLE `cluster_tbl` (
   `cluster_id` int(11) NOT NULL AUTO_INCREMENT,
@@ -54,8 +74,6 @@ CREATE TABLE `cluster_tbl` (
   PRIMARY KEY (`cluster_id`)
 );
 
-DROP TABLE IF EXISTS `elastic_ip_tbl`;
-
 CREATE TABLE `elastic_ip_tbl` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `instance_id` int(11) DEFAULT NULL,
@@ -69,8 +87,6 @@ CREATE TABLE `elastic_ip_tbl` (
   PRIMARY KEY (`id`)
 );
 
-DROP TABLE IF EXISTS `instance_tbl`;
-
 CREATE TABLE `instance_tbl` (
   `instance_id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) DEFAULT NULL,
@@ -82,8 +98,6 @@ CREATE TABLE `instance_tbl` (
   `instance_active` int(11) DEFAULT NULL,
   PRIMARY KEY (`instance_id`)
 );
-
-DROP TABLE IF EXISTS `job_tbl`;
 
 CREATE TABLE `job_tbl` (
   `job_id` int(11) NOT NULL AUTO_INCREMENT,
@@ -100,8 +114,6 @@ CREATE TABLE `job_tbl` (
   PRIMARY KEY (`job_id`)
 );
 
-DROP TABLE IF EXISTS `key_tbl`;
-
 CREATE TABLE `key_tbl` (
   `key_id` int(11) NOT NULL AUTO_INCREMENT,
   `instance_id` int(11) DEFAULT NULL,
@@ -110,8 +122,6 @@ CREATE TABLE `key_tbl` (
   `key_name` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`key_id`)
 );
-
-DROP TABLE IF EXISTS `machine_tbl`;
 
 CREATE TABLE `machine_tbl` (
   `machine_id` int(11) NOT NULL AUTO_INCREMENT,
@@ -133,8 +143,6 @@ CREATE TABLE `machine_tbl` (
   PRIMARY KEY (`machine_id`)
 );
 
-DROP TABLE IF EXISTS `user_authorized_ip_tbl`;
-
 CREATE TABLE `user_authorized_ip_tbl` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `instance_id` int(11) DEFAULT NULL,
@@ -147,8 +155,6 @@ CREATE TABLE `user_authorized_ip_tbl` (
   PRIMARY KEY (`id`)
 );
 
-DROP TABLE IF EXISTS `scaling_rule_tbl`;
-	
 CREATE TABLE `scaling_rule_tbl` (
   `cluster_id` int(11) NOT NULL,
   `periodic` boolean DEFAULT NULL,
@@ -166,8 +172,6 @@ CREATE TABLE `scaling_rule_tbl` (
   PRIMARY KEY (`cluster_id`)
 );
 
-DROP TABLE IF EXISTS `cluster_type_tbl`;
-	
 CREATE TABLE `cluster_type_tbl` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `configuration_id` int(11) DEFAULT NULL,
@@ -181,15 +185,11 @@ CREATE TABLE `cluster_type_tbl` (
   `max_repl_machines` int(11) DEFAULT NULL,  PRIMARY KEY (`id`)
 );
 
-DROP TABLE IF EXISTS `cloud_provider_tbl`;
-
 CREATE TABLE `cloud_provider_tbl` (
   `id` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
 );
-
-DROP TABLE IF EXISTS `availability_zone_tbl`;
 
 CREATE TABLE `availability_zone_tbl` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -199,16 +199,12 @@ CREATE TABLE `availability_zone_tbl` (
   CONSTRAINT fk_zone_cloud FOREIGN KEY (cloud_id) REFERENCES cloud_provider_tbl(id)
 );
 
-DROP TABLE IF EXISTS `machine_type_tbl`;
-
 CREATE TABLE `machine_type_tbl` (
   `id` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
   `spec` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
 );
-
-DROP TABLE IF EXISTS `acl_cluster_type_tbl`;
 
 CREATE TABLE `acl_cluster_type_tbl` (
   `org_name` varchar(50) NOT NULL,
@@ -217,16 +213,12 @@ CREATE TABLE `acl_cluster_type_tbl` (
   CONSTRAINT fk_acl_cluster_type FOREIGN KEY (cluster_id) REFERENCES cluster_type_tbl(id)
 );
 
-DROP TABLE IF EXISTS `acl_cloud_provider_tbl`;
-
 CREATE TABLE `acl_cloud_provider_tbl` (
   `org_name` varchar(50) NOT NULL,
   `cloud_id` int(11) NOT NULL,
   PRIMARY KEY (`org_name`, `cloud_id`),
   CONSTRAINT fk_acl_cloud_provider FOREIGN KEY (cloud_id) REFERENCES cloud_provider_tbl(id)
 );
-
-DROP TABLE IF EXISTS `acl_availability_zone_tbl`;
 
 CREATE TABLE `acl_availability_zone_tbl` (
   `org_name` varchar(50) NOT NULL,
@@ -235,16 +227,12 @@ CREATE TABLE `acl_availability_zone_tbl` (
   CONSTRAINT fk_acl_availability_zone FOREIGN KEY (zone_id) REFERENCES availability_zone_tbl(id)
 );
 
-DROP TABLE IF EXISTS `acl_machine_type_tbl`;
-
 CREATE TABLE `acl_machine_type_tbl` (
   `org_name` varchar(50) NOT NULL,
   `machine_type_id` int(11) NOT NULL,
   PRIMARY KEY (`org_name`, `machine_type_id`),
   CONSTRAINT fk_acl_machine_type FOREIGN KEY (machine_type_id) REFERENCES machine_type_tbl(id)
 );
-
-DROP TABLE IF EXISTS `instance_parameter_tbl`;
 
 CREATE TABLE `instance_parameter_tbl` (
   `id` int(11) AUTO_INCREMENT,
@@ -254,8 +242,6 @@ CREATE TABLE `instance_parameter_tbl` (
   PRIMARY KEY (`id`),
   CONSTRAINT fk_instance FOREIGN KEY (instance_id) REFERENCES instance_tbl(instance_id)
 );
-
-DROP TABLE IF EXISTS `usage_hours_tbl`;
 
 create table `usage_hours_tbl` (
   `id` bigint(20) not null auto_increment, 
@@ -274,8 +260,6 @@ create table `usage_hours_tbl` (
   primary key (`id`)
 );
 
-DROP TABLE IF EXISTS `deployment_state_tbl`;
-
 CREATE TABLE `deployment_state_tbl` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `deployment_id` int(11) NOT NULL,
@@ -283,4 +267,47 @@ CREATE TABLE `deployment_state_tbl` (
   `state` int(11) DEFAULT '0',
   `cur_timestamp` timestamp NOT NULL,
   PRIMARY KEY (`id`)
+);
+
+-- INVOICING TABLES
+
+CREATE TABLE `instance_share_tbl` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `instance_id` int(11) NOT NULL,
+  `period_start` datetime NOT NULL,  
+  `created_by` int(11) DEFAULT NULL,
+  `created` timestamp NOT NULL DEFAULT 0,
+  `modified_by` int(11) DEFAULT NULL,
+  `modified` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  CONSTRAINT fk_instance_share_instance_rule FOREIGN KEY (instance_id) REFERENCES instance_tbl(instance_id)
+);
+
+CREATE TABLE `instance_share_invoice_tbl` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `instance_share_id` int(11) NOT NULL,
+  `period_start` datetime NOT NULL,
+  `period_end` datetime NOT NULL,
+  `total_usage` int(11) NOT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `created` timestamp NOT NULL DEFAULT 0,
+  `modified_by` int(11) DEFAULT NULL,
+  `modified` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  CONSTRAINT fk_instance_share_invoice_instance_share_rule FOREIGN KEY (instance_share_id) REFERENCES instance_share_tbl(id)
+);
+
+CREATE TABLE `instance_share_detail_tbl` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `instance_share_id` int(11) NOT NULL,
+  `cost_pool` char(10) NOT NULL,
+  `share_percent` decimal(5,2) NOT NULL,
+  `description` varchar(256) DEFAULT NULL,
+  `order_number` char(8) NOT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `created` timestamp NOT NULL DEFAULT 0,
+  `modified_by` int(11) DEFAULT NULL,
+  `modified` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  CONSTRAINT fk_instance_share_detail_instance_share_rule FOREIGN KEY (instance_share_id) REFERENCES instance_share_tbl(id)
 );
