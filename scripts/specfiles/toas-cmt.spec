@@ -1,6 +1,6 @@
 %define name	toas_cmt
 %define version 1.1.0
-%define release 18
+%define release 20
 
 Name:		%{name}
 Version:	%{version}
@@ -13,7 +13,7 @@ Source0:	open-infinity-master.zip
 Source1:	toas_cmt-HEAD.tar.gz
 BuildArch:	noarch
 BuildRequires:	apache-maven
-Requires:	puppet-server, mysql-server, jakarta-commons-daemon-jsvc, java-1.6.0-openjdk, perl-DBI, perl-YAML, perl-DBD-MySQL
+Requires:	puppet-server, mysql-server, jakarta-commons-daemon-jsvc, java-1.6.0-openjdk, perl-DBI, perl-YAML, perl-DBD-MySQL, python, python-boto, MySQL-python
 Requires(pre):	shadow-utils
 
 %description
@@ -33,6 +33,8 @@ mkdir -p %{buildroot}/opt/toas/cloudmanagementtools/worker/logs
 mkdir -p %{buildroot}/opt/toas/cloudmanagementtools/portlet/
 mkdir -p %{buildroot}/opt/toas/cloudmanagementtools/scripts/sql/
 mkdir -p %{buildroot}/opt/toas/cloudmanagementtools/puppet/modules/oihealthmonitoring/files/empty
+mkdir -p %{buildroot}/opt/toas/cloudmanagementtools/tools/bin/
+mkdir -p %{buildroot}/opt/toas/cloudmanagementtools/tools/lib/
 cp cloud/cloud-worker/target/cloud-worker-2.0.0.jar %{buildroot}/opt/toas/cloudmanagementtools/worker/
 cp cloud/cloud-administrator/target/cloud-administrator-1.0.0.war %{buildroot}/opt/toas/cloudmanagementtools/portlet/
 cp -r cloud/cloud-worker/puppet %{buildroot}/opt/toas/cloudmanagementtools/
@@ -40,6 +42,13 @@ cp cloud/cloud-worker/scripts/startworker.sh %{buildroot}/opt/toas/cloudmanageme
 cp cloud/cloud-worker/scripts/stopworker.sh %{buildroot}/opt/toas/cloudmanagementtools/worker/
 cp scripts/sql/openinfinity-tables.sql %{buildroot}/opt/toas/cloudmanagementtools/scripts/sql/
 cp scripts/sql/initial_content.sql %{buildroot}/opt/toas/cloudmanagementtools/scripts/sql/
+cp scripts/command_line_tools/toascommon.py %{buildroot}/opt/toas/cloudmanagementtools/tools/lib/
+cp scripts/command_line_tools/toasconfig.py %{buildroot}/opt/toas/cloudmanagementtools/tools/lib/
+cp scripts/command_line_tools/toasdomain.py %{buildroot}/opt/toas/cloudmanagementtools/tools/lib/
+cp scripts/command_line_tools/toas-check-instances %{buildroot}/opt/toas/cloudmanagementtools/tools/bin/
+cp scripts/command_line_tools/toas-fix-loadbalancer %{buildroot}/opt/toas/cloudmanagementtools/tools/bin/
+cp scripts/command_line_tools/toas-get-instance-info %{buildroot}/opt/toas/cloudmanagementtools/tools/bin/
+cp scripts/command_line_tools/toas-instace-authorize %{buildroot}/opt/toas/cloudmanagementtools/tools/bin/
 
 %clean
 rm -rf %{buildroot}
@@ -59,6 +68,13 @@ exit 0
 %attr(-,toas,toas)/opt/toas/cloudmanagementtools/scripts/sql/openinfinity-tables.sql
 %attr(-,toas,toas)/opt/toas/cloudmanagementtools/scripts/sql/initial_content.sql
 %dir /opt/toas/cloudmanagementtools/worker/logs
+%attr(-,toas,toas)/opt/toas/cloudmanagementtools/tools/lib/toascommon.py
+%attr(-,toas,toas)/opt/toas/cloudmanagementtools/tools/lib/toasconfig.py
+%attr(-,toas,toas)/opt/toas/cloudmanagementtools/tools/lib/toasdomain.py
+%attr(0755,toas,toas)/opt/toas/cloudmanagementtools/tools/bin/toas-check-instances
+%attr(0755,toas,toas)/opt/toas/cloudmanagementtools/tools/bin/toas-fix-loadbalancer
+%attr(0755,toas,toas)/opt/toas/cloudmanagementtools/tools/bin/toas-get-instance-info
+%attr(0755,toas,toas)/opt/toas/cloudmanagementtools/tools/bin/toas-instace-authorize
 
 %attr(-,toas,toas)/opt/toas/cloudmanagementtools/puppet/modules/oi-identity-gateway/templates/amadmin.pwd.template
 %attr(-,toas,toas)/opt/toas/cloudmanagementtools/puppet/modules/oi-identity-gateway/templates/idp1-x.xml.ssoidentityprovider.template
