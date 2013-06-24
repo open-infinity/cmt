@@ -1,0 +1,53 @@
+#!/usr/bin/python
+
+import sys
+sys.path.append("/opt/toas/cloudmanagementtools/tools/lib")
+from toascommon import *
+
+def usage():
+        print "Usage: %s <instanceId> <clusterid/all> <cidr> <protocol> <start-port> <end-port>" % (sys.argv[0])
+
+def main():
+	try:
+		if(len(sys.argv) < 7):
+                        usage()
+                        sys.exit(0)
+                else:
+			instance = getInstance(sys.argv[1])
+                        if(instance == None):
+                                print "Instance "+sys.argv[1]+" not found"
+                                sys.exit()
+			clusters = getInstanceClusters(instance.id)
+			cidr = sys.argv[3]
+			protocol = sys.argv[4]
+			fromPort = int(sys.argv[5])
+			toPort = int(sys.argv[6])
+			cluster = 0
+			if(sys.argv[2] != "all"):
+				cluster = int(sys.argv[2])
+			print "%s %s %d %d" % (cidr, protocol, fromPort, toPort)
+			for c in clusters:
+				if(cluster == 0 or cluster == c.id):
+					print "Making authorization to instance %d cluster %d" % (instance.id, c.id)
+					if(insertAuthorizedIP(instance.id, c.id, cidr, protocol, c.groupName, fromPort, toPort)):
+						print "--- Information added to database"
+					else:
+						print "Error inserting information to database"
+						sys.exit(1)
+					if(authorizeIP(c.groupName, protocol, fromPort, toPort, cidr)):
+						print "--- Authorization made to cloud"
+					else:
+						print "Error authorizing IP to cloud"
+						sys.exit(1)
+	
+	except mdb.Error, e:
+		print "Error %d: %s" % (e.args[0], e.args[1])
+		sys.exit(1)
+
+	finally:
+		if con:
+			con.close()
+
+
+if __name__ == '__main__':
+	main()

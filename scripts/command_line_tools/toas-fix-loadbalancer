@@ -1,0 +1,92 @@
+#!/usr//bin/python
+
+import sys
+import time
+sys.path.append("/opt/toas/cloudmanagementtools/tools/lib")
+from toasdomain import *
+from toascommon import *
+
+def checkParameters():
+	if(len(sys.argv) < 2):
+		print "Usage: "+sys.argv[0]+" <clusterId>"
+		sys.exit(0)
+
+def checkIsLbNeeded(cluster):
+	if (cluster.type in [0, 1, 5, 8]):
+		return True
+	else:
+		return False
+
+def createNewLb(cluster):
+	key = getInstanceKey(cluster.instanceId)
+	if(key == None):
+		return None
+	print "Creating new machine instance for the loadbalancer"	
+	instance = runInstance(key.name, eucaInstanceStoreImage, cluster.groupName, "m1.small")
+	if(instance == None):
+		return None
+	wait = eucaMaxWait
+	print "Waiting for the instance to startup..."
+	while(instance.state != 'running' and wait > 0):
+		time.sleep(3)
+		instance = getEucaInstance(instance.id)
+		wait -= 1
+	if(wait <= 0):
+		print "Instance failed to start in time, aborting"
+		print "Please check that instance %s is terminated, or terminate it if necessary" % (instance.id)
+
+	print "Instance %s status %s" % (instance.id, instance.state)
+	print "Inserting new loadbalancer machine to database to be configured by worker"
+	if(insertMachine(instance.id, cluster.name, instance.public_dns_name, "root", instance.state, cluster.id, instance.private_dns_name, "loadbalancer", 0, 1, "null", "null", 0)):
+		print "Machine added to database"
+	else:
+		print "Problems adding machine to database"
+		sys.exit(-1)
+	
+	if(updateClusterLbInfo(cluster.id, instance.public_dns_name, instance.id)):
+		print "Cluster loadbalancer info updated"
+	else:
+		print "Failed to update cluster loadbalancer info. Please check cluster status"
+		sys.exit(-1)
+		
+
+def main():
+	checkParameters()
+	clusterId = sys.argv[1]
+	try:
+		cluster = getCluster(clusterId);
+		if(cluster == None):
+			print "Cluster not found"
+			sys.exit(0)
+		if(checkIsLbNeeded(cluster) == False):
+			print "There should not be loadbalancer in this cluster"
+			sys.exit(0)	
+		lb = getLoadbalancer(clusterId)
+		if(lb != None):
+			retVal = checkLoadBalancer(lb)
+			if(retVal == "OK"):
+				print "LB should be OK allready, nothing to do"
+				sys.exit(0)
+			else:
+				print "Deleting old loadbalancer infromation from database"
+				print "Deleting machine number "+str(lb.id)
+				num = deleteMachineFromDatabase(lb.id)
+				if(num < 1):
+					print "Deleting not successful"
+				else:
+					print "Machine deleted from database"
+
+		createNewLb(cluster)
+
+		
+	except mdb.Error, e:
+		print "Error %d: %s" % (e.args[0], e.args[1])
+		sys.exit(1)
+
+	finally:
+		if con:
+			con.close()
+
+
+if __name__ == '__main__':
+	main()

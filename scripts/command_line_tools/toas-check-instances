@@ -1,0 +1,122 @@
+#!/usr/bin/python
+
+import sys
+from optparse import OptionParser
+sys.path.append("/opt/toas/cloudmanagementtools/tools/lib")
+from toascommon import *
+
+
+def checkCluster(cluster, machines, verbose):
+	clusterOk = True
+	actualMachinesFound = 0
+	message = ""
+	result = None
+	result = ClusterCheck()
+	result.cluster = cluster
+	result.errorMessages = []
+
+	for m in machines:
+		if(m.type != 'loadbalancer'):
+			i = getEucaInstance(m.instanceId)
+			if(i != None):
+				if(verbose):
+					print "Found machine %s from the cloud. Machine state is %s. Machine public address is %s and internal address is %s" % (i.id, i.state, i.public_dns_name, i.private_dns_name)
+				if(i.state == 'running'):
+					actualMachinesFound += 1
+				else:
+					clusterOk = False
+					result.errorMessages.append("Machine "+ str(m.id) +" ("+m.instanceId+") state: "+i.state)
+			else:
+				clusterOk = False
+				result.errorMessages.append("Machine "+str(m.id)+" ("+m.instanceId+") not found from cloud");
+	if(cluster.type in [3, 6]):
+		# nosql and bigdata clusters have 1 setup node
+		if(actualMachinesFound > 0):
+			actualMachinesFound -= 1
+
+	if(actualMachinesFound != cluster.machines):
+		clusterOk = False
+		result.errorMessages.append("Service cluster machine count does not match. Machines in DB: "+str(cluster.machines)+" Machines in cloud: "+str(actualMachinesFound))
+	
+	if (cluster.type in [0, 1, 5, 8]):
+		# Check for loadbalancer
+		if(verbose):
+			print "Checking loadbalancer for cluster %d" % (cluster.id)
+		lbFound = False
+		for m in machines:
+			if(m.type == 'loadbalancer'):
+				lbFound = True
+				lbstatus = checkLoadBalancer(m)
+				if(lbstatus != "OK"):
+					clusterOk = False
+					result.errorMessages.append(lbstatus)
+				else:
+					if(verbose):
+						print "Loadbalancer OK"
+		if(lbFound == False):
+			clusterOk = False
+			result.errorMessages.append("Load balancer not found from database");
+
+	if(clusterOk):
+		result.clusterStatus = 1
+
+	return result	
+
+def main():	
+
+	parser = OptionParser()
+	parser.add_option("-v","--verbose", action="store_true", dest="verbose", help="Verbose mode")
+	(options, args) = parser.parse_args()
+	verbose = False
+	if(options.verbose):
+		verbose = True
+	try:
+		instances = []
+		if(len(args) > 0):
+			for n in args:
+				n = int(n)
+				instance = getInstance(n)
+				if(instance == None):
+					print "Instance %d not found" % (n)
+					sys.exit(0)
+				else:
+					instances.append(instance)
+		else: 
+			instances = getInstances(con)
+		for i in instances:
+			if(verbose):
+				print "----------------"
+				print "TOAS Instance %d (%s)" % (i.id,i.name)
+			clusters = getInstanceClusters(i.id)
+			if(verbose):
+				print "Instance has "+str(len(clusters))+" service clusters"
+			instanceOK = True
+			for c in clusters:
+				if(verbose):
+					print "Checking cluster %d (%s)" % (c.id,c.name)
+				machines = getClusterMachines(con, c.id)
+				status = checkCluster(c, machines, verbose)
+				if(status.clusterStatus > 0):
+					if(verbose):
+						print "Service cluster %d (%s) is OK (%d machines)" % (c.id,c.name,c.machines)
+				else:
+					instanceOK = False
+					print "TOAS instance %d service cluster %d (%s) has errors:" % (i.id, c.id, c.name)
+					for error in status.errorMessages:
+						print error
+				machines = None
+				status = None
+			if(instanceOK):
+				print "TOAS instance %d (%s) is OK" % (i.id, i.name)
+
+	except mdb.Error, e:
+		print "Error %d: %s" % (e.args[0], e.args[1])
+		sys.exit(1)
+
+	finally:
+		if con:
+			con.close()
+
+
+if __name__ == '__main__':
+	main()
