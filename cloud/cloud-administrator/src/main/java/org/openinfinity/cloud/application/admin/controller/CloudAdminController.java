@@ -375,14 +375,14 @@ public class CloudAdminController {
 				instance.setOrganizationid(orgIds[0]);
 			
 			instance.setCloudType(Integer.parseInt(pm.get("cloudtype")));
-			instance.setStatus("Starting");
+			instance.setStatus("Pending");
 
             instanceService.addInstance(instance);
 
 			Job job = new Job(	"create_instance", 
 								instance.getInstanceId(), 
 								instance.getCloudType(), 
-								JobService.CLOUD_JOB_CREATED, 
+								JobService.CLOUD_JOB_PENDING, 
 								pm.get("zone"));
 			
 			// Parse the parameters and configure the job 
