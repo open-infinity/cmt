@@ -53,7 +53,7 @@ label {
 </style>
 </head>
 <body>
-	<form:form modelAttribute="sharedPropertyModel" action="${action}" method="post" enctype="multipart/form-data">
+	<form:form modelAttribute="sharedPropertyModel" action="${action}" method="post">
 		<input id="instanceId" name="instanceId" type="hidden" />
 		<input id="organizationId" name="organizationId" type="hidden" />
 		<input id="clusterId" name="clusterId" type="hidden" />
@@ -85,7 +85,7 @@ label {
 			<form:input path="value" />
 		</p>
 		<p id="submitButton">
-			<input name="Store" type="submit"/>
+			<input name="Submit" type="submit"/>
 		</p>		
 	</form:form>
 
