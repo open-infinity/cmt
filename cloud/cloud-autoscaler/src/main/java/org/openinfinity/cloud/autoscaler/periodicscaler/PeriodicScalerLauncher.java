@@ -47,6 +47,6 @@ public class PeriodicScalerLauncher {
 		
 	@Log
 	public void launch() throws Exception {
-		JobExecution exec = jobLauncher.run(job, new JobParametersBuilder().addLong("p_time", System.currentTimeMillis()).toJobParameters());
+		jobLauncher.run(job, new JobParametersBuilder().addLong("p_time", System.currentTimeMillis()).toJobParameters());
 	}
 }

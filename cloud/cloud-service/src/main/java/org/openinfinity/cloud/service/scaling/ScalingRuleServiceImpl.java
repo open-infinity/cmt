@@ -99,8 +99,8 @@ public class ScalingRuleServiceImpl implements ScalingRuleService {
 		
         boolean allMachinesConfigured = false;
         
-        if (scalingJobActive)
-            allMachinesConfigured = machineService.allMachinesInClusterConfigured(clusterId);
+        if (!scalingJobActive)
+            allMachinesConfigured = machineService.allMachinesConfigured(clusterId);
 
         LOG.debug("scalingJobReady=" +  scalingJobActive + " allMachinesConfigured=" + allMachinesConfigured);
 

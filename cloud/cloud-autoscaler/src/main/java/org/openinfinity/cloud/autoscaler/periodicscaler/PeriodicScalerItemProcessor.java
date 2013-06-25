@@ -62,10 +62,8 @@ public class PeriodicScalerItemProcessor implements ItemProcessor<Machine, Job> 
 	
 	private static final String METRIC_TYPE_LOAD = "load";
 	
-	private static final String METRIC_NAME_LOAD_MIDTERM = "midterm";
-		
-	//private final int DELAY = 12000;
-
+	private static final String METRIC_PERIOD = "shortterm";
+			
 	@Autowired
 	MachineService machineService;
 	
@@ -129,20 +127,18 @@ public class PeriodicScalerItemProcessor implements ItemProcessor<Machine, Job> 
     }
 	
 	private float getClusterLoad(Machine machine) throws IOException, IndexOutOfBoundsException,  
-	    JsonParseException, JsonMappingException, SystemException {
-	    
-		//Date earlier = new Date((new Date()).getTime() - DELAY);
+	    JsonParseException, JsonMappingException, SystemException {  
 		String[] metricName = {METRIC_RRD_FILE_LOAD};
 		
 		HealthStatusResponse status = 
-		    healthMonitoringService.getClusterHealthStatusLast(machine, METRIC_TYPE_LOAD, metricName, new Date());	
-		
+		    healthMonitoringService.getClusterHealthStatusLast(machine, METRIC_TYPE_LOAD, metricName, new Date());		
 		List<SingleHealthStatus> metrics =  status.getMetrics();
+		
         if (metrics.size() > 0){
 	        Map<String, List<RrdValue>> values = metrics.get(0).getValues();
-	        List<RrdValue> midtermLoadRrd = values.get(METRIC_NAME_LOAD_MIDTERM);
-	        if (midtermLoadRrd != null){        
-    	        RrdValue midtermValue =  midtermLoadRrd.get(0);
+	        List<RrdValue> loadRrd = values.get(METRIC_PERIOD);
+	        if (loadRrd != null){        
+    	        RrdValue midtermValue =  loadRrd.get(0);
     	        return midtermValue.getValue().floatValue();
 	        }
         }
