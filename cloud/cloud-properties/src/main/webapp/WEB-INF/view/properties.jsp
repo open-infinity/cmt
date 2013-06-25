@@ -219,61 +219,10 @@ label {
 				ondblClickRow: function(id){ alert("You double click row with id: "+id);},				
 			   	caption: "Existing properties"
 			});
-		}
-
-	loadTable();
-// 			$("#propertyTable").jqGrid('navGrid','#propertyPager',{edit:false,add:false,del:false});
-// 			jQuery("#undeploy_property").button().click( function(){ 
-// 				var id = jQuery("#propertyTable").jqGrid('getGridParam','selrow'); 
-// 				if (id) { 
-//  				  	var ret = jQuery("#propertyTable").jqGrid('getRowData',id); 
-//  				  	var name = ret.name;				  	
-// 					var url = '<portlet:resourceURL id="undeployproperty"/>&propertyName='+name+"&propertyId="+id;
-// 					   $.getJSON(url, function(data) {
-// 						alert("property undeployed. Id: <"+id+">, Name: <"+ret.name+">");  
-// 					   });				
-// 				} else { 
-// 					alert("Please select row");
-// 				} 
-// 			}); 
-// 			$("#propertyTable").jqGrid('navGrid','#propertyPager',{edit:false,add:false,del:false});
-// 			jQuery("#redeploy_property").button().click( function(){ 
-// 				var id = jQuery("#propertyTable").jqGrid('getGridParam','selrow'); 
-// 				if (id) { 
-// 					var ret = jQuery("#propertyTable").jqGrid('getRowData',id); 
-// 					if(ret.state==1) {
-// 						alert("property <"+ret.name+"> with id <"+id+"> already deployed.");						
-// 					} else if (ret.state==11) {
-// 						var url = '<portlet:resourceURL id="redeployproperty"/>&propertyId='+id;
-// 						   $.getJSON(url, function(data) {
-// 							alert("property redeployed. Id: <"+id+">, Name: <"+ret.name+">");  
-// 						   });				
-// 					} else {
-// 						alert("Please select undeployed property.");						
-// 					}					
-// 				} else { 
-// 					alert("Please select row");
-// 				} 
-// 			}); 			
-// 			jQuery("#delete_property").button().click( function(){ 
-// 				var id = jQuery("#propertyTable").jqGrid('getGridParam','selrow'); 
-// 				if (id) { 
-// 					var ret = jQuery("#propertyTable").jqGrid('getRowData',id); 
-// 					if(ret.state==11) {
-// 						var url = '<portlet:resourceURL id="deleteproperty"/>&propertyId='+id;
-// 						   $.getJSON(url, function(data) {
-// 							alert("property deleted. Id: <"+id+">, Name: <"+ret.name+">"); 
-// 						   });				
-// 					} else {
-// 						alert("Please undeploy first.");						
-// 					}
-// 				} else { 
-// 					alert("Please select row!");
-// 				} 
-// 			}); 
-			
-	
 		
+			$("#propertyTable").jqGrid('navGrid','#propertyPager',{edit:false,add:false,del:false});
+		}
+		loadTable();	
 	});
 	
 	function switchState(toState){

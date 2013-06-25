@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.portlet.ActionRequest;
+import javax.portlet.PortletRequest;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 import javax.portlet.ResourceRequest;
@@ -53,6 +54,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.portlet.bind.annotation.ActionMapping;
 import org.springframework.web.portlet.bind.annotation.ResourceMapping;
 
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.model.Organization;
 import com.liferay.portal.service.OrganizationLocalServiceUtil;
 
@@ -92,7 +95,7 @@ public class SharedPropertiesController {
 
 	
 	/**
-	 * Rollback of deployment URL path.
+	 * Load shared properties for table view.
 	 */
 	private static final String PATH_FOR_LOAD_PROPERTIES_TABLE = "loadPropertiesTable";
 
@@ -103,21 +106,25 @@ public class SharedPropertiesController {
 	 * @param renderResponse
 	 * @param model
 	 * @return
+	 * @throws Exception 
 	 * @throws Throwable
 	 */
 	@RequestMapping(PATH_FOR_VIEW)
-	public String showView(RenderRequest renderRequest, RenderResponse renderResponse, ModelMap model) {
+	public String showView(RenderRequest renderRequest, RenderResponse renderResponse, ModelMap model) throws Exception {
 		@SuppressWarnings("unchecked")
 		Map<String, Object> userInfo = (Map<String, Object>) renderRequest.getAttribute(ActionRequest.USER_INFO);
 		if (userInfo == null) return "home";
-		int userId = Integer.valueOf(userInfo.get("liferay.user.id").toString());
+		Long userId = Long.valueOf(userInfo.get("liferay.user.id").toString());
 		Map<Long, String> organizationMap = loadOrganizationsAndSortByHierarchy(userId);
 		model.addAttribute("sharedPropertyModel", new SharedProperty());
 		model.addAttribute("organizationMap", organizationMap);
+		Collection<Long> organizationIds = loadOrganizationIds(renderRequest);
+		Collection<SharedProperty> sharedProperties = centralizedPropertiesService.loadSharedPropertiesByOrganizationIds(organizationIds);
+		model.addAttribute("properties", sharedProperties);
 		return "properties";
 	}
 	
-	private Map<Long, String> loadOrganizationsAndSortByHierarchy(int userId) {
+	private Map<Long, String> loadOrganizationsAndSortByHierarchy(Long userId) {
 		Map<Long, String> organizationMap = new HashMap<Long, String>(); 
 		try {
 			List<Organization> organizations = OrganizationLocalServiceUtil.getUserOrganizations(userId);
@@ -172,9 +179,9 @@ public class SharedPropertiesController {
 	
 	
 	/**
-	 * Deploys new application to backbone server.
+	 * Stores new shared property to backbone server.
 	 * 
-	 * @param sharedProperty  Represents the MVC model including deployment information.
+	 * @param sharedProperty  Represents the MVC model including shared property information.
 	 * @throws Throwable Thrown when system level exception arises.
 	 */
 	@Log
@@ -183,30 +190,12 @@ public class SharedPropertiesController {
     public void store(@ModelAttribute("sharedPropertyModel") SharedProperty sharedProperty) throws Throwable {
 		centralizedPropertiesService.store(sharedProperty);
 	}
-	
-	/**
-	 * Loads deployment data
-	 * 
-	 * TODO: If we redesign so that we clear away deployment rows from non-existing clusters, a simple SQL can be used to fetch only
-	 * deployments from existing clusters.
-	 * 
-	 * @param deploymentModel Represents the MVC model including deployment information.
-	 * @throws Throwable Thrown when system level exception arises.
-	 */
+
 	@Log
 	@AuditTrail
 	@ResourceMapping(PATH_FOR_LOAD_PROPERTIES_TABLE)
-	public void loadDeploymentTable(ResourceRequest request, ResourceResponse response,@RequestParam("page") int page, @RequestParam("rows") int rows) throws Exception {
-		Map<String, Object> userInfo = (Map<String, Object>) request.getAttribute(ActionRequest.USER_INFO);
-		if (userInfo == null) {
-			ExceptionUtil.throwApplicationException("User not authenticated");
-		}
-		Long userId = (Long)userInfo.get("liferay.user.id");
-		List<Organization> organizations = OrganizationLocalServiceUtil.getUserOrganizations(userId);
-		Collection<Long> organizationIds = new ArrayList<Long>();
-		for (Organization organization : organizations) {
-			organizationIds.add(organization.getOrganizationId());
-		}
+	public void loadPropertiesTable(ResourceRequest request, ResourceResponse response,@RequestParam("page") int page, @RequestParam("rows") int rows) throws Exception {
+		Collection<Long> organizationIds = loadOrganizationIds(request);
 		Collection<SharedProperty> sharedProperties = centralizedPropertiesService.loadSharedPropertiesByOrganizationIds(organizationIds);
 		List<SharedPropertyTableData> sharedPropertiesDataList = new ArrayList<SharedPropertyTableData>(); 
 		for (SharedProperty sharedProperty : sharedProperties) {
@@ -224,6 +213,20 @@ public class SharedPropertiesController {
 
 		JsonDataWrapper jdw = new JsonDataWrapper(page, totalPages, records, onePage);
 		SerializerUtil.jsonSerialize(response.getWriter(), jdw); 
+	}
+
+	private Collection<Long> loadOrganizationIds(PortletRequest request) throws Exception {
+		Map<String, Object> userInfo = (Map<String, Object>) request.getAttribute(ActionRequest.USER_INFO);
+		if (userInfo == null) {
+			ExceptionUtil.throwApplicationException("User not authenticated");
+		}
+		Long userId = Long.valueOf(userInfo.get("liferay.user.id").toString());
+		List<Organization> organizations = OrganizationLocalServiceUtil.getUserOrganizations(userId);
+		Collection<Long> organizationIds = new ArrayList<Long>();
+		for (Organization organization : organizations) {
+			organizationIds.add(organization.getOrganizationId());
+		}
+		return organizationIds;
 	} 
 
 }
