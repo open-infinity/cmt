@@ -8,7 +8,7 @@ import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.junit.AfterClass;
 import org.junit.runner.RunWith;
-import org.openinfinity.cloud.application.properties.CtrPropController;
+import org.openinfinity.cloud.application.properties.controller.SharedPropertiesController;
 import org.openinfinity.cloud.domain.SharedProperty;
 import org.openinfinity.cloud.service.properties.CentralizedPropertiesService;
 import org.springframework.beans.factory.annotation.Autowired;

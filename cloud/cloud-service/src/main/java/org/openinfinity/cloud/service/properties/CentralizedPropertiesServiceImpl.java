@@ -15,7 +15,9 @@
  */
 package org.openinfinity.cloud.service.properties;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 
 import org.openinfinity.cloud.domain.SharedProperty;
 import org.openinfinity.cloud.domain.repository.properties.CentralizedPropertiesRepository;
@@ -81,9 +83,25 @@ public class CentralizedPropertiesServiceImpl implements CentralizedPropertiesSe
 		return false;
 	}
 
-	@Override
+	@Log
+	@AuditTrail
 	public Collection<SharedProperty> loadKnownSharedPropertyDeployments() {
 		return repository.loadKnownSharedPropertyDeployments();
+	}
+
+	@Log
+	@AuditTrail
+	public Collection<SharedProperty> loadSharedPropertiesByOrganizationIds(Collection<Long> organizationIds) {
+		Collection<SharedProperty> sharedPropertiesByOrganization = new ArrayList<SharedProperty>();
+		Collection<SharedProperty> allSharedProperties = repository.loadAll();
+		for (SharedProperty sharedProperty : allSharedProperties) {
+			for (Long organizationId : organizationIds) {
+				if (sharedProperty.getOrganizationId() == organizationId) {
+					sharedPropertiesByOrganization.add(sharedProperty);
+				}
+			}
+		}
+		return Collections.unmodifiableCollection(sharedPropertiesByOrganization);
 	}
 	
 }

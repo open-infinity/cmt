@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 the original author or authors.
+ * Copyright (c) 2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ import lombok.ToString;
  * Represents a key-value pair, also known as a shared property, in cloud_properties_tbl table.
  * 
  * @author Timo Saarinen
+ * @author Ilkka Leinonen
  */
 @Data
 @NoArgsConstructor
@@ -37,13 +38,13 @@ import lombok.ToString;
 @RequiredArgsConstructor
 @ToString
 @EqualsAndHashCode
-public final class SharedProperty {
+public class SharedProperty {
 	
 	@NonNull
 	private int availabilityZone;
 	
 	@NonNull 
-	private int organizationId;
+	private long organizationId;
 	
 	@NonNull
 	private int instanceId;
@@ -51,41 +52,12 @@ public final class SharedProperty {
 	@NonNull
 	private int clusterId;
 	
+	private int id;
+	
 	private String key;
 	
 	private String value;
 	
 	private Date timestamp;
-	
-//	public SharedProperty(int organizationId, int key, int value) {
-//		this.organizationId = organizationId;
-//		this.key = key;
-//		this.value = value;
-//	}
 
-/* POIS VAAN ROHKEASTI	
-	public boolean equals(Object o) {
-		SharedProperty p = (SharedProperty) o;
-		if (o != null) {
-			return eq(organizationId, p.organizationId)
-					&& eq(instanceId, p.instanceId)
-					&& eq(clusterId, p.clusterId)
-					&& eq(key, p.key)
-					&& eq(value, p.value);
-		}
-		return false;
-	}
-	
-	private static boolean eq(String a, String b) {
-		if (a == null && b == null) {
-			return true;
-		} else if (a == null && b != null) {
-			return false;
-		} else if (a != null && b == null) {
-			return false;
-		} else {
-			return a.equals(b);
-		}
-	}
-*/	
 }

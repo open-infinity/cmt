@@ -19,9 +19,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 
 import javax.sql.DataSource;
+
+import lombok.NonNull;
 
 import org.apache.log4j.Logger;
 import org.openinfinity.cloud.domain.SharedProperty;

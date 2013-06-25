@@ -16,7 +16,6 @@
 package org.openinfinity.cloud.service.properties;
 
 import java.util.Collection;
-import java.util.List;
 
 import org.openinfinity.cloud.domain.SharedProperty;
 
@@ -24,6 +23,7 @@ import org.openinfinity.cloud.domain.SharedProperty;
  * Service interface of Centralized Properties portlet.
  * 
  * @author Timo Saarinen
+ * @author Ilkka Leinonen
  */
 public interface CentralizedPropertiesService {
 
@@ -60,4 +60,9 @@ public interface CentralizedPropertiesService {
 	 * @return true if found, false if not 
 	 */
 	public boolean rename(SharedProperty prop, String newkey);
+	
+	/**
+	 * Loads shared properties by organization id.
+	 */
+	public Collection<SharedProperty> loadSharedPropertiesByOrganizationIds(Collection<Long> organizationIds);
 }
