@@ -16,8 +16,6 @@
 
 package org.openinfinity.cloud.domain.repository.administrator;
 
-import org.openinfinity.cloud.domain.CloudProvider;
-import org.openinfinity.cloud.domain.ClusterType;
 import org.openinfinity.cloud.domain.MachineType;
 import org.openinfinity.core.annotation.AuditTrail;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,9 +45,9 @@ class MachineTypeRepositoryJdbcImpl implements MachineTypeRepository{
 
 	private NamedParameterJdbcTemplate jdbcTemplate;
 
-	private static final String SELECT_ALL = "SELECT * FROM MACHINE_TYPE_TBL";
+	private static final String SELECT_ALL = "SELECT * FROM machine_type_tbl";
 	
-	private static final String SELECT_BY_ID = "SELECT * FROM MACHINE_TYPE_TBL WHERE ID = :id";
+	private static final String SELECT_BY_ID = "SELECT * FROM machine_type_tbl WHERE ID = :id";
 	
 	@Autowired
 	public MachineTypeRepositoryJdbcImpl(@Qualifier("cloudDataSource") DataSource ds) {

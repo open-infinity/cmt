@@ -309,7 +309,7 @@ public class EC2Worker implements Worker {
 						try {
 							usageService.stopVirtualMachineUsageMonitoring(instance.getOrganizationid(), c.getType(), c.getId(), machine.getId());
 						} catch (Exception e) {
-							LOG.error(threadName+": Error stopping usage monitoring "+e.getMessage());
+							LOG.error(threadName+": Error stopping usage monitoring ", e);
 						}
 					}
 					try {
@@ -320,7 +320,7 @@ public class EC2Worker implements Worker {
 							try {
 								usageService.stopVirtualMachineUsageMonitoring(instance.getOrganizationid(), c.getType(), c.getId(), m.getId());
 							} catch (Exception e) {
-								LOG.error(threadName+": Error stopping usage monitoring "+e.getMessage());
+								LOG.error(threadName+": Error stopping usage monitoring ", e);
 							}
 						}
 					} catch (Exception ex) {
@@ -452,7 +452,7 @@ public class EC2Worker implements Worker {
 			try {
 				usageService.stopVirtualMachineUsageMonitoring(oiInstance.getOrganizationid(), c.getType(), c.getId(), machine.getId());
 			}catch (Exception e) {
-				LOG.error(threadName+": Error stopping usage monitoring "+e.getMessage());
+				LOG.error(threadName+": Error stopping usage monitoring ", e);
 			}
 		}
 		try {
@@ -463,7 +463,7 @@ public class EC2Worker implements Worker {
 				try {
 					usageService.stopVirtualMachineUsageMonitoring(oiInstance.getOrganizationid(), c.getType(), c.getId(), m.getId());
 				} catch (Exception e) {
-					LOG.error(threadName+": Error stopping usage monitoring "+e.getMessage());
+					LOG.error(threadName+": Error stopping usage monitoring ", e);
 				}
 			}
 		} catch (Exception ex) {
@@ -584,7 +584,7 @@ public class EC2Worker implements Worker {
 					try {
 						usageService.stopVirtualMachineUsageMonitoring(oiInstance.getOrganizationid(), cluster.getType(), cluster.getId(), m.getId());
 					} catch (Exception e) {
-						LOG.error(threadName+": Error stopping usage monitoring "+e.getMessage());
+						LOG.error(threadName+": Error stopping usage monitoring ", e);
 					}
 					terminated++;
 		        }
@@ -676,7 +676,7 @@ public class EC2Worker implements Worker {
 					try {
 						usageService.startVirtualMachineUsageMonitoring(oiInstance.getOrganizationid(), cluster.getType(), cluster.getId(), machine.getId());
 					} catch (Exception e) {
-						LOG.error(threadName+": Error starting usage monitoring");
+						LOG.error(threadName+": Error starting usage monitoring", e);
 					}
 					
 				}
@@ -1444,7 +1444,7 @@ public class EC2Worker implements Worker {
 			try {
 				usageService.startVirtualMachineUsageMonitoring(instance.getOrganizationid(), cluster.getType(), cluster.getId(), machine.getId());
 			} catch (Exception e) {
-				LOG.error(threadName+": Error starting usage monitoring");
+				LOG.error(threadName+": Error starting usage monitoring", e);
 			}
 						
 			machinesToTag.add(tempInstance.getInstanceId());

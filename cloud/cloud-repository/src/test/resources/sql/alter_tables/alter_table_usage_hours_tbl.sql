@@ -6,5 +6,5 @@ ALTER TABLE usage_hours_tbl ADD `cluster_type_title` varchar(50) not null;
 ALTER TABLE usage_hours_tbl ADD `machine_type_id` tinyint(4) not null;
 ALTER TABLE usage_hours_tbl ADD `machine_type_name` varchar(255) not null;
 ALTER TABLE usage_hours_tbl ADD `machine_type_spec` varchar(255) not null;
-
-
+ALTER TABLE usage_hours_tbl ADD `cluster_ebs_image_used` int(11) default null;
+ALTER TABLE usage_hours_tbl ADD `cluster_ebs_volumes_used` int(11) default null;
