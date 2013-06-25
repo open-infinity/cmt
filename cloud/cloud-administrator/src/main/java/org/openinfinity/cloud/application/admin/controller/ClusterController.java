@@ -18,7 +18,6 @@ package org.openinfinity.cloud.application.admin.controller;
 
 import java.io.IOException;
 import java.sql.Timestamp;
-
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
@@ -306,8 +305,8 @@ public class ClusterController {
 		@RequestParam("cluster") int clusterId, 
 		@RequestParam("manualScaling") boolean manualScaling, 
 		@RequestParam("machineCount") int newSize,
-		@RequestParam("minSize") int minSize,
-                @RequestParam("maxSize") int maxSize,
+		@RequestParam("minSize") int minSize,		
+		@RequestParam("maxSize") int maxSize,
 		@RequestParam("downscaleThreshold") float minClusterLoad, 
 		@RequestParam("upscaleThreshold") float maxClusterLoad, 
 		@RequestParam("automaticScaling") boolean periodicScallingOn,
@@ -447,8 +446,8 @@ public class ClusterController {
 	}
 	
 	private int calculateNewClusterSize(int refSize, int minSize, int maxSize){
-	    int newSize = refSize < minSize ? minSize : refSize;
-        newSize = refSize > maxSize ? maxSize : refSize;
-        return newSize;
+	    if (refSize < minSize) return minSize;
+	    else if (refSize > maxSize) return maxSize;
+	    else return refSize;
 	}
 }
