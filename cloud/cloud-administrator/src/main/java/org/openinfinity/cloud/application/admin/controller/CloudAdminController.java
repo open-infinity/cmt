@@ -375,14 +375,18 @@ public class CloudAdminController {
 				instance.setOrganizationid(orgIds[0]);
 			
 			instance.setCloudType(Integer.parseInt(pm.get("cloudtype")));
-			instance.setStatus("Pending");
+			instance.setStatus("Starting");
+//			todo OPPTS-300
+//			instance.setStatus("Pending");
 
             instanceService.addInstance(instance);
 
 			Job job = new Job(	"create_instance", 
 								instance.getInstanceId(), 
 								instance.getCloudType(), 
-								JobService.CLOUD_JOB_PENDING, 
+								JobService.CLOUD_JOB_CREATED, 
+//								todo OPPTS-300
+//								JobService.CLOUD_JOB_PENDING, 
 								pm.get("zone"));
 			
 			// Parse the parameters and configure the job 
