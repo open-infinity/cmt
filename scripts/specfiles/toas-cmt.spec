@@ -30,6 +30,12 @@ cd ../../../../../cloud && /usr/share/apache-maven/bin/mvn -DskipTests clean lom
 %install
 mkdir -p %{buildroot}/opt/toas/cloudmanagementtools/worker/
 mkdir -p %{buildroot}/opt/toas/cloudmanagementtools/worker/logs
+
+#Cloud Deployer
+mkdir -p %{buildroot}/opt/toas/cloudmanagementtools/deployer/
+mkdir -p %{buildroot}/opt/toas/cloudmanagementtools/deployer/logs
+mkdir -p %{buildroot}/opt/toas/cloudmanagementtools/deployer/staging
+
 mkdir -p %{buildroot}/opt/toas/cloudmanagementtools/portlet/
 mkdir -p %{buildroot}/opt/toas/cloudmanagementtools/scripts/sql/
 mkdir -p %{buildroot}/opt/toas/cloudmanagementtools/puppet/modules/oihealthmonitoring/files/empty
@@ -40,6 +46,13 @@ cp cloud/cloud-administrator/target/cloud-administrator-1.0.0.war %{buildroot}/o
 cp -r cloud/cloud-worker/puppet %{buildroot}/opt/toas/cloudmanagementtools/
 cp cloud/cloud-worker/scripts/startworker.sh %{buildroot}/opt/toas/cloudmanagementtools/worker/
 cp cloud/cloud-worker/scripts/stopworker.sh %{buildroot}/opt/toas/cloudmanagementtools/worker/
+
+#Cloud Deployer
+cp cloud/cloud-deployer-batch/target/cloud-deployer-batch-1.0.0.jar %{buildroot}/opt/toas/cloudmanagementtools/deployer/
+cp cloud/cloud-deployer/target/cloud-deployer-1.0.0.war %{buildroot}/opt/toas/cloudmanagementtools/portlet/
+cp cloud/cloud-deployer-batch/scripts/startdeployer.sh %{buildroot}/opt/toas/cloudmanagementtools/deployer/
+cp cloud/cloud-deployer-batch/scripts/stopdeployer.sh %{buildroot}/opt/toas/cloudmanagementtools/deployer/
+
 cp scripts/sql/openinfinity-tables.sql %{buildroot}/opt/toas/cloudmanagementtools/scripts/sql/
 cp scripts/sql/initial_content.sql %{buildroot}/opt/toas/cloudmanagementtools/scripts/sql/
 cp scripts/command_line_tools/toascommon.py %{buildroot}/opt/toas/cloudmanagementtools/tools/lib/
@@ -49,6 +62,8 @@ cp scripts/command_line_tools/toas-check-instances %{buildroot}/opt/toas/cloudma
 cp scripts/command_line_tools/toas-fix-loadbalancer %{buildroot}/opt/toas/cloudmanagementtools/tools/bin/
 cp scripts/command_line_tools/toas-get-instance-info %{buildroot}/opt/toas/cloudmanagementtools/tools/bin/
 cp scripts/command_line_tools/toas-instace-authorize %{buildroot}/opt/toas/cloudmanagementtools/tools/bin/
+
+
 
 %clean
 rm -rf %{buildroot}
@@ -64,6 +79,15 @@ exit 0
 %attr(0755,toas,toas)/opt/toas/cloudmanagementtools/worker/startworker.sh
 %attr(-,toas,toas)/opt/toas/cloudmanagementtools/worker/cloud-worker-2.0.0.jar
 %attr(-,toas,toas)/opt/toas/cloudmanagementtools/portlet/cloud-administrator-1.0.0.war
+
+#Cloud Deployer
+%attr(0755,toas,toas)/opt/toas/cloudmanagementtools/deployer/stopdeployer.sh
+%attr(0755,toas,toas)/opt/toas/cloudmanagementtools/deployer/startdeployer.sh
+%attr(-,toas,toas)/opt/toas/cloudmanagementtools/deployer/cloud-deployer-batch-1.0.0.jar
+%attr(-,toas,toas)/opt/toas/cloudmanagementtools/portlet/cloud-deployer-1.0.0.war
+%dir /opt/toas/cloudmanagementtools/deployer/logs
+%dir /opt/toas/cloudmanagementtools/deployer/staging
+
 %attr(0755,toas,toas)/opt/toas/cloudmanagementtools/puppet/puppet_nodes.pl
 %attr(-,toas,toas)/opt/toas/cloudmanagementtools/scripts/sql/openinfinity-tables.sql
 %attr(-,toas,toas)/opt/toas/cloudmanagementtools/scripts/sql/initial_content.sql
