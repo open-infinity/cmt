@@ -29,14 +29,12 @@
         http://www.springframework.org/schema/task
         http://www.springframework.org/schema/task/spring-task-3.0.xsd">
 
-	<import resource="classpath*:/test-autoscaler-context.xml" />
+	<!-- >import resource="classpath*:/test-autoscaler-context.xml" />
 	    
-	<!-- task:scheduled-tasks scheduler="autoscaler2Scheduler">
-		    <task:scheduled ref="periodicScalerLauncher" method="launch" cron="*/1 * * * * MON-FRI"/>
+	<task:scheduled-tasks scheduler="autoscaler2Scheduler">
+		    <task:scheduled ref="periodicScalerLauncher" method="launch" cron="*/10 * * * * ?"/>
 	</task:scheduled-tasks>
 	<task:scheduler id="autoscaler2Scheduler" pool-size="1"/-->
-
-	<!--description>Autoscaler job definition.</description-->
 	
 
 </beans>

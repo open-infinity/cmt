@@ -33,7 +33,6 @@
            	
 	<task:scheduled-tasks scheduler="autoscalerScheduler">
 	    <task:scheduled ref="scheduledScalerLauncher" method="launch" cron="*/1 * * * * *"/>
-	    <!-- task:scheduled ref="scheduledScalerLauncher" method="launch" cron="0 0/2 * * * ?"/-->
 	</task:scheduled-tasks>
 	<task:scheduler id="autoscalerScheduler" pool-size="1"/>
 

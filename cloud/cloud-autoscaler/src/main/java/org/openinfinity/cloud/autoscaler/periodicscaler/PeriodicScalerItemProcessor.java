@@ -138,8 +138,7 @@ public class PeriodicScalerItemProcessor implements ItemProcessor<Machine, Job> 
 	        Map<String, List<RrdValue>> values = metrics.get(0).getValues();
 	        List<RrdValue> loadRrd = values.get(METRIC_PERIOD);
 	        if (loadRrd != null){        
-    	        RrdValue midtermValue =  loadRrd.get(0);
-    	        return midtermValue.getValue().floatValue();
+    	        return loadRrd.get(0).getValue().floatValue();
 	        }
         }
         LOG.info(MSG_HM_METRIC_NOT_AVAILABLE);

@@ -6,7 +6,6 @@ public class AutoscalerApplication {
 
 	public static void main( String[] args ){    	
     	new ClassPathXmlApplicationContext("/autoscaler-context.xml", AutoscalerApplication.class);
-    	
     }
     
 }

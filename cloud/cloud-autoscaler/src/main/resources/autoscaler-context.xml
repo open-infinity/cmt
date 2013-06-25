@@ -18,7 +18,8 @@
     <context:property-placeholder location="classpath:/system.properties,
                                             classpath:/infrastructure.properties,
                                             classpath:/EucaCredentials.properties,
-                                            classpath:/healthmonitoring.properties" />  
+                                            classpath:/healthmonitoring.properties,
+                                            classpath:autoscaler.properties" />  
         		    
 	<import resource="classpath*:/META-INF/spring/cloud-context-util.xml" />
 	<import resource="classpath*:/META-INF/spring/cloud-context-core.xml" />
@@ -95,10 +96,7 @@
 	</batch:job>
 	
 	<task:scheduled-tasks>  
-	    <task:scheduled ref="scheduledScalerLauncher" method="launch" cron="0 0/2 * * * ?"/>
-	    <!-- for testing task:scheduled ref="scheduledScalerLauncher" method="launch" cron="*/1 * * * * *"/-->
-	    <!-- task:scheduled ref="scheduledScalerLauncher" method="launch" cron="*/1 * * * * *"/-->
-	    
+	    <task:scheduled ref="scheduledScalerLauncher" method="launch" cron="0 0/2 * * * ?"/>    
 	    <task:scheduled ref="periodicScalerLauncher" method="launch" cron="*/10 * * * * ?"/>
 	</task:scheduled-tasks>
 		

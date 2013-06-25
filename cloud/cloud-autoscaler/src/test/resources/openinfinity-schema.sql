@@ -14,8 +14,11 @@ CREATE TABLE cluster_tbl (
   cluster_security_group_name varchar,
   cluster_multicast_address varchar,
   cluster_machine_type tinyint,
+  cluster_ebs_image_used int,
+  cluster_ebs_volumes_used int,
   PRIMARY KEY (cluster_id)
 );
+
 
 DROP TABLE IF EXISTS instance_tbl;
 CREATE TABLE instance_tbl (
@@ -28,6 +31,15 @@ CREATE TABLE instance_tbl (
   instance_status varchar,
   instance_active int,
   PRIMARY KEY (instance_id)
+) ;
+
+DROP TABLE IF EXISTS instance_parameter_tbl;
+CREATE TABLE instance_parameter_tbl (
+  id int IDENTITY ,
+  instance_id int,
+  pkey varchar,
+  pvalue int,
+  PRIMARY KEY (id)
 ) ;
 
 
@@ -77,8 +89,8 @@ CREATE TABLE scaling_rule_tbl (
   scaling_state int,
   max_machines int,
   min_machines int,
-  max_cpu_load int,
-  min_cpu_load int,
+  max_load float,
+  min_load float,
   period_from datetime,
   period_to datetime,
   size_new int,
