@@ -10,11 +10,13 @@ import org.openinfinity.cloud.domain.Job;
  * @author Ilkka Leinonen
  * @author Ossi Hämäläinen
  * @author Juha-Matti Sironen
+ * @author Ari Simanainen
  */
  public interface JobService {
 	
 	static final int CLOUD_JOB_CREATED = 1;
 	static final int CLOUD_JOB_STARTED = 2;
+	static final int CLOUD_JOB_PENDING = 5;
 	static final int CLOUD_JOB_READY = 10;
 	static final int CLOUD_JOB_ERROR = 15;
 	

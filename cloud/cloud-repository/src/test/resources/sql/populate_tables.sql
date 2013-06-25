@@ -126,3 +126,17 @@ INSERT INTO usage_hours_tbl (id,organization_id,cluster_id,platform_id,machine_i
 INSERT INTO usage_hours_tbl (id,organization_id,cluster_id,platform_id,machine_id,state,cur_timestamp,cluster_type_title,machine_type_id,machine_type_name,machine_type_spec) VALUES (70,10495,19,'10','36',3,{ts '2013-06-10 12:33:04.'},'',0,'','');
 INSERT INTO usage_hours_tbl (id,organization_id,cluster_id,platform_id,machine_id,state,cur_timestamp,cluster_type_title,machine_type_id,machine_type_name,machine_type_spec) VALUES (71,10495,20,'10','37',1,{ts '2013-06-11 13:01:12.'},'',0,'','');
 INSERT INTO usage_hours_tbl (id,organization_id,cluster_id,platform_id,machine_id,state,cur_timestamp,cluster_type_title,machine_type_id,machine_type_name,machine_type_spec) VALUES (72,10495,20,'10','38',1,{ts '2013-06-11 13:01:14.'},'',0,'','');
+
+-- Test data for invoicing
+INSERT INTO instance_tbl (instance_id,user_id,instance_name,cloud_type,cloud_zone,organization_id,instance_status,instance_active) VALUES (720,12345,'extranet portal test',1,'dev',10500,'Starting',1);
+
+insert into instance_share_tbl (id, instance_id, period_start, created_by, created, modified_by) 
+    values (153, 720, '2013-06-01 00:00:00', 12345, NOW(), 12345);
+    
+insert into instance_share_invoice_tbl (instance_share_id, period_start, period_end, total_usage, created_by, created, modified_by) 
+    values (153, '2013-06-01 00:00:00', '2013-06-30 23:59:59', 12, 12345, NOW(), 12345);
+    
+insert into instance_share_detail_tbl (instance_share_id, cost_pool, share_percent, description, order_number, created_by, created, modified_by) 
+    values (153, '5064578230', 75.00, 'portal server', '12345678', 12345, NOW(), 12345);
+insert into instance_share_detail_tbl (instance_share_id, cost_pool, share_percent, description, order_number, created_by, created, modified_by) 
+    values (153, '5067816549', 25.00, 'portal server', '20214921', 12345, NOW(), 12345);    
