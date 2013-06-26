@@ -33,7 +33,6 @@ import javax.portlet.ResourceResponse;
 import lombok.NonNull;
 
 import org.apache.log4j.Logger;
-import org.openinfinity.cloud.application.properties.CtrPropController;
 import org.openinfinity.cloud.application.properties.model.OrganizationTreeModel;
 import org.openinfinity.cloud.application.properties.model.SharedPropertyTableData;
 import org.openinfinity.cloud.domain.Cluster;
