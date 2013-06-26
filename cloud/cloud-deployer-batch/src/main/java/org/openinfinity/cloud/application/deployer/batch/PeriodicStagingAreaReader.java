@@ -54,14 +54,14 @@ public class PeriodicStagingAreaReader implements ItemReader<File> {
 		if (stagingAreaDirectory.isDirectory() && stagingAreaFiles.isEmpty()) {
 			FileUtil.findFilesRecursively(stagingAreaDirectory, stagingAreaFiles);
 			stagingAreaFiles = FileUtil.sortByLastModifiedTimestamp(stagingAreaFiles);
-			LOGGER.trace("Initializing staging area reader finished. [" + stagingAreaFiles.size() + "] deployments loaded.");			
+			LOGGER.debug("Initializing staging area reader finished. [" + stagingAreaFiles.size() + "] deployments loaded.");			
 		}
 		if (index < stagingAreaFiles.size()) {
-			LOGGER.trace("Processing deployment statuses, current index is [" + index + "].");
+			LOGGER.debug("Processing deployment statuses, current index is [" + index + "].");
 			File retValue = stagingAreaFiles.get(index++);
 			return retValue;
 		} else {
-			LOGGER.trace("Reader finished, all items handled. Index is [" + index + "]. Returning null");			
+			LOGGER.debug("Reader finished, all items handled. Index is [" + index + "]. Returning null");			
 			index = 0;
 			//stagingAreaFiles.clear(); // this should not be necessary but still is
 			stagingAreaFiles = new ArrayList<File>(); // this should not be necessary but still is

@@ -179,7 +179,7 @@ public class PeriodicCloudDeployerWriter implements ItemWriter<DeploymentStatus>
 			Machine machine = machineService.getMachine(deploymentStatus.getMachineId());
 			LOGGER.debug("Processing machine with id [" + machine.getId() + "] with instance id [" + machine.getInstanceId() + "].");
 			Cluster cluster = clusterService.getClusterByClusterId(deploymentStatus.getDeployment().getClusterId());
-			LOGGER.debug("Processing deploymentStatus with [" + deploymentStatus.getId() + "] and machineId ["+deploymentStatus.getMachineId()+"] with deployment id [" + deploymentStatus.getDeployment().getId() + "] for cluster <"+cluster.getId()+">.");
+			LOGGER.debug("Processing deploymentStatus with [" + deploymentStatus.getId() + "] and machineId ["+deploymentStatus.getMachineId()+"] with deployment id [" + deploymentStatus.getDeployment().getId() + "] for cluster <"+cluster.getId()+"> of clustertype: <"+cluster.getType()+">.");
 			
 			int type = cluster.getType();
 			// TODO - to get clusterTypeName ClusterType repository and service need to be updated
@@ -189,8 +189,8 @@ public class PeriodicCloudDeployerWriter implements ItemWriter<DeploymentStatus>
 			String deploymentDirectory = deploymentDirectoryMap.get(type+"-"+deploymentStatus.getDeployment().getType());
 			String unDeploymentDirectory = unDeploymentDirectoryMap.get(type+"-"+deploymentStatus.getDeployment().getType());
 
-			//LOGGER.debug("DeploymentDirectory: "+ deploymentDirectory);
-			//LOGGER.debug("UndeploymentDirectory: "+ unDeploymentDirectory);
+			LOGGER.debug("DeploymentDirectory: "+ deploymentDirectory);
+			LOGGER.debug("UndeploymentDirectory: "+ unDeploymentDirectory);
 			
 			
 //			Replace command configuration with predefined set of dynamic parameters provided to be used in commands:
@@ -213,12 +213,13 @@ public class PeriodicCloudDeployerWriter implements ItemWriter<DeploymentStatus>
 				
 				//Collection<String> commands = new ArrayList<String>();
 				// Application updeployment  is platform specific
+				//LOGGER.debug("UnDeploymentCommandsMap is:");
 				//listMap(unDeploymentCommandsMap);
 				
 				Collection<String> commands = getCommands(unDeploymentCommandsMap, deploymentStatus.getDeployment().getType(), cluster.getType()+"", replacePatterns);
 				
-				LOGGER.info("Executing undeployment remote commands in machine with id [" + machine.getId() + "] for deploymentStatus <"+deploymentStatus.getId()+">.");
-				//listCollection(commands);
+				LOGGER.info("Executing undeployment remote commands in machine with ip [" + machine.getDnsName() + "] for deploymentStatus <"+deploymentStatus.getId()+">.");
+				listCollection(commands);
 				
 				SSHGateway.executeRemoteCommands(
 						key.getSecret_key().getBytes(), 
@@ -243,6 +244,7 @@ public class PeriodicCloudDeployerWriter implements ItemWriter<DeploymentStatus>
 			// Pushing deployment
 			LOGGER.info("Pushing deployment to machine with id [" + machine.getId() + "] for deployment directory [" + deploymentDirectory + "] with artifact named [" + deploymentStatus.getDeployment().getName() + "]. to cluster type<"+type+">");	
 						
+			// TODO - error handling if deployment target directory cannot be accessed
 			// deploymentDirectory already platform specific
 			SSHGateway.pushToServer(
 					key.getSecret_key().getBytes(), 
@@ -256,13 +258,15 @@ public class PeriodicCloudDeployerWriter implements ItemWriter<DeploymentStatus>
 					deploymentDirectory+"/"+deploymentStatus.getDeployment().getName()+"."+deploymentStatus.getDeployment().getType());			
 			
 			// Executing PostPush commands
+			//LOGGER.debug("DeploymentCommandsMap is:");			
 			//listMap(deploymentCommandsMap);			
 			Collection<String> commands = getCommands(deploymentCommandsMap, deploymentStatus.getDeployment().getType(), cluster.getType()+"", replacePatterns);
 			
-			LOGGER.debug("Executing deployment remote commands in machine with id [" + machine.getId() + "] .");
+			LOGGER.debug("Executing deployment remote commands in machine with ip [" + machine.getDnsName() + "].");
 			
 			listCollection(commands);
 			
+			// TODO - handle response values
 			SSHGateway.executeRemoteCommands(
 					key.getSecret_key().getBytes(), 
 					null,
@@ -282,13 +286,15 @@ public class PeriodicCloudDeployerWriter implements ItemWriter<DeploymentStatus>
 		Collection<String> commands = new ArrayList<String>();
 		int index=1;
 		String key = clusterType+"-"+applicationType+"."+index;
+		//LOGGER.debug("Key is now :<"+key+">");
 		
-		while (deploymentCommandsMap.containsKey(key)) {
+		while (commandMap.containsKey(key)) {
 			index++;
 			String command = commandMap.get(key);
 			LOGGER.debug("Fetched command with key:<"+key+">. Command: <"+command+">.");
 			commands.add(formatCommandParameters(command, replacePatterns));
-			key = clusterType+"-"+applicationType+"."+index;			
+			key = clusterType+"-"+applicationType+"."+index;	
+			//LOGGER.debug("Key is now :<"+key+">");			
 		}
 		
 		return commands;

@@ -71,6 +71,7 @@ public class PeriodicCloudDeployerProcessor implements ItemProcessor<DeploymentS
 			// location contains deployment id specific name
 			String key = deploymentStatus.getDeployment().getLocation();
 			LOGGER.debug("Deployment status of [" + deploymentStatus.getId() + "] and machineId ["+deploymentStatus.getMachineId()+"] continued with reading deployment key (S3 key) ["+ deploymentStatus.getDeployment().getName() +"] and organization id (S3 bucket name) [" + deploymentStatus.getDeployment().getClusterId() + "].");
+			// TODO - setting deploymentstates to error if artifact not found. Deployment state need to be updated also
 			InputStream inputStream = deployerService.load(bucketName, key);
 			//deploymentStatus.getDeployment().setInputStream(inputStream);
 			deploymentStatus.setInputStream(inputStream);
