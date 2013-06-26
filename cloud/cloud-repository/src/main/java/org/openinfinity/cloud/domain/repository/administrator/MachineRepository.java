@@ -34,8 +34,9 @@ public interface MachineRepository {
 
 	void addMachine(Machine machine);
 	List<Machine> getMachinesInCluster(int clusterId);
+	List<Machine> getMachinesInClusterRunningAndReady(int clusterId);
 	List<Machine> getMachinesInClusterExceptType(int clusterId, String machineType);
-	List<Machine> getMachinesInClusterNotConfigured(int clusterId);
+	List<Machine> getMachinesInClusterNotConfigured(int clusterId);	
 	List<Machine> getMachinesNeedingConfigure();
 	List<Machine> getBigDataMachinesNeedingConfigure();
 	List<Machine> getMachinesNeedingUpdate(int cloudType);

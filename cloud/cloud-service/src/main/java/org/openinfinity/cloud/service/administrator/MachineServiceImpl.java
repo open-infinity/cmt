@@ -80,6 +80,12 @@ public class MachineServiceImpl implements MachineService {
 	public List<Machine> getMachinesInCluster(int clusterId) {
 		return machineRepository.getMachinesInCluster(clusterId);
 	}
+	
+
+	@Log
+	public List<Machine> getMachinesInClusterRunningAndReady(int clusterId) {
+		return machineRepository.getMachinesInClusterRunningAndReady(clusterId);
+	}	
 
 	@Log
 	public List<Machine> getMachinesInClusterExceptType(int clusterId, String machineType) {

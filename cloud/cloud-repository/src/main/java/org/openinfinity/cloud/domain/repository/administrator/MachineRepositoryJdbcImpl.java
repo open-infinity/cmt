@@ -99,6 +99,14 @@ public class MachineRepositoryJdbcImpl implements MachineRepository {
 	}
 	
 	@AuditTrail
+	public List<Machine> getMachinesInClusterRunningAndReady(int clusterId) {
+		List<Machine> machines = this.jdbcTemplate.query("select * from machine_tbl where machine_cluster_id = ? and machine_running > 0 and machine_configured=3", new Object[] {clusterId}, machineRowMapper);
+		return machines;
+	}
+	
+	
+	
+	@AuditTrail
     public List<Machine> getMachinesInClusterExceptType(int clusterId, String machineType) {
         List<Machine> machines = this.jdbcTemplate.query(GET_ALL_CLUSTER_MACHINES_EXCEPT_TYPE, 
                                                          new Object[] {clusterId, machineType},

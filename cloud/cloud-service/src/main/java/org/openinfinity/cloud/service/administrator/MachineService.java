@@ -52,6 +52,8 @@ public interface MachineService {
 	
 	Collection<Machine> getMachinesInCluster(int clusterId);
 	
+	Collection<Machine> getMachinesInClusterRunningAndReady(int clusterId);
+	
 	Collection<Machine> getMachinesInClusterExceptType(int clusterId, String machineType);
 	
     Collection<Machine> getMachinesInClusterNotConfigured(int clusterId);
