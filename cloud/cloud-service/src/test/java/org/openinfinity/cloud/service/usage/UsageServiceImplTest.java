@@ -104,7 +104,7 @@ public class UsageServiceImplTest {
 		endTime = new Date(System.currentTimeMillis() + 100);	// Current time,
 																// and add some
 																// buffer..
-		usageService.startVirtualMachineUsageMonitoring(10495, 10, 1107, 38);
+		usageService.startVirtualMachineUsageMonitoring(10495, 10, 1107, 48);
 
 		UsagePeriod usagePeriod2 = usageService.loadUsagePeriod(10495,
 				startTime, endTime);

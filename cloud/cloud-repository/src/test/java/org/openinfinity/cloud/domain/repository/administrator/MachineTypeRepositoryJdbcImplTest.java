@@ -44,7 +44,7 @@ public class MachineTypeRepositoryJdbcImplTest {
 	public void testMachineTypeRepositoryGetAll() {
 		Collection<MachineType> machineTypes = machineTypeRepository.getMachineTypes();
 		
-		assertEquals(5, machineTypes.size());
+		assertTrue(machineTypes.size() > 1);
 		
 		MachineType actual = machineTypes.iterator().next();
 		assertEquals("Small", actual.getName());

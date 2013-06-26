@@ -79,6 +79,12 @@ public class UsageHour {
 	private String machineTypeSpec;
 	
 	/*
+	 * Duplicated from machine_tbl.machine_type.
+	 */
+	@NotScript
+	private String machineMachineType;
+	
+	/*
 	 * Duplicated from cluster_tbl.cluster_ebs_image_used.
 	 */
 	private int clusterEbsImageUsed;

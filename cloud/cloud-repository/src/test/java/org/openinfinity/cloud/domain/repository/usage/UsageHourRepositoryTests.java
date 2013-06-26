@@ -64,6 +64,7 @@ public class UsageHourRepositoryTests {
 		expected.setMachineTypeId(1); // Sizes of the machines in the cluster (see machine_type_tbl)
 		expected.setMachineTypeName("Medium"); // (see machine_type_tbl)
 		expected.setMachineTypeSpec("Cores: 2, RAM: 2GB, Disk: 10GB"); // (see machine_type_tbl)
+		expected.setMachineMachineType("clustermember");
 		expected.setClusterEbsImageUsed(0); // No EBS image
 		expected.setClusterEbsVolumesUsed(50); // 50Gb EBS volume
 		expected.setVirtualMachineState(VirtualMachineState.STARTED);
@@ -82,6 +83,7 @@ public class UsageHourRepositoryTests {
 		assertEquals(expected.getMachineTypeId(), actual.getMachineTypeId());
 		assertEquals(expected.getMachineTypeName(), actual.getMachineTypeName());
 		assertEquals(expected.getMachineTypeSpec(), actual.getMachineTypeSpec());
+		assertEquals(expected.getMachineMachineType(), actual.getMachineMachineType());
 		assertEquals(expected.getClusterEbsImageUsed(), actual.getClusterEbsImageUsed());
 		assertEquals(expected.getClusterEbsVolumesUsed(), actual.getClusterEbsVolumesUsed());
 		assertEquals(expected.getVirtualMachineState().getValue(), actual.getVirtualMachineState().getValue());
@@ -101,6 +103,7 @@ public class UsageHourRepositoryTests {
 		expected.setMachineTypeId(1); // Sizes of the machines in the cluster (see machine_type_tbl)
 		expected.setMachineTypeName("Medium"); // (see machine_type_tbl)
 		expected.setMachineTypeSpec("Cores: 2, RAM: 2GB, Disk: 10GB"); // (see machine_type_tbl)
+		expected.setMachineMachineType("loadbalancer");
 		expected.setClusterEbsImageUsed(1); // EBS image
 		expected.setClusterEbsVolumesUsed(0); // No EBS volume
 		expected.setVirtualMachineState(VirtualMachineState.STARTED);
@@ -121,6 +124,7 @@ public class UsageHourRepositoryTests {
 		assertEquals(expected.getMachineTypeId(), actual.getMachineTypeId());
 		assertEquals(expected.getMachineTypeName(), actual.getMachineTypeName());
 		assertEquals(expected.getMachineTypeSpec(), actual.getMachineTypeSpec());
+		assertEquals(expected.getMachineMachineType(), actual.getMachineMachineType());
 		assertEquals(expected.getClusterEbsImageUsed(), actual.getClusterEbsImageUsed());
 		assertEquals(expected.getClusterEbsVolumesUsed(), actual.getClusterEbsVolumesUsed());
 		assertEquals(expected.getVirtualMachineState().getValue(), actual.getVirtualMachineState().getValue());
@@ -186,6 +190,7 @@ public class UsageHourRepositoryTests {
 		usageHour.setMachineTypeId(1); // Sizes of the machines in the cluster (see machine_type_tbl)
 		usageHour.setMachineTypeName("Medium"); // (see machine_type_tbl)
 		usageHour.setMachineTypeSpec("Cores: 2, RAM: 2GB, Disk: 10GB"); // (see machine_type_tbl)
+		usageHour.setMachineMachineType("clustermember");
 		usageHour.setClusterEbsImageUsed(0); // No EBS image
 		usageHour.setClusterEbsVolumesUsed(0); // No EBS volume
 		usageHour.setVirtualMachineState(virtualMachineState);

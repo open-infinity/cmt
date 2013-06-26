@@ -136,6 +136,9 @@ CREATE TABLE `machine_tbl` (
   `machine_configured` int(11) DEFAULT NULL,
   `machine_last_update` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `machine_cloud_type` int(11) DEFAULT NULL,
+  `machine_extra_ebs_volume_id` varchar(20) DEFAULT NULL,
+  `machine_extra_ebs_volume_device`	varchar(10) DEFAULT NULL,
+  `machine_extra_ebs_volume_size` int(11) DEFAULT NULL,
   PRIMARY KEY (`machine_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
@@ -243,6 +246,7 @@ CREATE TABLE `instance_parameter_tbl` (
 -- machine_type_id : duplicated from cluster_tbl.cluster_machine_type
 -- machine_type_name : duplicated from machine_type_tbl.name
 -- machine_type_spec : duplicated from machine_type_tbl.spec
+-- machine_machine_type : duplicated from machine_tbl.machine_type
 -- cluster_ebs_image_used : duplicated from cluster_tbl.cluster_ebs_image_used
 -- cluster_ebs_volumes_used : duplicated from cluster_tbl.cluster_ebs_volumes_used
 create table `usage_hours_tbl` (
@@ -255,6 +259,7 @@ create table `usage_hours_tbl` (
   `machine_type_id` tinyint(4) not null,
   `machine_type_name` varchar(255) not null,
   `machine_type_spec` varchar(255) not null,
+  `machine_machine_type` varchar(50) default null,
   `cluster_ebs_image_used` int(11) default null,
   `cluster_ebs_volumes_used` int(11) default null,
   `state` int(11) not null, 

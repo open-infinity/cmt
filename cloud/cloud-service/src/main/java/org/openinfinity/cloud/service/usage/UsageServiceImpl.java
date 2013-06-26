@@ -4,11 +4,13 @@ import java.util.Collection;
 import java.util.Date;
 
 import org.openinfinity.cloud.domain.Cluster;
+import org.openinfinity.cloud.domain.Machine;
 import org.openinfinity.cloud.domain.MachineType;
 import org.openinfinity.cloud.domain.UsageHour;
 import org.openinfinity.cloud.domain.UsageHour.VirtualMachineState;
 import org.openinfinity.cloud.domain.UsagePeriod;
 import org.openinfinity.cloud.domain.repository.administrator.ClusterRepository;
+import org.openinfinity.cloud.domain.repository.administrator.MachineRepository;
 import org.openinfinity.cloud.domain.repository.administrator.MachineTypeRepository;
 import org.openinfinity.cloud.domain.repository.usage.UsageHourRepository;
 import org.openinfinity.core.annotation.AuditTrail;
@@ -35,11 +37,15 @@ public class UsageServiceImpl implements UsageService {
 	@Autowired
 	private MachineTypeRepository machineTypeRepository;
 	
+	@Autowired
+	private MachineRepository machineRepository;
+	
 	@Log
 	@AuditTrail
 	public void startVirtualMachineUsageMonitoring(long organizationId, int platformId, int clusterId, int machineId) {
 		Cluster cluster = clusterRepository.getCluster(clusterId);
 		MachineType machineType = machineTypeRepository.getMachineTypeById(cluster.getMachineType());
+		Machine machine = machineRepository.getMachine(machineId);
 		
 		UsageHour usageHour = new UsageHour();
 		usageHour.setClusterId(clusterId);
@@ -53,6 +59,7 @@ public class UsageServiceImpl implements UsageService {
 		usageHour.setMachineTypeId(cluster.getMachineType());
 		usageHour.setMachineTypeName(machineType.getName()); // (see machine_type_tbl)
 		usageHour.setMachineTypeSpec(machineType.getSpecification()); // (see machine_type_tbl)
+		usageHour.setMachineMachineType(machine.getType());
 		usageHour.setClusterEbsImageUsed(cluster.getEbsImageUsed());
 		usageHour.setClusterEbsVolumesUsed(cluster.getEbsVolumesUsed());
 		usageRepository.store(usageHour);
