@@ -69,15 +69,15 @@ public class PeriodicCloudDeployerReader implements ItemReader<DeploymentStatus>
 	public DeploymentStatus read() throws Exception {
 		if (deploymentStatuses.isEmpty()) {
 			deploymentStatuses = loadDeployments();
-			LOGGER.trace("Initializing reader finished. [" + deploymentStatuses.size() + "] deploymentstatuses loaded.");			
+			LOGGER.debug("Initializing reader finished. [" + deploymentStatuses.size() + "] deploymentstatuses loaded.");			
 		}
 		if (index < deploymentStatuses.size()) {
-			LOGGER.trace("Processing deployment statuses, current index is [" + index + "].");
+			LOGGER.debug("Processing deployment statuses, current index is [" + index + "].");
 			DeploymentStatus retValue = deploymentStatuses.get(index++);
 			return retValue;
 			//return deploymentStatuses.get(index++);
 		} else {
-			LOGGER.trace("Reader finished, all items handled. Index is [" + index + "]. Returning null");			
+			LOGGER.debug("Reader finished, all items handled. Index is [" + index + "]. Returning null");			
 			index = 0;
 			deploymentStatuses.clear();	// this should not be necessary
 			return null;
@@ -115,6 +115,9 @@ public class PeriodicCloudDeployerReader implements ItemReader<DeploymentStatus>
 				LOGGER.debug("Deployment with id [" + deployment.getId() + "] targeted for instance <"+instance.getInstanceId()+">. Comparing machines and DeploymentStatuses.");					
 						
 				// Verify machine
+				// When scaling cluster also the configured state for ready machines will be tempory changed to not configured
+				// Fech cannot be currenly used like this
+				//Collection<Machine> machinesInCluster=machineService.getMachinesInClusterRunningAndReady(deployment.getClusterId());
 				Collection<Machine> machinesInCluster=machineService.getMachinesInCluster(deployment.getClusterId());
 				List<Machine> machinesToBeCompared = new ArrayList<Machine>();
 				machinesToBeCompared.addAll(machinesInCluster);
@@ -148,7 +151,7 @@ public class PeriodicCloudDeployerReader implements ItemReader<DeploymentStatus>
 				
 				
 				for (DeploymentStatus deploymentStatus : deployedMachines) {																	
-					LOGGER.info("Processing deployment for deploymentStatus id [" + deployment.getId() + "] and deploymentStatus state of [" + deploymentStatus.getDeploymentState() + "].");						
+					LOGGER.debug("Processing deployment for deploymentStatus id [" + deployment.getId() + "] and deploymentStatus state of [" + deploymentStatus.getDeploymentState() + "].");						
 					deploymentStatus.setDeployment(deployment);
 					
 					// TODO - check if deployment is undeployed/to be undeployed
@@ -168,7 +171,7 @@ public class PeriodicCloudDeployerReader implements ItemReader<DeploymentStatus>
 							break;
 							case UNDEPLOY: 
 								//deploymentStatuses.add(deploymentStatus); 
-								LOGGER.info("DeploymentStatus <"+deploymentStatus.getId()+"> state already UNDEPLOY");								
+								LOGGER.debug("DeploymentStatus <"+deploymentStatus.getId()+"> state already UNDEPLOY");								
 							break;																	
 							case DEPLOYED: 
 								deploymentStatus.setDeploymentState(DeploymentState.UNDEPLOY);
@@ -178,15 +181,11 @@ public class PeriodicCloudDeployerReader implements ItemReader<DeploymentStatus>
 						}						
 					} 
 					
-					// test
-					
-							
-					// test
 					
 					boolean deploymentStatusMachineMissingFromClusterMachines = true;  // machine does not exist in cluster anymore
 				
 					for (Machine machine: machinesInCluster) {
-						LOGGER.info("Processing machine [" + machine.getId() + "] of Deployment ["+deployment.getId()+"]");
+						LOGGER.debug("Processing machine [" + machine.getId() + "] of Deployment ["+deployment.getId()+"]");
 
 						// check if DeploymentStatus is for this machine
 						if(deploymentStatus.getMachineId()==machine.getId()) {
@@ -196,7 +195,7 @@ public class PeriodicCloudDeployerReader implements ItemReader<DeploymentStatus>
 							// If machines can have only one deploymentState it can be done with remove
 							// otherwise separate collection needed							
 							machinesToBeCompared.remove(machine);
-							LOGGER.info("Machine [" + machine.getId() + "] found in deploymentStauses of Deployment ["+deployment.getId()+"]");
+							LOGGER.debug("Machine [" + machine.getId() + "] found in deploymentStauses of Deployment ["+deployment.getId()+"]");
 							
 							
 							DeploymentState deploymentState = deploymentStatus.getDeploymentState();
@@ -211,7 +210,7 @@ public class PeriodicCloudDeployerReader implements ItemReader<DeploymentStatus>
 								break;																	
 								case DEPLOYED: 
 									verifyTimeStampAndAddDeploymentInformation(deploymentStatuses, deploymentStatus, deployment); 
-									LOGGER.info("Deployed machine [" + machine.getId() + "] of Deployment ["+deployment.getId()+"]. Timestamp verified.");									
+									LOGGER.debug("Deployed machine [" + machine.getId() + "] of Deployment ["+deployment.getId()+"]. Timestamp verified.");									
 								break;
 								case UNDEPLOYED:
 									// handle redeployment
@@ -226,9 +225,9 @@ public class PeriodicCloudDeployerReader implements ItemReader<DeploymentStatus>
 							}
 							// continue; //can there be several statuses for the same machine?
 						} 
-					} 
+					} // end of loop machines
 					// handle deploymentStatuses with machines not existing anymore (TERMINATED) 
-					if (deploymentStatusMachineMissingFromClusterMachines) {
+					if (deploymentStatusMachineMissingFromClusterMachines && deploymentStatus.getDeploymentState()!=DeploymentState.TERMINATED) {
 						LOGGER.info("Terminated machine [" + deploymentStatus.getMachineId() + "] of Deployment ["+deployment.getId()+"]");															
 						deploymentStatus.setDeploymentState(DeploymentState.TERMINATED);
 						deploymentStatuses.add(deploymentStatus);
@@ -251,12 +250,16 @@ public class PeriodicCloudDeployerReader implements ItemReader<DeploymentStatus>
 						LOGGER.debug("Skipping (NEW) machine [" + machine.getId() + "] for deployment <"+deployment.getId()+"> in state <"+deployment.getState()+">.");							
 						continue;
 					}
-					LOGGER.info("Undeployed (NEW) machine [" + machine.getId() + "] of Deployment ["+deployment.getId()+"]");
-					DeploymentStatus newDeploymentStatus =  new DeploymentStatus();
-					newDeploymentStatus.setDeployment(deployment);
-					newDeploymentStatus.setDeploymentState(DeploymentState.NOT_DEPLOYED);
-					newDeploymentStatus.setMachineId(machine.getId());
-					deploymentStatuses.add(newDeploymentStatus); 					
+					if(machine.getConfigured()==MachineService.MACHINE_CONFIGURE_READY) {
+						LOGGER.info("Undeployed (NEW) machine [" + machine.getId() + "] of Deployment ["+deployment.getId()+"]. Setting deploymentStatus NOT_DEPLOYED.");
+						DeploymentStatus newDeploymentStatus =  new DeploymentStatus();
+						newDeploymentStatus.setDeployment(deployment);
+						newDeploymentStatus.setDeploymentState(DeploymentState.NOT_DEPLOYED);
+						newDeploymentStatus.setMachineId(machine.getId());
+						deploymentStatuses.add(newDeploymentStatus); 					
+					} else {
+						LOGGER.debug("NEW machine [" + machine.getId() + "] of Deployment ["+deployment.getId()+"] still in configured_state <"+machine.getConfigured()+">. Skipping now.");						
+					}
 				}
 				
 				
@@ -287,9 +290,9 @@ public class PeriodicCloudDeployerReader implements ItemReader<DeploymentStatus>
 	}
 
 	private void verifyTimeStampAndAddDeploymentInformation(Collection<DeploymentStatus> deploymentStatuses, DeploymentStatus deploymentStatus, Deployment deployment) {
-		LOGGER.info("Processing deployment state of machine [" + deploymentStatus.getMachineId() + "] for deployment status id [" + deployment.getId() + "] with allready existing deployment. Last deployment timestamp is [" + deployment.getDeploymentTimestamp().toString() + "] and last deployment status of the virtual machine is [" + deploymentStatus.getTimestamp().toString() + "].");
+		LOGGER.debug("Processing deployment state of machine [" + deploymentStatus.getMachineId() + "] for deployment status id [" + deployment.getId() + "] with allready existing deployment. Last deployment timestamp is [" + deployment.getDeploymentTimestamp().toString() + "] and last deployment status of the virtual machine is [" + deploymentStatus.getTimestamp().toString() + "].");
 		if (deploymentStatus.getTimestamp().before(deployment.getDeploymentTimestamp())) {
-			LOGGER.debug("Processing deployment state of machine [" + deploymentStatus.getMachineId() + "] for deployment status id [" + deployment.getId() + "] with allready existing deployment. Redeployed, upgrading new deployment to machine.");			
+			LOGGER.info("Processing deployment state of machine [" + deploymentStatus.getMachineId() + "] for deployment status id [" + deployment.getId() + "] with allready existing deployment. Redeployed, upgrading new deployment to machine.");			
 			deploymentStatuses.add(deploymentStatus);
 		}
 	}	
