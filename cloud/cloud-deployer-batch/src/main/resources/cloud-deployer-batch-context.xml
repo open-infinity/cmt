@@ -81,55 +81,77 @@
 		<property name="clusterService" ref="clusterService" />
 		<property name="instanceService" ref="instanceService" />
 		
+		<!-- Platforms currently identified by ids defined in ClusterService. Cluster-type names not used -->
 		<property name="deploymentDirectoryMap">
 			<map key-type="java.lang.String" value-type="java.lang.String">
 				<entry key="portal-war" value="/opt/openinfinity/2.0.0/deploy/"/>
 				<entry key="portal-properties" value="/opt/data"/>
+				<entry key="0-war" value="/opt/openinfinity/2.0.0/deploy/"/>
+				<entry key="0-properties" value="/opt/data"/>
 				<entry key="bas-war" value="/opt/openinfinity/2.0.0/tomcat/webapps"/>
 				<entry key="bas-properties" value="/opt/data"/>
 				<entry key="5-war" value="/opt/openinfinity/2.0.0/tomcat/webapps"/>
 				<entry key="5-properties" value="/opt/data"/>
 				<entry key="mq-war" value="/opt/openinfinity/2.0.0/tomcat/webapps"/>
 				<entry key="mq-properties" value="/opt/data"/>
+				<entry key="1-war" value="/opt/openinfinity/2.0.0/tomcat/webapps"/>
+				<entry key="1-properties" value="/opt/data"/>
 			</map>
 		</property>
+		<!-- Platforms currently identified by ids defined in ClusterService. Cluster-type names not used -->
 		<property name="unDeploymentDirectoryMap">
 			<map key-type="java.lang.String" value-type="java.lang.String">
 				<entry key="portal-war" value="/opt/openinfinity/2.0.0/tomcat/webapps"/>
 				<entry key="portal-properties" value="/opt/data"/>
+				<entry key="0-war" value="/opt/openinfinity/2.0.0/tomcat/webapps"/>
+				<entry key="0-properties" value="/opt/data"/>
 				<entry key="bas-war" value="/opt/openinfinity/2.0.0/tomcat/webapps"/>
 				<entry key="bas-properties" value="/opt/data"/>
 				<entry key="5-war" value="/opt/openinfinity/2.0.0/tomcat/webapps"/>
 				<entry key="5-properties" value="/opt/data"/>
 				<entry key="mq-war" value="/opt/openinfinity/2.0.0/tomcat/webapps"/>
 				<entry key="mq-properties" value="/opt/data"/>
+				<entry key="1-war" value="/opt/openinfinity/2.0.0/tomcat/webapps"/>
+				<entry key="1-properties" value="/opt/data"/>
 			</map>
 		</property>
 
+		<!-- Platforms currently identified by ids defined in ClusterService. Cluster-type names not used -->
 		<property name="deploymentCommandsMap">
 			<map key-type="java.lang.String" value-type="java.lang.String">
 				<entry key="portal-war.1" value="chown #%fileSystemUser%#.#%fileSystemGroup%# #%deploymentDirectory%#/#%deploymentName%#.#%deploymentType%#"/>
 				<entry key="portal-properties.1" value="chown #%fileSystemUser%#.#%fileSystemGroup%# #%deploymentDirectory%#/#%deploymentName%#.#%deploymentType%#"/>
+				<entry key="0-war.1" value="chown #%fileSystemUser%#.#%fileSystemGroup%# #%deploymentDirectory%#/#%deploymentName%#.#%deploymentType%#"/>
+				<entry key="0-properties.1" value="chown #%fileSystemUser%#.#%fileSystemGroup%# #%deploymentDirectory%#/#%deploymentName%#.#%deploymentType%#"/>
 				<entry key="bas-war.1" value="chown #%fileSystemUser%#.#%fileSystemGroup%# #%deploymentDirectory%#/#%deploymentName%#.#%deploymentType%#"/>
 				<entry key="bas-properties.1" value="chown #%fileSystemUser%#.#%fileSystemGroup%# #%deploymentDirectory%#/#%deploymentName%#.#%deploymentType%#"/>
 				<entry key="5-war.1" value="chown #%fileSystemUser%#.#%fileSystemGroup%# #%deploymentDirectory%#/#%deploymentName%#.#%deploymentType%#"/>
 				<entry key="5-properties.1" value="chown #%fileSystemUser%#.#%fileSystemGroup%# #%deploymentDirectory%#/#%deploymentName%#.#%deploymentType%#"/>
 				<entry key="mq-war.1" value="chown #%fileSystemUser%#.#%fileSystemGroup%# #%deploymentDirectory%#/#%deploymentName%#.#%deploymentType%#"/>
 				<entry key="mq-properties.1" value="chown #%fileSystemUser%#.#%fileSystemGroup%# #%deploymentDirectory%#/#%deploymentName%#.#%deploymentType%#"/>
+				<entry key="1-war.1" value="chown #%fileSystemUser%#.#%fileSystemGroup%# #%deploymentDirectory%#/#%deploymentName%#.#%deploymentType%#"/>
+				<entry key="1-properties.1" value="chown #%fileSystemUser%#.#%fileSystemGroup%# #%deploymentDirectory%#/#%deploymentName%#.#%deploymentType%#"/>
 			</map>
 		</property>
 
+		<!-- Platforms currently identified by ids defined in ClusterService. Cluster-type names not used -->
 		<property name="unDeploymentCommandsMap">
 			<map key-type="java.lang.String" value-type="java.lang.String">
 				<entry key="portal-war.1" value="su toas -c 'rm  #%unDeploymentDirectory%#/#%deploymentName%#.#%deploymentType%#'"/>
 				<entry key="portal-war.2" value="su toas -c 'rm -r #%unDeploymentDirectory%#/#%deploymentName%#'"/>				
 				<entry key="portal-properties.1" value="su toas -c 'rm #%deploymentDirectory%#/#%deploymentName%#.#%deploymentType%#'"/>
+<!-- 				<entry key="0-war.1" value="su toas -c 'rm  #%unDeploymentDirectory%#/#%deploymentName%#.#%deploymentType%#'"/> -->
+<!-- 				<entry key="0-war.2" value="su toas -c 'rm -r #%unDeploymentDirectory%#/#%deploymentName%#'"/>				 -->
+				<entry key="0-war.1" value="su toas -c 'rm -r #%unDeploymentDirectory%#/#%deploymentName%#'"/>				
+				<entry key="3-properties.1" value="su toas -c 'rm #%deploymentDirectory%#/#%deploymentName%#.#%deploymentType%#'"/>
 				<entry key="bas-war.1" value="su toas -c 'rm #%deploymentDirectory%#/#%deploymentName%#.#%deploymentType%#'"/>
 				<entry key="bas-properties.1" value="su toas -c 'rm #%deploymentDirectory%#/#%deploymentName%#.#%deploymentType%#'"/>
 				<entry key="5-war.1" value="su toas -c 'rm #%deploymentDirectory%#/#%deploymentName%#.#%deploymentType%#'"/>
 				<entry key="5-properties.1" value="su toas -c 'rm #%deploymentDirectory%#/#%deploymentName%#.#%deploymentType%#'"/>
 				<entry key="mq-war.1" value="su toas -c 'rm #%deploymentDirectory%#/#%deploymentName%#.#%deploymentType%#'"/>
 				<entry key="mq-properties.1" value="su toas -c 'rm #%deploymentDirectory%#/#%deploymentName%#.#%deploymentType%#'"/>
+				<entry key="1-war.1" value="su toas -c 'rm #%deploymentDirectory%#/#%deploymentName%#.#%deploymentType%#'"/>
+				<entry key="1-properties.1" value="su toas -c 'rm #%deploymentDirectory%#/#%deploymentName%#.#%deploymentType%#'"/>
 			</map>
 		</property>
 		
@@ -164,7 +186,7 @@
 	
 
 	<batch:job id="cloudDeployerBatchJob">
-		<batch:step id="stepP1">
+		<batch:step id="stepDeploymentHandling">
 			<batch:tasklet transaction-manager="txManager"
 				start-limit="1">
 				<batch:chunk 
@@ -185,7 +207,7 @@
 
 	 
 	<batch:job id="cloudStagingAreaJob">
-		<batch:step id="stepSA1">
+		<batch:step id="stepStagingHandling">
 			<batch:tasklet transaction-manager="txManager"
 				start-limit="1">
 				<batch:chunk 
@@ -205,13 +227,8 @@
 	
 	
 	<task:scheduled-tasks>  
-	    <task:scheduled ref="periodicCloudDeployerLauncher" method="launch" cron="*/20 * * * * ?"/>
+	    <task:scheduled ref="periodicCloudDeployerLauncher" method="launch" cron="*/10 * * * * ?"/>
 	</task:scheduled-tasks>
-		
-	<!--  Refactoring writer execution expendability. Platform specific deploy classes  -->
-	<!-- Implemented with ssh command execution maps
-	<bean id="applicationContextProvider" class="org.openinfinity.cloud.application.deployer.batch.ApplicationContextProvider"></bean>	
-	<context:component-scan base-package="org.openinfinity.cloud.application.deployer.batch.executor" />
-	-->
+			
 	
 </beans>
