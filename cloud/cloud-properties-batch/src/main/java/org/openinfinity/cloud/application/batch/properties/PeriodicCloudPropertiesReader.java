@@ -65,6 +65,7 @@ public class PeriodicCloudPropertiesReader implements ItemReader<Collection<Shar
 		} else {
 			LOGGER.trace("Reader finished, all items handled. Index is [" + index + "]. Returning null");			
 			sharedProperties.clear();
+			sharedProperties = new ArrayList<Collection<SharedProperty>>();
 			index = 0;
 			return null;
 		}	

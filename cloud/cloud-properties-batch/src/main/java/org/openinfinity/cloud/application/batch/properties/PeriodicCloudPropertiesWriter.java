@@ -48,7 +48,7 @@ public class PeriodicCloudPropertiesWriter implements ItemWriter<Map<File, Deplo
 				Deployment deployment = entry.getValue();
 				deployerService.deploy(deployment);
 				IOUtil.closeStream(deployment.getInputStream());
-				FileUtil.removeAllRecursively(file.getPath());
+				FileUtil.remove(file.getAbsolutePath());
 			}	
 		}
 	}
