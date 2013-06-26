@@ -75,11 +75,11 @@
 		<property name="suffix" value=".jsp" />
 	</bean>
 
-	<bean id="annotationMethodHandlerAdapter" class="org.springframework.web.portlet.mvc.annotation.AnnotationMethodHandlerAdapter">
+	<!-- >bean id="annotationMethodHandlerAdapter" class="org.springframework.web.portlet.mvc.annotation.AnnotationMethodHandlerAdapter">
 		<property name="customModelAndViewResolver">
 			<bean class="org.openinfinity.cloud.application.properties.view.JsonViewResolver"/>
 		</property>
-	</bean>
+	</bean-->
 
 	<bean id="validator"
 		class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean" />

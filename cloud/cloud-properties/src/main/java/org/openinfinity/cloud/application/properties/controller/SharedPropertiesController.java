@@ -18,6 +18,7 @@ package org.openinfinity.cloud.application.properties.controller;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +30,10 @@ import javax.portlet.RenderResponse;
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
 
+import lombok.NonNull;
+
+import org.apache.log4j.Logger;
+import org.openinfinity.cloud.application.properties.CtrPropController;
 import org.openinfinity.cloud.application.properties.model.OrganizationTreeModel;
 import org.openinfinity.cloud.application.properties.model.SharedPropertyTableData;
 import org.openinfinity.cloud.domain.Cluster;
@@ -67,6 +72,8 @@ import com.liferay.portal.service.OrganizationLocalServiceUtil;
 @RequestMapping(value = "VIEW") 
 public class SharedPropertiesController {
 	
+    private static final Logger LOG = Logger.getLogger(SharedPropertiesController.class.getName());
+
 	@Autowired
 	private InstanceService instanceService;
 	
@@ -192,16 +199,36 @@ public class SharedPropertiesController {
 	@Log
 	@AuditTrail
 	@ResourceMapping(PATH_FOR_LOAD_PROPERTIES_TABLE)
-	public void loadPropertiesTable(ResourceRequest request, ResourceResponse response,@RequestParam("page") int page, @RequestParam("rows") int rows) throws Exception {
+	public void loadPropertiesTable(ResourceRequest request, ResourceResponse response,@RequestParam("page") int page,
+	    @RequestParam("rows") int rows) throws Exception {
+	    
+	    LOG.error("---------------------------ENTER--------loadPropertiesTable---------------");
 		Collection<Long> organizationIds = loadOrganizationIds(request);
-		Collection<SharedProperty> sharedProperties = centralizedPropertiesService.loadSharedPropertiesByOrganizationIds(organizationIds);
+		Collection<SharedProperty> sharedProperties = centralizedPropertiesService.
+		    loadSharedPropertiesByOrganizationIds(organizationIds);
+		
 		List<SharedPropertyTableData> sharedPropertiesDataList = new ArrayList<SharedPropertyTableData>(); 
 		for (SharedProperty sharedProperty : sharedProperties) {
 			Instance instance = instanceService.getInstance(sharedProperty.getInstanceId());
 			Cluster cluster = clusterService.getCluster(sharedProperty.getClusterId());
-			SharedPropertyTableData sharedPropertyTableData = new SharedPropertyTableData(sharedProperty, OrganizationLocalServiceUtil.getOrganization(sharedProperty.getOrganizationId()).getName(), instance.getName(), cluster.getName() );
+			
+			SharedPropertyTableData sharedPropertyTableData = 
+			    new SharedPropertyTableData(sharedProperty, OrganizationLocalServiceUtil.
+			    getOrganization(sharedProperty.getOrganizationId()).getName(), instance.getName(), cluster.getName());
+			
 			sharedPropertiesDataList.add(sharedPropertyTableData);	
-		}		
+		}	
+		
+		/*
+    private int availabilityZone;
+    private long organizationId;
+    private int instanceId;
+    private int clusterId;
+    private int id;
+    private String key;
+    private String value;
+    private Date timestamp;
+		 */
 		int records = sharedPropertiesDataList.size();
 		int mod = records % rows;
 		int totalPages = records/rows;

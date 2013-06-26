@@ -30,11 +30,12 @@ import org.openinfinity.core.util.ExceptionUtil;
  */
 public class ListUtil {
 	/**
-	 * Returns a slice of a list based on imput parameters, and clears sliced portion of input list
+	 * Returns a slice of a list based on input parameters, and clears sliced portion of input list
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public static List sliceList(int page, int rows, List inputList){
-		if (page < 1) ExceptionUtil.throwApplicationException("Invalid page index requested from deployer portlet", ExceptionLevel.ERROR, "exception.error.invalid.parameter");
+		if (page < 1) ExceptionUtil.throwApplicationException("Invalid page index requested from deployer portlet",
+		    ExceptionLevel.ERROR, "exception.error.invalid.parameter");
 		int pageStartIndex = (page - 1) * rows;
 		int pageEndIndex = pageStartIndex + rows;
 		int totalRows = inputList.size();
