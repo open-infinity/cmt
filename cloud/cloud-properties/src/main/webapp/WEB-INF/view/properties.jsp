@@ -31,7 +31,8 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
-
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 
 <portlet:defineObjects />
 <portlet:actionURL var="action" />
@@ -39,7 +40,7 @@
 <%@page contentType="text/html;charset=UTF-8"%>
 <%@page pageEncoding="UTF-8"%>
 <%@ page session="false"%>
-<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
+
 
 <html>
 <head>
@@ -96,7 +97,7 @@ label {
 <!-- 	<br><br/> <a href="#" id="undeploy_property">Undeploy property</a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="#" id="redeploy_property">Redeploy property</a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="#" id="delete_property">Delete property</a> <br />	 -->
 	<fmt:setBundle basename="clouddeployer"/>
 	<div class="ui-button-bar">
-		<button id="deleteSharedProperty"><fmt:message key="cloudproperties.mainview.button.delete.property" /></button>
+		<button id="deleteSharedProperty"><spring:message code="cloudproperties.mainview.button.delete.property"/></button>
 	</div>
 	
 <script type="text/javascript">
@@ -216,7 +217,6 @@ label {
 				ondblClickRow: function(id){ alert("You double click row with id: "+id);},				
 			   	caption: "Existing properties"
 			});
-		
 			$("#propertyTable").jqGrid('navGrid','#propertyPager',{edit:false,add:false,del:false});
 		}
 		
@@ -225,10 +225,8 @@ label {
 			if (id) { 	
 			    var url = '<portlet:resourceURL id="deleteProperty"/>&propertyId='+id;
 			    $.getJSON(url, function(data) {
-			    	
-					//alert("Property deleted. Id: <"+id+">, Key: <"+ret.key+">"); 
+			    	loadTable();
 			    });
-			    loadTable();
 			    $('#propertyTable').trigger( 'reloadGrid' );
 			}
 		}); 

@@ -4,7 +4,7 @@
 <liferay-portlet-app>
 	<portlet>
 		<portlet-name>cloud-properties</portlet-name>
-<!-- 		<icon>/deployer_icon.png</icon> -->
+		<icon>/properties_icon.png</icon>
 		<instanceable>true</instanceable>
 		<remoteable>true</remoteable> <!-- CH8 -->
 		<header-portlet-css>/css/cloud-properties.css</header-portlet-css>
@@ -12,7 +12,6 @@
 		<header-portlet-css>/css/ui.jqgrid.css</header-portlet-css>
 		<header-portlet-javascript>/js/i18n/grid.locale-en.js</header-portlet-javascript>
 		<header-portlet-javascript>/js/jquery.jqGrid.min.js</header-portlet-javascript>	
-<!-- 		<header-portlet-javascript>/js/jquery-1.7.2.js</header-portlet-javascript> -->
 <!-- 		<header-portlet-javascript>/js/jquery.jeditable.mini.js</header-portlet-javascript> -->
 	</portlet>
 	<role-mapper>
