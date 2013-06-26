@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package org.openinfinity.cloud.autoscaler.test.scheduledscaler;
+package org.openinfinity.cloud.autoscaler.test;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.net.URL;
 import java.sql.Timestamp;
 import javax.sql.DataSource;
@@ -37,7 +36,10 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.openinfinity.cloud.domain.ScalingRule;
 import org.openinfinity.cloud.service.administrator.ClusterService;
+import org.openinfinity.cloud.service.administrator.JobService;
+import org.openinfinity.cloud.service.scaling.ScalingRuleService;
 
 /**
  * Batch configuration integration tests.
@@ -47,78 +49,107 @@ import org.openinfinity.cloud.service.administrator.ClusterService;
  * @since 1.0.0
  */
 
-@ContextConfiguration(locations={"classpath*:META-INF/spring/test-scheduled-scaler-context.xml"})
+@ContextConfiguration(locations={"classpath*:test-autoscaler-context.xml"})
 @RunWith(SpringJUnit4ClassRunner.class)
 public class SystemTests {
 	private static final Logger LOG = Logger.getLogger(SystemTests.class.getName());
 	@Autowired
 	@Qualifier("cloudDataSource")
-	DataSource ds;
+	DataSource dataSource;
 	
 	@Autowired
 	@Qualifier("clusterService")
-	ClusterService srs;
+	ClusterService clusterService;
 	
+	@Autowired
+    @Qualifier("scalingRuleService")
+	ScalingRuleService scalingRuleService;
+	
+    @Autowired
+    @Qualifier("jobService")
+    JobService jobService;
+    
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
 	
+	private static final int CLUSTER_ID = 1;    
+	
+	private static final int JOB_ID = 0;    
+		
 	protected IDataSet getDataSet(Timestamp from, Timestamp to) throws Exception
     {
-		LOG.debug("getDataSet enter ");
-
 		ReplacementDataSet dataSet = null;
 		try{
 			URL resourceLocation = Object.class.getResource("/dataset-scale-out.xml");
-			if (resourceLocation == null) { 
-				throw new FileNotFoundException("/dataset-scale-out.xml");
-			}      
-	        dataSet = new ReplacementDataSet(new FlatXmlDataSetBuilder().build(new FileInputStream(new File(resourceLocation.toURI())))); 
+	        dataSet = new ReplacementDataSet(new FlatXmlDataSetBuilder().
+	            build(new FileInputStream(new File(resourceLocation.toURI())))); 
 	        dataSet.addReplacementObject("[from]", from);
 	        dataSet.addReplacementObject("[to]", to);
 		}
 		catch (Exception e){
-			LOG.debug("Exception: "+e.getMessage());
+		    e.printStackTrace();
 		}
-		LOG.debug("getDataSet exit");
         return dataSet;
     }
 	
-	public void prepareDatabase(Timestamp from, Timestamp to){
+	public void prepareTestDatabase(Timestamp from, Timestamp to){
 		IDataSet dataSet;
 		try {
 			dataSet = getDataSet(from, to);
-			IDatabaseConnection dbConn = new DatabaseDataSourceConnection(ds);
+			IDatabaseConnection dbConn = new DatabaseDataSourceConnection(dataSource);
 			DatabaseOperation.CLEAN_INSERT.execute(dbConn, dataSet);
-			LOG.debug("database ready");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 	/*
-	 * System test configured so that scheduled scaler does a scale out, and then scale in
+	 * Scheduled scaler scaling out and in system test.
+	 * 
+	 * Database is configured so that scheduled scaler would perform scale out on a cluster.
+	 * After the scheduled scale period expires, the scheduled scaler performs scale in to original
+	 * size on a cluster.
+	 * 
+	 * Expect jobs created, and scaling rule table updates
 	 */
 	@Test
-	public void testScaleOutScaleIn() throws Exception {
+	public void scheduledScaler_scaleOutScaleIn() throws Exception {
 		try{	
 			long now = System.currentTimeMillis();	
-			prepareDatabase(new Timestamp(now + 2100), new Timestamp(now + 7200 ));
-						
-			// Scaling expected after 3 sec 	
+			prepareTestDatabase(new Timestamp(now + 2100), new Timestamp(now + 7200 ));
+				  
 			Thread.sleep(3000);
-			Assert.assertEquals(2, jdbcTemplate.queryForInt("select size_original from scaling_rule_tbl where cluster_id = ?", 1));			
-			Assert.assertEquals(2, jdbcTemplate.queryForInt("select scaling_state from scaling_rule_tbl where cluster_id = ?", 1));
-			Assert.assertEquals("1,5", jdbcTemplate.queryForObject("select job_services from job_tbl where job_id = 0", String.class));
-
-			// Unscaling expected after 5 sec
+			ScalingRule scalingRule = scalingRuleService.getRule(CLUSTER_ID);
+			Assert.assertEquals(2, scalingRule.getClusterSizeOriginal());
+			Assert.assertEquals(2, scalingRule.getScheduledScalingState());
+			Assert.assertEquals("1,5", jobService.getJob(JOB_ID).getServices());
+			
 			Thread.sleep(5000);
-			Assert.assertEquals(0, jdbcTemplate.queryForInt("select scaling_state from scaling_rule_tbl where cluster_id = ?", 1));
-			Assert.assertEquals("1,2", jdbcTemplate.queryForObject("select job_services from job_tbl where job_id = 1", String.class));		
-
+			Assert.assertEquals(0, scalingRuleService.getRule(CLUSTER_ID).getScheduledScalingState());
+            Assert.assertEquals("1,2", jobService.getJob(JOB_ID + 1).getServices());       
 		}
 		catch (Exception e){
-			LOG.debug("Exception in test: "+ e.getMessage());
+            e.printStackTrace();
 		}
 	}
+	
+	@Test
+    public void periodicScaler_scaleOutScaleIn() throws Exception {
+        try{    
+            // 
+            
+            
+            //
+            
+            
+            //
+            
+            
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+	
 	
 }
 

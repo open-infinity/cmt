@@ -132,7 +132,7 @@ public class PeriodicScalerItemProcessor implements ItemProcessor<Machine, Job> 
 		
 		HealthStatusResponse status = 
 		    healthMonitoringService.getClusterHealthStatusLast(machine, METRIC_TYPE_LOAD, metricName, new Date());		
-		List<SingleHealthStatus> metrics =  status.getMetrics();
+		List<SingleHealthStatus> metrics = status.getMetrics();
 		
         if (metrics.size() > 0){
 	        Map<String, List<RrdValue>> values = metrics.get(0).getValues();

@@ -78,5 +78,20 @@
 		size_new = "5"
 		size_original = "7"
 		job_id= "0"/>
+		
+	<scaling_rule_tbl 
+        cluster_id = "2"
+        periodic = "1"
+        scheduled = "0"
+        scaling_state = "1"
+        max_machines = "5"
+        min_machines = "1"
+        max_load = "0.9"
+        min_load = "0.2"
+        period_from = "[from]"
+        period_to = "[to]"
+        size_new = "5"
+        size_original = "7"
+        job_id= "-1"/>	
 	
 </dataset> 

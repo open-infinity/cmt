@@ -149,9 +149,7 @@ public class ScalingRuleRepositoryImpl implements ScalingRuleRepository {
 	    try {
 	        return (ScalingRule) jdbcTemplate.queryForObject(LOAD_BY_CLUSTER_ID, new Object[]{clusterId}, scalingRuleRowMapper);
 	    } catch (EmptyResultDataAccessException dae) {
-	        //FIXME: Looks like exception is allways caught st service level, doe snot propagate to autoscaler for 
-	        // some reason.
-	        //ExceptionUtil.throwBusinessViolationException("No scaling rules found for cluster");
+	        //FIXME: Looks like exception is always caught at service level, does not propagate to autoscaler 
 	    }
 	    return null;
 	}
