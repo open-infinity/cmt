@@ -26,19 +26,20 @@
         http://www.springframework.org/schema/aop
         http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
     
-	<context:property-placeholder 
-	   location="classpath:system.properties,
-	             classpath:infrastructure.properties,
-	             classpath:healthmonitoring.properties,
-	             classpath:autoscaler.properties" />
+	<context:property-placeholder location="
+	    classpath:system.properties,
+	    classpath:infrastructure.properties,
+	    classpath:healthmonitoring.properties,
+	    classpath:autoscaler.properties" />
+	    
 	<import resource="classpath*:/META-INF/spring/cloud-context-util.xml" />
 	<import resource="classpath*:/META-INF/spring/cloud-context-core.xml" />
 	<import resource="classpath*:/META-INF/spring/cloud-context-repository.xml" />
 	<import resource="classpath*:/META-INF/spring/cloud-context-service.xml" />
 	
+    <context:component-scan base-package="org.openinfinity.cloud.autoscaler.periodicscaler"/>
 	<context:component-scan base-package="org.openinfinity.cloud.autoscaler.scheduledscaler"/>
-	<tx:annotation-driven transaction-manager="transactionManager"/>
-	
+			
 	<jdbc:embedded-database id="cloudDataSource">
         <jdbc:script location="classpath*:*openinfinity-schema.sql"/>
         <jdbc:script location="classpath:/org/springframework/batch/core/schema-hsqldb.sql"/>
@@ -48,8 +49,6 @@
 		<property name="dataSource" ref="cloudDataSource" />
 	</bean> 
 		
-	<bean id="transactionManager" class="org.springframework.batch.support.transaction.ResourcelessTransactionManager" />
-	
 	<bean id="jobRepository"
 		class="org.springframework.batch.core.repository.support.JobRepositoryFactoryBean"
 		p:dataSource-ref="cloudDataSource" p:transactionManager-ref="txManager" />
@@ -68,7 +67,6 @@
 		    values (:jobType, :jobStatus, :instanceId, :services, :cloud, :zone)" />
 	</bean>
 	
-	<!-- 
 	<batch:job id="periodicJob">
 		<batch:step id="stepP1">
 			<batch:tasklet transaction-manager="txManager"
@@ -83,11 +81,10 @@
 			</batch:tasklet>
 		</batch:step>	
 	</batch:job>
-	-->
 	
 	<batch:job id="scheduledJob">
 		<batch:step id="scheduledJobStep1">
-			<batch:tasklet transaction-manager="transactionManager"
+			<batch:tasklet transaction-manager="txManager"
 				start-limit="2">
 				<batch:chunk reader="scheduledScalerItemReader" processor="scheduledScalerItemProcessor"
 					writer="autoscalerItemWriter" commit-interval="1" />
@@ -99,15 +96,13 @@
 		<constructor-arg ref="cloudDataSource" />
 	</bean>
 	
-	<!--
 	<bean id="periodicScalerItemReader" class="org.springframework.batch.item.database.JdbcCursorItemReader">
 		<property name="dataSource" ref="cloudDataSource"/>
-		<property name="sql" value="select * from machine_tbl where machine_type = 'loadbalancer'"/>
+        <property name="sql" value="select * from machine_tbl where machine_type = 'loadbalancer'"/>
 		<property name="rowMapper">
 			<bean id="machineRowMapper" class="org.openinfinity.cloud.domain.repository.administrator.MachineRowMapper"/>
 		</property>	
 	</bean>
-	-->
 	
 	<bean id="scheduledScalerItemReader" class="org.springframework.batch.item.database.JdbcCursorItemReader">
 		<property name="dataSource" ref="cloudDataSource"/>
@@ -115,7 +110,6 @@
 		<property name="rowMapper">
 			<bean id="scalingRuleRowMapper" class="org.openinfinity.cloud.domain.repository.scaling.ScalingRuleRowMapper"/>
 		</property>
-	</bean>
-	
+	</bean>	
 	
 </beans>

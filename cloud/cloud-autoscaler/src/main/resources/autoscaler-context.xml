@@ -15,11 +15,12 @@
         http://www.springframework.org/schema/task
         http://www.springframework.org/schema/task/spring-task-3.0.xsd">
        
-    <context:property-placeholder location="classpath:/system.properties,
-                                            classpath:/infrastructure.properties,
-                                            classpath:/EucaCredentials.properties,
-                                            classpath:/healthmonitoring.properties,
-                                            classpath:autoscaler.properties" />  
+    <context:property-placeholder location="
+        classpath:/system.properties,
+        classpath:/infrastructure.properties,
+        classpath:/EucaCredentials.properties,
+        classpath:/healthmonitoring.properties,
+        classpath:autoscaler.properties"/>  
         		    
 	<import resource="classpath*:/META-INF/spring/cloud-context-util.xml" />
 	<import resource="classpath*:/META-INF/spring/cloud-context-core.xml" />

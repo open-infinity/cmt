@@ -226,15 +226,12 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
 				    <skipTests>false</skipTests>
-				    
-					<!--forkMode>pertest</forkMode -->
 					<includes>
-						<include>**/SmokeTests.java</include>
+						<include>**/SystemTests.java</include>
 					</includes>
-					<!-- includes>
-						<include>**/*Test.java</include>
-					</includes-->
-					
+					<includes>
+                        <include>**/PeriodicScalerSystemTests.java</include>
+                    </includes>
 					<excludes>
 						<exclude>**/Abstract*.java</exclude>
 					</excludes>
