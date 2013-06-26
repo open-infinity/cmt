@@ -65,4 +65,13 @@ public interface CentralizedPropertiesService {
 	 * Loads shared properties by organization id.
 	 */
 	public Collection<SharedProperty> loadSharedPropertiesByOrganizationIds(Collection<Long> organizationIds);
+
+	/**
+	 * Deletes shared property by unique id.
+	 * @param id Represents the unique id.
+	 * @return true if delete was successful.
+	 */
+	public boolean deleteByUniqueId(int id);
+
 }
+

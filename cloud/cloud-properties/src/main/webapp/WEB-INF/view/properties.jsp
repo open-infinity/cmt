@@ -95,11 +95,9 @@ label {
 	<div id="propertyPager"></div>
 <!-- 	<br><br/> <a href="#" id="undeploy_property">Undeploy property</a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="#" id="redeploy_property">Redeploy property</a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="#" id="delete_property">Delete property</a> <br />	 -->
 	<fmt:setBundle basename="clouddeployer"/>
-<!-- 	<div class="ui-button-bar"> -->
-<%-- 		<button id="undeploy_property"><fmt:message key="clouddeployer.mainview.button.undeployproperty" /></button> --%>
-<%-- 		<button id="redeploy_property"><fmt:message key="clouddeployer.mainview.button.redeployproperty" /></button> --%>
-<%-- 		<button id="delete_property"><fmt:message key="clouddeployer.mainview.button.deleteproperty" /></button> --%>
-<!-- 	</div> -->
+	<div class="ui-button-bar">
+		<button id="deleteSharedProperty"><fmt:message key="cloudproperties.mainview.button.delete.property" /></button>
+	</div>
 	
 <script type="text/javascript">
 	
@@ -179,9 +177,8 @@ label {
 			$(this).removeClass("selectable").addClass("selected");
 		});
 		
-		
 		var propertyColModel =[
-		    {name:'id',index:'id', width:60, align:"center"},
+		    {name:'id',index:'id', width:40, align:"center"},
         	{name:'organization',index:'organization', width:120, align:"center"},
         	{name:'organizationId',index:'organizationId', width:60, align:"center"},
         	{name:'instance',index:'instance', width:100, align:"center"},
@@ -222,6 +219,20 @@ label {
 		
 			$("#propertyTable").jqGrid('navGrid','#propertyPager',{edit:false,add:false,del:false});
 		}
+		
+		jQuery("#deleteSharedProperty").button().click( function(){ 
+			var id = jQuery("#propertyTable").jqGrid('getGridParam','selrow'); 
+			if (id) { 	
+			    var url = '<portlet:resourceURL id="deleteProperty"/>&propertyId='+id;
+			    $.getJSON(url, function(data) {
+			    	
+					//alert("Property deleted. Id: <"+id+">, Key: <"+ret.key+">"); 
+			    });
+			    loadTable();
+			    $('#propertyTable').trigger( 'reloadGrid' );
+			}
+		}); 
+		
 		loadTable();	
 	});
 	

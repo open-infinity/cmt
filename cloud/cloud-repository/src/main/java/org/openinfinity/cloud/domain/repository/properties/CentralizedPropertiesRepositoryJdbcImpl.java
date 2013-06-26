@@ -19,15 +19,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
 
 import javax.sql.DataSource;
 
-import lombok.NonNull;
-
 import org.apache.log4j.Logger;
 import org.openinfinity.cloud.domain.SharedProperty;
+import org.openinfinity.core.annotation.AuditTrail;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -61,6 +58,7 @@ public class CentralizedPropertiesRepositoryJdbcImpl implements CentralizedPrope
 	private static final String LOAD_ALL_SQL_WHERE = "select * from properties_tbl " + WHERE2;
 	private static final String DELETE_BY_KEY = "delete from properties_tbl " + WHERE;
 	private static final String LOAD_DISTINCT_SHARED_PROPERTIES_CLUSTERS_SQL = "SELECT DISTINCT organization_id, cloud_id, instance_id, cluster_id FROM properties_tbl";
+	private static final String DELETE_BY_UNIQUE_ID = "delete from properties_tbl where id = :id";
 	
 	
 	private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
@@ -73,6 +71,7 @@ public class CentralizedPropertiesRepositoryJdbcImpl implements CentralizedPrope
 		jdbcTemplate = new JdbcTemplate(dataSource);
 	}
 
+	@AuditTrail
 	@Override
 	public SharedProperty store(SharedProperty prop) {
 		MapSqlParameterSource map = new MapSqlParameterSource();
@@ -91,6 +90,7 @@ public class CentralizedPropertiesRepositoryJdbcImpl implements CentralizedPrope
 		return prop;
 	}
 	
+	@AuditTrail
 	@Override
 	public Collection<SharedProperty> loadAll(SharedProperty prop) {
 		MapSqlParameterSource map = new MapSqlParameterSource();
@@ -101,18 +101,21 @@ public class CentralizedPropertiesRepositoryJdbcImpl implements CentralizedPrope
 		return Collections.unmodifiableCollection(props);
 	}
 	
+	@AuditTrail
 	@Override
 	public Collection<SharedProperty> loadAll() {
 		Collection<SharedProperty> props = jdbcTemplate.query(LOAD_ALL_SQL, new SharedPropertyRowMapper());
 		return Collections.unmodifiableCollection(props);
 	}
 	
+	@AuditTrail
 	@Override
 	public Collection<SharedProperty> loadKnownSharedPropertyDeployments() {
 		Collection<SharedProperty> props = jdbcTemplate.query(LOAD_DISTINCT_SHARED_PROPERTIES_CLUSTERS_SQL, new SharedPropertyRowMapper());
 		return Collections.unmodifiableCollection(props);
 	}
 	
+	@AuditTrail
 	@Override
 	public SharedProperty load(SharedProperty prop) {
 		try {
@@ -129,6 +132,7 @@ public class CentralizedPropertiesRepositoryJdbcImpl implements CentralizedPrope
 		}
 	}
 	
+	@AuditTrail
 	@Override
 	public boolean delete(SharedProperty prop) {
 		MapSqlParameterSource map = new MapSqlParameterSource();
@@ -140,16 +144,27 @@ public class CentralizedPropertiesRepositoryJdbcImpl implements CentralizedPrope
 		return (n >= 1); 
 	}
 	
+	@AuditTrail
+	@Override
+	public boolean deleteByUniqueId(int id) {
+		MapSqlParameterSource map = new MapSqlParameterSource();
+		map.addValue("id", id);
+		int n = namedParameterJdbcTemplate.update(DELETE_BY_UNIQUE_ID, map);
+		return (n >= 1); 
+	}
+	
 	private class SharedPropertyRowMapper implements RowMapper<SharedProperty> {
 		@Override
 		public SharedProperty mapRow(ResultSet resultSet, int rowNum) throws SQLException {
-			SharedProperty p = new SharedProperty();
-			p.setOrganizationId(resultSet.getInt("ORGANIZATION_ID"));
-			p.setInstanceId(resultSet.getInt("INSTANCE_ID"));
-			p.setClusterId(resultSet.getInt("CLUSTER_ID"));
-			p.setKey(resultSet.getString("KEY_COLUMN"));
-			p.setValue(resultSet.getString("VALUE_COLUMN"));
-			return p;
+			SharedProperty sharedProperty = new SharedProperty();
+			sharedProperty.setId(resultSet.getInt("ID"));
+			sharedProperty.setOrganizationId(resultSet.getInt("ORGANIZATION_ID"));
+			sharedProperty.setInstanceId(resultSet.getInt("INSTANCE_ID"));
+			sharedProperty.setClusterId(resultSet.getInt("CLUSTER_ID"));
+			sharedProperty.setKey(resultSet.getString("KEY_COLUMN"));
+			sharedProperty.setValue(resultSet.getString("VALUE_COLUMN"));
+			sharedProperty.setTimestamp(resultSet.getDate("CHANGED_LAST_UPDATE"));
+			return sharedProperty;
 		}
 	}
 }

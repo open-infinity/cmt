@@ -31,10 +31,6 @@
 		location="classpath:/META-INF/properties/system.properties,classpath:/META-INF/properties/infrastructure.properties,classpath:/META-INF/properties/core.properties,classpath:/META-INF/properties/repository.properties" />
 
 	<context:component-scan base-package="org.openinfinity.cloud.application.properties" />
-	<!-- <context:component-scan base-package="org.openinfinity.cloud.service.properties" 
-		/> -->
-	<!-- <context:component-scan base-package="org.openinfinity.cloud.domain.repository.properties" 
-		/> -->
 
 	<context:annotation-config />
 
@@ -93,16 +89,13 @@
 	<bean
 		class="org.springframework.context.annotation.AnnotationConfigBeanDefinitionParser" />
 
-	<!-- <bean -->
-	<!-- class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"> -->
-	<!-- <property name="locations"> -->
-	<!-- <list> -->
-	<!-- <value> -->
-	<!-- classpath:/META-INF/spring/system.properties -->
-	<!-- </value> -->
-	<!-- </list> -->
-	<!-- </property> -->
-	<!-- <property name="ignoreUnresolvablePlaceholders" value="true" /> -->
-	<!-- </bean> -->
+	<bean id="messageSource"
+		class="org.springframework.context.support.ResourceBundleMessageSource">
+		<property name="basenames">
+			<list>
+				<value>/META-INF/locale/messages</value>
+			</list>
+		</property>
+	</bean>
 
 </beans>

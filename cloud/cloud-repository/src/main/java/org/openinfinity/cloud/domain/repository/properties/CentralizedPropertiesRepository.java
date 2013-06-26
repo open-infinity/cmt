@@ -16,7 +16,6 @@
 package org.openinfinity.cloud.domain.repository.properties;
 
 import java.util.Collection;
-import java.util.List;
 
 import org.openinfinity.cloud.domain.SharedProperty;
 
@@ -57,4 +56,11 @@ public interface CentralizedPropertiesRepository {
 	 * @return true if the property was found, false if not
 	 */
 	public boolean delete(SharedProperty sample);
+	
+	/**
+	 * Deletes shared property by unique id.
+	 * @param id Represents the unique id.
+	 * @return true if delete was successful.
+	 */
+	public boolean deleteByUniqueId(int id);
 }

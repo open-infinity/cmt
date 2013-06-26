@@ -18,7 +18,6 @@ package org.openinfinity.cloud.application.properties.controller;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,9 +29,6 @@ import javax.portlet.RenderResponse;
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
 
-import lombok.NonNull;
-
-import org.apache.log4j.Logger;
 import org.openinfinity.cloud.application.properties.model.OrganizationTreeModel;
 import org.openinfinity.cloud.application.properties.model.SharedPropertyTableData;
 import org.openinfinity.cloud.domain.Cluster;
@@ -58,6 +54,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.portlet.bind.annotation.ActionMapping;
 import org.springframework.web.portlet.bind.annotation.ResourceMapping;
 
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.model.Organization;
 import com.liferay.portal.service.OrganizationLocalServiceUtil;
 
@@ -70,8 +68,6 @@ import com.liferay.portal.service.OrganizationLocalServiceUtil;
 @Controller
 @RequestMapping(value = "VIEW") 
 public class SharedPropertiesController {
-	
-    private static final Logger LOG = Logger.getLogger(SharedPropertiesController.class.getName());
 
 	@Autowired
 	private InstanceService instanceService;
@@ -102,6 +98,8 @@ public class SharedPropertiesController {
 	 * Load shared properties for table view.
 	 */
 	private static final String PATH_FOR_LOAD_PROPERTIES_TABLE = "loadPropertiesTable";
+	
+	private static final String PATH_FOR_SHARED_PROPERTY_DELETE = "deleteProperty";
 
 	/**
 	 * Returns the basic view including user's organizations and organization deployments to end-user. 
@@ -181,6 +179,19 @@ public class SharedPropertiesController {
 		SerializerUtil.jsonSerialize(response.getWriter(), clusterMap);
 	} 
 	
+
+	/**
+	 * Delete shared property 
+	 * 
+	 * @throws Throwable Thrown when system level exception arises.
+	 */
+	@Log
+	@AuditTrail
+	@ResourceMapping(PATH_FOR_SHARED_PROPERTY_DELETE)
+	public void deleteDeployment(ResourceResponse response, @RequestParam("propertyId") int propertyId) throws Exception {
+		centralizedPropertiesService.deleteByUniqueId(propertyId);
+	} 	
+	
 	
 	/**
 	 * Stores new shared property to backbone server.
@@ -198,36 +209,11 @@ public class SharedPropertiesController {
 	@Log
 	@AuditTrail
 	@ResourceMapping(PATH_FOR_LOAD_PROPERTIES_TABLE)
-	public void loadPropertiesTable(ResourceRequest request, ResourceResponse response,@RequestParam("page") int page,
-	    @RequestParam("rows") int rows) throws Exception {
-	    
-	    LOG.error("---------------------------ENTER--------loadPropertiesTable---------------");
+	public void loadPropertiesTable(ResourceRequest request, ResourceResponse response,@RequestParam("page") int page, @RequestParam("rows") int rows) throws Exception {
 		Collection<Long> organizationIds = loadOrganizationIds(request);
-		Collection<SharedProperty> sharedProperties = centralizedPropertiesService.
-		    loadSharedPropertiesByOrganizationIds(organizationIds);
-		
+		Collection<SharedProperty> sharedProperties = centralizedPropertiesService.loadSharedPropertiesByOrganizationIds(organizationIds);
 		List<SharedPropertyTableData> sharedPropertiesDataList = new ArrayList<SharedPropertyTableData>(); 
-		for (SharedProperty sharedProperty : sharedProperties) {
-			Instance instance = instanceService.getInstance(sharedProperty.getInstanceId());
-			Cluster cluster = clusterService.getCluster(sharedProperty.getClusterId());
-			
-			SharedPropertyTableData sharedPropertyTableData = 
-			    new SharedPropertyTableData(sharedProperty, OrganizationLocalServiceUtil.
-			    getOrganization(sharedProperty.getOrganizationId()).getName(), instance.getName(), cluster.getName());
-			
-			sharedPropertiesDataList.add(sharedPropertyTableData);	
-		}	
-		
-		/*
-    private int availabilityZone;
-    private long organizationId;
-    private int instanceId;
-    private int clusterId;
-    private int id;
-    private String key;
-    private String value;
-    private Date timestamp;
-		 */
+		populateSharedPropertyDataModel(sharedProperties, sharedPropertiesDataList);			
 		int records = sharedPropertiesDataList.size();
 		int mod = records % rows;
 		int totalPages = records/rows;
@@ -237,6 +223,21 @@ public class SharedPropertiesController {
 
 		JsonDataWrapper jdw = new JsonDataWrapper(page, totalPages, records, onePage);
 		SerializerUtil.jsonSerialize(response.getWriter(), jdw); 
+	}
+
+	private void populateSharedPropertyDataModel(
+			Collection<SharedProperty> sharedProperties,
+			List<SharedPropertyTableData> sharedPropertiesDataList)
+			throws PortalException, SystemException {
+		for (SharedProperty sharedProperty : sharedProperties) {
+			Instance instance = instanceService.getInstance(sharedProperty.getInstanceId());
+			Cluster cluster = clusterService.getCluster(sharedProperty.getClusterId());
+			SharedPropertyTableData sharedPropertyTableData = 
+			    new SharedPropertyTableData(sharedProperty, OrganizationLocalServiceUtil.
+			    getOrganization(sharedProperty.getOrganizationId()).getName(), instance.getName(), cluster.getName());
+			
+			sharedPropertiesDataList.add(sharedPropertyTableData);	
+		}
 	}
 
 	private Collection<Long> loadOrganizationIds(PortletRequest request) throws Exception {

@@ -23,6 +23,7 @@ import org.openinfinity.cloud.domain.SharedProperty;
 import org.openinfinity.cloud.domain.repository.properties.CentralizedPropertiesRepository;
 import org.openinfinity.core.annotation.AuditTrail;
 import org.openinfinity.core.annotation.Log;
+import org.openinfinity.core.util.ExceptionUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -102,6 +103,15 @@ public class CentralizedPropertiesServiceImpl implements CentralizedPropertiesSe
 			}
 		}
 		return Collections.unmodifiableCollection(sharedPropertiesByOrganization);
+	}
+
+	@Override
+	public boolean deleteByUniqueId(int id) {
+		boolean success = repository.deleteByUniqueId(id);
+		if (! success) {
+			ExceptionUtil.throwBusinessViolationException("Deleting shared property failed: " + id);
+		}
+		return success;
 	}
 	
 }
