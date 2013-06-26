@@ -82,10 +82,7 @@ public class DeployerServiceImpl implements DeployerService {
 	@Log
 	public Deployment redeploy(Deployment deployment) {
 		// For supporting rollback bucket objects need to be named to be uniquely and old versions stored in db with NOT_DEPLOYED state
-
-		// update current deployed deployment to undeploy and redeployed to deploy
-		// TODO: verify deploymentstatuses handling in reader
-		
+	
 		//  if previous DEPLOYED deployment (target and name) exists it will be updated to UNDEPLOY
 		deploymentRepository.updateExistingDeployedDeploymentState(deployment, DEPLOYMENT_STATE_UNDEPLOY);
 		// we could update state to UNDEPLOYED and deploymentStatuses to undeployed as well since current
@@ -95,17 +92,13 @@ public class DeployerServiceImpl implements DeployerService {
 		deploymentRepository.updateLocationAndState(deployment);
 		return deployment;
 				
-		//String location = bucketRepository.createBucket(deployment.getInputStream(), ""+deployment.getClusterId(), deployment.getName(), new HashMap<String, String>());
-		//deployment.setLocation(location);
-		//deploymentRepository.store(deployment);
-		//return deployment;
 	}	
 	
 	
 
 	@Log
 	public void deleteObject(Deployment deployment) {
-		bucketRepository.deleteObject(""+deployment.getClusterId(), deployment.getName());
+		bucketRepository.deleteObject(""+deployment.getClusterId(), deployment.getLocation());
 		// no mid-state used. if DeploymentStatuses need to be set to DELETED use mid state and implement batch processing
 		// deployment.setState(DeployerService.DEPLOYMENT_STATE_DELETED);
 		// deploymentRepository.store(deployment);
