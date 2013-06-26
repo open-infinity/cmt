@@ -140,17 +140,29 @@ public class SystemTests {
             jobService.updateStatus(JOB_ID, 10);
             jobService.updateStatus(JOB_ID + 1, 10);
             
-            // start stub server
+            // Start stub server
             Runtime r = Runtime.getRuntime();
             Process p = r.exec("python src/test/python/rrd-server-stub.py");
             
-            
-            Thread.sleep(20000);
-            // check that scaling out is done to size 3
+            // Sleep 15 sec, after that a scaling out job (id = 2)should be created.
+            Thread.sleep(15000);
+            ScalingRule scalingRule = scalingRuleService.getRule(CLUSTER_ID);
+            Assert.assertEquals(JOB_ID + 2, scalingRule.getjobId());
+            Assert.assertEquals("1,3", jobService.getJob(JOB_ID + 2).getServices());       
 
             
-            Thread.sleep(1000);
+            // Add one machine manually
+            // 
             
+            // Make the job ready
+            jobService.updateStatus(JOB_ID + 2, 10);
+
+            // Sleep 15 sec and wait that stub server decreases cluster load to 0. 
+            // After that a scaling in job (id = 3)should be created.
+            Thread.sleep(15000);
+            Assert.assertEquals(JOB_ID + 3, scalingRuleService.getRule(CLUSTER_ID).getjobId());
+            Assert.assertEquals("1,2", jobService.getJob(JOB_ID + 2).getServices());       
+
             // check that scaling in is done to size 2
             
             // destroy stub server 
