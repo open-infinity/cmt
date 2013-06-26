@@ -82,6 +82,7 @@ public class PeriodicScalerItemProcessor implements ItemProcessor<Machine, Job> 
 	@Override
 	public Job process(Machine machine) throws Exception {
 		try {
+		    LOG.debug("--------------ENTER-----------");
 			return applyScalingRule(machine);
 		}
 		catch(SystemException e){
@@ -95,6 +96,7 @@ public class PeriodicScalerItemProcessor implements ItemProcessor<Machine, Job> 
 	    ScalingRule rule = null; 
         Cluster cluster = null;
 	    try{
+	        LOG.debug("--------------ENTER apply-----------");
             rule = scalingRuleService.getRule(clusterId);
             if (rule == null) return null;                
             cluster = clusterService.getCluster(clusterId);
@@ -105,6 +107,8 @@ public class PeriodicScalerItemProcessor implements ItemProcessor<Machine, Job> 
             return null;
         }
         float load = getClusterLoad(machine);
+        LOG.debug("load = " + load);
+
         if (load == -1) return null;
         ScalingState state = scalingRuleService.calculateScalingState(rule, load, clusterId);
         switch (state) {
@@ -128,12 +132,13 @@ public class PeriodicScalerItemProcessor implements ItemProcessor<Machine, Job> 
 	
 	private float getClusterLoad(Machine machine) throws IOException, IndexOutOfBoundsException,  
 	    JsonParseException, JsonMappingException, SystemException {  
+	    LOG.debug("-----------------getClusterLoad-----------------");
 		String[] metricName = {METRIC_RRD_FILE_LOAD};
 		
 		HealthStatusResponse status = 
 		    healthMonitoringService.getClusterHealthStatusLast(machine, METRIC_TYPE_LOAD, metricName, new Date());		
 		List<SingleHealthStatus> metrics = status.getMetrics();
-		
+		LOG.debug("metrics len " + metrics.size());
         if (metrics.size() > 0){
 	        Map<String, List<RrdValue>> values = metrics.get(0).getValues();
 	        List<RrdValue> loadRrd = values.get(METRIC_PERIOD);

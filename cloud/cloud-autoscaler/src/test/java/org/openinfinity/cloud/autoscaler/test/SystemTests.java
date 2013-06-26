@@ -134,15 +134,27 @@ public class SystemTests {
 	
 	@Test
     public void periodicScaler_scaleOutScaleIn() throws Exception {
-        try{    
-            // 
+        try{  
+            
+            // Set jobs as ready
+            jobService.updateStatus(JOB_ID, 10);
+            jobService.updateStatus(JOB_ID + 1, 10);
+            
+            // start stub server
+            Runtime r = Runtime.getRuntime();
+            Process p = r.exec("python src/test/python/rrd-server-stub.py");
             
             
-            //
+            Thread.sleep(20000);
+            // check that scaling out is done to size 3
+
             
+            Thread.sleep(1000);
             
-            //
+            // check that scaling in is done to size 2
             
+            // destroy stub server 
+            p.destroy();
             
         }
         catch (Exception e){

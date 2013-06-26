@@ -78,6 +78,9 @@ CREATE TABLE machine_tbl (
   machine_configured int,
   machine_last_update timestamp,
   machine_cloud_type int,
+  machine_extra_ebs_volume_id varchar,
+  machine_extra_ebs_volume_device varchar,
+  machine_extra_ebs_volume_size int,
   PRIMARY KEY (machine_id)
 );
 
