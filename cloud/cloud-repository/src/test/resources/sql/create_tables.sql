@@ -271,7 +271,7 @@ CREATE TABLE `deployment_state_tbl` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- INVOICING TABLES
+-- USAGE BASED INVOICING TABLES
 
 CREATE TABLE `instance_share_tbl` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
