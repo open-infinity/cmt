@@ -179,7 +179,7 @@ label {
 			$(this).removeClass("selectable").addClass("selected");
 		});
 		
-
+		
 		var propertyColModel =[
 		    {name:'id',index:'id', width:60, align:"center"},
         	{name:'organization',index:'organization', width:120, align:"center"},
