@@ -31,12 +31,14 @@
 		location="classpath:/META-INF/properties/system.properties,classpath:/META-INF/properties/infrastructure.properties,classpath:/META-INF/properties/core.properties,classpath:/META-INF/properties/repository.properties" />
 
 	<context:component-scan base-package="org.openinfinity.cloud.application.properties" />
-<!-- 	<context:component-scan base-package="org.openinfinity.cloud.service.properties" /> -->
-<!-- 	<context:component-scan base-package="org.openinfinity.cloud.domain.repository.properties" /> -->
+	<!-- <context:component-scan base-package="org.openinfinity.cloud.service.properties" 
+		/> -->
+	<!-- <context:component-scan base-package="org.openinfinity.cloud.domain.repository.properties" 
+		/> -->
 
 	<context:annotation-config />
 
-	<mvc:annotation-driven/>
+	<mvc:annotation-driven />
 
 	<tx:annotation-driven transaction-manager="txManager" />
 
@@ -67,19 +69,23 @@
 			<value>true</value>
 		</property>
 	</bean>
-	
-	<bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+
+	<bean id="viewResolver"
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
 		<property name="cache" value="true" />
-		<property name="viewClass" value="org.springframework.web.servlet.view.JstlView" />
+		<property name="viewClass"
+			value="org.springframework.web.servlet.view.JstlView" />
 		<property name="prefix" value="/WEB-INF/view/" />
 		<property name="suffix" value=".jsp" />
 	</bean>
 
-	<!-- >bean id="annotationMethodHandlerAdapter" class="org.springframework.web.portlet.mvc.annotation.AnnotationMethodHandlerAdapter">
+	<bean id="annotationMethodHandlerAdapter"
+		class="org.springframework.web.portlet.mvc.annotation.AnnotationMethodHandlerAdapter">
 		<property name="customModelAndViewResolver">
-			<bean class="org.openinfinity.cloud.application.properties.view.JsonViewResolver"/>
+			<bean
+				class="org.openinfinity.cloud.application.properties.view.JsonViewResolver" />
 		</property>
-	</bean-->
+	</bean>
 
 	<bean id="validator"
 		class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean" />
@@ -87,16 +93,16 @@
 	<bean
 		class="org.springframework.context.annotation.AnnotationConfigBeanDefinitionParser" />
 
-<!--	<bean-->
-<!--		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">-->
-<!--		<property name="locations">-->
-<!--			<list>-->
-<!--				<value>-->
-<!--					classpath:/META-INF/spring/system.properties-->
-<!--				</value>-->
-<!--			</list>-->
-<!--		</property>-->
-<!--		<property name="ignoreUnresolvablePlaceholders" value="true" />-->
-<!--	</bean>-->
-	
+	<!-- <bean -->
+	<!-- class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"> -->
+	<!-- <property name="locations"> -->
+	<!-- <list> -->
+	<!-- <value> -->
+	<!-- classpath:/META-INF/spring/system.properties -->
+	<!-- </value> -->
+	<!-- </list> -->
+	<!-- </property> -->
+	<!-- <property name="ignoreUnresolvablePlaceholders" value="true" /> -->
+	<!-- </bean> -->
+
 </beans>

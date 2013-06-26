@@ -188,11 +188,11 @@ label {
         	{name:'instanceId',index:'instanceId', width:60, align:"center"},
         	{name:'cluster',index:'cluster', width:120, align:"center"},
         	{name:'clusterId',index:'clusterId', width:60, align:"center"},
-        	{name:'name',index:'type', width:90, align:"center"},
-        	{name:'value',index:'name', width:120, align:"center"},
+        	{name:'key',index:'key', width:90, align:"center"},
+        	{name:'value',index:'key', width:120, align:"center"},
         	{name:'formattedTime',index:'formattedTime', width:120, align:"center"}  
         ];
-		var propertyColNames = ['id', 'organization', 'organizationId','instance', 'instanceId', 'cluster', 'clusterId', 'key', 'value', 'time'];
+		var propertyColNames = ['id', 'organization', 'organizationId','instance', 'instanceId', 'cluster', 'clusterId', 'key', 'value', 'formattedTime'];
 		
 		function loadTable() {
 			jQuery("#propertyTable").jqGrid({
