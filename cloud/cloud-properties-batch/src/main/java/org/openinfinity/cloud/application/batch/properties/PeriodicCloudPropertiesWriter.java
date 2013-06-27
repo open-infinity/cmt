@@ -22,6 +22,7 @@ import java.util.Map;
 import org.openinfinity.cloud.domain.Deployment;
 import org.openinfinity.cloud.service.deployer.DeployerService;
 import org.openinfinity.cloud.util.filesystem.FileUtil;
+import org.openinfinity.core.annotation.Log;
 import org.openinfinity.core.util.IOUtil;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +41,7 @@ public class PeriodicCloudPropertiesWriter implements ItemWriter<Map<File, Deplo
 	@Autowired 
 	private DeployerService deployerService;
 	
+	@Log
 	@Override
 	public void write(List<? extends Map<File, Deployment>> items) {
 		for (Map<File, Deployment> fileAndDeploymentMap : items) {
