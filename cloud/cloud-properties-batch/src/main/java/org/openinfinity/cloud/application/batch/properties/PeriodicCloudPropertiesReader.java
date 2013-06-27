@@ -78,17 +78,22 @@ public class PeriodicCloudPropertiesReader implements ItemReader<Collection<Shar
 
 	private void addSharedPropertyIfNotDeployed(Collection<SharedProperty> sharedPropertiesPerDistinctCluster) {
 		for (SharedProperty sharedProperty : sharedPropertiesPerDistinctCluster) {
+			boolean isNeedForNewDeployement = true;
 			Deployment deployment = populateDeployment(sharedProperty);
 			Collection<Deployment> deploymentsPerCluster = deployerService.loadDeploymentsForClusterWithName(deployment);
 			for (Deployment existingDeployment : deploymentsPerCluster) {
-				verifyTimestampAndAddIfNeedsToBeDeployed(sharedPropertiesPerDistinctCluster, sharedProperty, existingDeployment);
+				verifyTimestampAndAddIfNeedsToBeDeployed(sharedPropertiesPerDistinctCluster, sharedProperty, existingDeployment, isNeedForNewDeployement);
+			}
+			if (isNeedForNewDeployement) {
+				sharedProperties.add(sharedPropertiesPerDistinctCluster);
 			}
 		}
 	}
 
-	private void verifyTimestampAndAddIfNeedsToBeDeployed(Collection<SharedProperty> sharedPropertiesPerDistinctCluster, SharedProperty sharedProperty, Deployment existingDeployment) {
+	private void verifyTimestampAndAddIfNeedsToBeDeployed(Collection<SharedProperty> sharedPropertiesPerDistinctCluster, SharedProperty sharedProperty, Deployment existingDeployment, boolean isNeedForNewDeployement) {
 		if (existingDeployment.getDeploymentTimestamp().before(sharedProperty.getTimestamp())) {
 			sharedProperties.add(sharedPropertiesPerDistinctCluster);
+			isNeedForNewDeployement = false;
 		}
 	}
 
