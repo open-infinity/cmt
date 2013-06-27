@@ -58,7 +58,6 @@ public class PeriodicCloudPropertiesProcessor implements ItemProcessor<Collectio
 		if (! localDiskTempFileSystemDirectory.exists()) {
 			ExceptionUtil.throwSystemException(EXCEPTION_MESSAGE_TEMPORARY_FILESYSTEM_DOES_NOT_EXIST + localDiskTempFileSystem);
 		}
-		//int availabilityZone = 0;
 		long organizationId = 0;
 		int instanceId = 0;
 		int clusterId = 0;
@@ -93,7 +92,7 @@ public class PeriodicCloudPropertiesProcessor implements ItemProcessor<Collectio
 		deployment.setInstanceId(instanceId);
 		deployment.setClusterId(clusterId);
 		deployment.setType("properties");
-		deployment.setName("infrastructure");
+		deployment.setName("application");
 		return deployment;
 	}
 
@@ -104,7 +103,7 @@ public class PeriodicCloudPropertiesProcessor implements ItemProcessor<Collectio
 				.append("=")
 				.append(sharedProperty.getValue())
 				.append("\n");
-			clusterId = sharedProperty.getClusterId();
+			organizationId = sharedProperty.getOrganizationId();
 			instanceId = sharedProperty.getInstanceId();
 			clusterId = sharedProperty.getClusterId();
 			lastModifiedTimeStamp = sharedProperty.getTimestamp().after(lastModifiedTimeStamp)?sharedProperty.getTimestamp():lastModifiedTimeStamp;
