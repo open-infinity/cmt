@@ -19,7 +19,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.openinfinity.cloud.domain.Deployment;
 import org.openinfinity.cloud.domain.SharedProperty;
+import org.openinfinity.cloud.service.deployer.DeployerService;
 import org.openinfinity.cloud.service.properties.CentralizedPropertiesService;
 import org.openinfinity.core.annotation.Log;
 import org.slf4j.Logger;
@@ -46,7 +48,10 @@ public class PeriodicCloudPropertiesReader implements ItemReader<Collection<Shar
 	
 	@Autowired
 	private CentralizedPropertiesService centralizedPropertiesService;
-		
+	
+	@Autowired
+	private DeployerService deployerService;
+	
 	@Log
 	@Override
 	public Collection<SharedProperty> read() throws Exception {
@@ -54,7 +59,7 @@ public class PeriodicCloudPropertiesReader implements ItemReader<Collection<Shar
 			Collection<SharedProperty> distinctSharedProperties = centralizedPropertiesService.loadKnownSharedPropertyDeployments();
 			for (SharedProperty sample : distinctSharedProperties) {
 				Collection<SharedProperty> sharedPropertiesPerDistinctCluster = centralizedPropertiesService.loadAll(sample);
-				sharedProperties.add(sharedPropertiesPerDistinctCluster);
+				addSharedPropertyIfNotDeployed(sharedPropertiesPerDistinctCluster);
 			}
 			LOGGER.trace("Initializing reader finished. [" + sharedProperties.size() + "] deployments loaded.");			
 		}
@@ -69,6 +74,31 @@ public class PeriodicCloudPropertiesReader implements ItemReader<Collection<Shar
 			index = 0;
 			return null;
 		}	
+	}
+
+	private void addSharedPropertyIfNotDeployed(Collection<SharedProperty> sharedPropertiesPerDistinctCluster) {
+		for (SharedProperty sharedProperty : sharedPropertiesPerDistinctCluster) {
+			Deployment deployment = populateDeployment(sharedProperty);
+			Collection<Deployment> deploymentsPerCluster = deployerService.loadDeploymentsForClusterWithName(deployment);
+			for (Deployment existingDeployment : deploymentsPerCluster) {
+				verifyTimestampAndAddIfNeedsToBeDeployed(sharedPropertiesPerDistinctCluster, sharedProperty, existingDeployment);
+			}
+		}
+	}
+
+	private void verifyTimestampAndAddIfNeedsToBeDeployed(Collection<SharedProperty> sharedPropertiesPerDistinctCluster, SharedProperty sharedProperty, Deployment existingDeployment) {
+		if (existingDeployment.getDeploymentTimestamp().before(sharedProperty.getTimestamp())) {
+			sharedProperties.add(sharedPropertiesPerDistinctCluster);
+		}
+	}
+
+	private Deployment populateDeployment(SharedProperty sharedProperty) {
+		Deployment deployment = new Deployment();
+		deployment.setOrganizationId(sharedProperty.getOrganizationId());
+		deployment.setInstanceId(sharedProperty.getInstanceId()); 
+		deployment.setClusterId(sharedProperty.getClusterId()); 
+		deployment.setName("application");
+		return deployment;
 	}
 		
 }

@@ -25,7 +25,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 /**
- * Job launcher fro cloud deployer batch process.
+ * Job launcher fro cloud properties batch process.
  * 
  * @author Ilkka Leinonen
  * @version 1.0.0
