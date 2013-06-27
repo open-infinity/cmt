@@ -4,11 +4,11 @@
     <parent>
         <artifactId>cloud</artifactId>
         <groupId>org.openinfinity</groupId>
-        <version>1.0.0</version>
+        <version>1.2.0.RELEASE</version>
     </parent>
     <groupId>org.openinfinity</groupId>
     <artifactId>cloud-administrator</artifactId>
-    <version>1.0.0</version>
+    <version>1.2.0.RELEASE</version>
     <packaging>war</packaging>
     <properties>
         <liferay.version>6.0.6</liferay.version>
@@ -153,7 +153,7 @@
         <dependency>
             <groupId>org.openinfinity</groupId>
             <artifactId>cloud-service</artifactId>
-            <version>1.0.0</version>
+            <version>1.2.0.RELEASE</version>
         </dependency>
         <dependency>
             <groupId>org.openinfinity</groupId>
