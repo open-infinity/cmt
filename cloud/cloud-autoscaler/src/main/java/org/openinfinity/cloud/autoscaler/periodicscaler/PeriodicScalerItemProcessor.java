@@ -82,7 +82,6 @@ public class PeriodicScalerItemProcessor implements ItemProcessor<Machine, Job> 
 	@Override
 	public Job process(Machine machine) throws Exception {
 		try {
-		    LOG.debug("--------------ENTER-----------");
 			return applyScalingRule(machine);
 		}
 		catch(SystemException e){
@@ -96,7 +95,6 @@ public class PeriodicScalerItemProcessor implements ItemProcessor<Machine, Job> 
 	    ScalingRule rule = null; 
         Cluster cluster = null;
 	    try{
-	        LOG.debug("--------------ENTER apply-----------");
             rule = scalingRuleService.getRule(clusterId);
             if (rule == null) return null;                
             cluster = clusterService.getCluster(clusterId);
@@ -132,7 +130,6 @@ public class PeriodicScalerItemProcessor implements ItemProcessor<Machine, Job> 
 	
 	private float getClusterLoad(Machine machine) throws IOException, IndexOutOfBoundsException,  
 	    JsonParseException, JsonMappingException, SystemException {  
-	    LOG.debug("-----------------getClusterLoad-----------------");
 		String[] metricName = {METRIC_RRD_FILE_LOAD};
 		
 		HealthStatusResponse status = 
@@ -151,15 +148,14 @@ public class PeriodicScalerItemProcessor implements ItemProcessor<Machine, Job> 
 	}
 	
 	private Job createJob(Machine machine, Cluster cluster, int machinesGrowth) {
-		Instance instance = instanceService.getInstanceByMachineId(machine.getId());
-		Job job = null;		
-		job = new Job("scale_cluster",
+        Instance instance = instanceService.getInstance(cluster.getInstanceId());
+		return new Job("scale_cluster",
 			cluster.getInstanceId(),
 			instance.getCloudType(),
 			JobService.CLOUD_JOB_CREATED,
-			instance.getZone());		
-		job.addService(Integer.toString(cluster.getId()), cluster.getNumberOfMachines() + machinesGrowth);
-		return job;
+			instance.getZone(),
+			Integer.toString(cluster.getId()),
+			cluster.getNumberOfMachines() + machinesGrowth);	
 	}
 	
 }

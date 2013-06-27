@@ -22,20 +22,21 @@ import java.net.URL;
 import java.sql.Timestamp;
 import javax.sql.DataSource;
 import junit.framework.Assert;
-import org.apache.log4j.Logger;
 import org.dbunit.database.DatabaseDataSourceConnection;
 import org.dbunit.database.IDatabaseConnection;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.ReplacementDataSet;
 import org.dbunit.dataset.xml.FlatXmlDataSetBuilder;
 import org.dbunit.operation.DatabaseOperation;
+import org.dbunit.util.fileloader.DataFileLoader;
+import org.dbunit.util.fileloader.FlatXmlDataFileLoader;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.openinfinity.cloud.autoscaler.gateway.HttpGateway;
 import org.openinfinity.cloud.domain.ScalingRule;
 import org.openinfinity.cloud.service.administrator.ClusterService;
 import org.openinfinity.cloud.service.administrator.JobService;
@@ -52,7 +53,6 @@ import org.openinfinity.cloud.service.scaling.ScalingRuleService;
 @ContextConfiguration(locations={"classpath*:test-autoscaler-context.xml"})
 @RunWith(SpringJUnit4ClassRunner.class)
 public class SystemTests {
-	private static final Logger LOG = Logger.getLogger(SystemTests.class.getName());
 	@Autowired
 	@Qualifier("cloudDataSource")
 	DataSource dataSource;
@@ -68,19 +68,25 @@ public class SystemTests {
     @Autowired
     @Qualifier("jobService")
     JobService jobService;
-    
-	@Autowired
-	private JdbcTemplate jdbcTemplate;
 	
 	private static final int CLUSTER_ID = 1;    
-	
-	private static final int JOB_ID = 0;    
-		
-	protected IDataSet getDataSet(Timestamp from, Timestamp to) throws Exception
+	private static final int JOB_ID = 0;
+	private static final String MOCK_SERVER_PATH = "src/test/python/mock-rrd-server.py";
+	private static final int AUTOSCALER_PERIOD_MS = 10000;
+	private static final String URL_LOAD_LOW = "http://127.0.0.1:8181/test/load/low";
+	private static final String URL_LOAD_HIGH = "http://127.0.0.1:8181/test/load/high";
+    private static final String URL_LOAD_MEDIUM = "http://127.0.0.1:8181/test/load/medium";
+    private static final int JOB_UNDEFINED = -1;
+    		
+	protected IDataSet initDataSet() throws Exception
     {
+        long now = System.currentTimeMillis();
+	    Timestamp from = new Timestamp(now + 2100);
+	    Timestamp to = new Timestamp(now + 7200 );
 		ReplacementDataSet dataSet = null;
+		
 		try{
-			URL resourceLocation = Object.class.getResource("/dataset-scale-out.xml");
+			URL resourceLocation = Object.class.getResource("/dataset-init-scale-out.xml");
 	        dataSet = new ReplacementDataSet(new FlatXmlDataSetBuilder().
 	            build(new FileInputStream(new File(resourceLocation.toURI())))); 
 	        dataSet.addReplacementObject("[from]", from);
@@ -92,10 +98,22 @@ public class SystemTests {
         return dataSet;
     }
 	
-	public void prepareTestDatabase(Timestamp from, Timestamp to){
-		IDataSet dataSet;
+	protected IDataSet addMachineDataSet() throws Exception
+    {
+	    IDataSet dataSet = null;   
+        try{
+            DataFileLoader loader = new FlatXmlDataFileLoader();
+            dataSet = loader.load("/dataset-machine.xml");
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+        return dataSet;
+    }
+	
+	
+	public void updateTestDatabase(IDataSet dataSet){
 		try {
-			dataSet = getDataSet(from, to);
 			IDatabaseConnection dbConn = new DatabaseDataSourceConnection(dataSource);
 			DatabaseOperation.CLEAN_INSERT.execute(dbConn, dataSet);
 		} catch (Exception e) {
@@ -114,9 +132,10 @@ public class SystemTests {
 	@Test
 	public void scheduledScaler_scaleOutScaleIn() throws Exception {
 		try{	
-			long now = System.currentTimeMillis();	
-			prepareTestDatabase(new Timestamp(now + 2100), new Timestamp(now + 7200 ));
+		    // Init
+			updateTestDatabase(initDataSet());
 				  
+			// Test
 			Thread.sleep(3000);
 			ScalingRule scalingRule = scalingRuleService.getRule(CLUSTER_ID);
 			Assert.assertEquals(2, scalingRule.getClusterSizeOriginal());
@@ -125,55 +144,66 @@ public class SystemTests {
 			
 			Thread.sleep(5000);
 			Assert.assertEquals(0, scalingRuleService.getRule(CLUSTER_ID).getScheduledScalingState());
-            Assert.assertEquals("1,2", jobService.getJob(JOB_ID + 1).getServices());       
+            Assert.assertEquals("1,2", jobService.getJob(JOB_ID + 1).getServices());  
 		}
 		catch (Exception e){
             e.printStackTrace();
 		}
 	}
 	
+	/*
+     * Periodic scaler scaling out and in system test.
+     * 
+     * A mock rrd server and a database are configured so that periodic scaler would perform scale out
+     * on a cluster.
+     * After that the mock server is configured to report low load, and scaler should perform
+     * scaling in on a cluster.
+     */
 	@Test
     public void periodicScaler_scaleOutScaleIn() throws Exception {
         try{  
+            // Init 
+            updateTestDatabase(initDataSet());          
             
-            // Set jobs as ready
-            jobService.updateStatus(JOB_ID, 10);
-            jobService.updateStatus(JOB_ID + 1, 10);
+            ProcessBuilder pb = new ProcessBuilder("python", MOCK_SERVER_PATH);
+            Process p = pb.start();          
+                  
+            HttpGateway.get(URL_LOAD_MEDIUM);
             
-            // Start stub server
-            Runtime r = Runtime.getRuntime();
-            Process p = r.exec("python src/test/python/rrd-server-stub.py");
-            
-            // Sleep 15 sec, after that a scaling out job (id = 2)should be created.
-            Thread.sleep(15000);
+            // Test 
+            Thread.sleep((int)(AUTOSCALER_PERIOD_MS * 1.1));
             ScalingRule scalingRule = scalingRuleService.getRule(CLUSTER_ID);
-            Assert.assertEquals(JOB_ID + 2, scalingRule.getjobId());
-            Assert.assertEquals("1,3", jobService.getJob(JOB_ID + 2).getServices());       
+            Assert.assertEquals(JOB_UNDEFINED, scalingRule.getJobId());
+                      
+            HttpGateway.get(URL_LOAD_HIGH);
+            Thread.sleep((int)(AUTOSCALER_PERIOD_MS * 1.1));
+            
+            scalingRule = scalingRuleService.getRule(CLUSTER_ID);
+            int lastScaleOutJobId = scalingRule.getJobId();
+            Assert.assertFalse(JOB_UNDEFINED == lastScaleOutJobId);
+            Assert.assertEquals("1,3", jobService.getJob(lastScaleOutJobId).getServices()); 
+            
+            HttpGateway.get(URL_LOAD_MEDIUM);
+            jobService.updateStatus(lastScaleOutJobId, 10);
 
+            Thread.sleep((int)(AUTOSCALER_PERIOD_MS * 1.1));
+            scalingRule = scalingRuleService.getRule(CLUSTER_ID);
+            Assert.assertEquals(lastScaleOutJobId, scalingRule.getJobId());
             
-            // Add one machine manually
-            // 
+            HttpGateway.get(URL_LOAD_LOW);
+            Thread.sleep((int)(AUTOSCALER_PERIOD_MS * 2));
             
-            // Make the job ready
-            jobService.updateStatus(JOB_ID + 2, 10);
-
-            // Sleep 15 sec and wait that stub server decreases cluster load to 0. 
-            // After that a scaling in job (id = 3)should be created.
-            Thread.sleep(15000);
-            Assert.assertEquals(JOB_ID + 3, scalingRuleService.getRule(CLUSTER_ID).getjobId());
-            Assert.assertEquals("1,2", jobService.getJob(JOB_ID + 2).getServices());       
-
-            // check that scaling in is done to size 2
-            
-            // destroy stub server 
-            p.destroy();
-            
+            scalingRule = scalingRuleService.getRule(CLUSTER_ID);
+            int lastScaleInJobId = scalingRule.getJobId();
+            Assert.assertFalse(lastScaleOutJobId == lastScaleInJobId);
+            Assert.assertEquals("1,1", jobService.getJob(lastScaleInJobId).getServices());       
+               
+            // Cleanup 
+            p.destroy();         
         }
         catch (Exception e){
             e.printStackTrace();
         }
-    }
-	
-	
+    }	
 }
 

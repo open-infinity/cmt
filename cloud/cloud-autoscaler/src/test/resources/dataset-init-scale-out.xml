@@ -77,7 +77,7 @@
 		period_to = "[to]"
 		size_new = "5"
 		size_original = "7"
-		job_id= "0"/>
+		job_id= "-1"/>
 		
 	<scaling_rule_tbl 
         cluster_id = "2"
