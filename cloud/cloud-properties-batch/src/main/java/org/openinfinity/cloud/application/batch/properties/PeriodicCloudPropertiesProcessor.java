@@ -93,6 +93,7 @@ public class PeriodicCloudPropertiesProcessor implements ItemProcessor<Collectio
 		deployment.setInstanceId(instanceId);
 		deployment.setClusterId(clusterId);
 		deployment.setType("properties");
+		deployment.setName("infrastructure");
 		return deployment;
 	}
 
