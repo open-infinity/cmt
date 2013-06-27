@@ -58,16 +58,16 @@ public class PeriodicCloudPropertiesProcessor implements ItemProcessor<Collectio
 		if (! localDiskTempFileSystemDirectory.exists()) {
 			ExceptionUtil.throwSystemException(EXCEPTION_MESSAGE_TEMPORARY_FILESYSTEM_DOES_NOT_EXIST + localDiskTempFileSystem);
 		}
-		int availabilityZone = 0;
+		//int availabilityZone = 0;
 		long organizationId = 0;
 		int instanceId = 0;
 		int clusterId = 0;
 		Date lastModifiedTimeStamp = new Date();
 		StringBuilder contentBuilder = new StringBuilder();
-		populateDeploymentMetadataAndTempFileContent(sharedProperties, availabilityZone, organizationId, instanceId, clusterId, lastModifiedTimeStamp, contentBuilder);
+		populateDeploymentMetadataAndTempFileContent(sharedProperties, organizationId, instanceId, clusterId, lastModifiedTimeStamp, contentBuilder);
 		File tmp = initializeTempFile(localDiskTempFileSystemDirectory, clusterId);
 		FileUtil.store(tmp.getAbsolutePath(), contentBuilder.toString());
-		Deployment deployment = populateDeployment(availabilityZone, organizationId, instanceId, clusterId);
+		Deployment deployment = populateDeployment(organizationId, instanceId, clusterId);
 		deployment.setInputStream(new FileInputStream(tmp));
 		Map<File, Deployment> fileAndDeployment = populateMapWithTempFileAndDeployment(tmp, deployment);
 		return fileAndDeployment;
@@ -87,9 +87,8 @@ public class PeriodicCloudPropertiesProcessor implements ItemProcessor<Collectio
 		return fileAndDeployment;
 	}
 
-	private Deployment populateDeployment(int availabilityZone, long organizationId, int instanceId, int clusterId) {
+	private Deployment populateDeployment(long organizationId, int instanceId, int clusterId) {
 		Deployment deployment = new Deployment();
-		deployment.setAvailabilityZone(availabilityZone);
 		deployment.setOrganizationId(organizationId);
 		deployment.setInstanceId(instanceId);
 		deployment.setClusterId(clusterId);
@@ -97,14 +96,13 @@ public class PeriodicCloudPropertiesProcessor implements ItemProcessor<Collectio
 		return deployment;
 	}
 
-	private void populateDeploymentMetadataAndTempFileContent(Collection<SharedProperty> sharedProperties, int availabilityZone, long organizationId, int instanceId, int clusterId, Date lastModifiedTimeStamp, StringBuilder contentBuilder) {		
+	private void populateDeploymentMetadataAndTempFileContent(Collection<SharedProperty> sharedProperties, long organizationId, int instanceId, int clusterId, Date lastModifiedTimeStamp, StringBuilder contentBuilder) {		
 		for (SharedProperty sharedProperty : sharedProperties) {
 			contentBuilder
 				.append(sharedProperty.getKey())
 				.append("=")
 				.append(sharedProperty.getValue())
 				.append("\n");
-			availabilityZone = sharedProperty.getAvailabilityZone();
 			clusterId = sharedProperty.getClusterId();
 			instanceId = sharedProperty.getInstanceId();
 			clusterId = sharedProperty.getClusterId();
