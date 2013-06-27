@@ -17,7 +17,6 @@ package org.openinfinity.cloud.domain.repository.scaling;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -26,13 +25,13 @@ import javax.sql.DataSource;
 import org.openinfinity.core.annotation.AuditTrail;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.Assert;
 import org.openinfinity.cloud.domain.ScalingRule;
-import org.openinfinity.cloud.domain.repository.scaling.ScalingRuleRowMapper;
 
 /**
  * Repository interface implementation of the scaling rules for storing cluster specific rules.
@@ -94,7 +93,7 @@ public class ScalingRuleRepositoryImpl implements ScalingRuleRepository {
 	private static final String LOAD_BY_CLUSTER_ID = "select * from scaling_rule_tbl where cluster_id = ?";
 	
 	private static final String LOAD_ALL = "select * from scaling_rule_tbl";
-	
+
 	private static final String DELETE_BY_ID = "delete from scaling_rule_tbl where cluster_id = ?";
 	
 	private static String UPDATE_JOB_ID = "update scaling_rule_tbl set job_id = ? where cluster_id = ?";
@@ -146,9 +145,13 @@ public class ScalingRuleRepositoryImpl implements ScalingRuleRepository {
 	}
 
 	@AuditTrail
-	public ScalingRule loadByClusterId(int clusterId) {
-		ScalingRule scalingRule = (ScalingRule) jdbcTemplate.queryForObject(LOAD_BY_CLUSTER_ID, new Object[]{clusterId}, scalingRuleRowMapper);
-		return scalingRule;
+	public ScalingRule getRule(int clusterId) {
+	    try {
+	        return (ScalingRule) jdbcTemplate.queryForObject(LOAD_BY_CLUSTER_ID, new Object[]{clusterId}, scalingRuleRowMapper);
+	    } catch (EmptyResultDataAccessException dae) {
+	        //FIXME: Looks like exception is always caught at service level, does not propagate to autoscaler 
+	    }
+	    return null;
 	}
 
 	@AuditTrail

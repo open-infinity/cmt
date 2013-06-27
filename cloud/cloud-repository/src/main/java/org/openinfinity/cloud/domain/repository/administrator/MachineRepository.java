@@ -36,7 +36,7 @@ public interface MachineRepository {
 	List<Machine> getMachinesInCluster(int clusterId);
 	List<Machine> getMachinesInClusterRunningAndReady(int clusterId);
 	List<Machine> getMachinesInClusterExceptType(int clusterId, String machineType);
-	List<Machine> getMachinesInClusterNotConfigured(int clusterId);	
+	boolean allMachinesConfigured(int clusterId);
 	List<Machine> getMachinesNeedingConfigure();
 	List<Machine> getBigDataMachinesNeedingConfigure();
 	List<Machine> getMachinesNeedingUpdate(int cloudType);

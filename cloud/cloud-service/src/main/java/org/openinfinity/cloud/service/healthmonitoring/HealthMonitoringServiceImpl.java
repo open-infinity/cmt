@@ -76,6 +76,7 @@ public class HealthMonitoringServiceImpl implements HealthMonitoringService {
 	private String connTimeout;
    
 	private static final int RRD_PORT = 8181;
+	private static final int RRA_STEP = 10;
 	private static final String CONTEXT_PATH = "monitoring";
 	private static final String PROTOCOL = "http://";
 	private static final String HM_GROUPNAME_PREFIX = "cluster_";
@@ -248,7 +249,28 @@ public class HealthMonitoringServiceImpl implements HealthMonitoringService {
         if (StringUtils.isNotBlank(metricType) && ArrayUtils.isNotEmpty(metricNames) && machine != null) { 
             String groupName = HM_GROUPNAME_PREFIX + machine.getClusterId();
             String url = getRequestBuilder(machine.getDnsName()).buildHealthStatusRequest(
-                new Request(groupName, Request.SOURCE_GROUP, metricType, metricNames, date, date, 100L));
+                new Request(groupName, Request.SOURCE_GROUP, metricType, metricNames, date, date, 1L));
+            String responseStr = HttpHelper.executeHttpRequest(client, url);
+            
+            // FIXME: handling in case that response is of type error
+            response = toObject(responseStr, HealthStatusResponse.class);
+            
+            LOG.debug("Request for machine "+url);
+        } else {
+            response = new HealthStatusResponse();
+            response.setResponseStatus(AbstractResponse.STATUS_PARAM_FAIL);
+        }
+        return response;
+    }
+    
+ // FIXME: this function needs refactoring  - there is lot of repeating code around.
+    @Override
+    public HealthStatusResponse getClusterHealthStatusLast(Machine machine, String metricType, String[] metricNames, Date date) {
+        HealthStatusResponse response = null;
+        if (StringUtils.isNotBlank(metricType) && ArrayUtils.isNotEmpty(metricNames) && machine != null) { 
+            String groupName = HM_GROUPNAME_PREFIX + machine.getClusterId();
+            String url = getRequestBuilder(machine.getDnsName()).buildLastHealthStatusRequest(
+                new Request(groupName, Request.SOURCE_GROUP, metricType, metricNames, date, date, RRA_STEP));
             String responseStr = HttpHelper.executeHttpRequest(client, url);
             
             // FIXME: handling in case that response is of type error

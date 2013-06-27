@@ -56,7 +56,7 @@ public interface MachineService {
 	
 	Collection<Machine> getMachinesInClusterExceptType(int clusterId, String machineType);
 	
-    Collection<Machine> getMachinesInClusterNotConfigured(int clusterId);
+    boolean allMachinesConfigured(int clusterId);
 	
 	Collection<Machine> getMachinesNeedingConfigure();
 	
@@ -90,6 +90,4 @@ public interface MachineService {
 
 	Machine getClusterManagementMachine(int clusterId);
 	
-	boolean allMachinesInClusterConfigured(int clusterId);
-
 }

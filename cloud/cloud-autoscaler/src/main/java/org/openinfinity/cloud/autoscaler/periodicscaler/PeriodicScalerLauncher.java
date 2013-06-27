@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 the original author or authors.
+ * Copyright (c) 2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,6 @@
 
 package org.openinfinity.cloud.autoscaler.periodicscaler;
 
-import org.apache.log4j.Logger;
-import org.openinfinity.cloud.domain.AbstractResponse;
 import org.openinfinity.cloud.service.healthmonitoring.HealthMonitoringService;
 import org.openinfinity.core.annotation.Log;
 import org.springframework.batch.core.Job;
@@ -37,8 +35,6 @@ import org.springframework.stereotype.Component;
 
 @Component("periodicScalerLauncher")
 public class PeriodicScalerLauncher {
-	private static final Logger LOG = Logger.getLogger(PeriodicScalerLauncher.class.getName());
-
 	@Autowired
 	@Qualifier("periodicJob")
 	private Job job;
@@ -51,8 +47,6 @@ public class PeriodicScalerLauncher {
 		
 	@Log
 	public void launch() throws Exception {
-		LOG.debug("launch() enter");
-		JobExecution exec = jobLauncher.run(job, new JobParametersBuilder().addLong("p_time", System.currentTimeMillis()).toJobParameters());
-		LOG.debug(exec.getExitStatus());
+		jobLauncher.run(job, new JobParametersBuilder().addLong("p_time", System.currentTimeMillis()).toJobParameters());
 	}
 }

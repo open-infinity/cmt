@@ -23,7 +23,6 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
-import org.hsqldb.lib.HashMap;
 import org.openinfinity.cloud.domain.Cluster;
 import org.openinfinity.cloud.domain.HealthStatusResponse;
 import org.openinfinity.cloud.domain.HealthStatusResponse.SingleHealthStatus;
@@ -38,6 +37,7 @@ import org.openinfinity.cloud.service.administrator.MachineService;
 import org.openinfinity.cloud.service.healthmonitoring.HealthMonitoringService;
 import org.openinfinity.cloud.service.scaling.Enumerations.ScalingState;
 import org.openinfinity.cloud.service.scaling.ScalingRuleService;
+import org.openinfinity.cloud.domain.ScalingRule;
 import org.openinfinity.core.exception.SystemException;
 import org.openinfinity.core.util.ExceptionUtil;
 import org.springframework.batch.item.ItemProcessor;
@@ -62,10 +62,8 @@ public class PeriodicScalerItemProcessor implements ItemProcessor<Machine, Job> 
 	
 	private static final String METRIC_TYPE_LOAD = "load";
 	
-	private static final String METRIC_NAME_LOAD_MIDTERM = "midterm";
-		
-	private final int DELAY = 30000;
-
+	private static final String METRIC_PERIOD = "shortterm";
+			
 	@Autowired
 	MachineService machineService;
 	
@@ -77,89 +75,87 @@ public class PeriodicScalerItemProcessor implements ItemProcessor<Machine, Job> 
 	
 	@Autowired
 	ScalingRuleService scalingRuleService;
-	
+		
 	@Autowired
 	HealthMonitoringService healthMonitoringService;
 	
 	@Override
 	public Job process(Machine machine) throws Exception {
-        LOG.debug("MACHINE public IP address: " + machine.getDnsName());
-		LOG.debug("CLUSTER ID: " + machine.getClusterId());
 		try {
 			return applyScalingRule(machine);
 		}
 		catch(SystemException e){
-			e.printStackTrace();
+		    ExceptionUtil.throwBusinessViolationException(e.getMessage(), e);
 			return null;
 		}			
 	}
 	
 	private Job applyScalingRule(Machine machine) throws IOException{
-        float load = getClusterLoad(machine);
-        if (load == -1) return null;
-        Job job = null;
-        ScalingState scalingState = scalingRuleService.calculateScalingState(load, machine.getClusterId());
-        Cluster cluster = clusterService.getCluster(machine.getClusterId());
-        if (cluster == null) {
-            LOG.error("Cluster fetching failed.");
-            return job;
+        int clusterId = machine.getClusterId();
+	    ScalingRule rule = null; 
+        Cluster cluster = null;
+	    try{
+            rule = scalingRuleService.getRule(clusterId);
+            if (rule == null) return null;                
+            cluster = clusterService.getCluster(clusterId);
         }
-        switch (scalingState) {
-            case SCALE_OUT: 
+        catch(Exception e){
+            if (rule == null) LOG.info("Rule not defined for cluster " + clusterId);
+            else if (cluster == null) LOG.error("Cluster " + clusterId + " fetching failed.");
+            return null;
+        }
+        float load = getClusterLoad(machine);
+        LOG.debug("load = " + load);
+
+        if (load == -1) return null;
+        ScalingState state = scalingRuleService.calculateScalingState(rule, load, clusterId);
+        switch (state) {
+            case SCALING_OUT: 
                 return createJob(machine, cluster, 1);
-            case SCALE_IN:  
+            case SCALING_IN:  
                 return createJob(machine, cluster, -1);
-            case SYSTEM_DISASTER_PANIC: ExceptionUtil.throwSystemException
-                ("Cluster scaling rules failed. Current CPU [" + load + "%] " +
-                 "load for cluster [" + machine.getClusterId() + "] is remarkable and cluster maximum limit has been reached.");
+            case SCALING_NEEDED_BUT_IMPOSSIBLE: 
+                ExceptionUtil.throwSystemException(
+                     "Cluster scaling failed. System load [" + load + "%] " +
+                     "for cluster [" + clusterId + "] is + too high, but " +
+                     "cluster maximum limit has been reached.");
+            case SCALING_DISABLED: 
+            case SCALING_SKIPPED:
+            case SCALING_NOT_NEEDED:
         default:
             break;
         }
         return null;
     }
 	
-	// FIXME: exceptions handling
-	private float getClusterLoad(Machine machine) throws IOException, JsonParseException, 
-	                                                     JsonMappingException, SystemException {
-		Date now = new Date();
-		Date earlier = new Date(now.getTime() - DELAY);
-		float load = -1;               
+	private float getClusterLoad(Machine machine) throws IOException, IndexOutOfBoundsException,  
+	    JsonParseException, JsonMappingException, SystemException {  
 		String[] metricName = {METRIC_RRD_FILE_LOAD};
-		HealthStatusResponse status = 
-		    healthMonitoringService.getClusterHealthStatus(machine, METRIC_TYPE_LOAD, metricName, earlier);	
 		
-		// FIXME: handle status return type for error situation
-		List<SingleHealthStatus> metrics =  status.getMetrics();
+		HealthStatusResponse status = 
+		    healthMonitoringService.getClusterHealthStatusLast(machine, METRIC_TYPE_LOAD, metricName, new Date());		
+		List<SingleHealthStatus> metrics = status.getMetrics();
+		LOG.debug("metrics len " + metrics.size());
         if (metrics.size() > 0){
 	        Map<String, List<RrdValue>> values = metrics.get(0).getValues();
-	        List<RrdValue> midtermLoadRrd = values.get(METRIC_NAME_LOAD_MIDTERM);
-	        if (midtermLoadRrd != null){        
-    	        RrdValue midtermValue =  midtermLoadRrd.get(0);
-    	        load = midtermValue.getValue().floatValue();
+	        List<RrdValue> loadRrd = values.get(METRIC_PERIOD);
+	        if (loadRrd != null){        
+    	        return loadRrd.get(0).getValue().floatValue();
 	        }
         }
-        if (load == -1) {
-        	LOG.debug(MSG_HM_METRIC_NOT_AVAILABLE);
-        }
-        LOG.debug("Load = " + load);
-		return load;
+        LOG.info(MSG_HM_METRIC_NOT_AVAILABLE);
+        return -1;
 	}
 	
 	private Job createJob(Machine machine, Cluster cluster, int machinesGrowth) {
-	    //int clusterId = cluster.getId();
-	    //Date now = new Date();
-	    	    
-		// TODO set scalingrule
-		Instance instance = instanceService.getInstanceByMachineId(machine.getId());
-		Job job = null;		
-		job = new Job("scale_cluster",
+        Instance instance = instanceService.getInstance(cluster.getInstanceId());
+		return new Job("scale_cluster",
 			cluster.getInstanceId(),
 			instance.getCloudType(),
 			JobService.CLOUD_JOB_CREATED,
-			instance.getZone());
-		// TODO: use a new Job constructor
-		job.addService(Integer.toString(cluster.getId()), cluster.getNumberOfMachines() + machinesGrowth);
-		return job;
+			instance.getZone(),
+			Integer.toString(cluster.getId()),
+			cluster.getNumberOfMachines() + machinesGrowth);	
 	}
 	
 }

@@ -9,7 +9,7 @@
 		organization_id = "13105"
 		instance_status = "Running"
 		instance_active= "1" />
-			
+					
 	<cluster_tbl 
 		cluster_id ="1"
 		cluster_name ="S platform"
@@ -24,14 +24,16 @@
 		cluster_security_group_id = "NULL"
 		cluster_security_group_name = "TOASinstance78"
 		cluster_multicast_address = "224.2.1.9"
-		cluster_machine_type ="1"/>	
+		cluster_machine_type = "1"
+		cluster_ebs_image_used = "0"
+		cluster_ebs_volumes_used = "1"/>	
 		
 	<machine_tbl 
 		machine_id = "1"
 		machine_instance_id = "machine1"
 		project_id = "0"
 		machine_name = "BAS platform"
-		machine_dns_name = "10.33.208.118"
+		machine_dns_name = "127.0.0.1"
 		machine_key = "0"
 		active = "1"
 		machine_username = "root" 
@@ -40,7 +42,7 @@
 		machine_cluster_id = "1" 
 		machine_private_dns_name = "dns" 
 		machine_type = "loadbalancer"
-		machine_configured = "0" 
+		machine_configured = "3" 
 		machine_last_update = "2013-10-01 13:03:47"
 		machine_cloud_type = "1"/> 
 		
@@ -49,7 +51,7 @@
 		machine_instance_id = "machine2"
 		project_id = "0"
 		machine_name = "BAS platform"
-		machine_dns_name = "10.33.208.119"
+		machine_dns_name = "127.0.0.1"
 		machine_key = "0"
 		active = "1"
 		machine_username = "root" 
@@ -58,7 +60,7 @@
 		machine_cluster_id = "1" 
 		machine_private_dns_name = "dns" 
 		machine_type = "loadbalancer"
-		machine_configured = "0" 
+		machine_configured = "3" 
 		machine_last_update = "2013-10-01 13:03:47"
 		machine_cloud_type = "1"/> 
 	
@@ -69,12 +71,27 @@
 	    scaling_state = "1"
 		max_machines = "12"
 		min_machines = "1"
-		max_cpu_load = "90"
-		min_cpu_load = "1"
+		max_load = "0.9"
+		min_load = "0.2"
 		period_from = "[from]"
 		period_to = "[to]"
 		size_new = "5"
 		size_original = "7"
-		job_id= "0"/>
+		job_id= "-1"/>
+		
+	<scaling_rule_tbl 
+        cluster_id = "2"
+        periodic = "1"
+        scheduled = "0"
+        scaling_state = "1"
+        max_machines = "5"
+        min_machines = "1"
+        max_load = "0.9"
+        min_load = "0.2"
+        period_from = "[from]"
+        period_to = "[to]"
+        size_new = "5"
+        size_original = "7"
+        job_id= "-1"/>	
 	
 </dataset> 
