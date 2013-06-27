@@ -57,9 +57,8 @@ public class CentralizedPropertiesRepositoryJdbcImpl implements CentralizedPrope
 	private static final String LOAD_ALL_SQL = "select * from properties_tbl";
 	private static final String LOAD_ALL_SQL_WHERE = "select * from properties_tbl " + WHERE2;
 	private static final String DELETE_BY_KEY = "delete from properties_tbl " + WHERE;
-	private static final String LOAD_DISTINCT_SHARED_PROPERTIES_CLUSTERS_SQL = "SELECT DISTINCT organization_id, instance_id, cluster_id FROM properties_tbl";
+	private static final String LOAD_DISTINCT_SHARED_PROPERTIES_CLUSTERS_SQL = "SELECT DISTINCT * FROM properties_tbl";
 	private static final String DELETE_BY_UNIQUE_ID = "delete from properties_tbl where id = :id";
-	
 	
 	private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 	private JdbcTemplate jdbcTemplate;
