@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011 the original author or authors.
+ * Copyright (c) 2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,7 +62,6 @@ import com.liferay.portal.model.User;
 /**
  * Controller for handling Cluster related CloudAdmin requests
  * @author Ossi Hämäläinen
- * @author Juha-Matti Sironen,
  * @author Vedran Bartonicek
  * @version 1.0.0 Initial version
  * @since 1.0.0
