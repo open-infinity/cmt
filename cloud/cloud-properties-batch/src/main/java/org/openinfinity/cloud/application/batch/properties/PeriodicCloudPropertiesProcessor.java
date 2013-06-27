@@ -63,7 +63,21 @@ public class PeriodicCloudPropertiesProcessor implements ItemProcessor<Collectio
 		int clusterId = 0;
 		Date lastModifiedTimeStamp = new Date();
 		StringBuilder contentBuilder = new StringBuilder();
-		populateDeploymentMetadataAndTempFileContent(sharedProperties, organizationId, instanceId, clusterId, lastModifiedTimeStamp, contentBuilder);
+		
+		for (SharedProperty sharedProperty : sharedProperties) {
+			contentBuilder
+				.append(sharedProperty.getKey())
+				.append("=")
+				.append(sharedProperty.getValue())
+				.append("\n");
+			organizationId = sharedProperty.getOrganizationId();
+			instanceId = sharedProperty.getInstanceId();
+			clusterId = sharedProperty.getClusterId();
+			LOGGER.debug("Creating properties properties file for unique cluster: " + clusterId);
+			lastModifiedTimeStamp = sharedProperty.getTimestamp().after(lastModifiedTimeStamp)?sharedProperty.getTimestamp():lastModifiedTimeStamp;
+		}
+		
+		//populateDeploymentMetadataAndTempFileContent(sharedProperties, organizationId, instanceId, clusterId, lastModifiedTimeStamp, contentBuilder);
 		File tmp = initializeTempFile(localDiskTempFileSystemDirectory, clusterId);
 		FileUtil.store(tmp.getAbsolutePath(), contentBuilder.toString());
 		Deployment deployment = populateDeployment(organizationId, instanceId, clusterId);
