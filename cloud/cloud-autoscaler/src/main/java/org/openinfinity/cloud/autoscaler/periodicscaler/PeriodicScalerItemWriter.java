@@ -18,7 +18,6 @@ package org.openinfinity.cloud.autoscaler.periodicscaler;
 
 
 import java.util.List;
-import org.apache.log4j.Logger;
 import org.openinfinity.cloud.domain.Job;
 import org.openinfinity.cloud.service.administrator.JobService;
 import org.openinfinity.cloud.service.scaling.ScalingRuleService;
@@ -35,7 +34,6 @@ import org.springframework.stereotype.Component;
  */
 @Component("periodicScalerItemWriter")
 public class PeriodicScalerItemWriter implements ItemWriter<Job> {
-	private static final Logger LOG = Logger.getLogger(PeriodicScalerItemWriter.class.getName());
 
 	@Autowired
     JobService jobService;		
@@ -46,11 +44,9 @@ public class PeriodicScalerItemWriter implements ItemWriter<Job> {
 	@Override
 	public void write(List<? extends Job> items) throws Exception {
 	    for (Job item : items) {
-	        LOG.debug("Enter write");
 	        // FIXME: parsing of cluster id 
 	        int jobId = jobService.addJob(item);        
 	        String[] services = item.getServices().split(",");
-	        LOG.debug("services = " + services);
 	        int clusterId = Integer.parseInt(services[0]);
 	        scalingRuleService.storeJobId(clusterId, jobId); 
         }

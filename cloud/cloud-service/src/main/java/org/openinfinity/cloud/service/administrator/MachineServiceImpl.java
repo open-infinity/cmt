@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.openinfinity.cloud.domain.Key;
 import org.openinfinity.cloud.domain.Machine;
 import org.openinfinity.cloud.domain.repository.administrator.MachineRepository;
 import org.openinfinity.core.annotation.Log;
@@ -93,11 +92,6 @@ public class MachineServiceImpl implements MachineService {
     } 
 	
 	@Log
-    public List<Machine> getMachinesInClusterNotConfigured(int clusterId) {
-        return machineRepository.getMachinesInClusterNotConfigured(clusterId);
-    } 
-	   
-	@Log
 	public void removeMachine(int id) {
 		machineRepository.removeMachine(id);
 	}
@@ -167,16 +161,8 @@ public class MachineServiceImpl implements MachineService {
 	}
 
    @Log
-    public boolean allMachinesInClusterConfigured(int clusterId) {
-       try {
-           int size = machineRepository.getMachinesInClusterNotConfigured(clusterId).size();
-           boolean allConfigured = size > 0 ? false : true;
-           return allConfigured;
-       } catch (Exception e) {
-           // TODO: what to do here? It is not desirable to log or re-throw exceptions in most cases.
-           // HOw to make difference between 0 results and error?
-           return true;
-       }
+    public boolean allMachinesConfigured(int clusterId) {
+       return machineRepository.allMachinesConfigured(clusterId);
     } 
 
 }

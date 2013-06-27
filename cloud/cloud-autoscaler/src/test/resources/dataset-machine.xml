@@ -1,0 +1,21 @@
+<dataset>
+		
+	<machine_tbl 
+		machine_id = "2"
+		machine_instance_id = "machine2"
+		project_id = "0"
+		machine_name = "BAS platform"
+		machine_dns_name = "127.0.0.1"
+		machine_key = "0"
+		active = "1"
+		machine_username = "root" 
+		machine_running = "1"
+		machine_state = "running"
+		machine_cluster_id = "1" 
+		machine_private_dns_name = "dns" 
+		machine_type = "clustermember"
+		machine_configured = "3" 
+		machine_last_update = "2013-10-01 13:03:47"
+		machine_cloud_type = "1"/> 
+	
+</dataset> 

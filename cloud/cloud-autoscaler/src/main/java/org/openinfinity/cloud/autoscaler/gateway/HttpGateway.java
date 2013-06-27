@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 the original author or authors.
+ * Copyright (c) 2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,32 +31,32 @@ import org.openinfinity.core.util.ExceptionUtil;
  * @since 1.0.0
  */
 public class HttpGateway {
-	
-	private static HttpClient HTTP_CLIENT;
-	
-	static {
-		HTTP_CLIENT = new HttpClient(new MultiThreadedHttpConnectionManager());
-		HTTP_CLIENT.getHttpConnectionManager().getParams().setConnectionTimeout(30000);
-	}
-	
-	public static InputStream get(String url) {
-		InputStream inputStream = null;
-		GetMethod method = null;
-		try {
-			method = new GetMethod(url);
-			method.setFollowRedirects(true);
-			int statusCode = HTTP_CLIENT.executeMethod(method);
-			if (statusCode == 200) {
-				inputStream = method.getResponseBodyAsStream();
-				return inputStream;
-			} 
-		} catch (Throwable throwable) {
-				ExceptionUtil.throwSystemException(throwable);
-		} finally {
-			if (method != null)
-				method.releaseConnection();
-		}
-		return inputStream;
-	}
-
+    
+    private static HttpClient HTTP_CLIENT;
+    
+    static {
+        HTTP_CLIENT = new HttpClient(new MultiThreadedHttpConnectionManager());
+        HTTP_CLIENT.getHttpConnectionManager().getParams().setConnectionTimeout(30000);
+    }
+    
+    public static InputStream get(String url) {
+        InputStream inputStream = null;
+        GetMethod method = null;
+        try {
+            method = new GetMethod(url);
+            method.setFollowRedirects(true);
+            int statusCode = HTTP_CLIENT.executeMethod(method);
+            if (statusCode == 200) {
+                inputStream = method.getResponseBodyAsStream();
+                return inputStream;
+            } 
+        } catch (Throwable throwable) {
+                ExceptionUtil.throwSystemException(throwable);
+        } finally {
+            if (method != null)
+                method.releaseConnection();
+        }
+        return inputStream;
+    }
+    
 }

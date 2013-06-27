@@ -146,16 +146,13 @@
 			<artifactId>log4j</artifactId>
 			<version>1.2.14</version>
 		</dependency>
-		<dependency>
-			<groupId>commons-httpclient</groupId>
-			<artifactId>commons-httpclient</artifactId>
-			<version>3.1</version>
-		</dependency>
-<!--		<dependency>-->
-<!--			<groupId>com.atomikos</groupId>-->
-<!--			<artifactId>transactions-essentials-all</artifactId>-->
-<!--			<version>3.6.4</version>-->
-<!--		</dependency>-->
+		
+        <dependency>
+            <groupId>commons-daemon</groupId>
+            <artifactId>commons-daemon</artifactId>
+            <version>1.0.10</version>
+        </dependency>
+        
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-all</artifactId>
@@ -181,14 +178,24 @@
 		    </exclusions> 
         </dependency>
         <dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpclient</artifactId>
-			<version>4.2.1</version>
-		</dependency>
+            <groupId>commons-httpclient</groupId>
+            <artifactId>commons-httpclient</artifactId>
+            <version>3.1</version>
+        </dependency>
         
 	</dependencies>
 
 	<build>
+	   <resources>
+           <resource>
+               <directory>src/main/resources</directory>
+               <filtering>true</filtering>
+           </resource> 
+           <resource>
+               <directory>src/main/resources/META-INF</directory>
+               <filtering>true</filtering>
+           </resource> 
+        </resources>
 		<pluginManagement>
 			<plugins>
 				<plugin>
@@ -216,15 +223,9 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
 				    <skipTests>true</skipTests>
-				    
-					<!--forkMode>pertest</forkMode -->
 					<includes>
-						<include>**/SmokeTests.java</include>
+						<include>**/SystemTests.java</include>
 					</includes>
-					<!-- includes>
-						<include>**/*Test.java</include>
-					</includes-->
-					
 					<excludes>
 						<exclude>**/Abstract*.java</exclude>
 					</excludes>
@@ -237,9 +238,7 @@
 				<configuration>
 					<mainClass>org.springframework.batch.core.launch.support.CommandLineJobRunner</mainClass>
 					<arguments>
-						<!-- job configuration file -->
 						<argument>classpath:/launch-context.xml</argument>
-						<!-- job name -->
 						<argument>job1</argument>
 					</arguments>
 				</configuration>
@@ -301,12 +300,6 @@
 				</executions>
 			</plugin>
 		</plugins>	
-		<resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-            </resource> 
-        </resources>
 	</build>
 	<repositories>
 		<repository>

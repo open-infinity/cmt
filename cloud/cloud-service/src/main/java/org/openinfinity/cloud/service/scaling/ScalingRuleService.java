@@ -32,9 +32,9 @@ import org.openinfinity.cloud.service.scaling.Enumerations.ScalingState;
 public interface ScalingRuleService {
 	
 	/**
-	 * Calculates scaling balance state based on scaling rules for the cluster
+	 * Calculates scaling balance state 
 	 */
-	ScalingState calculateScalingState(float cpuPercentage, int clusterId);
+	ScalingState calculateScalingState(ScalingRule rule, float load, int clusterId);
 	
 	/**
 	 * Stores the scaling rule into a repository.
@@ -42,9 +42,9 @@ public interface ScalingRuleService {
 	void store (ScalingRule scalingRule);
 		
 	/**
-	 * Loads <code>org.openinfinity.cloud.domain.ScalingRule</code> based on the cluster id.
+	 * Gets <code>org.openinfinity.cloud.domain.ScalingRule</code> based on the cluster id.
 	 */
-	ScalingRule loadByClusterId (int clusterId);
+	ScalingRule getRule(int clusterId);
 
 	/**
 	 * Deletes scaling rule by id.

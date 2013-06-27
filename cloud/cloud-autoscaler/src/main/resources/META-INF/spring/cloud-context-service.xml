@@ -10,7 +10,6 @@
 	
 	<context:component-scan base-package="org.openinfinity.cloud.service" />
 	
-	<!-- bean id = "apacheHttpClient" class = "org.apache.http.impl.client.DefaultHttpClient"/-->
 	<bean id="plainSocketFactory" class="org.apache.http.conn.scheme.PlainSocketFactory"
 		factory-method="getSocketFactory"></bean>
 

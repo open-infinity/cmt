@@ -147,6 +147,31 @@ public class RequestBuilder {
                 .append(request.getStep());
         return builder.toString();
     }
+    
+    public String buildLastHealthStatusRequest(Request request) {
+        StringBuilder builder = new StringBuilder(getHostPart());
+        String joinedMetricNames = StringUtils.join(request.getMetricNames(), METRIC_NAME_DELIMITER);
+        if (Request.SOURCE_GROUP.equals(request.getSourceType())) {
+            builder.append("/grouplasthealthstatus")
+                    .append("?")
+                    .append("groupName=");
+        } else {
+            builder.append("/healthstatus")
+                    .append("?")
+                    .append("hostName=");
+        }
+        builder
+                .append(request.getSourceName())
+                .append("&metricType=")
+                .append(request.getMetricType())
+                .append("&metricNames=")
+                .append(joinedMetricNames)
+                .append("&endTime=")
+                .append(request.getEndTime().getTime())
+                .append("&step=")
+                .append(request.getStep());
+        return builder.toString();
+    }
 
     private String getHostPart() {
         StringBuilder builder = new StringBuilder(50);

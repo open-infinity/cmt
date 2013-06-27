@@ -114,17 +114,12 @@ public class MachineRepositoryJdbcImpl implements MachineRepository {
         return machines;
     }
 
-    public List<Machine> getMachinesInClusterNotConfigured(int clusterId) {
-        List<Machine> machines = this.jdbcTemplate.query("select * from machine_tbl where machine_cluster_id = ? and machine_configured != 3",
-                                                         new Object[] {clusterId}, machineRowMapper);
-        //@AuditTrail removed to avoid exception being caught, logged and rethrown
-        // Result validation done below instead:
-        if ( machines.isEmpty() ){
-            return null;
-        }else if ( machines.size() > 0 ) { 
-            return machines;
-        }
-        return null;
+	@AuditTrail
+    public boolean allMachinesConfigured(int clusterId) {
+        List<Machine> machines = this.jdbcTemplate.query
+            ("select * from machine_tbl where machine_cluster_id = ? and machine_configured != 3",
+              new Object[] {clusterId}, machineRowMapper);
+        return machines.size() == 0 ? true : false;
     }
 	
 	

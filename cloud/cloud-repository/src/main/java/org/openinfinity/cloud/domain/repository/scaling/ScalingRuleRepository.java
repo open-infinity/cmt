@@ -39,7 +39,7 @@ public interface ScalingRuleRepository {
 	/**
 	 * Loads <code>org.openinfinity.cloud.domain.ScalingRule</code> based on the cluster id.
 	 */
-	ScalingRule loadByClusterId(int clusterId);
+	ScalingRule getRule(int clusterId);
 	
 	/**
 	 * Deletes scaling rule by id.

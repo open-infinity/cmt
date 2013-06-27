@@ -29,6 +29,7 @@ import org.openinfinity.cloud.service.administrator.JobService;
 import org.openinfinity.cloud.service.scaling.ScalingRuleService;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
@@ -50,20 +51,21 @@ public class ScheduledScalerItemProcessor implements ItemProcessor<ScalingRule, 
 	
 	@Autowired
 	InstanceService instanceService;
-
+	
+	@Value("${deltaPlus}")
+    int deltaPlus;
+    
+    @Value("${deltaMinus}")
+    int deltaMinus;
+    
 	@Override
 	public Job process(ScalingRule scalingRule) throws Exception {
 		Job ret = null;
-		Timestamp periodFrom = scalingRule.getPeriodFrom();
+	    Timestamp periodFrom = scalingRule.getPeriodFrom();
 		Timestamp periodTo = scalingRule.getPeriodTo();
 		long now = System.currentTimeMillis();	
-		
-		// TODO make a property for test / normal case
-		Timestamp windowStart = new Timestamp(now - 90000 );
-		Timestamp windowEnd = new Timestamp(now + 60000); 
-		
-		//Timestamp windowStart = new Timestamp(now - 1300 );
-		//Timestamp windowEnd = new Timestamp(now + 1000); 
+		Timestamp windowStart = new Timestamp(now - deltaMinus );
+		Timestamp windowEnd = new Timestamp(now + deltaPlus); 
 	
 		LOG.debug("periodFrom = " + periodFrom.toString());
 		LOG.debug("periodTo = " + periodTo.toString());

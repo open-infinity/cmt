@@ -622,7 +622,7 @@ var instanceManager = {
 			o.clusterSizeRange = 					$("#scaleClusterDialog .cluster_size_range_select_slider > .range_select_display").attr("id", "cluster_size_range");
 			o.jqClusterSizeRangeSlider =			$("#scaleClusterDialog .cluster_size_range_select_slider > .jq_slider").attr("id", "jq_cluster_size_range_slider");
 			o.cpuThresholdRange = 					$("#scaleClusterDialog .cpu_load_range_select_slider >.range_select_display").attr("id", "cpu_threshold_range");
-			o.jqCpuLoadThresholdsSlider = 			$("#scaleClusterDialog .cpu_load_range_select_slider > .jq_slider").attr("id", "jq_cpu_load_thresholds_slider");			
+			o.jqCpuLoadThresholdsSlider = 			$("#scaleClusterDialog .cpu_load_range_select_slider > .jq_slider").attr("id", "jq_load_thresholds_slider");			
 			o.scheduledScalingElements =			$("#scaleClusterDialog .scale_scheduler_datetime_picker_elements").attr("id", "scale_scheduler_datetime_picker_elements");;
 			o.scehduledScaleCheckbox = 				$("#scaleClusterDialog .scehduled_scale_checkbox").attr("id", "scehduled_scale_checkbox");
 			o.scaleSchedulerDatetimePickerFrom = 	$("#scaleClusterDialog .scale_scheduler_datetime_picker_from").attr("id", "scale_scheduler_datetime_picker_from");
@@ -657,8 +657,9 @@ var instanceManager = {
 			o.jqCpuLoadThresholdsSlider.slider({
 				range: true,
 				min: 0,
-				max: 100,
-				values: [ 10, 90 ],
+				max: 1,
+				values: [ 0.2, 0.9 ],
+				step: 0.01,
 				slide: function(event, ui) {
 					o.cpuThresholdRange.text(setRangeText(ui));
 				}
