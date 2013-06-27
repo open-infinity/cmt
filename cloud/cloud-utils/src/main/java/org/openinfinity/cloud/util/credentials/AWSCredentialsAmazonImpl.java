@@ -30,10 +30,10 @@ import com.amazonaws.auth.AWSCredentials;
 //@Configuration("amazonCredentials")
 public class AWSCredentialsAmazonImpl implements AWSCredentials {
 
-	//@Value("${awsaccesskeyid}")
+	@Value("${awsaccesskeyid}")
 	private String aWSAccessKeyId;
 	
-	//@Value("${awssecretkey}")
+	@Value("${awssecretkey}")
 	private String aWSSecretKey;
 	
 	@Override
