@@ -18,6 +18,7 @@ package org.openinfinity.cloud.application.batch.properties;
 
 import org.apache.commons.daemon.Daemon;
 import org.apache.commons.daemon.DaemonContext;
+import org.apache.commons.daemon.DaemonController;
 import org.apache.commons.daemon.DaemonInitException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -55,6 +56,10 @@ public class PeriodicCloudPropertiesExecutor implements Daemon {
 		if (this.applicationContext != null) {
 			this.applicationContext.stop();
 		}
+	}
+	
+	public static void main(String[] args) {
+		(new ClassPathXmlApplicationContext("/cloud-properties-batch-context.xml")).start();
 	}
 
 }
