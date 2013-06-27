@@ -3,11 +3,11 @@
   <parent>
     <artifactId>cloud</artifactId>
     <groupId>org.openinfinity</groupId>
-    <version>1.0.0</version>
+    <version>1.2.0.RELEASE</version>
   </parent>
   <groupId>org.openinfinity</groupId>
   <artifactId>cloud-worker</artifactId>
-  <version>2.0.0</version>
+  <version>1.2.0.RELEASE</version>
   <packaging>jar</packaging>
   <properties>
   	<springframework.version>3.1.1.RELEASE</springframework.version>
@@ -59,7 +59,7 @@
   	<dependency>
 		<groupId>org.openinfinity</groupId>
 		<artifactId>cloud-service</artifactId>
-		<version>1.0.0</version>
+		<version>1.2.0.RELEASE</version>
 	</dependency>
 	<dependency>
 		<groupId>commons-dbcp</groupId>

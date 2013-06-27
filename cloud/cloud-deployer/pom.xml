@@ -3,11 +3,11 @@
   <parent>
     <artifactId>cloud</artifactId>
     <groupId>org.openinfinity</groupId>
-    <version>1.0.0</version>
+    <version>1.2.0.RELEASE</version>
   </parent>
   <groupId>org.openinfinity</groupId>
   <artifactId>cloud-deployer</artifactId>
-  <version>1.0.0</version>
+  <version>1.2.0.RELEASE</version>
 	<packaging>war</packaging>
 	<build>
 		<plugins>
@@ -312,7 +312,7 @@
 		<dependency>
 			<groupId>org.openinfinity</groupId>
 			<artifactId>cloud-service</artifactId>
-			<version>1.0.0</version>
+			<version>1.2.0.RELEASE</version>
 		</dependency>
 		<dependency>
 			<groupId>org.openinfinity</groupId>
