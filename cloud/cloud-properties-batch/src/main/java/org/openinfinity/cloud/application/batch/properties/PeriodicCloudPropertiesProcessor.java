@@ -106,6 +106,7 @@ public class PeriodicCloudPropertiesProcessor implements ItemProcessor<Collectio
 			organizationId = sharedProperty.getOrganizationId();
 			instanceId = sharedProperty.getInstanceId();
 			clusterId = sharedProperty.getClusterId();
+			LOGGER.debug("Creating properties properties file for unique cluster: " + clusterId);
 			lastModifiedTimeStamp = sharedProperty.getTimestamp().after(lastModifiedTimeStamp)?sharedProperty.getTimestamp():lastModifiedTimeStamp;
 		}
 	}
