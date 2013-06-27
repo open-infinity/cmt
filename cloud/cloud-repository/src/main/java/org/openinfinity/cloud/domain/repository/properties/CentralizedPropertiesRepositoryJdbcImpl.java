@@ -157,13 +157,13 @@ public class CentralizedPropertiesRepositoryJdbcImpl implements CentralizedPrope
 		@Override
 		public SharedProperty mapRow(ResultSet resultSet, int rowNum) throws SQLException {
 			SharedProperty sharedProperty = new SharedProperty();
-			sharedProperty.setId(resultSet.getInt("ID"));
-			sharedProperty.setOrganizationId(resultSet.getInt("ORGANIZATION_ID"));
-			sharedProperty.setInstanceId(resultSet.getInt("INSTANCE_ID"));
-			sharedProperty.setClusterId(resultSet.getInt("CLUSTER_ID"));
-			sharedProperty.setKey(resultSet.getString("KEY_COLUMN"));
-			sharedProperty.setValue(resultSet.getString("VALUE_COLUMN"));
-			sharedProperty.setTimestamp(resultSet.getDate("CHANGED_LAST_UPDATE"));
+			sharedProperty.setId(resultSet.getInt("id"));
+			sharedProperty.setOrganizationId(resultSet.getInt("organization_id"));
+			sharedProperty.setInstanceId(resultSet.getInt("instance_id"));
+			sharedProperty.setClusterId(resultSet.getInt("cluster_id"));
+			sharedProperty.setKey(resultSet.getString("key_column"));
+			sharedProperty.setValue(resultSet.getString("value_column"));
+			sharedProperty.setTimestamp(resultSet.getDate("changed_last_update"));
 			return sharedProperty;
 		}
 	}
