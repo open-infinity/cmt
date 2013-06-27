@@ -16,6 +16,9 @@
 
 package org.openinfinity.cloud.application.batch.properties;
 
+import org.apache.commons.daemon.Daemon;
+import org.apache.commons.daemon.DaemonContext;
+import org.apache.commons.daemon.DaemonInitException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -26,30 +29,32 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  * @version 1.0.0
  * @since 1.2.0
  */
-public class PeriodicCloudPropertiesExecutor {
-	
-	private static ApplicationContext APPLICATION_CONTEXT;
-	
-	private static boolean SHUTDOWN_FLAG = false;
-	
-	public static void main(String[] args) {
-		APPLICATION_CONTEXT = new ClassPathXmlApplicationContext("/cloud-properties-batch-context.xml", PeriodicCloudPropertiesExecutor.class);
+public class PeriodicCloudPropertiesExecutor implements Daemon {
 
-//		final Thread mainThread = Thread.currentThread();
-//		Runtime.getRuntime().addShutdownHook(new Thread() {
-//		    public void run() {
-//		    	SHUTDOWN_FLAG = false;
-//		    	
-//		        try {
-//					mainThread.join();
-//				} catch (InterruptedException e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				}
-//		        ((AbstractApplicationContext) APPLICATION_CONTEXT).destroy();
-//		    }
-//		});
-	
+	private ClassPathXmlApplicationContext applicationContext = null;
+
+	@Override
+	public void destroy() {
+		if (this.applicationContext != null) {
+			this.applicationContext.close();
+		}
 	}
-	
+
+	@Override
+	public void init(DaemonContext arg0) throws DaemonInitException, Exception {
+		this.applicationContext = new ClassPathXmlApplicationContext("/cloud-properties-batch-context.xml");
+	}
+
+	@Override
+	public void start() throws Exception {
+		this.applicationContext.start();
+	}
+
+	@Override
+	public void stop() throws Exception {
+		if (this.applicationContext != null) {
+			this.applicationContext.stop();
+		}
+	}
+
 }
