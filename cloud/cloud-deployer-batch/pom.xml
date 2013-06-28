@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>org.openinfinity</groupId>
 	<artifactId>cloud-deployer-batch</artifactId>
-	<version>1.2.0.RELEASE</version>
+	<version>1.2.0.RELEASE</version> 
 	<name>cloud-deployer-batch</name>
 	<description>
 		<![CDATA[
