@@ -4,7 +4,7 @@
     <artifactId>cloud</artifactId>
     <groupId>org.openinfinity</groupId>
     <version>1.2.0.RELEASE</version>
-  </parent>
+  </parent> 
   <groupId>org.openinfinity</groupId>
   <artifactId>cloud-worker</artifactId>
   <version>1.2.0.RELEASE</version>
