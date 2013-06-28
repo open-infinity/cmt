@@ -1,5 +1,5 @@
 %define name	toas_cmt
-%define version 1.2.0
+%define version 1.2.0.RELEASE
 %define release 20
 
 Name:		%{name}
@@ -36,22 +36,34 @@ mkdir -p %{buildroot}/opt/toas/cloudmanagementtools/deployer/
 mkdir -p %{buildroot}/opt/toas/cloudmanagementtools/deployer/logs
 mkdir -p %{buildroot}/opt/toas/cloudmanagementtools/deployer/staging
 
+#Cloud Properties Batch
+mkdir -p %{buildroot}/opt/toas/cloudmanagementtools/properties/
+mkdir -p %{buildroot}/opt/toas/cloudmanagementtools/properties/logs
+mkdir -p %{buildroot}/opt/toas/cloudmanagementtools/properties/bin
+
+
 mkdir -p %{buildroot}/opt/toas/cloudmanagementtools/portlet/
 mkdir -p %{buildroot}/opt/toas/cloudmanagementtools/scripts/sql/
 mkdir -p %{buildroot}/opt/toas/cloudmanagementtools/puppet/modules/oihealthmonitoring/files/empty
 mkdir -p %{buildroot}/opt/toas/cloudmanagementtools/tools/bin/
 mkdir -p %{buildroot}/opt/toas/cloudmanagementtools/tools/lib/
-cp cloud/cloud-worker/target/cloud-worker-2.0.0.jar %{buildroot}/opt/toas/cloudmanagementtools/worker/
-cp cloud/cloud-administrator/target/cloud-administrator-1.0.0.war %{buildroot}/opt/toas/cloudmanagementtools/portlet/
+cp cloud/cloud-worker/target/cloud-worker-%{version}.jar %{buildroot}/opt/toas/cloudmanagementtools/worker/
+cp cloud/cloud-administrator/target/cloud-administrator-%{version}.war %{buildroot}/opt/toas/cloudmanagementtools/portlet/
 cp -r cloud/cloud-worker/puppet %{buildroot}/opt/toas/cloudmanagementtools/
 cp cloud/cloud-worker/scripts/startworker.sh %{buildroot}/opt/toas/cloudmanagementtools/worker/
 cp cloud/cloud-worker/scripts/stopworker.sh %{buildroot}/opt/toas/cloudmanagementtools/worker/
 
 #Cloud Deployer
-cp cloud/cloud-deployer-batch/target/cloud-deployer-batch-1.0.0.jar %{buildroot}/opt/toas/cloudmanagementtools/deployer/
-cp cloud/cloud-deployer/target/cloud-deployer-1.0.0.war %{buildroot}/opt/toas/cloudmanagementtools/portlet/
+cp cloud/cloud-deployer-batch/target/cloud-deployer-batch-%{version}.jar %{buildroot}/opt/toas/cloudmanagementtools/deployer/
+cp cloud/cloud-deployer/target/cloud-deployer-%{version}.war %{buildroot}/opt/toas/cloudmanagementtools/portlet/
 cp cloud/cloud-deployer-batch/scripts/startdeployer.sh %{buildroot}/opt/toas/cloudmanagementtools/deployer/
 cp cloud/cloud-deployer-batch/scripts/stopdeployer.sh %{buildroot}/opt/toas/cloudmanagementtools/deployer/
+
+#Cloud Properties Batch
+cp cloud/cloud-properties-batch/target/cloud-properties-batch-%{version}.jar %{buildroot}/opt/toas/cloudmanagementtools/properties/bin/
+cp cloud/cloud-properties/target/cloud-properties-%{version}.war %{buildroot}/opt/toas/cloudmanagementtools/portlet/
+#cp cloud/cloud-properties-batch/scripts/start.sh %{buildroot}/opt/toas/cloudmanagementtools/properties/bin/
+#cp cloud/cloud-properties-batch/scripts/stop.sh %{buildroot}/opt/toas/cloudmanagementtools/properties/bin/
 
 cp scripts/sql/openinfinity-tables.sql %{buildroot}/opt/toas/cloudmanagementtools/scripts/sql/
 cp scripts/sql/initial_content.sql %{buildroot}/opt/toas/cloudmanagementtools/scripts/sql/
@@ -67,9 +79,10 @@ cp scripts/command_line_tools/toas-instace-authorize %{buildroot}/opt/toas/cloud
 mkdir -p %{buildroot}/opt/toas/cloudmanagementtools/autoscaler/var/log
 mkdir -p %{buildroot}/opt/toas/cloudmanagementtools/autoscaler/var/run
 mkdir -p %{buildroot}/opt/toas/cloudmanagementtools/autoscaler/var/backup
-mkdir -p %{buildroot}/opt/toas/cloudmanagementtools/autosscaler/lib/java
-cp -f cloud/cloud-autoscaler/target/cloud-autoscaler-1.2.0.RELEASE.jar %{buildroot}/opt/toas/cloudmanagementtools/autoscaler/lib/java
-cp -f cloud/cloud-autoscaler/bin/* %{buildroot}/opt/toas/cloudmanagementtools/autoscaler/bin
+mkdir -p %{buildroot}/opt/toas/cloudmanagementtools/autoscaler/lib/java
+mkdir -p %{buildroot}/opt/toas/cloudmanagementtools/autoscaler/bin
+cp -f cloud/cloud-autoscaler/target/cloud-autoscaler-%{version}.jar %{buildroot}/opt/toas/cloudmanagementtools/autoscaler/lib/java/
+cp -f cloud/cloud-autoscaler/bin/* %{buildroot}/opt/toas/cloudmanagementtools/autoscaler/bin/
 
 %clean
 rm -rf %{buildroot}
@@ -83,16 +96,25 @@ exit 0
 %defattr(-,toas,toas)
 %attr(0755,toas,toas)/opt/toas/cloudmanagementtools/worker/stopworker.sh
 %attr(0755,toas,toas)/opt/toas/cloudmanagementtools/worker/startworker.sh
-%attr(-,toas,toas)/opt/toas/cloudmanagementtools/worker/cloud-worker-2.0.0.jar
-%attr(-,toas,toas)/opt/toas/cloudmanagementtools/portlet/cloud-administrator-1.0.0.war
+%attr(-,toas,toas)/opt/toas/cloudmanagementtools/worker/cloud-worker-%{version}.jar
+%attr(-,toas,toas)/opt/toas/cloudmanagementtools/portlet/cloud-administrator-%{version}.war
 
 #Cloud Deployer
 %attr(0755,toas,toas)/opt/toas/cloudmanagementtools/deployer/stopdeployer.sh
 %attr(0755,toas,toas)/opt/toas/cloudmanagementtools/deployer/startdeployer.sh
-%attr(-,toas,toas)/opt/toas/cloudmanagementtools/deployer/cloud-deployer-batch-1.0.0.jar
-%attr(-,toas,toas)/opt/toas/cloudmanagementtools/portlet/cloud-deployer-1.0.0.war
+%attr(-,toas,toas)/opt/toas/cloudmanagementtools/deployer/cloud-deployer-batch-%{version}.jar
+%attr(-,toas,toas)/opt/toas/cloudmanagementtools/portlet/cloud-deployer-%{version}.war
 %dir /opt/toas/cloudmanagementtools/deployer/logs
 %dir /opt/toas/cloudmanagementtools/deployer/staging
+
+#Cloud Properties
+#%attr(0755,toas,toas)/opt/toas/cloudmanagementtools/properties/bin/stop.sh
+#%attr(0755,toas,toas)/opt/toas/cloudmanagementtools/properties/bin/start.sh
+%attr(-,toas,toas)/opt/toas/cloudmanagementtools/properties/bin/cloud-properties-batch-%{version}.jar
+%attr(-,toas,toas)/opt/toas/cloudmanagementtools/portlet/cloud-properties-%{version}.war
+%dir /opt/toas/cloudmanagementtools/properties/logs
+%dir /opt/toas/cloudmanagementtools/properties/bin
+
 
 #Autoscaler
 /opt/toas/cloudmanagementtools/autoscaler/
