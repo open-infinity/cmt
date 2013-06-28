@@ -906,13 +906,13 @@ var instanceManager = {
 			o.addConnectionButton.on("click", function(event){
 				count ++;
 				var ipAddress = o.ipAddressInput.val();
-				var portFrom = o.portFromInput.val();
-				var portTo = o.portToInput.val();
+				var portFrom = parseInt(o.portFromInput.val());
+				var portTo = parseInt(o.portToInput.val());
 				var cidr = o.cidrPrefixSelect.val();
 				var protocol = o.protocolSelect.val();
 				if (!(isDottedIPv4(ipAddress) 
 						&& isTcpPort(portFrom) 
-						&& isTcpPort(portFrom)
+						&& isTcpPort(portTo)
 						&& portFrom <= portTo)){
 					alert("Invalid IP address or port");
 					return;
@@ -926,8 +926,8 @@ var instanceManager = {
 				var outData = {};
 				outData['clusterId'] = item;
 				outData['cidrIp'] = ipAddress + "/" + cidr;
-				outData['portFrom'] = portFrom;
-				outData['portTo'] = portTo;
+				outData['portFrom'] = portFrom.toString();
+				outData['portTo'] = portTo.toString();
 				outData['protocol'] = protocol;
 				$.ajax({
 					url: portletURL.url.cluster.addUserAuthorizedIPURL,
@@ -961,7 +961,7 @@ var instanceManager = {
 			}
 			
 			function isTcpPort(port){
-				if (port < 1 || port > 65535 && !isNaN(port)) return false;
+				if (port < 1 || port > 65535 || isNaN(port)) return false;
 				else return true;		
 			}
 			
