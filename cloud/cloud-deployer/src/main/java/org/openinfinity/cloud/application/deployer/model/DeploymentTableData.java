@@ -16,6 +16,10 @@
 
 package org.openinfinity.cloud.application.deployer.model;
 
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import org.openinfinity.cloud.domain.Deployment;
 
 /**
@@ -34,7 +38,22 @@ public class DeploymentTableData extends Deployment{
 	private String instance;
 	private String cluster;
 	private String formattedTime;
+	private String stateStr;
 	
+    private static final Map<Integer, String> stateMap;
+    static {
+        Map<Integer, String> aMap = new LinkedHashMap();
+		  aMap.put(0, "NOT_DEPLOYED");
+		  aMap.put(1, "DEPLOYED");
+		  aMap.put(10, "UNDEPLOYING");
+		  aMap.put(11, "UNDEPLOYED");
+		  aMap.put(12, "DELETING");
+		  aMap.put(13, "DELETED");
+		  aMap.put(15, "ERROR");
+		  aMap.put(-1, "TERMINATED");
+		  stateMap = Collections.unmodifiableMap(aMap);
+    }
+    
 	public String getOrganization() {
 		return organization;
 	}
@@ -66,13 +85,23 @@ public class DeploymentTableData extends Deployment{
 	public void setFormattedTime(String time) {
 		this.formattedTime = time;
 	}
+		
 	
+	public String getStateStr() {
+		return stateStr;
+	}
+
+	public void setStateStr(String stateStr) {
+		this.stateStr = stateStr;
+	}
+
 	public DeploymentTableData(Deployment aDeployment, String aOrganization, String aInstance, String aCluster){
 		super(aDeployment);	
 		this.organization = aOrganization;
 		instance = aInstance;
 		cluster = aCluster;
 		formattedTime = aDeployment.getDeploymentTimestamp().toString();
+		stateStr=stateMap.get(new Integer(aDeployment.getState()));
 	}
 	
 }
