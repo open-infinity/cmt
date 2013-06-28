@@ -193,19 +193,20 @@ label {
 		});
 
 		var deploymentColModel =[
-		    {name:'id',index:'id', width:60, align:"center"},
+		    {name:'id',index:'id', width:40, align:"center"},
         	{name:'organization',index:'organization', width:120, align:"center"},
         	{name:'organizationId',index:'organizationId', width:60, align:"center"},
         	{name:'instance',index:'instance', width:100, align:"center"},
-        	{name:'instanceId',index:'instanceId', width:60, align:"center"},
+        	{name:'instanceId',index:'instanceId', width:40, align:"center"},
         	{name:'cluster',index:'cluster', width:120, align:"center"},
-        	{name:'clusterId',index:'clusterId', width:60, align:"center"},
-        	{name:'type',index:'type', width:90, align:"center"},
+        	{name:'clusterId',index:'clusterId', width:40, align:"center"},
+        	{name:'type',index:'type', width:70, align:"center"},
         	{name:'name',index:'name', width:120, align:"center"},
-        	{name:'state',index:'state', width:60, align:"center"},
+        	{name:'state',index:'state', width:30, align:"center"},
+        	{name:'stateStr',index:'stateStr', width:90, align:"center"},
         	{name:'formattedTime',index:'formattedTime', width:120, align:"center"}  
         ];
-		var deploymentColNames = ['id', 'organization', 'organizationId','instance', 'instanceId', 'cluster', 'clusterId', 'type', 'name', 'state', 'time'];
+		var deploymentColNames = ['id', 'organization', 'organizationId','instance', 'instanceId', 'cluster', 'clusterId', 'type', 'name', 'statevalue', 'state', 'time'];
 		
 		function loadTable(){
 			jQuery("#deploymentTable").jqGrid({
