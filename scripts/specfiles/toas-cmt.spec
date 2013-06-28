@@ -1,5 +1,5 @@
 %define name	toas_cmt
-%define version 1.1.0
+%define version 1.2.0
 %define release 20
 
 Name:		%{name}
@@ -17,7 +17,7 @@ Requires:	puppet-server, mysql-server, jakarta-commons-daemon-jsvc, java-1.6.0-o
 Requires(pre):	shadow-utils
 
 %description
-This package contains CMT Worker and puppet scripts
+This package contains Cloud Management Tools for TOAS PaaS
 
 %prep
 %setup -T -a 0 -c 
@@ -63,7 +63,13 @@ cp scripts/command_line_tools/toas-fix-loadbalancer %{buildroot}/opt/toas/cloudm
 cp scripts/command_line_tools/toas-get-instance-info %{buildroot}/opt/toas/cloudmanagementtools/tools/bin/
 cp scripts/command_line_tools/toas-instace-authorize %{buildroot}/opt/toas/cloudmanagementtools/tools/bin/
 
-
+#Autoscaler
+mkdir -p %{buildroot}/opt/toas/cloudmanagementtools/autoscaler/var/log
+mkdir -p %{buildroot}/opt/toas/cloudmanagementtools/autoscaler/var/run
+mkdir -p %{buildroot}/opt/toas/cloudmanagementtools/autoscaler/var/backup
+mkdir -p %{buildroot}/opt/toas/cloudmanagementtools/autosscaler/lib/java
+cp -f cloud/cloud-autoscaler/target/cloud-autoscaler-1.2.0.RELEASE.jar %{buildroot}/opt/toas/cloudmanagementtools/autoscaler/lib/java
+cp -f cloud/cloud-autoscaler/bin/* %{buildroot}/opt/toas/cloudmanagementtools/autoscaler/bin
 
 %clean
 rm -rf %{buildroot}
@@ -87,6 +93,9 @@ exit 0
 %attr(-,toas,toas)/opt/toas/cloudmanagementtools/portlet/cloud-deployer-1.0.0.war
 %dir /opt/toas/cloudmanagementtools/deployer/logs
 %dir /opt/toas/cloudmanagementtools/deployer/staging
+
+#Autoscaler
+/opt/toas/cloudmanagementtools/autoscaler/
 
 %attr(0755,toas,toas)/opt/toas/cloudmanagementtools/puppet/puppet_nodes.pl
 %attr(-,toas,toas)/opt/toas/cloudmanagementtools/scripts/sql/openinfinity-tables.sql
