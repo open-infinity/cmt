@@ -11,6 +11,11 @@
 		<spring.maven.artifact.version>3.1.1.RELEASE</spring.maven.artifact.version>
 		<spring.security.version>3.1.0.RELEASE</spring.security.version>
 		<maven.build.timestamp.format>yyyyMMdd-HHmm</maven.build.timestamp.format>
+
+        <spring.version>3.1.1.RELEASE</spring.version>
+        <springdata.jpa.version>1.2.1.RELEASE</springdata.jpa.version>
+        <hibernate.version>4.1.9.Final</hibernate.version>
+
 	</properties>
 	<modules>
 		<module>cloud-domain</module>
@@ -33,6 +38,30 @@
 			<artifactId>open-infinity-core</artifactId>
 			<version>1.1.0.RELEASE</version>
 		</dependency>
+        <!--  dependencies for spring-data-jpa + hibernate >>>>>> -->
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-jpa</artifactId>
+            <version>${springdata.jpa.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.javax.persistence</groupId>
+            <artifactId>hibernate-jpa-2.0-api</artifactId>
+            <version>1.0.0.Final</version>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-entitymanager</artifactId>
+            <version>${hibernate.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency> 
+            <groupId>org.springframework</groupId> 
+            <artifactId>spring-aspects</artifactId> 
+            <version>${spring.version}</version> 
+        </dependency>
+        <!--  dependencies for spring-data-jpa + hibernate <<<<<<< -->
+        
 	</dependencies>
 	<build>
 		<plugins>

@@ -2,6 +2,7 @@ package org.openinfinity.cloud.domain.repository.administrator;
 
 import static org.junit.Assert.*;
 
+
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -34,9 +35,6 @@ public class JobRepositoryJdbcImplTest {
 		String aJobType="create";
 
 		Job job=new Job(aJobType, aInstanceId, aCloud, aJobStatus);
-		int jobId = jobRepository.addJob(job);
-		
-		Job job2 = jobRepository.getJob(jobId);
 		
 		for (int i=0;i<10;i++){
 			job.setJobStatus(3);

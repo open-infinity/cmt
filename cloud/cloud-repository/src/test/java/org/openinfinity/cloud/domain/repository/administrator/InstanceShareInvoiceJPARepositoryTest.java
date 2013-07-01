@@ -14,6 +14,8 @@ import org.openinfinity.cloud.domain.InstanceShareInvoiceTbl;
 import org.openinfinity.cloud.domain.InstanceShareTbl;
 import org.openinfinity.cloud.domain.InstanceTbl;
 import org.openinfinity.cloud.domain.repository.administrator.InstanceJPARepository;
+import org.openinfinity.cloud.domain.repository.invoice.InstanceShareInvoiceJPARepository;
+import org.openinfinity.cloud.domain.repository.invoice.InstanceShareJPARepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.annotation.Rollback;
@@ -21,7 +23,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
-@ContextConfiguration(locations={"classpath*:META-INF/spring/repository-context-mysql.xml"})
+//@ContextConfiguration(locations={"classpath*:META-INF/spring/repository-context-mysql.xml"})
+@ContextConfiguration(locations={"classpath*:META-INF/spring/repository-context.xml"})
 @RunWith(SpringJUnit4ClassRunner.class)
 public class InstanceShareInvoiceJPARepositoryTest {
     
