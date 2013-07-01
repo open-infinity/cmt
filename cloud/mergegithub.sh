@@ -16,4 +16,5 @@ if [ $? -ne 0 ];then
     echo "Failed to merge from Github"
     exit 1
 fi
-#mvn clean install lombok:delombok -Pcmt_hattara_dev
+mvn clean install lombok:delombok -Pcmt_hattara_dev
+
