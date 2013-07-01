@@ -12,3 +12,6 @@ ALTER TABLE usage_hours_tbl ADD `machine_type_spec` varchar(255) not null;
 ALTER TABLE usage_hours_tbl ADD `machine_machine_type` varchar(50) default null,
 ALTER TABLE usage_hours_tbl ADD `cluster_ebs_image_used` int(11) default null;
 ALTER TABLE usage_hours_tbl ADD `cluster_ebs_volumes_used` int(11) default null;
+
+-- Added: 1.7.2013
+ALTER TABLE usage_hours_tbl ADD `instance_id` int(11) not null;

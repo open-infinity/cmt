@@ -40,6 +40,9 @@ public class UsageHour {
 	@NotNull
 	private long organizationId;
 	
+	@NotNull
+	private int instanceId;
+	
 	@NotScript
 	@NotNull
 	private int platformId;
