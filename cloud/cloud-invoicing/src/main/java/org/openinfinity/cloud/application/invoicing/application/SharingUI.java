@@ -1,6 +1,7 @@
 package org.openinfinity.cloud.application.invoicing.application;
 
 
+import com.vaadin.annotations.Title;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
@@ -11,7 +12,7 @@ import com.vaadin.ui.VerticalLayout;
 /**
  * Main UI class
  */
-@SuppressWarnings("serial")
+@Title("Invoice Sharing")
 public class SharingUI extends UI {
 
 	@Override

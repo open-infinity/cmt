@@ -8,7 +8,7 @@
         <param-value>true</param-value>
     </context-param>
     <servlet>
-        <servlet-name>Vaadin</servlet-name>
+        <servlet-name>AddressbookUI</servlet-name>
         <servlet-class>com.vaadin.server.VaadinServlet</servlet-class>
         <init-param>
             <description>Vaadin UI to display</description>
@@ -16,9 +16,21 @@
             <param-value>com.vaadin.tutorial.addressbook.AddressbookUI</param-value>
         </init-param>
     </servlet>
+    <servlet>
+        <servlet-name>SharingUI</servlet-name>
+        <servlet-class>com.vaadin.server.VaadinServlet</servlet-class>
+        <init-param>
+            <description>Vaadin UI to display</description>
+            <param-name>UI</param-name>
+            <param-value>org.openinfinity.cloud.application.invoicing.application.SharingUI</param-value>
+        </init-param>
+    </servlet>    
     <servlet-mapping>
-        <servlet-name>Vaadin</servlet-name>
-        <url-pattern>/*</url-pattern>
+        <servlet-name>AddressbookUI</servlet-name>
+        <url-pattern>/addressbook/*</url-pattern>
     </servlet-mapping>
-
+    <servlet-mapping>
+        <servlet-name>SharingUI</servlet-name>
+        <url-pattern>/sharing/*</url-pattern>
+    </servlet-mapping>
 </web-app>
