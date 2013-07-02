@@ -59,6 +59,7 @@ public class UsageHourRepositoryTests {
 		expected.setClusterId(123456);
 		expected.setMachineId(654321);
 		expected.setOrganizationId(organizationId);
+		expected.setInstanceId(66);
 		expected.setPlatformId(2);
 		expected.setClusterTypeTitle("BAS Platform");
 		expected.setMachineTypeId(1); // Sizes of the machines in the cluster (see machine_type_tbl)
@@ -78,6 +79,7 @@ public class UsageHourRepositoryTests {
 		assertEquals(expected.getClusterId(), actual.getClusterId());
 		assertEquals(expected.getMachineId(), actual.getMachineId());
 		assertEquals(expected.getOrganizationId(), actual.getOrganizationId());
+		assertEquals(expected.getInstanceId(), actual.getInstanceId());
 		assertEquals(expected.getPlatformId(), actual.getPlatformId());
 		assertEquals(expected.getClusterTypeTitle(), actual.getClusterTypeTitle());
 		assertEquals(expected.getMachineTypeId(), actual.getMachineTypeId());
@@ -98,6 +100,7 @@ public class UsageHourRepositoryTests {
 		expected.setClusterId(123456);
 		expected.setMachineId(654321);
 		expected.setOrganizationId(organizationId);
+		expected.setInstanceId(66);
 		expected.setPlatformId(2);
 		expected.setClusterTypeTitle("BAS Platform");
 		expected.setMachineTypeId(1); // Sizes of the machines in the cluster (see machine_type_tbl)
@@ -119,6 +122,7 @@ public class UsageHourRepositoryTests {
 		assertEquals(expected.getClusterId(), actual.getClusterId());
 		assertEquals(expected.getMachineId(), actual.getMachineId());
 		assertEquals(expected.getOrganizationId(), actual.getOrganizationId());
+		assertEquals(expected.getInstanceId(), actual.getInstanceId());
 		assertEquals(expected.getPlatformId(), actual.getPlatformId());
 		assertEquals(expected.getClusterTypeTitle(), actual.getClusterTypeTitle());
 		assertEquals(expected.getMachineTypeId(), actual.getMachineTypeId());
@@ -185,6 +189,7 @@ public class UsageHourRepositoryTests {
 		usageHour.setClusterId(123456);
 		usageHour.setMachineId(654321);
 		usageHour.setOrganizationId(startTimeMilliseconds);
+		usageHour.setInstanceId(99);
 		usageHour.setPlatformId(2);
 		usageHour.setClusterTypeTitle("BAS Platform");
 		usageHour.setMachineTypeId(1); // Sizes of the machines in the cluster (see machine_type_tbl)

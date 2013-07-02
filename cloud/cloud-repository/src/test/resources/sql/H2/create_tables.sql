@@ -248,7 +248,8 @@ CREATE TABLE `instance_parameter_tbl` (
 
 create table `usage_hours_tbl` (
   `id` bigint(20) not null auto_increment, 
-  `organization_id` bigint(20) not null, 
+  `organization_id` bigint(20) not null,
+  `instance_id` int(11) not null,
   `cluster_id` bigint(20) not null, 
   `platform_id` char(254) not null, 
   `cluster_type_title` varchar(50) not null,

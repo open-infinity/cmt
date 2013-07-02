@@ -91,6 +91,7 @@ public class UsageServiceImplTest {
 
 		UsageHour usage1 = list1.get(list1.size() - 1);
 
+		assertEquals(720, usage1.getInstanceId());
 		assertEquals(1106, usage1.getClusterId());
 		assertEquals("Service platform", usage1.getClusterTypeTitle());
 		assertEquals(1, usage1.getMachineTypeId());
@@ -114,6 +115,7 @@ public class UsageServiceImplTest {
 
 		UsageHour usage2 = list2.get(list2.size() - 1);
 
+		assertEquals(720, usage1.getInstanceId());
 		assertEquals(1107, usage2.getClusterId());
 		assertEquals("Portal platform", usage2.getClusterTypeTitle());
 		assertEquals(2, usage2.getMachineTypeId());

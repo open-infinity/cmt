@@ -48,6 +48,7 @@ public class UsageServiceImpl implements UsageService {
 		Machine machine = machineRepository.getMachine(machineId);
 		
 		UsageHour usageHour = new UsageHour();
+		usageHour.setInstanceId(cluster.getInstanceId());
 		usageHour.setClusterId(clusterId);
 		usageHour.setMachineId(machineId);
 		usageHour.setOrganizationId(organizationId);
