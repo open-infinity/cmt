@@ -54,6 +54,7 @@ public class UsageHourRepositoryJdbcImpl implements UsageHourRepository {
 	 */
 	private static final String STORE_SQL = "INSERT INTO usage_hours_tbl" +
 			"(organization_id," +
+			"instance_id," +
 			"cluster_id," +
 			"platform_id," +
 			"cluster_type_title," +
@@ -65,7 +66,7 @@ public class UsageHourRepositoryJdbcImpl implements UsageHourRepository {
 			"cluster_ebs_image_used," +
 			"cluster_ebs_volumes_used," +
 			"state)" +
-			"values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+			"values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 	
 	/**
 	 * Represents the SQL script for loading usage hour information.
@@ -92,6 +93,7 @@ public class UsageHourRepositoryJdbcImpl implements UsageHourRepository {
 	public void store(UsageHour usageHours) {
 		jdbcTemplate.update(STORE_SQL,
 				usageHours.getOrganizationId(),
+				usageHours.getInstanceId(),
 				usageHours.getClusterId(),
 				usageHours.getPlatformId(),
 				usageHours.getClusterTypeTitle(),
@@ -129,6 +131,7 @@ public class UsageHourRepositoryJdbcImpl implements UsageHourRepository {
 			UsageHour usageHour = new UsageHour();
 			usageHour.setId(resultSet.getLong("id"));
 			usageHour.setOrganizationId(resultSet.getLong("organization_id"));
+			usageHour.setInstanceId(resultSet.getInt("instance_id"));
 			usageHour.setClusterId(resultSet.getInt("cluster_id"));
 			usageHour.setPlatformId(resultSet.getInt("platform_id"));
 			usageHour.setClusterTypeTitle(resultSet.getString("cluster_type_title"));
