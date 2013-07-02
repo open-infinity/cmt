@@ -44,6 +44,13 @@
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-jpa</artifactId>
             <version>${springdata.jpa.version}</version>
+            <!-- Excluded due to version conflict with openinfinity-core spring-aop version which is 3.1.1 -->
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-aop</artifactId>
+                </exclusion>
+            </exclusions>           
         </dependency>
         <dependency>
             <groupId>org.hibernate.javax.persistence</groupId>
