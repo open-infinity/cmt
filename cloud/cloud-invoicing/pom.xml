@@ -82,9 +82,37 @@
             <version>2.4</version>
             <scope>provided</scope>
         </dependency>
+        
+        <dependency>
+            <groupId>org.openinfinity</groupId>
+            <artifactId>cloud-service</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openinfinity</groupId>
+            <artifactId>open-infinity-core</artifactId>
+            <version>1.1.0.RELEASE</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.jolokia</groupId>
+                    <artifactId>jolokia-client-java</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.jolokia</groupId>
+                    <artifactId>jolokia-core</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        
     </dependencies>
 
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

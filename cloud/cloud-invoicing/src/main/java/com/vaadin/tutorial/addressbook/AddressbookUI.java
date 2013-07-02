@@ -1,5 +1,11 @@
 package com.vaadin.tutorial.addressbook;
 
+import org.openinfinity.cloud.application.invoicing.service.InvoicingService;
+import org.openinfinity.cloud.application.invoicing.utility.ApplicationContextProvider;
+import org.openinfinity.cloud.service.administrator.ClusterService;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
 import com.vaadin.annotations.Title;
 import com.vaadin.data.Container.Filter;
 import com.vaadin.data.Item;
@@ -52,6 +58,8 @@ public class AddressbookUI extends UI {
 	 * implementations.
 	 */
 	IndexedContainer contactContainer = createDummyDatasource();
+    //private String CONFIG_PATH="classpath*:WEB-INF/cloud-invoicing-portlet2.xml";
+	private String CONFIG_PATH="/WEB-INF/cloud-invoicing-portlet.xml";
 
 	/*
 	 * After UI class is created, init() is executed. You should build and wire
@@ -107,6 +115,22 @@ public class AddressbookUI extends UI {
 		/* Put a little margin around the fields in the right side editor */
 		editorLayout.setMargin(true);
 		editorLayout.setVisible(false);
+		
+		/*
+	         * Fetch Spring bean from application context.
+	         */
+		InvoicingService bean=null;
+		
+                if (ApplicationContextProvider.getContext() != null) {
+                    bean = ApplicationContextProvider.getContext().getBean(InvoicingService.class);
+                }
+                
+		
+		//final ApplicationContext context = new ClassPathXmlApplicationContext(CONFIG_PATH);
+		//InstanceService bean2 = (InstanceService) context.getBean("myInstanceService");
+	        System.out.println("DBG: bean="+bean);
+	        //System.out.println("DBG: bean2="+bean2);
+ 
 	}
 
 	private void initEditor() {
