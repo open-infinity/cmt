@@ -62,7 +62,6 @@
 				});
 			});
 			
-		    //$("#").dialog("open");
 		}
 	});
 	
@@ -80,28 +79,6 @@
 		modal: true,
 		width: 395,
 		height: 540,
-		
-		/*buttons: {
-			"Save modifications": function() {
-				if ($("#configureClusterDialog").data('elasticIpSupported') == 1){
-					var outData = {};
-					outData["clusterId"] = parseInt($("#configureClusterDialog").data('clusterId'));
-					outData["ipId"] = parseInt($("#configureClusterDialog select").val());
-					var dropIp = getCheckboxValue($("#configureClusterDialog .dropElasticIpCheckBox:checked"));
-					var url = (dropIp) ? portletURL.url.cluster.removeElasticIPURL : portletURL.url.cluster.setElasticIPURL;
-					try{
-						$.post(url, outData);
-					}
-					catch(e){
-						console.log("Exception thrown: " + e.message);
-					}
-				}			
-				$(this).dialog("close");
-			},
-			"Cancel": function() {
-				$(this).dialog("close");
-			}
-		}*/
 	});
 		
 	$("#scaleClusterDialog").dialog({
@@ -114,14 +91,8 @@
 			"Scale cluster": function() {
 				var outData = {};
 				var clusterId = this.getAttribute("data-cluster");				 
-				// Define formatter for date-time-picker 
 				var dateFormat = "%e-%b-%Y-%H:%i";
 				var defaultConv = new AnyTime.Converter({format:dateFormat});
-				
-				/*function getCheckboxValue (element) {
-					if (element.length == 1) return true;
-					else return false;
-				}*/
 				
 				function getDateTimePickerValue (element) {
 					if(element.val().length > 0) return defaultConv.parse(element.val()).getTime();

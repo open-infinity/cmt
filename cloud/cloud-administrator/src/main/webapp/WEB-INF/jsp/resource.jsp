@@ -70,7 +70,6 @@ dialogRes.setResource({
 </script>
 
 <%-- Cluster settings template, used in instance creation dialog --%>
-<%-- TODO: use labels from property file --%>
 <div id="clusterConfigurationTemplate" class="template">
 	<h3 class ="clusterTypeConfigurationHeader platformNotSelected">
 		<label class ="clusterTypeTitle"></label>
