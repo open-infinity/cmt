@@ -2,8 +2,8 @@
 <portlet-app xmlns="http://java.sun.com/xml/ns/portlet/portlet-app_2_0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.0" xsi:schemaLocation="http://java.sun.com/xml/ns/portlet/portlet-app_2_0.xsd http://java.sun.com/xml/ns/portlet/portlet-app_2_0.xsd">
 
     <portlet>
-        <portlet-name>cloudinvoicing</portlet-name>
-        <display-name>CloudInvoicingPortlet</display-name>
+        <portlet-name>Address Book</portlet-name>
+        <display-name>Address Book</display-name>
         
         <portlet-class>com.vaadin.server.VaadinPortlet</portlet-class>
         <init-param>
@@ -34,8 +34,47 @@
         
         <!-- Not always required but Liferay uses these. -->
         <portlet-info>
-            <title>CloudInvoicingPortlet</title>
-            <short-title>CloudInvoicingPortlet</short-title>
+            <title>Address Book</title>
+            <short-title>Address Book</short-title>
         </portlet-info>
     </portlet>
+
+
+    <portlet>
+        <portlet-name>Invoice Sharing</portlet-name>
+        <display-name>Invoice Sharing</display-name>
+        
+        <portlet-class>com.vaadin.server.VaadinPortlet</portlet-class>
+        <init-param>
+            <name>UI</name>
+            <value>org.openinfinity.cloud.application.invoicing.application.SharingUI</value>
+        </init-param>
+        
+        <!--
+          To enable displaying multiple Vaadin portlets on a page,
+          they should all use the same widgetset. In that case, the
+          widgetset can be configured on the portal level (parameter
+          vaadin.widgetset) or here for each portlet.
+        -->
+        <!--
+        <init-param>
+            <name>widgetset</name>
+            <value>com.vaadin.portal.gwt.PortalDefaultWidgetSet</value>
+        </init-param>
+        -->
+        
+        <!-- Supported portlet modes and content types. -->
+        <supports>
+            <mime-type>text/html</mime-type>
+            <portlet-mode>view</portlet-mode>
+            <!-- <portlet-mode>edit</portlet-mode> -->
+            <!-- <portlet-mode>help</portlet-mode> -->
+        </supports>
+        
+        <!-- Not always required but Liferay uses these. -->
+        <portlet-info>
+            <title>Invoice Sharing</title>
+            <short-title>Invoice Sharing</short-title>
+        </portlet-info>
+    </portlet>    
 </portlet-app>
