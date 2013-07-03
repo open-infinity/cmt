@@ -1,6 +1,9 @@
 package org.openinfinity.cloud.application.invoicing.view.instance;
 
 
+import org.openinfinity.cloud.application.invoicing.view.InvoiceShareView;
+import org.openinfinity.cloud.application.invoicing.view.InvoiceShareViewImpl;
+
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.util.BeanItemContainer;
@@ -35,7 +38,7 @@ public class InstanceSelectionComponent extends CustomComponent{
      */
     private static final long serialVersionUID = 1L;
 
-    public InstanceSelectionComponent(){
+    public InstanceSelectionComponent(InvoiceShareViewImpl invoiceShareViewImpl){
         VerticalLayout main=new VerticalLayout();
         this.setCompositionRoot(main);
 
@@ -45,18 +48,7 @@ public class InstanceSelectionComponent extends CustomComponent{
         selectInstance.setNullSelectionAllowed(false);
         selectInstance.setImmediate(true);
         
-        selectInstance.addValueChangeListener(new ValueChangeListener() {
-            @Override
-            public void valueChange(final ValueChangeEvent event) {
-                
-                Object value = event.getProperty().getValue();
-                final String valueString = String.valueOf(event.getProperty()
-                        .getValue());
-                Notification.show("Value changed:", valueString,
-                        Type.TRAY_NOTIFICATION);
-            }
-        });
-
+        selectInstance.addValueChangeListener(invoiceShareViewImpl);
         main.addComponent(selectInstance);
 
     }

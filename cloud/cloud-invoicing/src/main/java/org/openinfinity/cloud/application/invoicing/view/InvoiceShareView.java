@@ -13,7 +13,8 @@ import com.vaadin.data.util.BeanItemContainer;
 public interface InvoiceShareView{
     
     public interface InvoiceShareViewListener{
-        void buttonClick(String buttonName);
+        void buttonClick(final String buttonName);
+        void valueChange(Object value);
     }
     
     public void addListener(InvoiceShareViewListener listener);

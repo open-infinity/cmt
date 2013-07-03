@@ -5,6 +5,9 @@ import org.openinfinity.cloud.application.invoicing.model.InvoiceShareModel;
 import org.openinfinity.cloud.application.invoicing.view.InvoiceShareView;
 import org.openinfinity.cloud.application.invoicing.view.InvoiceShareView.InvoiceShareViewListener;
 
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.Notification.Type;
+
 
 public class InvoiceSharePresenter implements InvoiceShareViewListener {
     InvoiceShareModel model;
@@ -21,7 +24,15 @@ public class InvoiceSharePresenter implements InvoiceShareViewListener {
     }
 
     public void buttonClick(String buttonName) {
-        System.out.println("DBG: button clicked is " + buttonName);
+        Notification.show("Button clicked:", buttonName,
+                Type.TRAY_NOTIFICATION);
 
+    }
+
+    @Override
+    public void valueChange(Object value) {
+        Notification.show("Value changed:", value.toString(),
+                Type.TRAY_NOTIFICATION);
+        
     }
 }
