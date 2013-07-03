@@ -20,6 +20,7 @@ DROP TABLE IF EXISTS `DEPLOYMENT`;
 DROP TABLE IF EXISTS `authorized_ip_tbl`;
 DROP TABLE IF EXISTS `cluster_tbl`;
 DROP TABLE IF EXISTS `elastic_ip_tbl`;
+DROP TABLE IF EXISTS `reserved_multicast_ip_tbl`;
 DROP TABLE IF EXISTS `instance_tbl`;
 DROP TABLE IF EXISTS `job_tbl`;
 DROP TABLE IF EXISTS `key_tbl`;
@@ -84,6 +85,14 @@ CREATE TABLE `elastic_ip_tbl` (
   `in_use` int(11) DEFAULT NULL,
   `user_id` int(11) DEFAULT NULL,
   `organization_id` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+);
+
+CREATE TABLE `reserved_multicast_ip_tbl` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `instance_id` int(11) DEFAULT NULL,
+  `cluster_id` int(11) DEFAULT NULL,
+  `address` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`id`)
 );
 
