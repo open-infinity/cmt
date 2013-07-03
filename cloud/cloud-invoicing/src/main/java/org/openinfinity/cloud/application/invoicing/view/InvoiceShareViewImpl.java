@@ -3,11 +3,15 @@ package org.openinfinity.cloud.application.invoicing.view;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.openinfinity.cloud.application.invoicing.service.component.InstanceSelectionComponent;
+import org.openinfinity.cloud.application.invoicing.service.component.InstanceShareComponent;
+
 import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.NativeSelect;
+import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
 
 
@@ -16,21 +20,23 @@ implements InvoiceShareView, ClickListener {
     public InvoiceShareViewImpl() {
         super();
         
-        VerticalLayout main=new VerticalLayout();
-        this.setCompositionRoot(main);
+        Panel mainPanel=new Panel();
         
-        //Instances drop down
-        AbstractSelect selectInstance = new NativeSelect("Select an instance");
-        for (int i = 0; i < 6; i++) {
-            selectInstance.addItem(i);
-            selectInstance.setItemCaption(i, "Instance " + i);
-        }
+        VerticalLayout mainLayout=new VerticalLayout();
+        this.setCompositionRoot(mainPanel);
+        mainPanel.setContent(mainLayout);
+        
+        InstanceSelectionComponent instanceSelectionComponent = new InstanceSelectionComponent();
+        mainLayout.addComponent(instanceSelectionComponent);
+                
+        InstanceShareComponent instanceShareComponent = new InstanceShareComponent("Hello");
+        mainLayout.addComponent(instanceShareComponent);
+        
+        // Set the size as undefined at all levels
+        mainPanel.getContent().setSizeUndefined();
+        mainPanel.setSizeUndefined();
+        setSizeUndefined();
 
-        selectInstance.setNullSelectionAllowed(false);
-        selectInstance.setValue(2);
-        selectInstance.setImmediate(true);
-        
-        main.addComponent(selectInstance);
     }
 
     private static final long serialVersionUID = 1L;
