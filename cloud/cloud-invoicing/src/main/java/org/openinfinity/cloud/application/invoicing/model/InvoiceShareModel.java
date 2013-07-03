@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.openinfinity.cloud.application.invoicing.service.InvoicingService;
-import org.openinfinity.cloud.application.invoicing.service.component.InstanceSelectionBean;
 import org.openinfinity.cloud.application.invoicing.utility.ApplicationContextProvider;
+import org.openinfinity.cloud.application.invoicing.view.instance.InstanceSelectionBean;
 import org.openinfinity.cloud.domain.Instance;
 
 import com.vaadin.data.util.BeanItemContainer;

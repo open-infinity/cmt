@@ -77,13 +77,13 @@
     -->
     <!-- Declare a JPA entityManagerFactory -->
     <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean" 
-        p:persistenceUnitName="jpa.sample.mysql"
+        p:persistenceUnitName="jpa.hibernate.mysql"
         p:dataSource-ref="cloudDataSource"
         p:jpaVendorAdapter-ref="hibernateVendor"/>
 
     <!-- Specify our ORM vendor -->
     <bean id="hibernateVendor" class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter"
-                p:showSql="true"/>
+            p:showSql="${jdbc.show.sql}"/>
 
     <!-- 
     <bean id="entityManagerFactory"

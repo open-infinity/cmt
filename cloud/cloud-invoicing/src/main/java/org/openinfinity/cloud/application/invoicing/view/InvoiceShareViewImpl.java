@@ -4,9 +4,9 @@ import java.util.ArrayList;
 
 import java.util.List;
 
-import org.openinfinity.cloud.application.invoicing.service.component.InstanceSelectionBean;
-import org.openinfinity.cloud.application.invoicing.service.component.InstanceSelectionComponent;
 import org.openinfinity.cloud.application.invoicing.service.component.InstanceShareComponent;
+import org.openinfinity.cloud.application.invoicing.view.instance.InstanceSelectionBean;
+import org.openinfinity.cloud.application.invoicing.view.instance.InstanceSelectionComponent;
 
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.Button.ClickEvent;

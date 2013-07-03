@@ -1,6 +1,6 @@
 package org.openinfinity.cloud.application.invoicing.view;
 
-import org.openinfinity.cloud.application.invoicing.service.component.InstanceSelectionBean;
+import org.openinfinity.cloud.application.invoicing.view.instance.InstanceSelectionBean;
 
 import com.vaadin.data.util.BeanItemContainer;
 

@@ -1,4 +1,5 @@
-package org.openinfinity.cloud.application.invoicing.service.component;
+package org.openinfinity.cloud.application.invoicing.view.instance;
+
 
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;

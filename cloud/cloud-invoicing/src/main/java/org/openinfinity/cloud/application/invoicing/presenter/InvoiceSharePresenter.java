@@ -1,6 +1,7 @@
 package org.openinfinity.cloud.application.invoicing.presenter;
 
 import org.openinfinity.cloud.application.invoicing.model.InvoiceShareModel;
+
 import org.openinfinity.cloud.application.invoicing.view.InvoiceShareView;
 import org.openinfinity.cloud.application.invoicing.view.InvoiceShareView.InvoiceShareViewListener;
 
