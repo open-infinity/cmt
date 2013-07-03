@@ -361,9 +361,7 @@ public class CloudAdminController {
 	
 	@ResourceMapping("addInstance")
 	public void addInstance(ResourceRequest request, ResourceResponse response, @RequestParam Map<String, String> pm){
-		try{
-			LOG.info("addInstance " + pm);
-			
+		try{			
 			User user = liferayService.getUser(request, response);
 			if (user == null) throw new AdminException("User not logged in");
 			Instance instance = new Instance();
@@ -387,6 +385,9 @@ public class CloudAdminController {
 			
 			// Parse the parameters and configure the job 
 			// TODO simplification needed: lot of repeating code.
+			
+			// TODO: USe Json for making better structure of data.
+			// There are properties repeating for each machine.
 
 			if ("true".equals(pm.get("bigdata"))) {
 				job.addService(ClusterService.SERVICE_NAME[ClusterService.CLUSTER_TYPE_BIGDATA],

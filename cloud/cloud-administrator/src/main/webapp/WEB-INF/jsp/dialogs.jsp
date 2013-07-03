@@ -33,7 +33,8 @@
 
 
 <%-- add service dialog --%>
-<div id="addServiceDialog" title="<fmt:message key="cloud.servicedialog.title.addNew" />">
+<div id="addServicesDialog" title="<fmt:message key="cloud.servicedialog.title.addNew" />">
+    <div id="addServicesAccordion"></div>
 </div>
 
 

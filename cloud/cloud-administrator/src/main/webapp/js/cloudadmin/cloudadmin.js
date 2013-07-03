@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2011 the original author or authors.
+ * Copyright (c) 2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -222,7 +222,7 @@ var instanceManager = {
 			
 		},
 		
-		// Mainview button setup
+		// Main view button setup
 		setupButtons: function() {
 			$("#manage-instance").button().click(function() {
 				instanceManager.openInstance();
@@ -316,8 +316,7 @@ var instanceManager = {
 			
 			// Add services button
 			$template.find(".add-services").button().click(function() {				
-				cloudadmin.dialog.initAddServiceDialog(instanceId, cloudadmin.resource.clusters);
-				$("#addServiceDialog").dialog("open");
+				cloudadmin.dialog.addNewService(cloudadmin.dialog.addServiceDialog);
 			});
 			
 			//  View instance machines button
@@ -661,7 +660,7 @@ var instanceManager = {
 				values: [ 0.2, 0.9 ],
 				step: 0.01,
 				slide: function(event, ui) {
-					o.cpuThresholdRange.text(setRangeText(ui));
+					o.cpuThopenresholdRange.text(setRangeText(ui));
 				}
 			});			
 			o.mbScheduledSizeSlider.mbSlider({			

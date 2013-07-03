@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011 the original author or authors.
+ * Copyright (c) 2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,7 +12,6 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  *
  * @author Ossi Hämäläinen
  * @author Juha-Matti Sironen
@@ -27,7 +26,7 @@
 
 	turkoosi - color: #00AFF0;
 	tummempi - #0081b0  
-	vihre�   - #9EE619  #D4E7B1   #A2F20D
+	vihreä   - #9EE619  #D4E7B1   #A2F20D
 	
 */
 
@@ -312,19 +311,22 @@ col.data {
 	background-color:#EAF2D3;
 }
 
-/* Add new instance dialog */
+/* Dialog: add new instance  */
 
 
 /* General*/
 
-#addInstanceDialog .radioButton .ui-button-text-only .ui-button-text {
+#addInstanceDialog .radioButton .ui-button-text-only .ui-button-text,
+#addServicesDialog .radioButton .ui-button-text-only .ui-button-text
+ {
 	padding:0 .1em;
 	font-weight:normal;
 	font-size: .9em;
 	margin: 0 .2em 0 .2em;}
 
 
-#addInstanceDialog .clusterTypeConfigurationHeader, #addInstanceDialog .platformNotSelected{
+#addInstanceDialog .clusterTypeConfigurationHeader, #addInstanceDialog .platformNotSelected,
+#addServicesDialog .clusterTypeConfigurationHeader, #addServicesDialog .platformNotSelected{
 	outline: none;
 	color: #4F4F4F;
 	border: 1px solid white;
@@ -332,7 +334,8 @@ col.data {
 	background:white;
 }
 
-#addInstanceDialog .valueDisplay{
+#addInstanceDialog .valueDisplay,
+#addServicesDialog .valueDisplay{
 	display: inline-block;	
 	border-radius: 3px;
 	margin-left:2.1em;
@@ -342,21 +345,25 @@ col.data {
 	font-size:.9em;
 }
 
-#addInstanceDialog .subtitleLabel{
+#addInstanceDialog .subtitleLabel,
+#addServicesDialog .subtitleLabel{
 	font-weight:bold;
 	display:block;
 }
 
-#addInstanceDialog .valueDisplaySlider{
+#addInstanceDialog .valueDisplaySlider,
+#addServicesDialog .valueDisplaySlider{
 	margin-left:2.6em;
 }
 
-#addInstanceDialog .platformSelected{ 
+#addInstanceDialog .platformSelected, 
+#addServicesDialog .platformSelected{ 
 	outline: none;
 	font-weight:bold;
 }
 
-#addInstanceDialog  .jq_slider_wrapper{
+#addInstanceDialog  .jq_slider_wrapper,
+#addServicesDialog  .jq_slider_wrapper{
 	border: none;
 	border-radius:5px;
 	display: inline-block;
@@ -366,7 +373,8 @@ col.data {
 	width: 19.9em;
 }
 
-#addInstanceDialog  .jq_slider{
+#addInstanceDialog  .jq_slider,
+#addServicesDialog  .jq_slider{
 	border: none;
 	display: inline-block;
 	float: left;
@@ -397,7 +405,8 @@ col.data {
 /* Pimpping the query range slider */
 /* Clear unwanted inherited styles */
 
-#addInstanceDialog  .jq_slider_wrapper{
+/*//#addInstanceDialog  .jq_slider_wrapper{*/
+.jq_slider_wrapper{
 	border: none;
 	border-radius:5px;
 	display: inline-block;
@@ -408,18 +417,23 @@ col.data {
 }
 
 
-#addInstanceDialog .ui-slider-handle {border:none;}
+#addInstanceDialog .ui-slider-handle,
+#addServicesDialog .ui-slider-handle {
+    border:none;
+}
 
 /* Pimpped from base jQuery style */
 
-#addInstanceDialog .ui-slider {
+#addInstanceDialog .ui-slider,
+#addServicesDialog .ui-slider {
 	position: relative; 
 	-moz-box-shadow:	#CCC 0px 0px 1px;
 	-webkit-box-shadow: #CCC 0px 0px 1px;
 	-box-shadow:		#CCC 0px 0px 1px;
 }
 
-#addInstanceDialog div.ui-slider {
+#addInstanceDialog div.ui-slider,
+#addServicesDialog div.ui-slider {
 
 	border: none;
 	display: inline-block;
@@ -433,7 +447,8 @@ col.data {
 	-box-shadow: none;
 }
 
-#addInstanceDialog .ui-slider-handle { 
+#addInstanceDialog .ui-slider-handle, 
+#addServicesDialog .ui-slider-handle { 
 	 background: white;
 	 top: 0;
 	 height:18px; 
@@ -443,7 +458,8 @@ col.data {
 	 box-shadow:			#BBB 1px 1px 1px 1px;
 }
 
-#addInstanceDialog .ui-slider .ui-slider-range { 
+#addInstanceDialog .ui-slider .ui-slider-range,
+#addServicesDialog .ui-slider .ui-slider-range { 
 	-moz-box-shadow: 	0 1px 2px rgba(17,35,45,0.6) inset; 
 	-webkit-box-shadow: 0 11px 2px rgba(17,35,45,0.6) inset; 
 	box-shadow: 		0 1px 2px rgba(17,35,45,0.6) inset;
@@ -461,42 +477,60 @@ col.data {
 .addInstanceLabel{padding: 10px 0 0 100px;}
 
 #addInstanceDialog .ui-accordion .ui-accordion-header {padding-left: 2.2em;}
+#addServicesDialog .ui-accordion .ui-accordion-header {padding-left: 2.2em;}
 
 #addInstanceDialog .ui-accordion .ui-accordion-content{border-color: white;}
+#addServicesDialog .ui-accordion .ui-accordion-content{border-color: white;}
 
 #addInstanceDialog .radioButton {display:inline-block;}
+#addServicesDialog .radioButton {display:inline-block;}
 
 #addInstanceDialog .togglePlatformSelectionRow{position:relative;}
+#addServicesDialog .togglePlatformSelectionRow{position:relative;}
 
 #addInstanceDialog .clusterTypeConigurationBody{position:relative;border: 1px solid #E9E9E9;}
+#addServicesDialog .clusterTypeConigurationBody{position:relative;border: 1px solid #E9E9E9;}
 
 #addInstanceDialog .clusterSizeRow{position:relative;margin-top: 1.1em;}
+#addServicesDialog .clusterSizeRow{position:relative;margin-top: 1.1em;}
 
 #addInstanceDialog .clusterSizeLabel{margin-top:0.3em;float:left;display: block; clear: left;}
+#addServicesDialog .clusterSizeLabel{margin-top:0.3em;float:left;display: block; clear: left;}
 
 #addInstanceDialog .machineSizeRow{position:relative;margin-top:1.1em;}
+#addServicesDialog .machineSizeRow{position:relative;margin-top:1.1em;}
 
 #addInstanceDialog .machineSizeLabel{margin-top:.1em;float:left;clear:left;}
+#addServicesDialog .machineSizeLabel{margin-top:.1em;float:left;clear:left;}
 
 #addInstanceDialog .replicationClusterSizeRow{position:relative;margin-top: 1.1em;}
+#addServicesDialog .replicationClusterSizeRow{position:relative;margin-top: 1.1em;}
 
 #addInstanceDialog .replicationClusterSizeLabel{margin-top:0.3em;float:left;celar:left;}
+#addServicesDialog .replicationClusterSizeLabel{margin-top:0.3em;float:left;celar:left;}
 
 #addInstanceDialog .replicationMachineSizeLabel{margin-top:.1em;float:left;}
+#addServicesDialog .replicationMachineSizeLabel{margin-top:.1em;float:left;}
 
 #addInstanceDialog .toggleEbsRow{position:relative;margin-top:1.1em;display:block;clear:left;}
+#addServicesDialog .toggleEbsRow{position:relative;margin-top:1.1em;display:block;clear:left;}
 
 #addInstanceDialog .imageTypeRow{position:relative;margin-top:1.1em;display:block;clear:left;}
+#addServicesDialog .imageTypeRow{position:relative;margin-top:1.1em;display:block;clear:left;}
 
 #addInstanceDialog .toggleEbsLabel{margin-top:.1em;float:left;}
+#addServicesDialog .toggleEbsLabel{margin-top:.1em;float:left;}
 
 #addInstanceDialog .ebsSizeRow{position:relative;margin-top:1.1em;display:block;clear:left;}
+#addServicesDialog .ebsSizeRow{position:relative;margin-top:1.1em;display:block;clear:left;}
 
 #addInstanceDialog .ebsSizeLabel{margin-top:.3em;float:left;}
+#addServicesDialog .ebsSizeLabel{margin-top:.3em;float:left;}
 
 
 
-#addInstanceDialog  .sliderMask{
+#addInstanceDialog  .sliderMask,
+#addServicesDialog  .sliderMask{
 	position: relative;
 	bottom: 3em;
 	left: 15em;
