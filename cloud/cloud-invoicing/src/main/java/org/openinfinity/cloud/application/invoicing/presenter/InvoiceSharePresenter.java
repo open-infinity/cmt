@@ -14,6 +14,9 @@ public class InvoiceSharePresenter implements InvoiceShareViewListener {
         this.model = model;
         this.view  = view;
         view.addListener(this);
+        
+        view.setInstanceSelectionSource(model.getInstanceContainer());
+
     }
 
     public void buttonClick(String buttonName) {

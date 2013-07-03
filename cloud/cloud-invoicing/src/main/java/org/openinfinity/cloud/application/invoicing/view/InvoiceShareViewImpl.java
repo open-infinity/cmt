@@ -1,22 +1,34 @@
 package org.openinfinity.cloud.application.invoicing.view;
 
 import java.util.ArrayList;
+
 import java.util.List;
 
+import org.openinfinity.cloud.application.invoicing.service.component.InstanceSelectionBean;
 import org.openinfinity.cloud.application.invoicing.service.component.InstanceSelectionComponent;
 import org.openinfinity.cloud.application.invoicing.service.component.InstanceShareComponent;
 
-import com.vaadin.ui.AbstractSelect;
+import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.CustomComponent;
-import com.vaadin.ui.NativeSelect;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
 
 
-public class InvoiceShareViewImpl extends CustomComponent
-implements InvoiceShareView, ClickListener {
+public class InvoiceShareViewImpl extends CustomComponent implements InvoiceShareView, ClickListener {
+    
+    public InstanceSelectionComponent getInstanceSelectionComponent() {
+        return instanceSelectionComponent;
+    }
+
+    public InstanceShareComponent getInstanceShareComponent() {
+        return instanceShareComponent;
+    }
+
+    InstanceSelectionComponent instanceSelectionComponent;
+    InstanceShareComponent instanceShareComponent;
+    
     public InvoiceShareViewImpl() {
         super();
         
@@ -26,10 +38,10 @@ implements InvoiceShareView, ClickListener {
         this.setCompositionRoot(mainPanel);
         mainPanel.setContent(mainLayout);
         
-        InstanceSelectionComponent instanceSelectionComponent = new InstanceSelectionComponent();
+        instanceSelectionComponent = new InstanceSelectionComponent();
         mainLayout.addComponent(instanceSelectionComponent);
                 
-        InstanceShareComponent instanceShareComponent = new InstanceShareComponent("Hello");
+        instanceShareComponent = new InstanceShareComponent("Hello");
         mainLayout.addComponent(instanceShareComponent);
         
         // Set the size as undefined at all levels
@@ -55,5 +67,10 @@ implements InvoiceShareView, ClickListener {
     public void buttonClick(ClickEvent event) {
         for (InvoiceShareViewListener listener: listeners)
             listener.buttonClick(event.getButton().getId());
+    }
+
+    public void setInstanceSelectionSource(BeanItemContainer<InstanceSelectionBean> container) {
+        instanceSelectionComponent.setInstanceContainer(container);
+        
     }
 }
