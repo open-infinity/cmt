@@ -1,50 +1,50 @@
 package org.openinfinity.cloud.application.invoicing.service.component;
 
-import org.openinfinity.cloud.domain.InstanceTbl;
+import java.util.List;
+
+import org.openinfinity.cloud.domain.Instance;
+import org.openinfinity.cloud.domain.InstanceParameter;
 
 public class InstanceSelectionBean {
     @Override
     public String toString() {
-        return "InstanceSelectionBean [id=" + id + ", abbreviation="
-                + abbreviation + ", fullName=" + fullName + "]";
+        return "InstanceSelectionBean [id=" + instance.getInstanceId()+ ", name=" + instance.getName() + "]";
     }
-    public InstanceSelectionBean(String id, String abbreviation, String fullName) {
+    public InstanceSelectionBean(Instance instance) {
         super();
-        this.id = id;
-        this.abbreviation = abbreviation;
-        this.fullName = fullName;
+        this.instance=instance;
     }
-    private InstanceTbl entity;
+    private Instance instance;
+    public int getCloudType() {
+        return instance.getCloudType();
+    }
+    public int getInstanceId() {
+        return instance.getInstanceId();
+    }
+    public String getName() {
+        return instance.getName();
+    }
+    public Long getOrganizationid() {
+        return instance.getOrganizationid();
+    }
+    public String getOrganizationName() {
+        return instance.getOrganizationName();
+    }
+    public List<InstanceParameter> getParameters() {
+        return instance.getParameters();
+    }
+    public String getStatus() {
+        return instance.getStatus();
+    }
+    public int getUserId() {
+        return instance.getUserId();
+    }
+    public String getUserName() {
+        return instance.getUserName();
+    }
+    public String getZone() {
+        return instance.getZone();
+    }
     
-    private String id;
-    private String abbreviation;
- 
-    private String fullName;
-
-    public String getAbbreviation() {
-        return abbreviation;
-    }
-    public void setAbbreviation(String abbreviation) {
-        this.abbreviation = abbreviation;
-    }
-
-    public InstanceTbl getEntity() {
-        return entity;
-    }
-    public void setEntity(InstanceTbl entity) {
-        this.entity = entity;
-    }
-    public String getId() {
-        return id;
-    }
-    public void setId(String id) {
-        this.id = id;
-    }
-    public String getFullName() {
-        return fullName;
-    }
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
-    }
   
 }
