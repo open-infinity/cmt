@@ -1,5 +1,7 @@
 package org.openinfinity.cloud.application.invoicing.service.component;
 
+import org.openinfinity.cloud.domain.InstanceShare;
+
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.util.BeanItemContainer;
@@ -17,39 +19,44 @@ public class InstanceShareComponent extends CustomComponent{
 	
 	/* User interface components are stored in session. */
 	private Table sharesList = new Table();		
-    BeanItemContainer<InstanceShareBean> instanceShareContainer;
+    BeanItemContainer<InstanceShare> instanceShareContainer;
 
-    public BeanItemContainer<InstanceShareBean> getInstanceShareContainer() {
+    public BeanItemContainer<InstanceShare> getInstanceShareContainer() {
         return instanceShareContainer;
     }
 
-	public void setInstanceShareContainer(
-            BeanItemContainer<InstanceShareBean> instanceShareContainer) {
+	public void setInstanceShareContainer(BeanItemContainer<InstanceShare> instanceShareContainer) {
         this.instanceShareContainer = instanceShareContainer;
                
-		sharesList.setContainerDataSource(instanceShareContainer);
-		sharesList.setVisibleColumns(new String[] { "period_start" });
-		sharesList.setColumnHeaderMode(ColumnHeaderMode.HIDDEN);
-		sharesList.setSelectable(true);
-		sharesList.setImmediate(true);
-
-		sharesList.addValueChangeListener(new Property.ValueChangeListener() {
-			public void valueChange(ValueChangeEvent event) {
-				Object id = sharesList.getValue();
-
-				/*
-				 * When a share is selected from the list, it is shown 
-				 * in our editor on the right. 
-				 */
-/*				
-				if (id != null)
-					editorFields.setItemDataSource(sharesList
-							.getItem(id));
-				
-				editorLayout.setVisible(id != null);
-*/				
-			}
-		});        
+        if (instanceShareContainer.size() == 0) {
+        	sharesList.setVisible(false);
+        }
+        else {
+        	sharesList.setVisible(true);
+			sharesList.setContainerDataSource(instanceShareContainer);
+			sharesList.setVisibleColumns(new String[] { "period_start" });
+			sharesList.setColumnHeaderMode(ColumnHeaderMode.HIDDEN);
+			sharesList.setSelectable(true);
+			sharesList.setImmediate(true);
+	
+			sharesList.addValueChangeListener(new Property.ValueChangeListener() {
+				public void valueChange(ValueChangeEvent event) {
+					Object id = sharesList.getValue();
+	
+					/*
+					 * When a share is selected from the list, it is shown 
+					 * in our editor on the right. 
+					 */
+	/*				
+					if (id != null)
+						editorFields.setItemDataSource(sharesList
+								.getItem(id));
+					
+					editorLayout.setVisible(id != null);
+	*/				
+				}
+			});
+        }
     }
     
     

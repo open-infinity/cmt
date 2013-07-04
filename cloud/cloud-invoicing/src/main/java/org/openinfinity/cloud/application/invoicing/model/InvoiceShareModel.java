@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.openinfinity.cloud.application.invoicing.service.InvoicingService;
-import org.openinfinity.cloud.application.invoicing.service.component.InstanceShareBean;
 import org.openinfinity.cloud.application.invoicing.utility.ApplicationContextProvider;
 import org.openinfinity.cloud.application.invoicing.view.instance.InstanceSelectionBean;
 import org.openinfinity.cloud.domain.Instance;
@@ -20,7 +19,7 @@ import com.vaadin.data.util.BeanItemContainer;
 public class InvoiceShareModel{
     
     private BeanItemContainer<InstanceSelectionBean> instanceContainer=null;
-    private BeanItemContainer<InstanceShareBean> instanceShareContainer=null;
+    private BeanItemContainer<InstanceShare> instanceShareContainer=null;
     
     private InvoicingService invoicingService;
 
@@ -35,12 +34,12 @@ public class InvoiceShareModel{
         this.instanceContainer = instanceContainer;
     }
 
-    public BeanItemContainer<InstanceShareBean> getInstanceShareContainer() {
+    public BeanItemContainer<InstanceShare> getInstanceShareContainer() {
         return instanceShareContainer;
     }
 
     public void setInstanceShareContainer(
-            BeanItemContainer<InstanceShareBean> instanceShareContainer) {
+            BeanItemContainer<InstanceShare> instanceShareContainer) {
         this.instanceShareContainer = instanceShareContainer;
     }
         
@@ -61,17 +60,11 @@ public class InvoiceShareModel{
 
         
         // Instance_share beans
-        ArrayList<InstanceShareBean> shareBeans = new ArrayList<InstanceShareBean>();
-
         long instanceId=1;
 		Collection<InstanceShare> instanceShares = invoicingService.getInstanceShareService().findByInstanceId(instanceId);
-        /*for (Instance instance:instanceShares){
-            beans.add(new InstanceShareBean(instance));
-        }*/
 
         // Create a Collection container using id property as the key
-        instanceShareContainer = new BeanItemContainer<InstanceShareBean>(InstanceShareBean.class);
-        instanceShareContainer.addAll(shareBeans);
-    }
-    
+        instanceShareContainer = new BeanItemContainer<InstanceShare>(InstanceShare.class);
+        instanceShareContainer.addAll(instanceShares);
+    }    
 }
