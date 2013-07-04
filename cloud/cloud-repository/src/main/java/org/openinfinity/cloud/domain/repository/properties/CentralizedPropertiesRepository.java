@@ -56,6 +56,35 @@ public interface CentralizedPropertiesRepository {
 	 * @return true if the property was found, false if not
 	 */
 	public boolean delete(SharedProperty sample);
+
+	/**
+	 * Delete the properties defined by organization, instance, cluster id and name in deleted state from database. 
+	 */
+	public void deleteByStateOrgInstClusName(long organizationId, int instanceId, int clusterId);
+	
+	/**
+	 * Delete the properties defined by cluster id from database. 
+	 */
+	public void deleteByCluster(int clusterId);
+
+	
+	/**
+	 * Update the given property from database. The value part will be ignored.
+	 * @param sample Identifies the property to be updated
+	 */
+	public void update(SharedProperty sharedProperty);
+	
+	/**
+	 * Update the properties defined by organization, instance, cluster id and name from database. The value part will be ignored.
+	 */
+	public void updateStatesNewToFinalizedByOrgInstClusName(long organizationId, int instanceId, int clusterId);
+	
+	/**
+	 * Update the given property to given state from database. 
+	 * @param id Represents the unique id.
+	 * @param state State to be updated to.
+	 */
+	public boolean updateStateByUniqueId(int id, int state);
 	
 	/**
 	 * Deletes shared property by unique id.

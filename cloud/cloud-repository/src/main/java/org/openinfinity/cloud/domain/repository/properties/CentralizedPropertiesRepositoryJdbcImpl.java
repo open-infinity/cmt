@@ -49,9 +49,21 @@ public class CentralizedPropertiesRepositoryJdbcImpl implements CentralizedPrope
 	// See create_tables.sql for more information
 	private static final String WHERE = "where key_column = :key and organization_id = :orgid and instance_id = :insid and cluster_id = :clid";
 	private static final String WHERE2 = "where organization_id = :orgid and instance_id = :insid and cluster_id = :clid";
+	
+	private static final String WHERE3 = "where organization_id = :orgid and instance_id = :insid and cluster_id = :clid and state=0";
+	private static final String WHERE4 = "where organization_id = :orgid and instance_id = :insid and cluster_id = :clid and state=-1";
+	
 	private static final String STORE_SQL = "insert into properties_tbl (organization_id, instance_id, cluster_id, key_column, value_column, changed_last_update) " + 
 												"values (:orgid, :insid, :clid, :key, :value, CURRENT_TIMESTAMP)";
-	private static final String UPDATE_SQL = "update properties_tbl set key_column = :key, value_column = :value, changed_last_update = CURRENT_TIMESTAMP " + WHERE;
+	private static final String UPDATE_SQL = "update properties_tbl set key_column = :key, value_column = :value, state = :state, changed_last_update = CURRENT_TIMESTAMP " + WHERE;	
+	
+	private static final String UPDATE_STATE_BY_UNIQUE_ID = "update properties_tbl set state = :state, changed_last_update = CURRENT_TIMESTAMP where id = :id";		
+	
+	private static final String UPDATE_STATES_TO_DEPLOYED_SQL = "update properties_tbl set state=1, changed_last_update = CURRENT_TIMESTAMP " + WHERE3;	
+	private static final String DELETE_BY_STATE_ORG_INST_CLUS = "delete from properties_tbl " + WHERE4;	
+
+	private static final String DELETE_BY_CLUSTERID = "delete from properties_tbl where cluster_id = :clid";
+	
 	private static final String LOAD_BY_KEY = "select * from properties_tbl " + WHERE;
 	private static final String COUNT_BY_KEY = "select count(*) from properties_tbl " + WHERE;
 	private static final String LOAD_ALL_SQL = "select * from properties_tbl";
@@ -79,6 +91,7 @@ public class CentralizedPropertiesRepositoryJdbcImpl implements CentralizedPrope
 		map.addValue("orgid", prop.getOrganizationId());
 		map.addValue("insid", prop.getInstanceId());
 		map.addValue("clid", prop.getClusterId());
+		map.addValue("state", prop.getState());		
 		int n = namedParameterJdbcTemplate.queryForInt(COUNT_BY_KEY, map);
 		if (n == 0) {
 			map.addValue("value", prop.getValue());
@@ -87,7 +100,7 @@ public class CentralizedPropertiesRepositoryJdbcImpl implements CentralizedPrope
 			namedParameterJdbcTemplate.update(UPDATE_SQL, map);
 		}
 		return prop;
-	}
+	}		
 	
 	@AuditTrail
 	@Override
@@ -142,6 +155,55 @@ public class CentralizedPropertiesRepositoryJdbcImpl implements CentralizedPrope
 		int n = namedParameterJdbcTemplate.update(DELETE_BY_KEY, map);
 		return (n >= 1); 
 	}
+
+	@AuditTrail
+	@Override
+	public void deleteByStateOrgInstClusName(long organizationId, int instanceId, int clusterId) {
+		MapSqlParameterSource map = new MapSqlParameterSource();
+		map.addValue("orgid", organizationId);
+		map.addValue("insid", instanceId);
+		map.addValue("clid", clusterId);
+		int n = namedParameterJdbcTemplate.update(DELETE_BY_STATE_ORG_INST_CLUS, map);
+		//return (n >= 1); 
+	}
+	
+	public void deleteByCluster(int clusterId) {
+		MapSqlParameterSource map = new MapSqlParameterSource();
+		map.addValue("clid", clusterId);
+		int n = namedParameterJdbcTemplate.update(DELETE_BY_CLUSTERID, map);		
+	}
+	
+	
+	@AuditTrail
+	@Override 
+	public void update(SharedProperty prop) {
+		MapSqlParameterSource map = new MapSqlParameterSource();
+		map.addValue("key", prop.getKey());
+		map.addValue("value", prop.getValue());
+		map.addValue("orgid", prop.getOrganizationId());
+		map.addValue("insid", prop.getInstanceId());
+		map.addValue("clid", prop.getClusterId());
+		map.addValue("state", prop.getState());
+		namedParameterJdbcTemplate.update(UPDATE_SQL, map);
+	}
+	
+	@AuditTrail
+	@Override 
+	public void updateStatesNewToFinalizedByOrgInstClusName(long organizationId, int instanceId, int clusterId) {
+		MapSqlParameterSource map = new MapSqlParameterSource();
+		map.addValue("orgid", organizationId);
+		map.addValue("insid", instanceId);
+		map.addValue("clid", clusterId);
+		namedParameterJdbcTemplate.update(UPDATE_STATES_TO_DEPLOYED_SQL, map);		
+	}
+	
+	public boolean updateStateByUniqueId(int id, int state) {
+		MapSqlParameterSource map = new MapSqlParameterSource();
+		map.addValue("id", id);
+		map.addValue("state", state);
+		int n = namedParameterJdbcTemplate.update(UPDATE_STATE_BY_UNIQUE_ID, map);
+		return (n >= 1); 		
+	}
 	
 	@AuditTrail
 	@Override
@@ -162,7 +224,8 @@ public class CentralizedPropertiesRepositoryJdbcImpl implements CentralizedPrope
 			sharedProperty.setClusterId(resultSet.getInt("cluster_id"));
 			sharedProperty.setKey(resultSet.getString("key_column"));
 			sharedProperty.setValue(resultSet.getString("value_column"));
-			sharedProperty.setTimestamp(resultSet.getDate("changed_last_update"));
+			sharedProperty.setState(resultSet.getInt("state"));
+			sharedProperty.setPropertyTimestamp(resultSet.getTimestamp("changed_last_update"));
 			return sharedProperty;
 		}
 	}
