@@ -135,6 +135,8 @@ INSERT INTO instance_tbl (instance_id,user_id,instance_name,cloud_type,cloud_zon
 
 insert into instance_share_tbl (id, instance_id, period_start, created_by, created, modified_by) 
     values (153, 720, '2013-06-01 00:00:00', 12345, NOW(), 12345);
+insert into instance_share_tbl (id, instance_id, period_start, created_by, created, modified_by) 
+    values (154, 720, '2013-07-01 00:00:00', 12345, NOW(), 12345);
     
 insert into instance_share_invoice_tbl (instance_share_id, period_start, period_end, total_usage, created_by, created, modified_by) 
     values (153, '2013-06-01 00:00:00', '2013-06-30 23:59:59', 12, 12345, NOW(), 12345);

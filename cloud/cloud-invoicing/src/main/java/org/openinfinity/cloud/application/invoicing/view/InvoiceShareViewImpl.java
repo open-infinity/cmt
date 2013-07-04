@@ -6,8 +6,8 @@ import java.util.List;
 
 import org.openinfinity.cloud.application.invoicing.view.instance.InstanceSelectionBean;
 import org.openinfinity.cloud.application.invoicing.view.instance.InstanceSelectionComponent;
+import org.openinfinity.cloud.application.invoicing.view.instanceshare.InstanceShareBean;
 import org.openinfinity.cloud.application.invoicing.view.instanceshare.InstanceShareComponent;
-import org.openinfinity.cloud.domain.InstanceShare;
 
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
@@ -78,7 +78,7 @@ public class InvoiceShareViewImpl extends CustomComponent implements InvoiceShar
     }
 
 	@Override
-	public void setInstanceShareSource(BeanItemContainer<InstanceShare> container) {
+	public void setInstanceShareSource(BeanItemContainer<InstanceShareBean> container) {
         instanceShareComponent.setInstanceShareContainer(container);		
 	}
     

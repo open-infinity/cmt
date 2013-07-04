@@ -1,5 +1,8 @@
 package org.openinfinity.cloud.application.invoicing.view.instanceshare;
 
+import java.util.Date;
+import java.text.SimpleDateFormat;
+
 import org.openinfinity.cloud.domain.InstanceShare;
 
 import com.vaadin.data.Property;
@@ -18,23 +21,32 @@ import com.vaadin.ui.VerticalLayout;
 public class InstanceShareComponent extends CustomComponent{
 	
 	/* User interface components are stored in session. */
-	private Table sharesList = new Table();		
-    BeanItemContainer<InstanceShare> instanceShareContainer;
+	private Table sharesList = new Table() {
+		@Override
+		protected String formatPropertyValue(Object rowId, Object colId, Property property) {
+			if (property.getType() == Date.class) {
+				SimpleDateFormat df = new SimpleDateFormat("MMMMM yyyy");			
+				return df.format((Date)property.getValue());
+			}
+			return super.formatPropertyValue(rowId, colId, property);
+		}
+	};		
+    BeanItemContainer<InstanceShareBean> instanceShareContainer;
 
-    public BeanItemContainer<InstanceShare> getInstanceShareContainer() {
+    public BeanItemContainer<InstanceShareBean> getInstanceShareContainer() {
         return instanceShareContainer;
     }
 
-	public void setInstanceShareContainer(BeanItemContainer<InstanceShare> instanceShareContainer) {
-        this.instanceShareContainer = instanceShareContainer;
+	public void setInstanceShareContainer(BeanItemContainer<InstanceShareBean> container) {
+        this.instanceShareContainer = container;
                
-        if (instanceShareContainer.size() == 0) {
+        if (container.size() == 0) {
         	sharesList.setVisible(false);
         }
         else {
         	sharesList.setVisible(true);
-			sharesList.setContainerDataSource(instanceShareContainer);
-			sharesList.setVisibleColumns(new String[] { "period_start" });
+			sharesList.setContainerDataSource(container);
+			sharesList.setVisibleColumns(new String[] { "periodStart" });
 			sharesList.setColumnHeaderMode(ColumnHeaderMode.HIDDEN);
 			sharesList.setSelectable(true);
 			sharesList.setImmediate(true);
