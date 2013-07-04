@@ -53,13 +53,9 @@ jQuery(function($) {
 		
 		setupErrorHandler: function () {
 		    $('body').ajaxError(function (event, xhr, ajaxOptions, thrownError) {
-		        var headers = xhr.getAllResponseHeaders();
-		        var portlet_status = xhr.getResponseHeader('portlet.http-status-code');
-	
-		        if (portlet_status == "421") {
+		        if (xhr.getAllResponseHeaders().getResponseHeader('portlet.http-status-code') == "421") {
 		        	alert("Something went wrong: \n\n" + xhr.responseText);	        	
 		        }
-	
 		        console.log("XHR Response: " + JSON.stringify(xhr));
 		      });
 	    },
@@ -70,7 +66,7 @@ jQuery(function($) {
 	    		console.log("refresh instancetable event");
 	    		
 	    		setTimeout(function () {
-	    			instanceManager.refreshInstanceTable()
+	    			instanceManager.refreshInstanceTable();
 	    		}, 2000);
 	    	});
 
@@ -188,9 +184,6 @@ var instanceManager = {
 			} else {
 				for(var i = 0; i < instanceManager.tabArray.length; i++) {
 					if(instanceManager.tabArray[i].tabName == id) {
-
-						//console.log("data poller for tab   : " + instanceManager.tabArray[i].tabName);
-						//console.log("instanceId for poller : " + instanceManager.tabArray[i].id);
 						instanceManager.refreshInstanceView(instanceManager.tabArray[i].id);
 						return;
 					}
@@ -278,7 +271,6 @@ var instanceManager = {
 					}
 							
 			} else {
-				// TODO: replace alert with div
 				alert("Please select instance first!");
 			}	
 		},
@@ -315,8 +307,9 @@ var instanceManager = {
 			});
 			
 			// Add services button
-			$template.find(".add-services").button().click(function() {				
-				cloudadmin.dialog.addNewService(cloudadmin.dialog.addServiceDialog);
+			$template.find(".add-services").button().click(function() {
+				cloudadmin.dialog.addServiceDialog.instanceId = instanceId;
+ 				cloudadmin.dialog.addNewService(cloudadmin.dialog.addServiceDialog);
 			});
 			
 			//  View instance machines button
