@@ -25,6 +25,7 @@ import java.util.Map;
 
 import org.openinfinity.cloud.domain.Deployment;
 import org.openinfinity.cloud.domain.SharedProperty;
+import org.openinfinity.cloud.service.deployer.DeployerService;
 import org.openinfinity.cloud.util.filesystem.FileUtil;
 import org.openinfinity.core.annotation.Log;
 import org.openinfinity.core.util.ExceptionUtil;
@@ -42,7 +43,8 @@ import org.springframework.stereotype.Component;
  * @since 1.2.0
  */
 @Component("periodicCloudPropertiesProcessor")
-public class PeriodicCloudPropertiesProcessor implements ItemProcessor<Collection<SharedProperty>, Map<File, Deployment>>{
+//public class PeriodicCloudPropertiesProcessor implements ItemProcessor<Collection<SharedProperty>, Map<File, Deployment>>{
+public class PeriodicCloudPropertiesProcessor implements ItemProcessor<Collection<SharedProperty>, Map<Deployment, File>>{
 
 	private static final String EXCEPTION_MESSAGE_TEMPORARY_FILESYSTEM_DOES_NOT_EXIST = "Local temporary file system for storing key-value pairs is not existing. Please refine your setup: ";
 
@@ -53,7 +55,8 @@ public class PeriodicCloudPropertiesProcessor implements ItemProcessor<Collectio
 	
 	@Log
 	@Override
-	public Map<File, Deployment> process(Collection<SharedProperty> sharedProperties) throws Exception {
+	//public Map<File, Deployment> process(Collection<SharedProperty> sharedProperties) throws Exception {
+	public Map<Deployment, File> process(Collection<SharedProperty> sharedProperties) throws Exception {
 		File localDiskTempFileSystemDirectory = new File(localDiskTempFileSystem); 
 		if (! localDiskTempFileSystemDirectory.exists()) {
 			ExceptionUtil.throwSystemException(EXCEPTION_MESSAGE_TEMPORARY_FILESYSTEM_DOES_NOT_EXIST + localDiskTempFileSystem);
@@ -63,26 +66,55 @@ public class PeriodicCloudPropertiesProcessor implements ItemProcessor<Collectio
 		int clusterId = 0;
 		Date lastModifiedTimeStamp = new Date();
 		StringBuilder contentBuilder = new StringBuilder();
+		boolean isEmpty=true;
 		
 		for (SharedProperty sharedProperty : sharedProperties) {
-			contentBuilder
-				.append(sharedProperty.getKey())
-				.append("=")
-				.append(sharedProperty.getValue())
-				.append("\n");
 			organizationId = sharedProperty.getOrganizationId();
 			instanceId = sharedProperty.getInstanceId();
 			clusterId = sharedProperty.getClusterId();
-			LOGGER.debug("Creating properties properties file for unique cluster: " + clusterId);
-			lastModifiedTimeStamp = sharedProperty.getTimestamp().after(lastModifiedTimeStamp)?sharedProperty.getTimestamp():lastModifiedTimeStamp;
+			
+			// update state for deleted properties and build content file for others
+			if (sharedProperty.getState()==-1) {
+				// mark for deletion and skip key-value from content
+				//sharedProperty.setState(-2);				
+				LOGGER.debug("Deleted property with key["+sharedProperty.getKey()+"] and value["+sharedProperty.getValue()+"] for clusterId: " + clusterId);				
+			} else {		
+				isEmpty=false;
+				contentBuilder
+					.append(sharedProperty.getKey())
+					.append("=")
+					.append(sharedProperty.getValue())
+					.append("\n");
+				LOGGER.debug("Adding key["+sharedProperty.getKey()+"] and value["+sharedProperty.getValue()+"] for clusterId: " + clusterId);
+				lastModifiedTimeStamp = sharedProperty.getPropertyTimestamp().after(lastModifiedTimeStamp)?sharedProperty.getPropertyTimestamp():lastModifiedTimeStamp;
+				//lastModifiedTimeStamp = sharedProperty.getTimestamp().after(lastModifiedTimeStamp)?sharedProperty.getTimestamp():lastModifiedTimeStamp;
+				sharedProperty.setState(2);
+			}
+		}
+		
+		LOGGER.debug("Properties file for cluster [" + clusterId +"] is:\n"+contentBuilder);
+
+		Deployment deployment = populateDeployment(organizationId, instanceId, clusterId);
+
+		// do not generate file for empty content
+		if(isEmpty) {
+			// TODO - final state should be DELETED but UNDEPLOY it first
+			LOGGER.debug("Only deleted properties left for cluster: " + clusterId + ". Setting properties to be undeployed.");			
+			deployment.setState(DeployerService.DEPLOYMENT_STATE_UNDEPLOY);
+			Map<Deployment, File> fileAndDeployment = populateMapWithDeploymentAndTempFile(deployment, null);			
+			return fileAndDeployment;
 		}
 		
 		//populateDeploymentMetadataAndTempFileContent(sharedProperties, organizationId, instanceId, clusterId, lastModifiedTimeStamp, contentBuilder);
 		File tmp = initializeTempFile(localDiskTempFileSystemDirectory, clusterId);
 		FileUtil.store(tmp.getAbsolutePath(), contentBuilder.toString());
-		Deployment deployment = populateDeployment(organizationId, instanceId, clusterId);
+		//Deployment deployment = populateDeployment(organizationId, instanceId, clusterId);
 		deployment.setInputStream(new FileInputStream(tmp));
-		Map<File, Deployment> fileAndDeployment = populateMapWithTempFileAndDeployment(tmp, deployment);
+		
+		//Map<File, Deployment> fileAndDeployment = populateMapWithTempFileAndDeployment(tmp, deployment);
+		Map<Deployment, File> fileAndDeployment = populateMapWithDeploymentAndTempFile(deployment, tmp);
+		
+		LOGGER.debug("Returning tmp Properties file for cluster [" + clusterId +"]:"+tmp.getName());		
 		return fileAndDeployment;
 	}
 
@@ -100,6 +132,12 @@ public class PeriodicCloudPropertiesProcessor implements ItemProcessor<Collectio
 		return fileAndDeployment;
 	}
 
+	private Map<Deployment, File> populateMapWithDeploymentAndTempFile(Deployment deployment, File tmp) {
+		Map<Deployment, File> fileAndDeployment = new HashMap<Deployment, File>();
+		fileAndDeployment.put(deployment, tmp);
+		return fileAndDeployment;
+	}
+	
 	private Deployment populateDeployment(long organizationId, int instanceId, int clusterId) {
 		Deployment deployment = new Deployment();
 		deployment.setOrganizationId(organizationId);
@@ -121,7 +159,8 @@ public class PeriodicCloudPropertiesProcessor implements ItemProcessor<Collectio
 			instanceId = sharedProperty.getInstanceId();
 			clusterId = sharedProperty.getClusterId();
 			LOGGER.debug("Creating properties properties file for unique cluster: " + clusterId);
-			lastModifiedTimeStamp = sharedProperty.getTimestamp().after(lastModifiedTimeStamp)?sharedProperty.getTimestamp():lastModifiedTimeStamp;
+			lastModifiedTimeStamp = sharedProperty.getPropertyTimestamp().after(lastModifiedTimeStamp)?sharedProperty.getPropertyTimestamp():lastModifiedTimeStamp;
+			//lastModifiedTimeStamp = sharedProperty.getTimestamp().after(lastModifiedTimeStamp)?sharedProperty.getTimestamp():lastModifiedTimeStamp;
 		}
 	}
 	
