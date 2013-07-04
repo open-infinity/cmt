@@ -98,6 +98,8 @@ public class BucketRepositoryJets3tImpl implements BucketRepository {
 		return inputStream;
 	}
 	
+	
+	
 
 	/**
 	 * Delete object
@@ -117,12 +119,37 @@ public class BucketRepositoryJets3tImpl implements BucketRepository {
 	/**
 	 * Delete all objects and bucket
 	 */	
-	public void deleteBucketAndObjects(String bucketName, List <String> keyList) {
+	public void deleteBucketAndObjects(String bucketName) {
+		try {
+			// list and delete objects in a bucket 
+			S3Object[] objects = simpleStorageService.listObjects(bucketName);
+			
+			for (S3Object s3Object : objects) {
+				simpleStorageService.deleteObject(bucketName, s3Object.getKey());
+			}
+				
+			// Now that the bucket is empty, you can delete it. If you try to delete your bucket before it is empty, it will fail.
+			simpleStorageService.deleteBucket(bucketName);
+			//System.out.println("Deleted bucket " + testBucket.getName());		
+			
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			ExceptionUtil.throwSystemException(e.getMessage(), ExceptionLevel.ERROR, BucketRepository.EXCEPTION_MESSAGE_CONNECTION_FAILURE);						
+		}			
+	}
+	
+
+	/**
+	 * Delete all objects and bucket
+	 */	
+	public void deleteBucketAndObjectsVersioned(String bucketName, List <String> keyList) {
 		try {
 			// if versioning is used need to check how to delete all versions
 			// Check bucket versioning status for the bucket
 			//S3BucketVersioningStatus versioningStatus = simpleStorageService.getBucketVersioningStatus(vBucketName);			
-			//simpleStorageService.suspendBucketVersioning(bucketName);
+			//simpleStorageService.suspendBucketVersioning(bucketName);			
+			
 			// Delete all the objects in the bucket	
 			for (String key : keyList) {
 				simpleStorageService.deleteObject(bucketName,key);			
@@ -138,6 +165,7 @@ public class BucketRepositoryJets3tImpl implements BucketRepository {
 			ExceptionUtil.throwSystemException(e.getMessage(), ExceptionLevel.ERROR, BucketRepository.EXCEPTION_MESSAGE_CONNECTION_FAILURE);						
 		}			
 	}
+	
 	
 	
 	/**
