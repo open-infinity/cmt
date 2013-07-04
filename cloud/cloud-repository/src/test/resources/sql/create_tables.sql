@@ -274,3 +274,17 @@ CREATE TABLE `deployment_state_tbl` (
   `cur_timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP  ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `properties_tbl`;
+
+CREATE TABLE `properties_tbl` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `organization_id` int(11) NOT NULL,
+  `instance_id` int(11),
+  `cluster_id` int(11),
+  `key_column` varchar(256) NOT NULL,
+  `value_column` varchar(256) NOT NULL,  
+  `state` int(11) DEFAULT '0',
+  `changed_last_update` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP  ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
