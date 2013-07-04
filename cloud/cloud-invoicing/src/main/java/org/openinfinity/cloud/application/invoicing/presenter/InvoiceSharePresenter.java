@@ -23,6 +23,7 @@ public class InvoiceSharePresenter implements InvoiceShareViewListener {
 
     }
 
+    @Override
     public void buttonClick(String buttonName) {
         Notification.show("Button clicked:", buttonName,
                 Type.TRAY_NOTIFICATION);

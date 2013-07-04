@@ -4,54 +4,55 @@ import java.io.Serializable;
 import javax.persistence.*;
 
 import java.sql.Timestamp;
-import java.math.BigDecimal;
+import java.util.Date;
 
 import lombok.Getter;
 import lombok.Setter;
 
 
 /**
- * The persistent class for the instance_share_detail_tbl database table.
+ * The persistent class for the instance_share_invoice_tbl database table.
  * 
  */
 @Entity
 @Getter
 @Setter
-@Table(name="instance_share_detail_tbl")
-public class InstanceShareDetailTbl implements Serializable {
+@Table(name="instance_share_invoice_tbl")
+public class InstanceShareInvoice implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue
 	private Long id;
 
-	@Column(name="cost_pool")
-	private String costPool;
-
 	private Timestamp created;
 
 	@Column(name="created_by")
 	private int createdBy;
-
-	private String description;
 
 	private Timestamp modified;
 
 	@Column(name="modified_by")
 	private int modifiedBy;
 
-	@Column(name="order_number")
-	private String orderNumber;
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name="period_end")
+	private Date periodEnd;
 
-	@Column(name="share_percent")
-	private BigDecimal sharePercent;
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name="period_start")
+	private Date periodStart;
+
+	@Column(name="total_usage")
+	private int totalUsage;
 
 	//bi-directional many-to-one association to InstanceShareTbl
 	@ManyToOne
 	@JoinColumn(name="instance_share_id")
-	private InstanceShareTbl instanceShareTbl;
+	private InstanceShare instanceShare;
 
-	public InstanceShareDetailTbl() {
+	public InstanceShareInvoice() {
 	}
+
 
 }
