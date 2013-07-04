@@ -230,7 +230,7 @@ public class DeployerServiceImpl implements DeployerService {
 		// TODO:set Deployments to TERMINATED state
 		deploymentRepository.updateDeploymentStateByClusterId(clusterId, DEPLOYMENT_STATE_TERMINATED);
 		// TODO:set DeploymentStatuses to TERMINATED state
-		deploymentRepository.updateDeploymentStatusStateByClusterId(clusterId, DEPLOYMENT_STATE_TERMINATED);
+		deploymentRepository.updateDeploymentStatusStateByClusterId(clusterId, DeploymentStatus.DeploymentState.TERMINATED.getValue());
 		// TODO: remove deployment from Walrus
 		bucketRepository.deleteBucketAndObjects(String.valueOf(clusterId));
 	}
