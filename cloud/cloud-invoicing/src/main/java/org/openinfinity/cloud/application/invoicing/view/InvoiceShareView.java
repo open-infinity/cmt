@@ -1,5 +1,6 @@
 package org.openinfinity.cloud.application.invoicing.view;
 
+import org.openinfinity.cloud.application.invoicing.service.component.InstanceShareBean;
 import org.openinfinity.cloud.application.invoicing.view.instance.InstanceSelectionBean;
 
 import com.vaadin.data.util.BeanItemContainer;
@@ -20,5 +21,7 @@ public interface InvoiceShareView{
     public void addListener(InvoiceShareViewListener listener);
     
     public void setInstanceSelectionSource(BeanItemContainer<InstanceSelectionBean> container);
+
+    public void setInstanceShareSource(BeanItemContainer<InstanceShareBean> container);
     
 }

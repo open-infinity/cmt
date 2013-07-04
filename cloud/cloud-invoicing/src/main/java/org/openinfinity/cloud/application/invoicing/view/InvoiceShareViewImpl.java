@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import java.util.List;
 
+import org.openinfinity.cloud.application.invoicing.service.component.InstanceShareBean;
 import org.openinfinity.cloud.application.invoicing.service.component.InstanceShareComponent;
 import org.openinfinity.cloud.application.invoicing.view.instance.InstanceSelectionBean;
 import org.openinfinity.cloud.application.invoicing.view.instance.InstanceSelectionComponent;
@@ -76,10 +77,16 @@ public class InvoiceShareViewImpl extends CustomComponent implements InvoiceShar
         
     }
 
+	@Override
+	public void setInstanceShareSource(BeanItemContainer<InstanceShareBean> container) {
+        instanceShareComponent.setInstanceShareContainer(container);		
+	}
+    
     @Override
     public void valueChange(ValueChangeEvent event) {
         for (InvoiceShareViewListener listener: listeners)
             listener.valueChange(event.getProperty().getValue());
         
     }
+
 }
