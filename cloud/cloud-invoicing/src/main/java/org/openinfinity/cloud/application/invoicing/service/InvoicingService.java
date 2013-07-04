@@ -3,8 +3,8 @@ package org.openinfinity.cloud.application.invoicing.service;
 import java.util.Collection;
 
 import org.openinfinity.cloud.domain.Instance;
-import org.openinfinity.cloud.service.administrator.ClusterService;
 import org.openinfinity.cloud.service.administrator.InstanceService;
+import org.openinfinity.cloud.service.invoicing.InstanceShareService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -15,8 +15,11 @@ public class InvoicingService {
     @Autowired
     @Qualifier("instanceService")
     private InstanceService instanceService;
-
     
+    @Autowired
+    @Qualifier("instanceShareService")
+    private InstanceShareService instanceShareService;
+        
     public Collection<Instance> getOrganizationInstances(Long organizationId) {
         return instanceService.getOrganizationInstances(organizationId);
     }
