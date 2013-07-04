@@ -1,4 +1,4 @@
-package org.openinfinity.cloud.application.invoicing.service.component;
+package org.openinfinity.cloud.application.invoicing.view.instanceshare;
 
 import org.openinfinity.cloud.domain.InstanceShare;
 

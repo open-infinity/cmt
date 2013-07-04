@@ -4,9 +4,9 @@ import java.util.ArrayList;
 
 import java.util.List;
 
-import org.openinfinity.cloud.application.invoicing.service.component.InstanceShareComponent;
 import org.openinfinity.cloud.application.invoicing.view.instance.InstanceSelectionBean;
 import org.openinfinity.cloud.application.invoicing.view.instance.InstanceSelectionComponent;
+import org.openinfinity.cloud.application.invoicing.view.instanceshare.InstanceShareComponent;
 import org.openinfinity.cloud.domain.InstanceShare;
 
 import com.vaadin.data.Property.ValueChangeEvent;
