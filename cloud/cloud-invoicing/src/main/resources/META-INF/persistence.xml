@@ -4,9 +4,9 @@
     <persistence-unit name="jpa.hibernate.mysql">
         <provider>org.hibernate.ejb.HibernatePersistence</provider> 	
         <class>org.openinfinity.cloud.domain.InstanceTbl</class>
-        <class>org.openinfinity.cloud.domain.InstanceShareTbl</class>
-        <class>org.openinfinity.cloud.domain.InstanceShareDetailTbl</class>
-        <class>org.openinfinity.cloud.domain.InstanceShareInvoiceTbl</class>
+        <class>org.openinfinity.cloud.domain.InstanceShare</class>
+        <class>org.openinfinity.cloud.domain.InstanceShareDetail</class>
+        <class>org.openinfinity.cloud.domain.InstanceShareInvoice</class>
         <class>org.openinfinity.cloud.domain.InstanceParameterTbl</class>
 		<properties>
             <property name="hibernate.dialect" value="org.hibernate.dialect.MySQL5Dialect" />
