@@ -16,6 +16,7 @@
 package org.openinfinity.cloud.service.deployer;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -28,6 +29,7 @@ import org.openinfinity.cloud.domain.repository.administrator.ClusterRepository;
 import org.openinfinity.cloud.domain.repository.administrator.InstanceRepository;
 import org.openinfinity.cloud.domain.repository.deployer.BucketRepository;
 import org.openinfinity.cloud.domain.repository.deployer.DeploymentRepository;
+import org.openinfinity.core.annotation.AuditTrail;
 import org.openinfinity.core.annotation.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -58,16 +60,26 @@ public class DeployerServiceImpl implements DeployerService {
 	private ClusterRepository clusterRepository;
 
 	@Log
+	@AuditTrail	
 	public Deployment deploy(Deployment deployment) {
 		// For supporting rollback bucket objects need to be named to be uniquely and old versions stored in db with NOT_DEPLOYED state
 		
 		// we need new deployment id for location? location need to be stored also
-		
-		deployment.setLocation("not_in_walrus"); 
+		String location = "not_in_walrus";
+		deployment.setLocation(location);
+		// TODO - redesign this fix. set state to undeployed until location is set
+		deployment.setState(DEPLOYMENT_STATE_UNDEPLOYED);
 		//  if previous DEPLOYED deployment (target and name) exists it will be updated to UNDEPLOYED
 		// this will update deploymenstatuses and actually remove old application from target cluster machines
 		deploymentRepository.storeAndUpdate(deployment);
-		String location = bucketRepository.createBucket(deployment.getInputStream(), ""+deployment.getClusterId(), deployment.getName()+"-"+deployment.getId(), new HashMap<String, String>());
+		try {
+			location = bucketRepository.createBucket(deployment.getInputStream(), ""+deployment.getClusterId(), deployment.getName()+"-"+deployment.getId(), new HashMap<String, String>());			
+		} catch (Exception e) {			
+			deployment.setState(DEPLOYMENT_STATE_ERROR);
+			deploymentRepository.updateLocationAndState(deployment);
+			return deployment;
+		}
+		
 		deployment.setLocation(location);
 		deployment.setState(DEPLOYMENT_STATE_DEPLOYED);
 		deploymentRepository.updateLocationAndState(deployment);
@@ -80,6 +92,7 @@ public class DeployerServiceImpl implements DeployerService {
 	} 
 	
 	@Log
+	@AuditTrail	
 	public Deployment redeploy(Deployment deployment) {
 		// For supporting rollback bucket objects need to be named to be uniquely and old versions stored in db with NOT_DEPLOYED state
 	
@@ -97,6 +110,7 @@ public class DeployerServiceImpl implements DeployerService {
 	
 
 	@Log
+	@AuditTrail	
 	public void deleteObject(Deployment deployment) {
 		bucketRepository.deleteObject(""+deployment.getClusterId(), deployment.getLocation());
 		// no mid-state used. if DeploymentStatuses need to be set to DELETED use mid state and implement batch processing
@@ -105,60 +119,99 @@ public class DeployerServiceImpl implements DeployerService {
 		deploymentRepository.updateDeploymentStateById(deployment.getId(), DeployerService.DEPLOYMENT_STATE_DELETED);
 	}
 	
+	@Log
+	@AuditTrail	
+	public void deleteBucketandObjects(int clusterId) {
+		bucketRepository.deleteBucketAndObjects(String.valueOf(clusterId));
+	}
+	
 	
 	@Log
+	@AuditTrail	
 	public Deployment loadDeploymentById(int deploymentId) {
 		return deploymentRepository.loadById(deploymentId);
 	}
 		
 	
 	@Log
+	@AuditTrail	
 	public Collection<Deployment> loadDeployments() {
 		return deploymentRepository.loadAll();
 	}
 	
 	@Log
+	@AuditTrail	
+	public Collection<Deployment> loadDeploymentsByOrganizations(Collection<Long> organizationIds) {
+		Collection<Deployment> deploymentByOrganizations = new ArrayList<Deployment>();
+		Collection<Deployment> deploymentsAll = deploymentRepository.loadAll();
+		for (Deployment deployment : deploymentsAll) {
+			for (Long oid : organizationIds) {
+				if (deployment.getOrganizationId()==oid.longValue()) {
+					deploymentByOrganizations.add(deployment);
+				}
+			}
+		}				
+		return deploymentByOrganizations;
+	}
+	
+	
+	@Log
+	@AuditTrail	
 	public Collection<Deployment> loadDeploymentsForOrganization(long organizationId) {
 		return deploymentRepository.loadAllForOrganization(organizationId);
 	}
 	
 	@Log
+	@AuditTrail	
 	public Collection<Deployment> loadDeploymentsForClusterWithName(Deployment deployment) {
 		return deploymentRepository.loadByOrgInstClusName(deployment.getOrganizationId(), deployment.getInstanceId(), deployment.getClusterId(), deployment.getName());
 	}
 	
 	@Log
+	@AuditTrail	
 	public Collection<Deployment> loadNewerDeploymentsForClusterWithNameInDeployedState(Deployment deployment) {
 		return deploymentRepository.loadByOrgInstClusNameDeployedNewer(deployment);
 	}
 	
 	@Log
+	@AuditTrail	
 	public Collection<Deployment> loadDeployments(int page, int rows){
 		return deploymentRepository.loadDeployments(page, rows);
 	}
 	
 	@Log
+	@AuditTrail	
 	public Collection<Instance> loadInstances(long organizationId) {
 		Collection<Instance> instances = instanceRepository.getOrganizationInstances(organizationId);
 		return Collections.unmodifiableCollection(instances);
 	}
 
 	@Log
+	@AuditTrail	
 	public Collection<Cluster> loadClusters(int instanceId) {
 		Collection<Cluster> clusters = clusterRepository.getClusters(instanceId);
 		return Collections.unmodifiableCollection(clusters);
 	}
 	
 	@Log
+	@AuditTrail	
 	public void updateDeploymentState(Deployment deployment) {
 		deploymentRepository.updateDeploymentStateById(deployment.getId(), deployment.getState());
 	}
 	
 	@Log
+	@AuditTrail	
 	public void updateDeployment(Deployment deployment) {
 		// store should both handle add and update ?
 		//deploymentRepository.store(deployment);
 	}
+	
+	
+	@Log
+	public void updateExistingDeployedDeploymentState(Deployment deployment, int state) {
+		deploymentRepository.updateExistingDeployedDeploymentState(deployment, state);
+	}
+	
 	
 	@Log
 	public void updateDeploymentStatusStatesFromToByDeploymentId(DeploymentStatus.DeploymentState from, DeploymentStatus.DeploymentState to, int deploymentId) {		
@@ -172,6 +225,17 @@ public class DeployerServiceImpl implements DeployerService {
 		// fetch deployment with id in object name and update deployment statuses. also deploy need changes
 	}
 
+	@Log
+	public void terminateDeploymentsForCluster(int clusterId) {
+		// TODO:set Deployments to TERMINATED state
+		deploymentRepository.updateDeploymentStateByClusterId(clusterId, DEPLOYMENT_STATE_TERMINATED);
+		// TODO:set DeploymentStatuses to TERMINATED state
+		deploymentRepository.updateDeploymentStatusStateByClusterId(clusterId, DEPLOYMENT_STATE_TERMINATED);
+		// TODO: remove deployment from Walrus
+		bucketRepository.deleteBucketAndObjects(String.valueOf(clusterId));
+	}
+	
+	
 	@Log
 	@Override
 	public InputStream load(String bucketName, String key) {
