@@ -74,7 +74,7 @@
 		<dependency>
 			<groupId>org.openinfinity</groupId>
 			<artifactId>cloud-service</artifactId>
-			<version>1.0.0</version>
+			<version>1.2.0.RELEASE</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
