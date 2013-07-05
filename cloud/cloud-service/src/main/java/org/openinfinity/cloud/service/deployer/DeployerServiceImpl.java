@@ -227,11 +227,12 @@ public class DeployerServiceImpl implements DeployerService {
 
 	@Log
 	public void terminateDeploymentsForCluster(int clusterId) {
-		// TODO:set Deployments to TERMINATED state
+		// set Deployments to TERMINATED state
 		deploymentRepository.updateDeploymentStateByClusterId(clusterId, DEPLOYMENT_STATE_TERMINATED);
-		// TODO:set DeploymentStatuses to TERMINATED state
+		// set DeploymentStatuses to TERMINATED state
 		deploymentRepository.updateDeploymentStatusStateByClusterId(clusterId, DeploymentStatus.DeploymentState.TERMINATED.getValue());
-		// TODO: remove deployment from Walrus
+		// remove deployment from Walrus
+		// for the instance/cluster replacing with a new one it might make sense to leave deployment to cluster
 		bucketRepository.deleteBucketAndObjects(String.valueOf(clusterId));
 	}
 	
