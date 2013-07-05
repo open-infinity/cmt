@@ -8,8 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service("instanceShareService")
+@Transactional
 public class InstanceShareServiceImpl implements InstanceShareService{
     @Autowired
     InstanceShareRepository repository;
@@ -51,7 +53,11 @@ public class InstanceShareServiceImpl implements InstanceShareService{
      */
     @Override
     public InstanceShare findOne(Long arg0) {
-        return repository.findOne(arg0);
+        InstanceShare findOne = repository.findOne(arg0);
+        
+        if (findOne!=null)//triggers details fetch
+            findOne.getInstanceShareDetails().size();
+        return findOne;
     }
 
     /* (non-Javadoc)

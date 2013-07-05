@@ -6,8 +6,10 @@ import org.openinfinity.cloud.application.invoicing.view.instance.InstanceSelect
 import org.openinfinity.cloud.application.invoicing.view.instanceshare.InstanceShareBean;
 import org.openinfinity.cloud.domain.Instance;
 import org.openinfinity.cloud.domain.InstanceShare;
+import org.openinfinity.cloud.domain.InstanceShareDetail;
 
 import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.event.ItemClickEvent;
 
 
 /**
@@ -18,8 +20,9 @@ import com.vaadin.data.util.BeanItemContainer;
 public interface InvoiceShareView{
     
     public interface InvoiceShareViewListener{
-        void buttonClick(final String buttonName);
-        void valueChange(Object value);
+        public void buttonClick(final String buttonName);
+        public void instanceSelected(InstanceSelectionBean value);
+        public void instanceShareSelected(Object value);
     }
     
     public void addListener(InvoiceShareViewListener listener);
@@ -27,5 +30,7 @@ public interface InvoiceShareView{
     public void setInstances(Collection<Instance> instances);
 
     public void setInstanceShares(Collection<InstanceShare> instanceShares);
+    
+    public void setInstanceShareDetails(Collection<InstanceShareDetail> instanceShareDetails);
     
 }

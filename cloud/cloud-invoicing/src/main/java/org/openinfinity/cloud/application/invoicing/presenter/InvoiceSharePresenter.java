@@ -1,6 +1,8 @@
 package org.openinfinity.cloud.application.invoicing.presenter;
 
 import java.lang.reflect.Array;
+
+import java.util.Collection;
 import java.util.Collections;
 
 import org.openinfinity.cloud.application.invoicing.model.InvoiceShareModel;
@@ -9,8 +11,9 @@ import org.openinfinity.cloud.application.invoicing.view.InvoiceShareView;
 import org.openinfinity.cloud.application.invoicing.view.InvoiceShareView.InvoiceShareViewListener;
 import org.openinfinity.cloud.application.invoicing.view.instance.InstanceSelectionBean;
 import org.openinfinity.cloud.domain.InstanceShare;
+import org.openinfinity.cloud.domain.InstanceShareDetail;
 
-import com.google.gwt.user.client.rpc.core.java.util.Arrays;
+import com.vaadin.event.ItemClickEvent;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 
@@ -38,12 +41,22 @@ public class InvoiceSharePresenter implements InvoiceShareViewListener {
     }
 
     @Override
-    public void valueChange(Object value) {
+    public void instanceSelected(InstanceSelectionBean value) {
         
-        InstanceSelectionBean bean=(InstanceSelectionBean) value;
-        view.setInstanceShares(model.getInstanceShares(bean.getInstanceId()));
+        view.setInstanceShares(model.getInstanceShares(value.getInstanceId()));
         Notification.show("Value changed:", value.toString(),
                 Type.TRAY_NOTIFICATION);
+        
+    }
+
+    @Override
+    public void instanceShareSelected(Object item) {
+        ItemClickEvent event=(ItemClickEvent) item;
+        view.setInstanceShareDetails(model.getInstanceShareDetails((Long)event.getItemId()));
+        
+        Notification.show("Item " +
+                item + " clicked.");
+
         
     }
 }

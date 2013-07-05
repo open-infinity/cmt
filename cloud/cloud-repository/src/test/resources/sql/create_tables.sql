@@ -318,7 +318,7 @@ CREATE TABLE `instance_share_detail_tbl` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `instance_share_id` int(11) NOT NULL,
   `cost_pool` char(10) NOT NULL,
-  `share_percent` decimal(5,2) NOT NULL,
+  `share_percent` int(3) NOT NULL,
   `description` varchar(256) DEFAULT NULL,
   `order_number` char(8) NOT NULL,
   `created_by` int(11) DEFAULT NULL,
