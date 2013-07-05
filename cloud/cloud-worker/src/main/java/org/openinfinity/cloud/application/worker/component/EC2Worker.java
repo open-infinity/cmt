@@ -45,6 +45,8 @@ import org.openinfinity.cloud.service.administrator.JobService;
 import org.openinfinity.cloud.service.administrator.KeyService;
 import org.openinfinity.cloud.service.administrator.MachineService;
 import org.openinfinity.cloud.service.administrator.MulticastAddressService;
+import org.openinfinity.cloud.service.deployer.DeployerService;
+import org.openinfinity.cloud.service.properties.CentralizedPropertiesService;
 import org.openinfinity.cloud.service.usage.UsageService;
 import org.openinfinity.cloud.util.PropertyManager;
 import org.openinfinity.cloud.util.WorkerException;
@@ -114,6 +116,14 @@ public class EC2Worker implements Worker {
 	@Autowired
 	@Qualifier("usageService")
 	private UsageService usageService;
+	
+	@Autowired
+	@Qualifier("deployerService")
+	private DeployerService deployerService;
+
+	@Autowired
+	@Qualifier("centralizedPropertiesService")
+	private CentralizedPropertiesService centralizedPropertiesService;
 	
 	@Async
 	public void work(Job job) {
@@ -365,6 +375,8 @@ public class EC2Worker implements Worker {
 					}
 					
 					clusterService.deleteCluster(c);
+					deployerService.terminateDeploymentsForCluster(c.getId());
+					centralizedPropertiesService.terminatePropertiesForCluster(c.getId());
 					LOG.info(threadName+": Cluster "+c.getName()+" deleted");
 				}
 				Key key = keyService.getKeyByInstanceId(job.getInstanceId());
@@ -420,6 +432,8 @@ public class EC2Worker implements Worker {
 			}
 		}			
 		clusterService.deleteCluster(c);
+		deployerService.terminateDeploymentsForCluster(c.getId());
+		centralizedPropertiesService.terminatePropertiesForCluster(c.getId());
 		LOG.info(threadName+": Cluster "+c.getName()+" deleted");
 	}
 	
