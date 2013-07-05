@@ -54,7 +54,7 @@ public class InstanceTbl implements Serializable {
 	//bi-directional many-to-one association to InstanceShareTbl
 	@OneToMany(mappedBy="instanceTbl",cascade={CascadeType.PERSIST,
 	        CascadeType.REFRESH,CascadeType.MERGE})
-	private List<InstanceShareTbl> instanceShareTbls;
+	private List<InstanceShare> instanceShareTbls;
 
 	public InstanceTbl() {
 	}
@@ -78,9 +78,9 @@ public class InstanceTbl implements Serializable {
 		return instanceParameterTbl;
 	}
 
-	public InstanceShareTbl addInstanceShareTbl(InstanceShareTbl instanceShareTbl) {
+	public InstanceShare addInstanceShareTbl(InstanceShare instanceShareTbl) {
 	    if (instanceShareTbls==null){
-	        instanceShareTbls=new ArrayList<InstanceShareTbl>();
+	        instanceShareTbls=new ArrayList<InstanceShare>();
 	    }
 	    getInstanceShareTbls().add(instanceShareTbl);
 		instanceShareTbl.setInstanceTbl(this);
@@ -88,7 +88,7 @@ public class InstanceTbl implements Serializable {
 		return instanceShareTbl;
 	}
 
-	public InstanceShareTbl removeInstanceShareTbl(InstanceShareTbl instanceShareTbl) {
+	public InstanceShare removeInstanceShareTbl(InstanceShare instanceShareTbl) {
 		getInstanceShareTbls().remove(instanceShareTbl);
 		instanceShareTbl.setInstanceTbl(null);
 

@@ -11,10 +11,10 @@ import javax.sql.DataSource;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.openinfinity.cloud.domain.InstanceShareTbl;
+import org.openinfinity.cloud.domain.InstanceShare;
 import org.openinfinity.cloud.domain.InstanceTbl;
 import org.openinfinity.cloud.domain.repository.administrator.InstanceJPARepository;
-import org.openinfinity.cloud.domain.repository.invoice.InstanceShareJPARepository;
+import org.openinfinity.cloud.domain.repository.invoice.InstanceShareRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.annotation.Rollback;
@@ -36,7 +36,7 @@ public class InstanceJPARepositoryTest {
     InstanceJPARepository repository;
     
     @Autowired
-    InstanceShareJPARepository instanceShareRepository;
+    InstanceShareRepository instanceShareRepository;
     
     private InstanceTbl createInstance(String instanceName){
         InstanceTbl instance=new InstanceTbl();
@@ -59,8 +59,8 @@ public class InstanceJPARepositoryTest {
     }
 
     
-    private InstanceShareTbl createInstanceShare(){
-        InstanceShareTbl instanceShare=new InstanceShareTbl();
+    private InstanceShare createInstanceShare(){
+        InstanceShare instanceShare=new InstanceShare();
         Timestamp created=dateToSqlTimestamp(new Date());
         instanceShare.setCreated(created);
         int createdBy=1;
@@ -76,7 +76,7 @@ public class InstanceJPARepositoryTest {
         //Save
         InstanceTbl instance=createInstance(instanceName);
         
-        InstanceShareTbl instanceShare = createInstanceShare();
+        InstanceShare instanceShare = createInstanceShare();
         instanceShare.setInstanceTbl(instance);
         instance.addInstanceShareTbl(instanceShare);
         
@@ -108,10 +108,10 @@ public class InstanceJPARepositoryTest {
         assertEquals(1,instance.getInstanceShareTbls().size());
         
         //find shares by instance id
-        List<InstanceShareTbl> instanceShares = instanceShareRepository.findByInstanceId(instance.getInstanceId());
+        List<InstanceShare> instanceShares = instanceShareRepository.findByInstanceId(instance.getInstanceId());
         assertEquals(instance.getInstanceId(), instanceShares.get(0).getInstanceTbl().getInstanceId());
         
-        for (InstanceShareTbl instanceShare2: instanceShares){
+        for (InstanceShare instanceShare2: instanceShares){
             assertNotNull(instanceShareRepository.findOne(instanceShare2.getId()));
             //remove instance share
             instanceShareRepository.delete(instanceShare2);

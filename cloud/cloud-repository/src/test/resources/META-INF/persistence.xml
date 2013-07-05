@@ -2,21 +2,21 @@
 <persistence version="2.0" xmlns="http://java.sun.com/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
 	<persistence-unit name="jpa.sample">
         <class>org.openinfinity.cloud.domain.InstanceTbl</class>
-        <class>org.openinfinity.cloud.domain.InstanceShareTbl</class>
-        <class>org.openinfinity.cloud.domain.InstanceShareDetailTbl</class>
-        <class>org.openinfinity.cloud.domain.InstanceShareInvoiceTbl</class>
+        <class>org.openinfinity.cloud.domain.InstanceShare</class>
+        <class>org.openinfinity.cloud.domain.InstanceShareDetail</class>
+        <class>org.openinfinity.cloud.domain.InstanceShareInvoice</class>
         <class>org.openinfinity.cloud.domain.InstanceParameterTbl</class>
     </persistence-unit>
 	
     <persistence-unit name="jpa.sample.mysql">
         <provider>org.hibernate.ejb.HibernatePersistence</provider> 	
         <class>org.openinfinity.cloud.domain.InstanceTbl</class>
-        <class>org.openinfinity.cloud.domain.InstanceShareTbl</class>
-        <class>org.openinfinity.cloud.domain.InstanceShareDetailTbl</class>
-        <class>org.openinfinity.cloud.domain.InstanceShareInvoiceTbl</class>
+        <class>org.openinfinity.cloud.domain.InstanceShare</class>
+        <class>org.openinfinity.cloud.domain.InstanceShareDetail</class>
+        <class>org.openinfinity.cloud.domain.InstanceShareInvoice</class>
         <class>org.openinfinity.cloud.domain.InstanceParameterTbl</class>
 		<properties>
-            <property name="hibernate.dialect" value="org.hibernate.dialect.MySQL5InnoDBDialect" />
+            <property name="hibernate.dialect" value="org.hibernate.dialect.MySQL5Dialect" />
             <property name="hibernate.hbm2ddl.auto" value="update" />
             <property name="hibernate.connection.charSet" value="UTF-8" />
  

@@ -10,12 +10,12 @@ import javax.sql.DataSource;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.openinfinity.cloud.domain.InstanceShareInvoiceTbl;
-import org.openinfinity.cloud.domain.InstanceShareTbl;
+import org.openinfinity.cloud.domain.InstanceShareInvoice;
+import org.openinfinity.cloud.domain.InstanceShare;
 import org.openinfinity.cloud.domain.InstanceTbl;
 import org.openinfinity.cloud.domain.repository.administrator.InstanceJPARepository;
-import org.openinfinity.cloud.domain.repository.invoice.InstanceShareInvoiceJPARepository;
-import org.openinfinity.cloud.domain.repository.invoice.InstanceShareJPARepository;
+import org.openinfinity.cloud.domain.repository.invoice.InstanceShareInvoiceRepository;
+import org.openinfinity.cloud.domain.repository.invoice.InstanceShareRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.annotation.Rollback;
@@ -37,10 +37,10 @@ public class InstanceShareInvoiceJPARepositoryTest {
     InstanceJPARepository repository;
     
     @Autowired
-    InstanceShareJPARepository instanceShareRepository;
+    InstanceShareRepository instanceShareRepository;
 
     @Autowired
-    InstanceShareInvoiceJPARepository instanceShareInvoiceRepository;
+    InstanceShareInvoiceRepository instanceShareInvoiceRepository;
     
     private InstanceTbl createInstance(String instanceName){
         InstanceTbl instance=new InstanceTbl();
@@ -62,8 +62,8 @@ public class InstanceShareInvoiceJPARepositoryTest {
 
     }
 
-    private InstanceShareTbl createInstanceShare(){
-        InstanceShareTbl instanceShare=new InstanceShareTbl();
+    private InstanceShare createInstanceShare(){
+        InstanceShare instanceShare=new InstanceShare();
         Timestamp created=dateToSqlTimestamp(new Date());
         instanceShare.setCreated(created);
         int createdBy=1;
@@ -74,8 +74,8 @@ public class InstanceShareInvoiceJPARepositoryTest {
         return instanceShare;
     }
     
-    private InstanceShareInvoiceTbl createInstanceShareInvoice(){
-        InstanceShareInvoiceTbl instanceShareInvoice=new InstanceShareInvoiceTbl();
+    private InstanceShareInvoice createInstanceShareInvoice(){
+        InstanceShareInvoice instanceShareInvoice=new InstanceShareInvoice();
         instanceShareInvoice.setCreated(dateToSqlTimestamp(new Date()));
         instanceShareInvoice.setCreatedBy(1);
         
@@ -86,7 +86,7 @@ public class InstanceShareInvoiceJPARepositoryTest {
     private InstanceTbl createInstanceAndSave(String instanceName){
         //Save
         InstanceTbl instance=createInstance(instanceName);
-        InstanceShareTbl instanceShare=createInstanceShare();
+        InstanceShare instanceShare=createInstanceShare();
         instance.addInstanceShareTbl(instanceShare);
         instanceShare.setInstanceTbl(instance);
         
@@ -117,23 +117,23 @@ public class InstanceShareInvoiceJPARepositoryTest {
         assertEquals(1,instance.getInstanceShareTbls().size());
         
         //find shares by instance id
-        List<InstanceShareTbl> instanceShares = instanceShareRepository.findByInstanceId(instance.getInstanceId());
+        List<InstanceShare> instanceShares = instanceShareRepository.findByInstanceId(instance.getInstanceId());
         assertEquals(instance.getInstanceId(), instanceShares.get(0).getInstanceTbl().getInstanceId());
         
         //associate each share with new InstanceShareInvoice
-        for (InstanceShareTbl instanceShare: instanceShares){
+        for (InstanceShare instanceShare: instanceShares){
             
-            InstanceShareTbl instanceShare2 = instanceShareRepository.findOne(instanceShare.getId());
-            InstanceShareInvoiceTbl invoice = createInstanceShareInvoice();
-            invoice.setInstanceShareTbl(instanceShare2);
-            instanceShare2.addInstanceShareInvoiceTbl(invoice);
+            InstanceShare instanceShare2 = instanceShareRepository.findOne(instanceShare.getId());
+            InstanceShareInvoice invoice = createInstanceShareInvoice();
+            invoice.setInstanceShare(instanceShare2);
+            instanceShare2.addInstanceShareInvoice(invoice);
             instanceShareRepository.save(instanceShare);
         }
         
         //delete rows that this test case added
-        for (InstanceShareTbl instanceShare: instanceShares){
-            InstanceShareTbl instanceShare2 = instanceShareRepository.findOne(instanceShare.getId());
-            for (InstanceShareInvoiceTbl instanceShareInvoice:instanceShare2.getInstanceShareInvoiceTbls()){
+        for (InstanceShare instanceShare: instanceShares){
+            InstanceShare instanceShare2 = instanceShareRepository.findOne(instanceShare.getId());
+            for (InstanceShareInvoice instanceShareInvoice:instanceShare2.getInstanceShareInvoices()){
                 instanceShareInvoiceRepository.delete(instanceShareInvoice);
             }
             instanceShareRepository.delete(instanceShare2);

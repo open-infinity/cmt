@@ -50,3 +50,4 @@ insert into acl_cluster_type_tbl select 'Tieto Finland', id from cluster_type_tb
 
 insert into acl_machine_type_tbl select 'TOAS', id from machine_type_tbl;
 insert into acl_machine_type_tbl select 'Tieto Finland', id from machine_type_tbl;
+

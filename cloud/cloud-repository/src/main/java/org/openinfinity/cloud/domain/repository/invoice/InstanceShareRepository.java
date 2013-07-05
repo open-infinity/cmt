@@ -17,21 +17,21 @@
 package org.openinfinity.cloud.domain.repository.invoice;
 
 import java.util.List;
-import org.openinfinity.cloud.domain.InstanceShareInvoiceTbl;
+
+import org.openinfinity.cloud.domain.InstanceShare;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-
 /**
- * Interface for InstanceShareInvoice repository
+ * Interface for InstanceShare repository
  
  * @author Pasi Kilponen
  * @version 1.0.0 Initial version
  * @since 1.0.0
  */
 
-public interface InstanceShareInvoiceJPARepository extends JpaRepository<InstanceShareInvoiceTbl, Long>{
+public interface InstanceShareRepository extends JpaRepository<InstanceShare, Long>{
     
-    @Query("select u from InstanceShareInvoiceTbl u where u.instanceShareTbl.id = ?1")
-    List<InstanceShareInvoiceTbl> findByInstanceShareId(long instanceId);
+    @Query("select u from InstanceShare u where u.instanceTbl.instanceId = ?1")
+    List<InstanceShare> findByInstanceId(long instanceId);
 }

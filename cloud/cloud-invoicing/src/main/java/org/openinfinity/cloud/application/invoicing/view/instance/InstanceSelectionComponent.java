@@ -1,4 +1,12 @@
-package org.openinfinity.cloud.application.invoicing.service.component;
+package org.openinfinity.cloud.application.invoicing.view.instance;
+
+
+import java.util.ArrayList;
+import java.util.Collection;
+
+import org.openinfinity.cloud.application.invoicing.view.InvoiceShareView;
+import org.openinfinity.cloud.application.invoicing.view.InvoiceShareViewImpl;
+import org.openinfinity.cloud.domain.Instance;
 
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
@@ -12,29 +20,31 @@ import com.vaadin.ui.VerticalLayout;
 
 public class InstanceSelectionComponent extends CustomComponent{
     
-    BeanItemContainer<InstanceSelectionBean> instanceContainer;
-    AbstractSelect selectInstance;
 
-    public BeanItemContainer<InstanceSelectionBean> getInstanceContainer() {
-        return instanceContainer;
-    }
-
-    public void setInstanceContainer(
-            BeanItemContainer<InstanceSelectionBean> instanceContainer) {
-        this.instanceContainer = instanceContainer;
+    public void setInstances(Collection<Instance> instances) {
+        
+        BeanItemContainer<InstanceSelectionBean> instanceContainer = new BeanItemContainer<InstanceSelectionBean>(InstanceSelectionBean.class);
+        Collection<InstanceSelectionBean> beans=new ArrayList<InstanceSelectionBean>();
+        for (Instance instance:instances){
+            beans.add(new InstanceSelectionBean(instance));
+        }
+        
+        instanceContainer.addAll(beans);
         
         selectInstance.setContainerDataSource(instanceContainer);
         selectInstance.sanitizeSelection();
         selectInstance.setValue("id1");
-
     }
+
+    private AbstractSelect selectInstance;
+
 
     /**
      * 
      */
     private static final long serialVersionUID = 1L;
 
-    public InstanceSelectionComponent(){
+    public InstanceSelectionComponent(InvoiceShareViewImpl invoiceShareViewImpl){
         VerticalLayout main=new VerticalLayout();
         this.setCompositionRoot(main);
 
@@ -44,18 +54,7 @@ public class InstanceSelectionComponent extends CustomComponent{
         selectInstance.setNullSelectionAllowed(false);
         selectInstance.setImmediate(true);
         
-        selectInstance.addValueChangeListener(new ValueChangeListener() {
-            @Override
-            public void valueChange(final ValueChangeEvent event) {
-                
-                Object value = event.getProperty().getValue();
-                final String valueString = String.valueOf(event.getProperty()
-                        .getValue());
-                Notification.show("Value changed:", valueString,
-                        Type.TRAY_NOTIFICATION);
-            }
-        });
-
+        selectInstance.addValueChangeListener(invoiceShareViewImpl);
         main.addComponent(selectInstance);
 
     }
