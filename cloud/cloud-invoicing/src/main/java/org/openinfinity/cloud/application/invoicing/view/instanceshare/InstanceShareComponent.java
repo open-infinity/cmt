@@ -35,6 +35,10 @@ public class InstanceShareComponent extends CustomComponent{
         for (InstanceShareDetail detail:details){
             shareDetailsTable.addItem(new Object[]{detail.getOrderNumber(),detail.getCostPool(),detail.getSharePercent(), detail.getDescription()},detail.getId());
         }
+        
+        //add empty item
+        if (details.size()==0)
+            shareDetailsTable.addItem();
     }
 
     public void setInstanceShares(Collection<InstanceShare> instanceShares) {
@@ -42,8 +46,11 @@ public class InstanceShareComponent extends CustomComponent{
         sharesTable.removeAllItems();
 
         for (InstanceShare share:instanceShares){
-            sharesTable.addItem(new Object[]{share.getPeriodStart()},share.getId());
+            sharesTable.addItem(new Object[]{share.getPeriodStart()},share.getId().intValue());
         }
+        
+        if (instanceShares.size()==0)
+            sharesTable.addItem();
 
         sharesTable.setPageLength(8);
 
