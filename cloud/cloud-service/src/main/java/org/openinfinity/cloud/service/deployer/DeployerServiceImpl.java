@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 
+import org.apache.log4j.Logger;
 import org.openinfinity.cloud.domain.Cluster;
 import org.openinfinity.cloud.domain.Deployment;
 import org.openinfinity.cloud.domain.DeploymentStatus;
@@ -29,6 +30,7 @@ import org.openinfinity.cloud.domain.repository.administrator.ClusterRepository;
 import org.openinfinity.cloud.domain.repository.administrator.InstanceRepository;
 import org.openinfinity.cloud.domain.repository.deployer.BucketRepository;
 import org.openinfinity.cloud.domain.repository.deployer.DeploymentRepository;
+import org.openinfinity.cloud.service.scaling.ScalingRuleServiceImpl;
 import org.openinfinity.core.annotation.AuditTrail;
 import org.openinfinity.core.annotation.Log;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +47,7 @@ import org.springframework.stereotype.Service;
  */
 @Service("deployerService")
 public class DeployerServiceImpl implements DeployerService {
+	private static final Logger LOGGER = Logger.getLogger(DeployerServiceImpl.class.getName());
 
 	@Autowired
 	@Qualifier("jetS3Repository")
@@ -233,7 +236,12 @@ public class DeployerServiceImpl implements DeployerService {
 		deploymentRepository.updateDeploymentStatusStateByClusterId(clusterId, DeploymentStatus.DeploymentState.TERMINATED.getValue());
 		// remove deployment from Walrus
 		// for the instance/cluster replacing with a new one it might make sense to leave deployment to cluster
-		bucketRepository.deleteBucketAndObjects(String.valueOf(clusterId));
+		// done in deployer-batch
+		//try {
+		//	bucketRepository.deleteBucketAndObjects(String.valueOf(clusterId));
+		//} catch(Exception e) {
+		//	LOGGER.error("Error id deleting object and buckets for cluster"+clusterId+" Error: "+e);
+		//}
 	}
 	
 	
