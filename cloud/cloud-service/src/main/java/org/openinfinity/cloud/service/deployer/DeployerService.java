@@ -77,6 +77,14 @@ public interface DeployerService {
 	
 	
 	/**
+	 * Loads all <code>org.openinfinity.core.cloud.deployer.domain.Deployment</code> objects based on organization ids.
+	 * 
+	 * @param organizationIds Represents the organizations and it's deployments based on organization ids. 
+	 * @return <code>org.openinfinity.core.cloud.deployer.domain.Deployment</code> Represents the collection of items.
+	 */
+	public Collection<Deployment> loadDeploymentsByOrganizations(Collection<Long> organizationIds);
+	
+	/**
 	 * Loads all <code>org.openinfinity.core.cloud.deployer.domain.Deployment</code> objects based on organization id.
 	 * 
 	 * @param organizationId Represents the organization and it's deployments based on organization id. 
@@ -112,6 +120,13 @@ public interface DeployerService {
 	 * @param deployment Represents the deployment to be updated.
 	 */
 	void updateDeploymentState(Deployment deployment);
+
+	/** 
+	 * Updates state of deployment defined by  orgId, InstId, ClustId, name and type.
+	 *  
+	 * @param deployment Represents the deployment to be updated.
+	 */
+	public void updateExistingDeployedDeploymentState(Deployment deployment, int state);
 	
 
 	/** NEW
@@ -139,6 +154,14 @@ public interface DeployerService {
 	 * @param deployment Represents the deployment to be rolled back.
 	 */
 	void rollback(Deployment deployment);
+	
+	
+	/**
+	 * Sets deployments and deploymentsStatuses to TERMINATED state for defined cluster and removes deployment from walrus.
+	 * @param clusterId
+	 */
+	public void terminateDeploymentsForCluster(int clusterId);
+	
 	
 	/**
 	 * Returns collection of <code>org.openinfinity.cloud.domain.Instance</code> objects.

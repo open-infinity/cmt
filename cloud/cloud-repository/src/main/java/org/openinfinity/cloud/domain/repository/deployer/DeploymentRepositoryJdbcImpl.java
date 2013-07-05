@@ -65,7 +65,12 @@ DeploymentRepository {
 	/**
 	 * Represents the SQL script for updating the state of the Deployment object.
 	 */
-	private static final String UPDATE_STATE_1_SQL = "UPDATE DEPLOYMENT SET STATE = ?  WHERE NAME = ? AND ORGANIZATION_ID = ? AND INSTANCE_ID = ? AND CLUSTER_ID = ? AND STATE=1";
+	private static final String UPDATE_STATE_1_SQL = "UPDATE DEPLOYMENT SET STATE = ?  WHERE NAME = ? AND ORGANIZATION_ID = ? AND INSTANCE_ID = ? AND CLUSTER_ID = ? AND TYPE=? AND STATE=1";
+	
+	private static final String UPDATE_STATE_BY_CLUSTER_SQL = "UPDATE DEPLOYMENT SET STATE = ?  WHERE CLUSTER_ID = ?";
+	
+	private static final String UPDATE_STATUSSTATE_BY_CLUSTER_SQL = "update deployment_state_tbl set state = ? where deployment_id in (select id from DEPLOYMENT where cluster_id = ?)";
+	
 	
 	/**
 	 * Represents the SQL script for updating the state of the Deployment object.
@@ -224,10 +229,19 @@ DeploymentRepository {
 	 */
 	@AuditTrail
 	public void updateExistingDeployedDeploymentState(Deployment deployment, int newState) {
-		jdbcTemplate.update(UPDATE_STATE_1_SQL, newState, deployment.getName(), deployment.getOrganizationId(), deployment.getInstanceId(), deployment.getClusterId());		
+		jdbcTemplate.update(UPDATE_STATE_1_SQL, newState, deployment.getName(), deployment.getOrganizationId(), deployment.getInstanceId(), deployment.getClusterId(), deployment.getType());		
 		deployment.setState(newState);
 	}
 
+	@AuditTrail
+	public void updateDeploymentStateByClusterId(int clusterId, int newState) {
+		jdbcTemplate.update(UPDATE_STATE_BY_CLUSTER_SQL, newState, clusterId);		
+	}
+	
+	@AuditTrail
+	public void updateDeploymentStatusStateByClusterId(int clusterId, int newState) {
+		jdbcTemplate.update(UPDATE_STATUSSTATE_BY_CLUSTER_SQL, newState, clusterId);		
+	}
 	
 	/**
 	 * Update deployment status object.

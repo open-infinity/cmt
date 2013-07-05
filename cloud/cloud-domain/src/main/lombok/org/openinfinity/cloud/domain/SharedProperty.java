@@ -16,7 +16,9 @@
 
 package org.openinfinity.cloud.domain;
 
-import java.util.Date;
+import java.sql.Timestamp;
+
+import org.openinfinity.core.annotation.NotScript;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -31,6 +33,7 @@ import lombok.ToString;
  * 
  * @author Timo Saarinen
  * @author Ilkka Leinonen
+ * @author Tommi Siitonen
  */
 @Data
 @NoArgsConstructor
@@ -57,7 +60,10 @@ public class SharedProperty {
 	private String key;
 	
 	private String value;
+
+	private int state;
 	
-	private Date timestamp;
+	@NotScript
+	private Timestamp propertyTimestamp;	
 
 }

@@ -72,6 +72,27 @@ public class CentralizedPropertiesServiceImpl implements CentralizedPropertiesSe
 		return repository.delete(p);
 	}
 
+	public void deleteByStateOrgInstClusName(long organizationId, int instanceId, int clusterId) {
+		repository.deleteByStateOrgInstClusName(organizationId, instanceId, clusterId);
+	}
+	
+	
+	@Log
+	@AuditTrail
+	public void update(SharedProperty sharedProperty) {
+		repository.update(sharedProperty);
+	}
+	
+	@Log
+	@AuditTrail
+	public void updateStatesNewToFinalizedByOrgInstClusName(long organizationId, int instanceId, int clusterId) {	
+		repository.updateStatesNewToFinalizedByOrgInstClusName(organizationId, instanceId, clusterId);
+	}
+	
+	public boolean updateStateByUniqueId(int id, int state) {
+		return repository.updateStateByUniqueId(id, state);
+	}
+	
 	@Log
 	@AuditTrail
 	public boolean rename(SharedProperty prop, String newkey) {
@@ -114,4 +135,11 @@ public class CentralizedPropertiesServiceImpl implements CentralizedPropertiesSe
 		return success;
 	}
 	
+	@Log
+	@AuditTrail
+	public void terminatePropertiesForCluster(int clusterId) {
+		// delete properties for cluster
+		repository.deleteByCluster(clusterId);
+	}
+
 }

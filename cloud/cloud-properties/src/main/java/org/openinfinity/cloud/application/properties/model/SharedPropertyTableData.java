@@ -73,12 +73,15 @@ public class SharedPropertyTableData extends SharedProperty {
 		this.setValue(sharedProperty.getValue());
 		this.setClusterId(sharedProperty.getClusterId());
 		this.setInstanceId(sharedProperty.getInstanceId());
-		this.setOrganizationId(sharedProperty.getOrganizationId()); 
-		this.setFormattedTime(sharedProperty.getTimestamp().toString());
+		this.setOrganizationId(sharedProperty.getOrganizationId());
+		this.setState(sharedProperty.getState());
+		
+		this.setFormattedTime(sharedProperty.getPropertyTimestamp().toString());
+		
 		this.organization = organization;
 		this.instance = instance;
 		this.cluster = cluster;
-		formattedTime = sharedProperty.getTimestamp().toString();
+		formattedTime = sharedProperty.getPropertyTimestamp().toString();
 	}
 	
 }

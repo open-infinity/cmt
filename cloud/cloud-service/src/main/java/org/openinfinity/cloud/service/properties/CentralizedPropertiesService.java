@@ -17,6 +17,7 @@ package org.openinfinity.cloud.service.properties;
 
 import java.util.Collection;
 
+import org.openinfinity.cloud.domain.Deployment;
 import org.openinfinity.cloud.domain.SharedProperty;
 
 /**
@@ -26,6 +27,13 @@ import org.openinfinity.cloud.domain.SharedProperty;
  * @author Ilkka Leinonen
  */
 public interface CentralizedPropertiesService {
+	
+	static final int PROPERTIES_STATE_NEW = 0;
+	static final int PROPERTIES_STATE_DEPLOYED = 1;	
+	static final int PROPERTIES_STATE_DELETED = -1;	
+
+	static final int PROPERTIES_STATE_ERROR = 15;		
+	static final int PROPERTIES_STATE_TERMINATED = -11;
 
 	/**
 	 * Save or create the given property in database.
@@ -54,6 +62,32 @@ public interface CentralizedPropertiesService {
 	 * @return true if found, false if not
 	 */
 	public boolean delete(SharedProperty prop);
+
+	
+	/**
+	 * Delete the properties defined by organization, instance ,cluster id in deleted state.
+	 */
+	public void deleteByStateOrgInstClusName(long organizationId, int instanceId, int clusterId);
+	
+	
+	/**
+	 * Update the property.
+	 */
+	public void update(SharedProperty prop);
+
+	/**
+	 * Update the properties states by organization, instance ,cluster id in new state to deployed state.
+	 */
+	public void updateStatesNewToFinalizedByOrgInstClusName(long organizationId, int instanceId, int clusterId);
+
+	/**
+	 * Updates shared property state by unique id.
+	 * @param id Represents the unique id.
+	 * @param state state to be updated to.
+	 * @return true if update was successful.
+	 */
+	public boolean updateStateByUniqueId(int id, int state);
+	
 	
 	/**
 	 * Change key part of the given property.
@@ -72,6 +106,13 @@ public interface CentralizedPropertiesService {
 	 * @return true if delete was successful.
 	 */
 	public boolean deleteByUniqueId(int id);
+	
+	/**
+	 * Deletes properties for defined cluster.
+	 * @param clusterId
+	 */
+	public void terminatePropertiesForCluster(int clusterId);
+	
 
 }
 

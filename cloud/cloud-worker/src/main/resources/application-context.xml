@@ -22,7 +22,7 @@
   		     classpath:EucaCredentials.properties"/>
 	</bean> --> 
     
-   <context:property-placeholder location="classpath:worker_jdbc.properties,classpath:infrastructure.properties"/>
+   <context:property-placeholder location="classpath:worker_jdbc.properties,classpath:infrastructure.properties,jets3.properties"/>
     
     <context:component-scan base-package="org.openinfinity.cloud">
     	<context:exclude-filter type="regex" expression="org.openinfinity.cloud.service.healthmonitoring.*.*"/>

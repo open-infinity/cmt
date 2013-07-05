@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.portlet.ActionRequest;
+import javax.portlet.PortletRequest;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 import javax.portlet.ResourceRequest;
@@ -385,7 +386,11 @@ public class DeployerController {
 	@AuditTrail
 	@ResourceMapping(PATH_FOR_LOAD_DEPLYMENT_TABLE)
 	public void loadDeploymentTable(ResourceRequest request, ResourceResponse response,@RequestParam("page") int page, @RequestParam("rows") int rows) throws Exception {
-		Collection<Deployment> deployments = deployerService.loadDeployments();
+		Collection<Long> organizationIds = loadOrganizationIds(request);
+		
+		//Collection<Deployment> deployments = deployerService.loadDeployments();
+		Collection<Deployment> deployments = deployerService.loadDeploymentsByOrganizations(organizationIds);
+		
 		List<DeploymentTableData> deploymentDataList = new ArrayList<DeploymentTableData>(); 
 		for (Deployment deployment : deployments){
 			Instance instance = instanceService.getInstance(deployment.getInstanceId());
@@ -444,5 +449,19 @@ public class DeployerController {
 		} 
 		return organizationMap;
 	}
+	
+	private Collection<Long> loadOrganizationIds(PortletRequest request) throws Exception {
+		Map<String, Object> userInfo = (Map<String, Object>) request.getAttribute(ActionRequest.USER_INFO);
+		if (userInfo == null) {
+			ExceptionUtil.throwApplicationException("User not authenticated");
+		}
+		Long userId = Long.valueOf(userInfo.get("liferay.user.id").toString());
+		List<Organization> organizations = OrganizationLocalServiceUtil.getUserOrganizations(userId);
+		Collection<Long> organizationIds = new ArrayList<Long>();
+		for (Organization organization : organizations) {
+			organizationIds.add(organization.getOrganizationId());
+		}
+		return organizationIds;
+	} 	
 		
 }

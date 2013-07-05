@@ -59,5 +59,11 @@ public interface BucketRepository {
 	 */
 	void deleteObject(String bucketName, String key);
 	
+
+	/**
+	 * Deletes all object in a bucket and the bucket itself.
+	 * @param bucketName
+	 */
+	public void deleteBucketAndObjects(String bucketName);
 	
 }

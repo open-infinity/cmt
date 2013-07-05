@@ -208,7 +208,7 @@
 								var replicationClusterSizeRow = $("#clusterConfigurationTemplate .clusterTypeConfigurationBody .clusterSizeRow").clone();
 								var replicationMachineSizeRow = $("#clusterConfigurationTemplate .clusterTypeConfigurationBody .machineSizeRow").clone();		
 								replicationClusterSizeRow.attr('class', 'replicationClusterSizeRow configRow').find("label").html("Repl. cluster size");
-								replicationMachineSizeRow.attr('class', 'machineSizeRow configRow replication');
+								replicationMachineSizeRow.attr('class', 'machineSizeRow configRow replicationMachine');
 								replicationMachineSizeRow.find('.radioButton').attr('class', 'replicationRadio radioButton');	
 								body.find(".machineSizeRow").after(replicationMachineSizeRow).after(replicationClusterSizeRow);
 							}				
@@ -287,7 +287,6 @@
 				$(selectorName).prev().addClass("platformNotSelected").removeClass("platformSelected");
 			}
 			$("#cloudTypesSelectionAccordion").accordion("option", "active", false);		
-			$("#addInstanceDialog .radioButton input").attr('checked',false).button("refresh");
 			$('#addInstanceDialog .togglePlatformSelectionRow input[id*="togglePlatformRadioOff_"]').attr('checked',true).button("refresh");
 			$('#addInstanceDialog .imageTypeRow input[id*="imageTypeEphemeral_"]').attr('checked',true).button("refresh");
 			$('#addInstanceDialog .toggleEbsRow input[id*="toggleEbsRadioOff_"]').attr('checked',true).button("refresh");
@@ -331,10 +330,10 @@
 						// should be like this: 
 						// outData[clusters[i].name + "clustersize"] 	= $('#' + clusters[i].name + ' .clusterSizeRow .jq_slider').slider("value");
 						outData[clusters[i].name + "clustersize"] = $('#' + clusters[i].name + ' .clusterSizeRow .jq_slider').parent().next().text();
-						outData[clusters[i].name + "machinesize"] = machineSize(clusters[i].name, 1);
+						outData[clusters[i].name + "machinesize"] = machineSize("", clusters[i].name, 1);
 						if (clusters[i].replicated == true){
 							outData[clusters[i].name + "replclustersize"] = $('#' + clusters[i].name + ' .replicationClusterSizeRow .jq_slider').parent().next().text();
-							outData[clusters[i].name + "replmachinesize"] = machineSize(clusters[i].name, 2);
+							outData[clusters[i].name + "replmachinesize"] = machineSize("", clusters[i].name, 2);
 						}
 						if($('#' + "imageTypeEphemeral_" + clusters[i].name).attr('checked')){
 							outData[clusters[i].name + "imagetype"] = "0";
@@ -397,19 +396,6 @@
 			return false;
 		}
 		else return true;
-	}
-	
-	function machineSize(clusterName, machineType){
-		var ret = 0;
-		var rowClass = "";
-		machineType== 1 ? rowClass = ".ordinaryMachine": rowClass = ".replicationMachine";
-		$('#' + clusterName + ' ' +  rowClass + ' .radioButton input').each(function(){	
-			if ($(this).attr('checked')){
-				ret = $(this).attr("value");
-				return false;
-			}
-		});
-		return ret;
 	}
 	
 	function dimElements(){

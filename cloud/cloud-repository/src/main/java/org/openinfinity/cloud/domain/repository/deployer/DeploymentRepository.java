@@ -64,6 +64,21 @@ public interface DeploymentRepository {
 	 * @param newState Represents the state to be updated to.
 	 */
 	void updateExistingDeployedDeploymentState(Deployment deployment, int newState);
+
+	/**
+	 * Update Deployment state by clusterId.
+	 * @param clusterId
+	 * @param newState
+	 */
+	public void updateDeploymentStateByClusterId(int clusterId, int newState);
+	
+	/**
+	 * Update DeploymentStatus state by clusterId.
+	 * @param clusterId
+	 * @param newState
+	 */
+	public void updateDeploymentStatusStateByClusterId(int clusterId, int newState);
+	
 	
 	/**
 	 * Returns all <code>org.openinfinity.core.cloud.domain.Deployment</code> objects based on organization id.
@@ -131,7 +146,7 @@ public interface DeploymentRepository {
 	/**
 	 * Update deployment status object.
 	 */
-	void updateDeploymentStateByOrganizationIdAndName(int organizationId, String name, int state);
+	void updateDeploymentStateByOrganizationIdAndName(int organizationId, String name, int state);	
 	
 	/**
 	 * Update DeploymentStatus object states.

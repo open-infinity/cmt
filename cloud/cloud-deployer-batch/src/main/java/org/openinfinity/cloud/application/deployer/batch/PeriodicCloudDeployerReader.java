@@ -102,6 +102,7 @@ public class PeriodicCloudDeployerReader implements ItemReader<DeploymentStatus>
 					
 					// replace current deployment with new
 					if (!newerDeployments.isEmpty()) {
+						LOGGER.info("Deployment with id [" + deployment.getId() + "] with name ["+deployment.getName()+"] is set to UNDEPLOY since newer deployments for the same cluster ["+deployment.getClusterId()+"] with the same name exist.");					
 						deployment.setState(DeployerService.DEPLOYMENT_STATE_UNDEPLOY);
 					}
 				}

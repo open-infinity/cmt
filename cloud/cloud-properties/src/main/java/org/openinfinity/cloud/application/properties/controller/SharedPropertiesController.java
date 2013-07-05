@@ -67,7 +67,7 @@ import com.liferay.portal.service.OrganizationLocalServiceUtil;
 @Qualifier("sharedPropertiesController")
 @Controller
 @RequestMapping(value = "VIEW") 
-public class SharedPropertiesController {
+public class SharedPropertiesController { 
 
 	@Autowired
 	private InstanceService instanceService;
@@ -189,7 +189,8 @@ public class SharedPropertiesController {
 	@AuditTrail
 	@ResourceMapping(PATH_FOR_SHARED_PROPERTY_DELETE)
 	public void deleteDeployment(ResourceResponse response, @RequestParam("propertyId") int propertyId) throws Exception {
-		centralizedPropertiesService.deleteByUniqueId(propertyId);
+		//centralizedPropertiesService.deleteByUniqueId(propertyId);
+		centralizedPropertiesService.updateStateByUniqueId(propertyId, CentralizedPropertiesService.PROPERTIES_STATE_DELETED);
 	} 	
 	
 	
@@ -230,6 +231,9 @@ public class SharedPropertiesController {
 			List<SharedPropertyTableData> sharedPropertiesDataList)
 			throws PortalException, SystemException {
 		for (SharedProperty sharedProperty : sharedProperties) {
+			// skip deleted properties
+			if(sharedProperty.getState()<0) continue;
+			
 			Instance instance = instanceService.getInstance(sharedProperty.getInstanceId());
 			Cluster cluster = clusterService.getCluster(sharedProperty.getClusterId());
 			SharedPropertyTableData sharedPropertyTableData = 
