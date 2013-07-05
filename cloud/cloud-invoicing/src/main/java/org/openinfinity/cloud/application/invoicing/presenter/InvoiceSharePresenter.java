@@ -52,7 +52,7 @@ public class InvoiceSharePresenter implements InvoiceShareViewListener {
     @Override
     public void instanceShareSelected(Object item) {
         ItemClickEvent event=(ItemClickEvent) item;
-        view.setInstanceShareDetails(model.getInstanceShareDetails((Long)event.getItemId()));
+        view.setInstanceShareDetails(model.getInstanceShareDetails((Integer)event.getItemId()));
         
         Notification.show("Item " +
                 item + " clicked.");

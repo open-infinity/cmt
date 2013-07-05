@@ -49,6 +49,7 @@ public class InvoiceShareModel{
 
     private InvoicingService invoicingService;
 
+    //TODO: get organization id from logged in user information
     private Long organizationId=(long) 10495;
 
     public InvoiceShareModel(){
