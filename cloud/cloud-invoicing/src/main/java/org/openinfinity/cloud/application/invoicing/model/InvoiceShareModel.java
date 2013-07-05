@@ -18,59 +18,36 @@ import com.vaadin.data.util.BeanItemContainer;
  *
  */
 public class InvoiceShareModel{
+
+    private Collection<Instance> instances=null;
+    private Collection<InstanceShare> instanceShares;
     
-    private BeanItemContainer<InstanceSelectionBean> instanceContainer=null;
-    private BeanItemContainer<InstanceShareBean> instanceShareContainer=null;
-    
+    public Collection<Instance> getInstances() {
+        return instances;
+    }
+
+    public void setInstances(Collection<Instance> instances) {
+        this.instances = instances;
+    }
+
+    public Collection<InstanceShare> getInstanceShares(long instanceId) {
+        instanceShares = invoicingService.getInstanceShareService().findByInstanceId(instanceId);
+        return instanceShares;
+    }
+
+    public void setInstanceShares(Collection<InstanceShare> instanceShares) {
+        this.instanceShares = instanceShares;
+    }
+
     private InvoicingService invoicingService;
 
     private Long organizationId=(long) 10495;
-    
-    public BeanItemContainer<InstanceSelectionBean> getInstanceContainer() {
-        return instanceContainer;
-    }
 
-    public void setInstanceContainer(
-            BeanItemContainer<InstanceSelectionBean> instanceContainer) {
-        this.instanceContainer = instanceContainer;
-    }
-
-    public BeanItemContainer<InstanceShareBean> getInstanceShareContainer() {
-        return instanceShareContainer;
-    }
-
-    public void setInstanceShareContainer(
-            BeanItemContainer<InstanceShareBean> instanceShareContainer) {
-        this.instanceShareContainer = instanceShareContainer;
-    }
-        
-    
     public InvoiceShareModel(){
         // Some sample beans
         ArrayList<InstanceSelectionBean> beans = new ArrayList<InstanceSelectionBean>();
 
         invoicingService = ApplicationContextProvider.getContext().getBean(InvoicingService.class);
-        Collection<Instance> organizationInstances = invoicingService.getOrganizationInstances(organizationId);
-        for (Instance instance:organizationInstances){
-            beans.add(new InstanceSelectionBean(instance));
-        }
-
-        // Create a Collection container using id property as the key
-        instanceContainer = new BeanItemContainer<InstanceSelectionBean>(InstanceSelectionBean.class);
-        instanceContainer.addAll(beans);
-
-        
-        // Instance_share beans
-        long instanceId=720;
-		Collection<InstanceShareBean> instanceShareBeans = new ArrayList<InstanceShareBean>(); 
-				
-		Collection<InstanceShare> instanceShares = invoicingService.getInstanceShareService().findByInstanceId(instanceId);
-        for (InstanceShare instanceShare:instanceShares){
-        	instanceShareBeans.add(new InstanceShareBean(instanceShare));
-        }
-				
-        // Create a Collection container using id property as the key
-        instanceShareContainer = new BeanItemContainer<InstanceShareBean>(InstanceShareBean.class);
-        instanceShareContainer.addAll(instanceShareBeans);
-    }    
+        instances = invoicingService.getOrganizationInstances(organizationId);
+     }    
 }
