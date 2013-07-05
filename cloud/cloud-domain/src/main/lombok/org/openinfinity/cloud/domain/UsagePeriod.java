@@ -22,6 +22,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import lombok.Data;
 
@@ -59,6 +60,106 @@ public class UsagePeriod {
 	
 	public Collection<UsageHour> loadUsageHours() {
 		return Collections.unmodifiableCollection(usageHours);
+	}
+	
+	/**
+	 * Return a Map that contains uptime per machine. The machine id acts as a key for the Map.
+	 * 
+	 * @return
+	 */
+	public Map<Integer, MachineUsage> getUptimeHoursPerMachine() {
+		
+		/*
+		 * Collect data to this Map and return it.
+		 */
+		Map<Integer, MachineUsage> uptimePerMachine = new HashMap<Integer, MachineUsage>();
+		
+		Map<Integer, List<UsageHour>> usageEventsPerMachine = generateUsageHourTreePerMachineId();
+		
+		for (Entry<Integer, List<UsageHour>> eventSet : usageEventsPerMachine.entrySet()) {
+			
+			List<UsageHour> usageEventsPerMachineList = eventSet.getValue();
+			
+			Date machineStartTime = null;
+			Date machineStopTime = null;
+			int errorCount = 0;
+			String errorMessage = "";
+			
+			for (UsageHour event : usageEventsPerMachineList) {
+				
+				switch (event.getVirtualMachineState()) {
+				case STARTED:
+					if (machineStartTime != null) {
+						/*
+						 * Too many START events.
+						 */
+						errorCount++;
+						errorMessage = "Too many START events with machine id : " + event.getMachineId() + ". Using the most recent.";
+						LOGGER.warn(errorMessage);
+					}
+					LOGGER.debug("Machine id {} started : {}", event.getMachineId(), event.getTimeStamp());
+					machineStartTime = event.getTimeStamp();
+					break;
+				case STOPPED:
+					if (machineStartTime == null) {
+						/*
+						 * There is no start time for the machine. Can not calculate uptime.
+						 */
+						errorCount++;
+						errorMessage = "No START event for the machine id : " + event.getMachineId() + ". Can not calculate uptime.";
+						LOGGER.warn(errorMessage);
+					}
+					if (machineStopTime != null) {
+						/*
+						 * Too many STOP events. Using the oldest one.
+						 */
+						errorCount++;
+						errorMessage = "Too many STOP events with machine id : " + event.getMachineId() + ". Using the oldest one.";
+						LOGGER.warn(errorMessage);
+					} else {
+						LOGGER.debug("Machine id {} stopped : {}", event.getMachineId(), event.getTimeStamp());
+						machineStopTime = event.getTimeStamp();
+					}
+					break;
+					
+					/*
+					 * These events are not supported at the moment. Throws exception.
+					 */
+				case RESUMED:
+				case PAUSED:
+				case TERMINATED:
+					throw new RuntimeException("Calculation of the following events are not implemented yet: RESUMED, PAUSED, TERMINATED");
+				}
+				
+			}
+			
+			UsageHour uh = usageEventsPerMachineList.get(0);
+			
+			if (machineStopTime == null) {
+				machineStopTime = endTime;
+			}
+			if (machineStartTime == null) {
+				errorCount++; // There should be error count, but increment just in case.
+				errorMessage = "No start time for the machine id : " + uh.getMachineId() + ". Can not calculate uptime.";
+				LOGGER.warn(errorMessage);
+				
+			}
+			long uptime = machineStopTime.getTime() - machineStartTime.getTime();
+			
+			MachineUsage mu = new MachineUsage(
+					uh.getMachineId(),
+					uh.getInstanceId(),
+					uptime,
+					errorCount,
+					errorMessage
+					);
+			LOGGER.debug(mu.toString());
+			LOGGER.debug("Uptime (sec): {}", mu.getUptimeInSeconds());
+			LOGGER.debug("Uptime (min): {}", mu.getUptimeInMinutes());
+			uptimePerMachine.put(mu.getMachineId(), mu);
+		}
+		
+		return uptimePerMachine;
 	}
 	
 	public void loadUptimeHours() {
@@ -106,7 +207,7 @@ public class UsagePeriod {
 						LOGGER.trace("State : terminated, Downtime : " + uptime);
 						break;
 				}
-				System.out.println("Point of time : " + previousGatheringPointOfTime);
+				LOGGER.debug("Point of time : {}", previousGatheringPointOfTime);
 			}	
 		}
 		long periodTime = endTime.getTime()-startTime.getTime();

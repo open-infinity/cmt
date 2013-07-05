@@ -36,6 +36,7 @@
     <jdbc:initialize-database data-source="cloudDataSource">
   		<jdbc:script location="${sql.script_location}"/>
   		<jdbc:script location="file:///${user.dir}/../cloud-repository/src/test/resources/sql/populate_tables.sql"/>
+  		<jdbc:script location="file:///${user.dir}/../cloud-repository/src/test/resources/sql/populate_test_data.sql"/>
 	</jdbc:initialize-database>
 	
 	<bean id="txManager"

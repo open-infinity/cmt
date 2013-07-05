@@ -8,10 +8,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.openinfinity.cloud.domain.MachineUsage;
 import org.openinfinity.cloud.domain.UsageHour;
 import org.openinfinity.cloud.domain.UsagePeriod;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +37,37 @@ public class UsageServiceImplTest {
 	}
 	*/
 
+	@Test
+	public void testUpTimeHoursPerMachine() {
+		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+		Date startTime = null;
+		try {
+			startTime = sdf.parse("01/06/2013");
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		Date endTime = new Date(); // Current time
+
+		UsagePeriod usagePeriod = usageService.loadUsagePeriod(10495,
+				startTime, endTime);
+		
+		Map<Integer, MachineUsage> actual = usagePeriod.getUptimeHoursPerMachine();
+		
+		System.out.println("*************************");
+		System.out.println("Map: " + actual.toString());
+		System.out.println("*************************");
+		
+		assertEquals(1, actual.get(1).getMachineId());
+		assertEquals(1, actual.get(1).getInstanceId());
+		assertEquals(525000, actual.get(1).getUptime());
+		assertEquals(525, actual.get(1).getUptimeInSeconds());
+		assertEquals(8, actual.get(1).getUptimeInMinutes());
+		assertEquals(MachineUsage.State.VALID, actual.get(1).getState());
+		assertEquals(0, actual.get(1).getErrorCount());
+		assertEquals(0, actual.get(1).getErrorMessage().length());
+		
+	}
+	
 	// TODO: missing asserts.
 	@Test
 	public void testLoadUsagePeriod() {
