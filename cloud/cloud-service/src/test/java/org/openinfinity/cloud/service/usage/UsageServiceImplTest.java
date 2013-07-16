@@ -10,7 +10,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openinfinity.cloud.domain.MachineUsage;
@@ -62,7 +61,7 @@ public class UsageServiceImplTest {
 		assertEquals(525000, actual.get(1).getUptime());
 		assertEquals(525, actual.get(1).getUptimeInSeconds());
 		assertEquals(8, actual.get(1).getUptimeInMinutes());
-		assertEquals(MachineUsage.State.VALID, actual.get(1).getState());
+		assertEquals(MachineUsage.State.USAGE_DATA_VALID, actual.get(1).getState());
 		assertEquals(0, actual.get(1).getErrorCount());
 		assertEquals(0, actual.get(1).getErrorMessage().length());
 		

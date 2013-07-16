@@ -34,6 +34,8 @@ public interface InstanceRepository {
 	
 	Instance getInstance(int instanceId);
 	
+	Instance getInstanceAlsoPassive(int instanceId);
+	
 	Collection<Instance> getInstances(Long userId);
 	
 	Collection<Instance> getOrganizationInstances(Long organizationId);

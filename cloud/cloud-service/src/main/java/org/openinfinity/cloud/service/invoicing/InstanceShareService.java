@@ -1,5 +1,6 @@
 package org.openinfinity.cloud.service.invoicing;
 
+import java.util.Date;
 import java.util.List;
 
 import org.openinfinity.cloud.domain.InstanceShare;
@@ -15,6 +16,8 @@ public interface InstanceShareService {
     public abstract Page<InstanceShare> findAll(Pageable arg0);
 
     public abstract List<InstanceShare> findByInstanceId(long instanceId);
+    
+    public abstract InstanceShare findLatestByInstanceIdAndPeriodStart(long instanceId, Date periodStart);
 
     public abstract InstanceShare findOne(Long arg0);
 

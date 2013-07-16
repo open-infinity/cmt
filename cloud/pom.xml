@@ -32,6 +32,7 @@
 		<module>cloud-worker</module>
 		<module>cloud-health-monitoring</module>
         <module>cloud-invoicing</module>
+        <module>cloud-invoicing-batch</module>
   </modules>
 	<dependencies>
 		<dependency>

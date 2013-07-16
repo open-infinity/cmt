@@ -53,5 +53,16 @@ public class InstanceShareDetail implements Serializable {
 
 	public InstanceShareDetail() {
 	}
+	
+	public String toCSV(String delimiter) {
+		return costPool + delimiter +
+				//created + delimiter +
+				//createdBy + delimiter +
+				description + delimiter +
+				//modified + delimiter +
+				//modifiedBy + delimiter +
+				orderNumber + delimiter +
+				sharePercent;
+	}
 
 }

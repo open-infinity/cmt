@@ -7,6 +7,9 @@ target/
 .project
 .classpath
 
+# ignore Eclipse Spring beans file. This is automatically made by Spring nature
+.springBeans
+
 # ignore IDEA metadata
 *.iml
 

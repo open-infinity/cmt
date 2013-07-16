@@ -91,5 +91,9 @@ public class InstanceShare implements Serializable {
 
 		return instanceShareInvoiceTbl;
 	}
+	
+	public String toCSV(String delimiter) {
+		return periodStart.toString();
+	}
 
 }

@@ -74,6 +74,13 @@ public class InstanceRepositoryJdbcImpl implements InstanceRepository {
 	}
 	
 	@AuditTrail
+	public Instance getInstanceAlsoPassive(int instanceId) {
+		List<Instance> instances = this.jdbcTemplate.query("select * from instance_tbl where instance_id = ?", new Object[] { instanceId }, new InstanceMapper());
+		Instance instance = DataAccessUtils.singleResult(instances);
+		return instance;
+	}
+	
+	@AuditTrail
 	public Collection<Instance> getInstances(Long userId) {
 		Collection<Instance> instances = this.jdbcTemplate.query("select * from instance_tbl where instance_active = 1 and user_id = ?", new Object[] { userId }, new InstanceMapper());
 		if (instances!=null){

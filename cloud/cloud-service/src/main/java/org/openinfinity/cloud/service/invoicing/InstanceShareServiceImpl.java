@@ -1,8 +1,10 @@
 package org.openinfinity.cloud.service.invoicing;
 
+import java.util.Date;
 import java.util.List;
 
 import org.openinfinity.cloud.domain.InstanceShare;
+import org.openinfinity.cloud.domain.InstanceShareDetail;
 import org.openinfinity.cloud.domain.repository.invoice.InstanceShareRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -47,6 +49,21 @@ public class InstanceShareServiceImpl implements InstanceShareService{
     public List<InstanceShare> findByInstanceId(long instanceId) {
         return repository.findByInstanceId(instanceId);
     }
+    
+    /**
+     * Fetch latest instance share and its details. If share can not be found returns null.
+     */
+    @Override
+	public InstanceShare findLatestByInstanceIdAndPeriodStart(long instanceId, Date periodStart) {
+    	InstanceShare instanceShare = null;
+    	
+    	List<InstanceShare> instanceShares = repository.findByInstanceIdAndPeriodStart(instanceId, periodStart);
+    	if (instanceShares.size() > 0) {
+    		instanceShare = instanceShares.get(0);
+    		instanceShare.getInstanceShareDetails().size(); // Load share details within transaction
+    	}
+    	return instanceShare;
+	}
 
     /* (non-Javadoc)
      * @see org.openinfinity.cloud.service.invoicing.InstanceShareService2#findOne(java.lang.Long)

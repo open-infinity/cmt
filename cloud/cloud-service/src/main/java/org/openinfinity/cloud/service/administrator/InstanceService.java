@@ -31,6 +31,8 @@ public interface InstanceService {
 	
 	Instance getInstance(int instanceId);
 	
+	Instance getInstanceAlsoPassive(int instanceId);
+	
 	void updateInstanceStatus(int instanceId, String status);
 	
 	Collection<Instance> getUserInstances(Collection<Long> organizationIds);

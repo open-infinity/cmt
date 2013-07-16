@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+				xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				xmlns:batch="http://www.springframework.org/schema/batch"
+				xmlns:context="http://www.springframework.org/schema/context"
+				xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+				xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+				xmlns:tx="http://www.springframework.org/schema/tx"
+				xmlns:util="http://www.springframework.org/schema/util"
+				xmlns:aop="http://www.springframework.org/schema/aop"
+				xmlns:p="http://www.springframework.org/schema/p"
+				xsi:schemaLocation="http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-3.0.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.1.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd
+		http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa-1.2.xsd
+		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.1.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+	<context:property-placeholder location="classpath:batch.properties" />
+
+	<context:component-scan base-package="org.openinfinity.cloud.application.invoicing.batch" />
+	<context:component-scan base-package="org.openinfinity.cloud.service.invoicing" />
+	<context:component-scan base-package="org.openinfinity.cloud.service.usage" />
+	<context:component-scan base-package="org.openinfinity.cloud.domain.repository.usage" />
+	<context:component-scan base-package="org.openinfinity.cloud.service.administrator" />
+	<context:component-scan base-package="org.openinfinity.cloud.domain.repository.administrator" />
+	<context:component-scan base-package="org.openinfinity.cloud.domain.repository.scaling" />
+	
+	<jpa:repositories base-package="org.openinfinity.cloud.domain.repository" />
+	
+	    <bean id="cloudDataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+        destroy-method="close">
+        <property name="driverClass">
+            <value>${batch.jdbc.driver}</value>
+        </property>
+        <property name="jdbcUrl">
+            <value>${batch.jdbc.url}</value>
+        </property>
+        <property name="user">
+            <value>${batch.jdbc.user}</value>
+        </property>
+        <property name="password">
+            <value>${batch.jdbc.password}</value>
+        </property>
+        <property name="maxPoolSize">
+            <value>30</value>
+        </property>
+        <property name="minPoolSize">
+            <value>2</value>
+        </property>
+        <property name="numHelperThreads">
+            <value>2</value>
+        </property>
+        <property name="testConnectionOnCheckout">
+            <value>true</value>
+        </property>
+    </bean>  
+	
+	<!-- Declare a JPA entityManagerFactory -->
+    <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean" 
+        p:persistenceUnitName="jpa.hibernate.mysql"
+        p:dataSource-ref="cloudDataSource"
+        p:jpaVendorAdapter-ref="hibernateVendor"/>
+
+    <!-- Specify our ORM vendor -->
+    <bean id="hibernateVendor" class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter"
+            p:showSql="${jdbc.show.sql}"/>
+	
+	<bean id="persistenceAnnotationBeanPostProcessor"
+        class="org.springframework.orm.jpa.support.PersistenceAnnotationBeanPostProcessor" />
+ 
+    <bean id="persistenceExceptionTranslationPostProcessor"
+        class="org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor" />
+ 
+    <bean id="jpaTransactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+        <property name="entityManagerFactory" ref="entityManagerFactory" />
+    </bean>
+    
+    <tx:annotation-driven transaction-manager="jpaTransactionManager" />
+
+	<jdbc:initialize-database data-source="dataSource" enabled="false">
+		<jdbc:script location="${batch.schema.script}" />
+	</jdbc:initialize-database>
+
+	<batch:job-repository id="jobRepository" />
+
+	<import resource="classpath:/META-INF/spring/module-context.xml" />
+
+</beans>

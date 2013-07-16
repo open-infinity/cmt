@@ -135,20 +135,36 @@ public class UsagePeriod {
 			
 			UsageHour uh = usageEventsPerMachineList.get(0);
 			
-			if (machineStopTime == null) {
-				machineStopTime = endTime;
-			}
 			if (machineStartTime == null) {
 				errorCount++; // There should be error count, but increment just in case.
 				errorMessage = "No start time for the machine id : " + uh.getMachineId() + ". Can not calculate uptime.";
 				LOGGER.warn(errorMessage);
 				
 			}
-			long uptime = machineStopTime.getTime() - machineStartTime.getTime();
+			
+			long uptime = 0;
+			if (machineStartTime != null) {
+				if (machineStopTime != null) {
+					uptime = machineStopTime.getTime() - machineStartTime.getTime();
+				} else {
+					// The machine is still running. Using period end time for calculation.
+					uptime = endTime.getTime() - machineStartTime.getTime();
+				}
+			}
 			
 			MachineUsage mu = new MachineUsage(
 					uh.getMachineId(),
 					uh.getInstanceId(),
+					uh.getClusterTypeTitle(),
+					uh.getClusterId(),
+					uh.getMachineTypeId(),
+					uh.getMachineTypeName(),
+					uh.getMachineTypeSpec(),
+					uh.getMachineMachineType(),
+					uh.getClusterEbsImageUsed(),
+					uh.getClusterEbsVolumesUsed(),
+					machineStartTime,
+					machineStopTime,
 					uptime,
 					errorCount,
 					errorMessage

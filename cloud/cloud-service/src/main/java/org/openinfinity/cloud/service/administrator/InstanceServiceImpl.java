@@ -65,6 +65,11 @@ public class InstanceServiceImpl implements InstanceService {
 	}
 	
 	@Log
+	public Instance getInstanceAlsoPassive(int instanceId) {
+		return instanceRepository.getInstanceAlsoPassive(instanceId);
+	}
+	
+	@Log
 	public Collection<Instance> getUserInstances(Collection<Long> organizationIds) {
 		Collection<Instance> instanceList = new ArrayList<Instance>();
 

@@ -16,6 +16,7 @@
 
 package org.openinfinity.cloud.domain.repository.invoice;
 
+import java.util.Date;
 import java.util.List;
 
 import org.openinfinity.cloud.domain.InstanceShare;
@@ -34,4 +35,8 @@ public interface InstanceShareRepository extends JpaRepository<InstanceShare, Lo
     
     @Query("select u from InstanceShare u where u.instanceTbl.instanceId = ?1")
     List<InstanceShare> findByInstanceId(long instanceId);
+    
+    @Query("select u from InstanceShare u where u.instanceTbl.instanceId = ?1 and u.periodStart <= ?2 order by u.periodStart desc")
+    List<InstanceShare> findByInstanceIdAndPeriodStart(long instanceId, Date periodStart);
+    
 }

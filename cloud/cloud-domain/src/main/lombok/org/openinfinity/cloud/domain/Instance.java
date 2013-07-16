@@ -64,5 +64,17 @@ public class Instance implements Serializable {
 		}
 		parameters.add(param);		
 	}
+	
+	public String toCSV(String delimiter) {
+		return instanceId + delimiter +
+				userId + delimiter +
+				organizationid + delimiter +
+				name + delimiter +
+				cloudType + delimiter +
+				zone + delimiter +
+				status + delimiter +
+				userName + delimiter +
+				organizationName;
+	}
 		
 }
