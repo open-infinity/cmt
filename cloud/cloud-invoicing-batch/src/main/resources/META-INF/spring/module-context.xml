@@ -8,7 +8,7 @@
 
 	<description>Example job to get you started. It provides a skeleton for a typical batch application.</description>
  	
-	<batch:job id="jobInvoice">
+	<batch:job id="jobInvoice" restartable="false">
 		<batch:step id="stepInvoice">
 			<batch:tasklet transaction-manager="transactionManager" start-limit="100" >
 				<batch:chunk reader="reader" writer="writer" commit-interval="1" />

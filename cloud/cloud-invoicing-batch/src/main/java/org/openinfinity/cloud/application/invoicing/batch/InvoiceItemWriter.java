@@ -8,9 +8,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.mail.internet.MimeMessage;
-import javax.persistence.Column;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 import org.apache.commons.io.FileUtils;
 import org.openinfinity.cloud.domain.InstanceShare;
@@ -43,6 +40,12 @@ public class InvoiceItemWriter implements ItemWriter<Map<Integer, InstanceInvoic
 	
 	@Value("${line.separator}")
 	private String LF;
+	
+	@Value("${batch.save_receipt}")
+	private boolean saveReceipt;
+	
+	@Value("${batch.send_email}")
+	private boolean sendEmail;
 	
 	@Value("${invoice_batch.userid}")
 	private int batchUserId;
@@ -102,8 +105,21 @@ public class InvoiceItemWriter implements ItemWriter<Map<Integer, InstanceInvoic
 			}
 		}
 		
-		// Write receipt to DB
-		instanceShareInvoiceService.save(instanceShareInvoices);
+		if (saveReceipt == true) {
+			// Write receipt to DB
+			instanceShareInvoiceService.save(instanceShareInvoices);
+		} else {
+			LOGGER.info("Property batch.save_receipt was set to false. Not saving receipt.");
+		}
+		
+		sendEmail();
+	}
+	
+	public void sendEmail() throws Exception {
+		if (sendEmail == false) {
+			LOGGER.info("Property batch.send_email was set to false. Not sending email.");
+			return;
+		}
 		
 		for (int i = 0; i < mailTo.length; i++) {
 			LOGGER.info("Mail to: {}", mailTo[i]);

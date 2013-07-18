@@ -1,15 +1,12 @@
 package org.openinfinity.cloud.application.invoicing.batch;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-import org.openinfinity.cloud.domain.Instance;
 import org.openinfinity.cloud.domain.InstanceShare;
-import org.openinfinity.cloud.domain.InstanceShareDetail;
 import org.openinfinity.cloud.domain.MachineUsage;
 import org.openinfinity.cloud.domain.UsagePeriod;
 import org.openinfinity.cloud.service.administrator.InstanceService;
@@ -91,6 +88,8 @@ public class InvoiceItemReader implements ItemReader<Map<Integer, InstanceInvoic
 		DateTimeFormatter dateFormat = DateTimeFormat.forPattern(dateFormatPattern);
 		DateTime periodStart = dateFormat.parseDateTime(periodStartStr);
 		DateTime periodEnd = dateFormat.parseDateTime(periodEndStr);
+		
+		LOGGER.info("Starting the invoice batch for period: {} to {}", periodStart.toString(), periodEnd.toString());
 		
 		UsagePeriod usagePeriod = usageService.loadUsagePeriod(organizationId, periodStart.toDate(), periodEnd.toDate());
 		Map<Integer, MachineUsage> machineUsages = usagePeriod.getUptimeHoursPerMachine();
