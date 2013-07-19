@@ -110,5 +110,16 @@ public class UsageServiceImpl implements UsageService {
 		usagePeriod.loadUptimeHours();
 		return usagePeriod;
 	}
+	
+	@Log
+	@AuditTrail
+	@Override
+	public UsagePeriod loadUsage(long organizationId) {
+		Collection<UsageHour> usageHours = usageRepository.loadUsageHoursByOrganizationId(organizationId);
+		UsagePeriod usagePeriod = new UsagePeriod();
+		usagePeriod.setOrganizationId(organizationId);
+		usagePeriod.setUsageHours(usageHours);
+		return usagePeriod;
+	}
 
 }

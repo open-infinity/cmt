@@ -38,6 +38,9 @@ public class InvoiceItemWriter implements ItemWriter<Map<Integer, InstanceInvoic
 	@Value("${output.file}")
 	private String outputFileName;
 	
+	@Value("${output.file.overwrite}")
+	private boolean outputFileOverwrite;
+	
 	@Value("${line.separator}")
 	private String LF;
 	
@@ -61,6 +64,15 @@ public class InvoiceItemWriter implements ItemWriter<Map<Integer, InstanceInvoic
 	
 	@Value("${mail.port}")
 	private int port;
+	
+	@Value("${usage.organizationId}")
+	private int organizationId;
+	
+	@Value("${usage.periodStart}")
+	private String periodStart;
+			
+	@Value("${usage.periodEnd}")
+	private String periodEnd;
 	
 	private File outputFile;
 	
@@ -135,7 +147,7 @@ public class InvoiceItemWriter implements ItemWriter<Map<Integer, InstanceInvoic
 		MimeMessageHelper helper = new MimeMessageHelper(message, true);
 		helper.setTo(mailTo);
 		helper.setFrom(mailFrom);
-		helper.setSubject("Invoice period from TODO to TODO");
+		helper.setSubject("Invoice period from " + periodStart + " to " + periodEnd + " for organization " + organizationId);
 		helper.setText("Invoice CSV file attached.");
 		FileSystemResource file = new FileSystemResource(outputFile);
 		helper.addAttachment(outputFile.getName(), file);
@@ -145,7 +157,13 @@ public class InvoiceItemWriter implements ItemWriter<Map<Integer, InstanceInvoic
 	@Override
 	public void beforeStep(StepExecution stepExecution) {
 		LOGGER.debug("Creating a file");
-		outputFile = new File(outputFileName);
+		String concatenatedFileName = outputFileName + "_" + organizationId + "_" + periodStart + "_" + periodEnd + ".csv";
+		outputFile = new File(concatenatedFileName);
+		
+		if (outputFileOverwrite == true) {
+			LOGGER.info("Deleting the outputfile {} if exists", concatenatedFileName);
+			FileUtils.deleteQuietly(outputFile);
+		}
 	}
 
 	@Override

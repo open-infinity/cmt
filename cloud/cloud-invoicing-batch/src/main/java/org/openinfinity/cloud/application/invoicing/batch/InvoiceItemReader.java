@@ -91,7 +91,9 @@ public class InvoiceItemReader implements ItemReader<Map<Integer, InstanceInvoic
 		
 		LOGGER.info("Starting the invoice batch for period: {} to {}", periodStart.toString(), periodEnd.toString());
 		
-		UsagePeriod usagePeriod = usageService.loadUsagePeriod(organizationId, periodStart.toDate(), periodEnd.toDate());
+		UsagePeriod usagePeriod = usageService.loadUsage(organizationId);
+		usagePeriod.setStartTime(periodStart.toDate());
+		usagePeriod.setEndTime(periodEnd.toDate());
 		Map<Integer, MachineUsage> machineUsages = usagePeriod.getUptimeHoursPerMachine();
 		
 		LOGGER.debug("UsagePeriod for organization id : {}", usagePeriod.getOrganizationId());

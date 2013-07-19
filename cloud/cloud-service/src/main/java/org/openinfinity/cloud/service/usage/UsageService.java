@@ -72,5 +72,13 @@ public interface UsageService {
 	 * @return
 	 */
 	UsagePeriod loadUsagePeriod(long organizationId, Date startTime, Date endTime);
+	
+	/**
+	 * Load all usages by organization id
+	 * 
+	 * @param organizationId
+	 * @return UsagePeriod
+	 */
+	UsagePeriod loadUsage(long organizationId);
 
 }

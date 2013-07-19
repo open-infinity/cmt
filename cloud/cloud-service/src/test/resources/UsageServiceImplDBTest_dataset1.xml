@@ -1,0 +1,61 @@
+<!-- <!DOCTYPE dataset SYSTEM "my-dataset.dtd"> -->
+ <dataset>
+     <usage_hours_tbl id="1"
+     	organization_id="10495"
+     	instance_id="1"
+     	cluster_id="1"
+     	platform_id="11"
+     	cluster_type_title="Start and stop events (instance state: stopped)"
+     	machine_id="1"
+     	machine_type_id="1"
+     	machine_type_name="Medium"
+     	machine_type_spec="Cores 2, RAM: 2GB, Disk: 10GB"
+     	machine_machine_type="loadbalancer"
+     	cluster_ebs_image_used="0"
+     	cluster_ebs_volumes_used="0"
+     	state="1"
+     	cur_timestamp="2013-06-05 12:00:00"/>
+     <usage_hours_tbl id="2"
+     	organization_id="10495"
+     	instance_id="1"
+     	cluster_id="1"
+     	platform_id="11"
+     	cluster_type_title="Start and stop events (instance state: stopped)"
+     	machine_id="1"
+     	machine_type_id="1"
+     	machine_type_name="Medium"
+     	machine_type_spec="Cores 2, RAM: 2GB, Disk: 10GB"
+     	machine_machine_type="loadbalancer"
+     	cluster_ebs_image_used="0"
+     	cluster_ebs_volumes_used="0"
+     	state="3"
+     	cur_timestamp="2013-06-20 12:00:00"/>
+     	
+     <usage_hours_tbl id="21"
+     	organization_id="10495"
+     	instance_id="3"
+     	cluster_id="5"
+     	platform_id="11"
+     	cluster_type_title="Start event (instance state: running)"
+     	machine_id="21"
+     	machine_type_id="1"
+     	machine_type_name="Medium"
+     	machine_type_spec="Cores 2, RAM: 2GB, Disk: 10GB"
+     	machine_machine_type="loadbalancer"
+     	cluster_ebs_image_used="0"
+     	cluster_ebs_volumes_used="0"
+     	state="1"
+     	cur_timestamp="2013-06-05 12:00:00"/>
+ </dataset>
+
+<!--
+INSERT INTO usage_hours_tbl (id,organization_id,instance_id,cluster_id,platform_id,cluster_type_title,machine_id,machine_type_id,machine_type_name,machine_type_spec,machine_machine_type,cluster_ebs_image_used,cluster_ebs_volumes_used,state,cur_timestamp) VALUES (1,10495,1,1,'11','JBoss Service platform','1',1,'Medium','Cores: 2, RAM: 2GB, Disk: 10GB','loadbalancer',0,0,1,{ts '2013-06-05 12:00:00.'});
+INSERT INTO usage_hours_tbl (id,organization_id,instance_id,cluster_id,platform_id,cluster_type_title,machine_id,machine_type_id,machine_type_name,machine_type_spec,machine_machine_type,cluster_ebs_image_used,cluster_ebs_volumes_used,state,cur_timestamp) VALUES (2,10495,1,1,'11','JBoss Service platform','2',1,'Medium','Cores: 2, RAM: 2GB, Disk: 10GB','clustermember',0,0,1,{ts '2013-06-05 12:00:00.'});
+INSERT INTO usage_hours_tbl (id,organization_id,instance_id,cluster_id,platform_id,cluster_type_title,machine_id,machine_type_id,machine_type_name,machine_type_spec,machine_machine_type,cluster_ebs_image_used,cluster_ebs_volumes_used,state,cur_timestamp) VALUES (3,10495,1,1,'11','JBoss Service platform','1',1,'Medium','Cores: 2, RAM: 2GB, Disk: 10GB','loadbalancer',0,0,3,{ts '2013-06-20 12:00:00.'});
+INSERT INTO usage_hours_tbl (id,organization_id,instance_id,cluster_id,platform_id,cluster_type_title,machine_id,machine_type_id,machine_type_name,machine_type_spec,machine_machine_type,cluster_ebs_image_used,cluster_ebs_volumes_used,state,cur_timestamp) VALUES (4,10495,1,1,'11','JBoss Service platform','2',1,'Medium','Cores: 2, RAM: 2GB, Disk: 10GB','clustermember',0,0,3,{ts '2013-06-20 12:00:00.'});
+
+
+INSERT INTO usage_hours_tbl (id,organization_id,instance_id,cluster_id,platform_id,cluster_type_title,machine_id,machine_type_id,machine_type_name,machine_type_spec,machine_machine_type,cluster_ebs_image_used,cluster_ebs_volumes_used,state,cur_timestamp) VALUES (21,10495,3,5,'11','JBoss Service platform','11',0,'Small','Cores: 1, RAM: 1GB, Disk: 10GB','loadbalancer',0,0,1,{ts '2013-06-05 12:00:00.'});
+INSERT INTO usage_hours_tbl (id,organization_id,instance_id,cluster_id,platform_id,cluster_type_title,machine_id,machine_type_id,machine_type_name,machine_type_spec,machine_machine_type,cluster_ebs_image_used,cluster_ebs_volumes_used,state,cur_timestamp) VALUES (22,10495,3,5,'11','JBoss Service platform','12',0,'Small','Cores: 1, RAM: 1GB, Disk: 10GB','clustermember',0,0,1,{ts '2013-06-05 12:00:00.'});
+-->
+ 
