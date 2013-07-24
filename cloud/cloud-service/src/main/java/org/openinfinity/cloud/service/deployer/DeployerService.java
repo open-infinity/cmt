@@ -47,6 +47,7 @@ public interface DeployerService {
 	static final int DEPLOYMENT_STATE_ERROR = 15;	
 	
 	static final int DEPLOYMENT_STATE_TERMINATED = -1;
+	static final int DEPLOYMENT_STATE_CLUSTER_TERMINATED = -10;
 	
 	
 	

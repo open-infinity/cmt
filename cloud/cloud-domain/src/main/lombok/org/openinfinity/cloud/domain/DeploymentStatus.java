@@ -43,6 +43,8 @@ public class DeploymentStatus implements Serializable {
 	private static final int DEPLOYMENT_STATE_ERROR = 15;	
 	
 	private static final int DEPLOYMENT_STATE_TERMINATED = -1;
+
+	private static final int DEPLOYMENT_STATE_CLUSTER_TERMINATED = -10;
 	
 	public enum DeploymentState {
 		
@@ -56,7 +58,9 @@ public class DeploymentStatus implements Serializable {
 		
 		ERROR (DEPLOYMENT_STATE_ERROR),		
 
-		TERMINATED (DEPLOYMENT_STATE_TERMINATED); 
+		TERMINATED (DEPLOYMENT_STATE_TERMINATED), 
+		
+		CLUSTER_TERMINATED (DEPLOYMENT_STATE_CLUSTER_TERMINATED); 
 		
 		private int state;
 		
@@ -78,6 +82,7 @@ public class DeploymentStatus implements Serializable {
 			case DEPLOYMENT_STATE_UNDEPLOYED : return DeploymentState.UNDEPLOYED;
 			case DEPLOYMENT_STATE_ERROR : return DeploymentState.ERROR;
 			case DEPLOYMENT_STATE_TERMINATED : return DeploymentState.TERMINATED;
+			case DEPLOYMENT_STATE_CLUSTER_TERMINATED: return DeploymentState.CLUSTER_TERMINATED;
 			default: return DeploymentState.NOT_DEPLOYED;
 		}
 	}

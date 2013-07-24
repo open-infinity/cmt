@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.openinfinity.cloud.domain.Deployment;
 import org.openinfinity.cloud.domain.DeploymentStatus;
 import org.openinfinity.cloud.domain.DeploymentStatus.DeploymentState;
+import org.openinfinity.cloud.domain.repository.deployer.BucketRepository;
 import org.openinfinity.cloud.domain.Instance;
 import org.openinfinity.cloud.domain.Machine;
 import org.openinfinity.cloud.domain.MachineType;
@@ -32,8 +33,10 @@ import org.openinfinity.cloud.service.administrator.InstanceService;
 import org.openinfinity.cloud.service.administrator.MachineService;
 import org.openinfinity.cloud.service.deployer.DeployerService;
 import org.openinfinity.core.annotation.Log;
+import org.openinfinity.core.util.ExceptionUtil;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 /**
@@ -57,6 +60,10 @@ public class PeriodicCloudDeployerReader implements ItemReader<DeploymentStatus>
 	
 	@Autowired 	
 	MachineService machineService;
+	
+	//@Autowired
+	//@Qualifier("jetS3Repository")
+	//private BucketRepository bucketRepository;
 	
 	private int index = 0;
 	
@@ -107,6 +114,29 @@ public class PeriodicCloudDeployerReader implements ItemReader<DeploymentStatus>
 					}
 				}
 				
+				// handle deleted clusters. remove deploymentfile from walrus and remove bucket if empty
+				if (deployment.getState()==DeployerService.DEPLOYMENT_STATE_CLUSTER_TERMINATED) {
+					// statuses for all deployments and seplouymentstatuses are already updated to terminated
+					// just add deploymentstatus for triggering cleaning of walrus in writer
+//					try {
+//						LOGGER.info("Deployment with id [" + deployment.getId() + "] with name ["+deployment.getName()+"] for the cluster ["+deployment.getClusterId()+"] CLUSTER_TERMINATED. Deleting object and bucket if empty.");					
+//						bucketRepository.deleteBucketAndObjects(String.valueOf(deployment.getClusterId()));
+//						deployment.setState(DeployerService.DEPLOYMENT_STATE_TERMINATED);
+//						deployerService.updateDeploymentState(deployment);
+//					} catch (Exception e) {
+//						LOGGER.warn("Error cleaning walrus for terminated cluster: <"+deployment.getClusterId()+"> Error: "+e);
+//						LOGGER.warn("Error cleaning walrus for terminated cluster. Stacktrace: "+ExceptionUtil.getStackTraceString(e));
+//						deployment.setState(DeployerService.DEPLOYMENT_STATE_ERROR);
+//						deployerService.updateDeploymentState(deployment);
+//					}
+					LOGGER.info("Deployment with id [" + deployment.getId() + "] with name ["+deployment.getName()+"] for the cluster ["+deployment.getClusterId()+"] CLUSTER_TERMINATED. Passing handling to writer.");					
+					DeploymentStatus terminatedStatus = new DeploymentStatus();
+					terminatedStatus.setDeployment(deployment);
+					terminatedStatus.setDeploymentState(DeploymentState.CLUSTER_TERMINATED);
+					deploymentStatuses.add(terminatedStatus); 				
+					// add terminated status for writer 
+					continue;
+				}
 				
 				// check if deployment is targeted for this instance
 				if (deployment.getInstanceId() != instance.getInstanceId()) {

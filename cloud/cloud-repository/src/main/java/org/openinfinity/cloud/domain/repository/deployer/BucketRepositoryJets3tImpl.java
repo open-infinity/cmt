@@ -20,9 +20,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.jets3t.service.Constants;
 import org.jets3t.service.S3Service;
 import org.jets3t.service.ServiceException;
+import org.jets3t.service.StorageService;
 import org.jets3t.service.impl.rest.httpclient.RestS3Service;
 import org.jets3t.service.model.S3Bucket;
 import org.jets3t.service.model.S3Object;
@@ -44,6 +46,8 @@ import org.springframework.stereotype.Repository;
  */
 @Repository("jetS3Repository")
 public class BucketRepositoryJets3tImpl implements BucketRepository {
+	private static final Logger LOGGER = Logger.getLogger(BucketRepositoryJets3tImpl.class.getName());
+	
 	private S3Service simpleStorageService;
 	
 	@Value("${eucaaccesskeyid}") 
@@ -121,20 +125,45 @@ public class BucketRepositoryJets3tImpl implements BucketRepository {
 	 */	
 	public void deleteBucketAndObjects(String bucketName) {
 		try {
+			LOGGER.debug("deleteBucketAndObjects called for bucket: <"+bucketName+">. Listing objects in bucket");
+			
 			// list and delete objects in a bucket 
+			simpleStorageService = new RestS3Service(new ProviderCredentialsImpl(accesskeyid, secretkey));		
+			
+			//int bucketStatus = simpleStorageService.checkBucketStatus(bucketName);
+			//if (bucketStatus==StorageService.BUCKET_STATUS__DOES_NOT_EXIST) {
+			//	LOGGER.warn("Trying to delete nonExisting bucket: "+bucketName);
+			//	return;
+			//}
+			
 			S3Object[] objects = simpleStorageService.listObjects(bucketName);
 			
+			
 			for (S3Object s3Object : objects) {
+				LOGGER.debug("Trying to delete object <"+s3Object.getKey()+"> from bucket <: "+bucketName+">.");				
 				simpleStorageService.deleteObject(bucketName, s3Object.getKey());
 			}
 				
 			// Now that the bucket is empty, you can delete it. If you try to delete your bucket before it is empty, it will fail.
+			LOGGER.warn("Trying to delete bucket <: "+bucketName+">.");
 			simpleStorageService.deleteBucket(bucketName);
 			//System.out.println("Deleted bucket " + testBucket.getName());		
 			
+		} catch (ServiceException se) {
+			// if first deployment cleans all objects and bucket others will be in ERRONOUS	unless response code checked.
+			// checkBucketState in jets3t is buggy, must use response code
+			if(se.getResponseCode()==404) {
+				LOGGER.info("Trying to delete nonExisting bucket: <"+bucketName+">. Just returning.");
+				return;					
+			} else {
+				LOGGER.warn("Error in deleting objects and bucket. ErrorCode: "+se.getErrorCode());				
+				LOGGER.warn("Error in deleting objects and bucket: "+se+" -- "+ExceptionUtil.getStackTraceString(se));				
+				ExceptionUtil.throwSystemException(se.getMessage(), ExceptionLevel.ERROR, BucketRepository.EXCEPTION_MESSAGE_CONNECTION_FAILURE);				
+			}
 		} catch (Exception e) {
 			// TODO: handle exception
 			e.printStackTrace();
+			LOGGER.warn("Error in deleting objects and bucket: "+e+" -- "+ExceptionUtil.getStackTraceString(e));				
 			ExceptionUtil.throwSystemException(e.getMessage(), ExceptionLevel.ERROR, BucketRepository.EXCEPTION_MESSAGE_CONNECTION_FAILURE);						
 		}			
 	}
