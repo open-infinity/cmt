@@ -69,23 +69,26 @@ public class DeployerServiceImpl implements DeployerService {
 		
 		// we need new deployment id for location? location need to be stored also
 		String location = "not_in_walrus";
-		deployment.setLocation(location);
-		// TODO - redesign this fix. set state to undeployed until location is set
-		deployment.setState(DEPLOYMENT_STATE_UNDEPLOYED);
 		//  if previous DEPLOYED deployment (target and name) exists it will be updated to UNDEPLOYED
-		// this will update deploymenstatuses and actually remove old application from target cluster machines
+		// this will update deploymenstatuses and actually remove old application from target cluster machines		
+		deployment.setLocation(location);
+		deployment.setState(DEPLOYMENT_STATE_UNDEPLOYED);
 		deploymentRepository.storeAndUpdate(deployment);
+		
+		LOGGER.debug("Deploying. Deployment with name <"+deployment.getName()+"> stored. Got Id <"+deployment.getId()+">. State is: <"+deployment.getState()+">. Storing to walrus.");
 		try {
 			location = bucketRepository.createBucket(deployment.getInputStream(), ""+deployment.getClusterId(), deployment.getName()+"-"+deployment.getId(), new HashMap<String, String>());			
+			deployment.setLocation(location);
+			deployment.setState(DEPLOYMENT_STATE_DEPLOYED);
+			LOGGER.debug("Deployment <"+deployment.getId()+"> stored. Location is now <"+deployment.getLocation()+">. State is <"+deployment.getState()+">.");
+			deploymentRepository.updateLocationAndState(deployment);
 		} catch (Exception e) {			
 			deployment.setState(DEPLOYMENT_STATE_ERROR);
+			LOGGER.error("Deployment <"+deployment.getId()+"> deploy upload to walrus failed. Location is: <"+deployment.getLocation()+">, state is: <"+deployment.getState()+">");
 			deploymentRepository.updateLocationAndState(deployment);
-			return deployment;
+			//return deployment;
 		}
-		
-		deployment.setLocation(location);
-		deployment.setState(DEPLOYMENT_STATE_DEPLOYED);
-		deploymentRepository.updateLocationAndState(deployment);
+		LOGGER.debug("Deployment <"+deployment.getId()+"> deploy finished. Location is: <"+deployment.getLocation()+">, state is: <"+deployment.getState()+">");
 		return deployment;
 				
 		//String location = bucketRepository.createBucket(deployment.getInputStream(), ""+deployment.getClusterId(), deployment.getName(), new HashMap<String, String>());
