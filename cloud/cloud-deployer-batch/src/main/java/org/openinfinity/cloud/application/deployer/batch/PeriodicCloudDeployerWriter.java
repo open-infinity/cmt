@@ -188,7 +188,7 @@ public class PeriodicCloudDeployerWriter implements ItemWriter<DeploymentStatus>
 			
 			// just update TERMINATED deploymentStatus states to db
 			if (deploymentStatus.getDeploymentState()==DeploymentState.TERMINATED) {
-				LOGGER.debug("Processing deploymentStatus with [" + deploymentStatus.getId() + "] and machineId ["+deploymentStatus.getMachineId()+"]. State TERMINATED, storing status.");				
+				LOGGER.info("Writing deploymentStatus with [" + deploymentStatus.getId() + "] and machineId ["+deploymentStatus.getMachineId()+"]. State TERMINATED, storing status.");				
 				try {
 					deployerService.storeDeploymentStatus(deploymentStatus);					
 				} catch(SystemException se) {
