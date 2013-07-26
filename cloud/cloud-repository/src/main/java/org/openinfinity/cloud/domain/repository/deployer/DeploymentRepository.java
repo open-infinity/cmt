@@ -45,7 +45,8 @@ public interface DeploymentRepository {
 	 * @param deployment Represents the deployment information.
 	 * @return Deployment Represents the created object with unique id.
 	 */
-	Deployment storeAndUpdate(Deployment deployment);
+	//Deployment storeAndUpdate(Deployment deployment);
+	void storeAndUpdate(Deployment deployment);
 
 	/**
 	 * Updates deployment <code>org.openinfinity.core.cloud.domain.Deployment</code>  location and to DEPLOYED state 
