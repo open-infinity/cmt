@@ -30,6 +30,8 @@ import org.jets3t.service.model.S3Bucket;
 import org.jets3t.service.model.S3Object;
 
 import org.openinfinity.cloud.util.credentials.ProviderCredentialsImpl;
+import org.openinfinity.core.annotation.AuditTrail;
+import org.openinfinity.core.annotation.Log;
 import org.openinfinity.core.exception.ExceptionLevel;
 import org.openinfinity.core.util.ExceptionUtil;
 import org.openinfinity.core.util.IOUtil;
@@ -69,6 +71,8 @@ public class BucketRepositoryJets3tImpl implements BucketRepository {
 	 * @param metadataMap Represents the key value based metadata to object.
 	 * @return String Represents the bucket key value of the created resource.
 	 */
+	@Log
+	@AuditTrail		
 	public String createBucket(InputStream inputStream, String bucketName, String key, Map<String, String> metadataMap) {
 		String resource = "";
 		try {
@@ -80,10 +84,12 @@ public class BucketRepositoryJets3tImpl implements BucketRepository {
 			object = simpleStorageService.putObject(bucket, object);		
 			resource = key;
 		} catch (Throwable throwable) {
+			LOGGER.error("Error in createBucket: "+throwable.getMessage());
 			ExceptionUtil.throwSystemException(throwable.getMessage(), ExceptionLevel.ERROR, BucketRepository.EXCEPTION_MESSAGE_CONNECTION_FAILURE);
 		} finally {
 			IOUtil.closeStream(inputStream);                      
 		}
+		LOGGER.debug("Object inserted to bucket <"+bucketName+"> with key <"+key+">. Returning resource: <"+resource+">." );
 		return resource;
 	}
 	
@@ -123,6 +129,8 @@ public class BucketRepositoryJets3tImpl implements BucketRepository {
 	/**
 	 * Delete all objects and bucket
 	 */	
+	@Log
+	@AuditTrail		
 	public void deleteBucketAndObjects(String bucketName) {
 		try {
 			LOGGER.debug("deleteBucketAndObjects called for bucket: <"+bucketName+">. Listing objects in bucket");
@@ -130,6 +138,7 @@ public class BucketRepositoryJets3tImpl implements BucketRepository {
 			// list and delete objects in a bucket 
 			simpleStorageService = new RestS3Service(new ProviderCredentialsImpl(accesskeyid, secretkey));		
 			
+			// current implementation of jets3t has bug in checkBucketStatus method, cannot be used
 			//int bucketStatus = simpleStorageService.checkBucketStatus(bucketName);
 			//if (bucketStatus==StorageService.BUCKET_STATUS__DOES_NOT_EXIST) {
 			//	LOGGER.warn("Trying to delete nonExisting bucket: "+bucketName);
@@ -147,7 +156,6 @@ public class BucketRepositoryJets3tImpl implements BucketRepository {
 			// Now that the bucket is empty, you can delete it. If you try to delete your bucket before it is empty, it will fail.
 			LOGGER.warn("Trying to delete bucket <: "+bucketName+">.");
 			simpleStorageService.deleteBucket(bucketName);
-			//System.out.println("Deleted bucket " + testBucket.getName());		
 			
 		} catch (ServiceException se) {
 			// if first deployment cleans all objects and bucket others will be in ERRONOUS	unless response code checked.
