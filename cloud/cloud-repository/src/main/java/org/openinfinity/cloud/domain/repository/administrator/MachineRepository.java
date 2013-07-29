@@ -18,6 +18,7 @@ package org.openinfinity.cloud.domain.repository.administrator;
 
 import java.util.List;
 
+import org.openinfinity.cloud.domain.Cluster;
 import org.openinfinity.cloud.domain.Machine;
 
 /**

@@ -140,6 +140,14 @@ public class ClusterRepositoryJdbcImpl implements ClusterRepository {
 		List<Cluster> clusters = this.jdbcTemplate.query("select * from cluster_tbl", new ClusterWrapper());
 		return clusters;
 	}
+	
+	@AuditTrail
+    public List<Integer> getClusterTypes(int instanceId) {
+        List<Integer> types = this.jdbcTemplate.query("select cluster_type from cluster_tbl where instance_id = ?", 
+                                                  new Object[] { instanceId },
+                                                  new ClusterTypeMapper());
+        return types;
+    }
 
 	@AuditTrail
 	public void updatePublished(final int id, final int pubValue) {
@@ -183,5 +191,11 @@ public class ClusterRepositoryJdbcImpl implements ClusterRepository {
 			return cluster;
 		}
 	}
+	
+	private static final class ClusterTypeMapper implements RowMapper<Integer> {
+        public Integer mapRow(ResultSet rs, int rowNumber) throws SQLException {
+            return rs.getInt("cluster_type");
+        }
+    }
 	
 }

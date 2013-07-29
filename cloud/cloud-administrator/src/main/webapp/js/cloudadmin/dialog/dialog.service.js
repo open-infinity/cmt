@@ -52,15 +52,23 @@
 				buttons: {
 					"Create cluster": function() {
 						var outData = {};	
-						prepareRequestParameters(outData, dc);						
-						$.ajax({
+						prepareRequestParameters(outData, dc);					
+						
+						var request = $.ajax({
 							type: 'POST',
 							url: portletURL.url.service.newServiceURL + "&id=" + dc.instanceId,
 							data: outData,
 							dataType: 'json'
 						});
-						dc.accordion.accordion("option", "active", false);
-						$(this).dialog("close");
+						
+						request.fail(function(jqXHR, textStatus) {
+							  alert( "Unable to add service. Cluster type already exists for the instance.");
+							});
+						
+						request.success(function(jqXHR, textStatus) {
+							dc.accordion.accordion("option", "active", false);
+							$(this).dialog("close");							
+						});
 
 					},
 					"Cancel": function() {

@@ -323,11 +323,11 @@ public class CloudAdminController {
             
             Instance i = instanceService.getInstance(Integer.parseInt(pm.get("instanceid"))); 
             jobService.addJob(parseNewServiceRequestParams(
-                new Job("add_service", i.getInstanceId(), i.getCloudType(), JobService.CLOUD_JOB_CREATED, pm.get("zone")),
-                pm));
+                                 new Job("add_service", i.getInstanceId(), i.getCloudType(), JobService.CLOUD_JOB_CREATED),
+                                 pm));
             
         } catch (Exception e) {
-            LOG.error("Error setting up the instance: " + e.getMessage(), e);
+            LOG.error("Error adding new service: " + e.getMessage(), e);
             response.setProperty(ResourceResponse.HTTP_STATUS_CODE, "421");
             try {
                 response.getWriter().write(e.getMessage());
@@ -369,7 +369,7 @@ public class CloudAdminController {
             instanceService.addInstance(i);
 
 			jobService.addJob(parseNewServiceRequestParams(
-			    new Job("create_instance", i.getInstanceId(), i.getCloudType(), JobService.CLOUD_JOB_CREATED, pm.get("zone")),
+			    new Job("create_instance", i.getInstanceId(), i.getCloudType(), JobService.CLOUD_JOB_CREATED),
 			    pm));
         
 		} catch (Exception e) {
@@ -426,56 +426,109 @@ public class CloudAdminController {
 	
 	// Helper functions
 	
-	private Job parseNewServiceRequestParams(Job job, Map<String, String> pm){
-	
-        // TODO: USe Json for making better structure of data.
-        // There are properties repeating for each machine.
-
+	private void checkIfClusterTypeCreated(Collection<Integer> clusterTypes, int type) throws AdminException{
+	    if (clusterTypes.contains(new Integer(type))){
+	        throw new AdminException("Cluster type already created for the instance"); 
+	    }
+	}
+	  
+    // TODO: USe Json for making better structure of data.
+    // There are properties repeating for each machine.          
+	private Job parseNewServiceRequestParams(Job job, Map<String, String> pm) throws AdminException{
+	    	    
+	    Collection<Integer> instanceClusterTypes = clusterService.getClusterTypes(job.getInstanceId());
+        boolean withEcmService = "true".equals(pm.get("ecm"));
+        boolean withIgService = "true".equals(pm.get("ig"));
+        
+        job.setZone(pm.get("zone"));
+            
         if ("true".equals(pm.get("bigdata"))) {
+            checkIfClusterTypeCreated(instanceClusterTypes, ClusterService.CLUSTER_TYPE_BIGDATA);
             job.addService(ClusterService.SERVICE_NAME[ClusterService.CLUSTER_TYPE_BIGDATA],
-                pm.get("bigdataclustersize"),
-                pm.get("bigdatamachinesize"),
-                pm.get("bigdataimagetype"),
-                pm.get("bigdataesbvolumesize"));
+                           pm.get("bigdataclustersize"),
+                           pm.get("bigdatamachinesize"),
+                           pm.get("bigdataimagetype"),
+                           pm.get("bigdataesbvolumesize"));
             job.setExtraData("replicationSize: " + pm.get("bigdatareplclustersize"));
+            
         }
         if ("true".equals(pm.get("nosql"))) {
-            job.addService(ClusterService.SERVICE_NAME[ClusterService.CLUSTER_TYPE_NOSQL], pm.get("nosqlclustersize"), pm.get("nosqlmachinesize"),
-                pm.get("nosqlimagetype"), pm.get("nosqlesbvolumesize"));
+            checkIfClusterTypeCreated(instanceClusterTypes, ClusterService.CLUSTER_TYPE_NOSQL);
+            job.addService(ClusterService.SERVICE_NAME[ClusterService.CLUSTER_TYPE_NOSQL], 
+                           pm.get("nosqlclustersize"), 
+                           pm.get("nosqlmachinesize"),
+                           pm.get("nosqlimagetype"),
+                           pm.get("nosqlesbvolumesize"));
             job.setExtraData("replicationSize: " + pm.get("nosqlreplclustersize"));
         }
         
         if ("true".equals(pm.get("rdbms"))) {
-            job.addService(ClusterService.SERVICE_NAME[ClusterService.CLUSTER_TYPE_DATABASE], pm.get("rdbmsclustersize"), pm.get("rdbmsmachinesize"),
-                pm.get("rdbmsimagetype"), pm.get("rdbmsesbvolumesize"));
+            checkIfClusterTypeCreated(instanceClusterTypes, ClusterService.CLUSTER_TYPE_DATABASE);
+            job.addService(ClusterService.SERVICE_NAME[ClusterService.CLUSTER_TYPE_DATABASE],
+                           pm.get("rdbmsclustersize"),
+                           pm.get("rdbmsmachinesize"),
+                           pm.get("rdbmsimagetype"),
+                           pm.get("rdbmsesbvolumesize"));
         }
-
-        boolean withEcmService = "true".equals(pm.get("ecm"));
-        boolean withIgService = "true".equals(pm.get("ig"));
         
         if ("true".equals(pm.get("portal"))) {
-            job.addService(ClusterService.SERVICE_NAME[ClusterService.CLUSTER_TYPE_PORTAL], pm.get("portalclustersize"), pm.get("portalmachinesize"),
-                pm.get("portalimagetype"), pm.get("portalesbvolumesize"));
-            if (withIgService && !withEcmService) job.setExtraData(JobService.EXTRA_DATA_PORTAL_IG);
-            else if (withEcmService && withIgService) job.setExtraData(JobService.EXTRA_DATA_PORTAL_IG_ECM);
-            else job.setExtraData(JobService.EXTRA_DATA_PORTAL);
+            checkIfClusterTypeCreated(instanceClusterTypes, ClusterService.CLUSTER_TYPE_PORTAL);
+            job.addService(ClusterService.SERVICE_NAME[ClusterService.CLUSTER_TYPE_PORTAL], 
+                           pm.get("portalclustersize"),
+                           pm.get("portalmachinesize"),
+                           pm.get("portalimagetype"),
+                           pm.get("portalesbvolumesize"));
+            if (withIgService && !withEcmService){
+                checkIfClusterTypeCreated(instanceClusterTypes, ClusterService.CLUSTER_TYPE_IDENTITY_GATEWAY);
+                job.setExtraData(JobService.EXTRA_DATA_PORTAL_IG);
+            }
+            else if (withEcmService && withIgService){
+                checkIfClusterTypeCreated(instanceClusterTypes, ClusterService.CLUSTER_TYPE_ECM);
+                job.setExtraData(JobService.EXTRA_DATA_PORTAL_IG_ECM);
+            }
+            else job.setExtraData(JobService.EXTRA_DATA_PORTAL);       
         }
         
-        if ("true".equals(pm.get("mq"))) job.addService(ClusterService.SERVICE_NAME[ClusterService.CLUSTER_TYPE_MULE_MQ], pm.get("mqclustersize"), pm.get("mqmachinesize"),
-                pm.get("mqimagetype"), pm.get("mqesbvolumesize"));
+        if ("true".equals(pm.get("mq")))
+            checkIfClusterTypeCreated(instanceClusterTypes, ClusterService.CLUSTER_TYPE_MULE_MQ);
+            job.addService(ClusterService.SERVICE_NAME[ClusterService.CLUSTER_TYPE_MULE_MQ],
+                           pm.get("mqclustersize"),
+                           pm.get("mqmachinesize"),
+                           pm.get("mqimagetype"),
+                           pm.get("mqesbvolumesize"));
         
-        if("true".equals(pm.get("bas"))) job.addService(ClusterService.SERVICE_NAME[ClusterService.CLUSTER_TYPE_BAS], pm.get("basclustersize"), pm.get("basmachinesize"),
-                pm.get("basimagetype"), pm.get("basesbvolumesize"));
+        if("true".equals(pm.get("bas"))) 
+            checkIfClusterTypeCreated(instanceClusterTypes, ClusterService.CLUSTER_TYPE_BAS);
+            job.addService(ClusterService.SERVICE_NAME[ClusterService.CLUSTER_TYPE_BAS],
+                           pm.get("basclustersize"),
+                           pm.get("basmachinesize"),
+                           pm.get("basimagetype"),
+                           pm.get("basesbvolumesize"));
         
-        if(withIgService) job.addService(ClusterService.SERVICE_NAME[ClusterService.CLUSTER_TYPE_IDENTITY_GATEWAY], pm.get("igclustersize"), pm.get("igmachinesize"),
-                pm.get("igimagetype"), pm.get("igesbvolumesize"));
+        if(withIgService)
+            checkIfClusterTypeCreated(instanceClusterTypes, ClusterService.CLUSTER_TYPE_IDENTITY_GATEWAY);
+            job.addService(ClusterService.SERVICE_NAME[ClusterService.CLUSTER_TYPE_IDENTITY_GATEWAY], 
+                           pm.get("igclustersize"),
+                           pm.get("igmachinesize"),
+                           pm.get("igimagetype"),
+                           pm.get("igesbvolumesize"));
         
-        if("true".equals(pm.get("ee"))) job.addService(ClusterService.SERVICE_NAME[ClusterService.CLUSTER_TYPE_EE], pm.get("eeclustersize"), pm.get("eemachinesize"),
-                pm.get("eeimagetype"), pm.get("eeesbvolumesize"));
+        if("true".equals(pm.get("ee"))) 
+            checkIfClusterTypeCreated(instanceClusterTypes, ClusterService.CLUSTER_TYPE_EE);
+            job.addService(ClusterService.SERVICE_NAME[ClusterService.CLUSTER_TYPE_EE],
+                           pm.get("eeclustersize"), 
+                           pm.get("eemachinesize"),
+                           pm.get("eeimagetype"),
+                           pm.get("eeesbvolumesize"));
         
-        if(withEcmService) job.addService(ClusterService.SERVICE_NAME[ClusterService.CLUSTER_TYPE_ECM], pm.get("ecmclustersize"), pm.get("ecmmachinesize"),
-                pm.get("ecmimagetype"), pm.get("ecmesbvolumesize"));
-        
+        if(withEcmService) 
+            checkIfClusterTypeCreated(instanceClusterTypes, ClusterService.CLUSTER_TYPE_ECM);
+            job.addService(ClusterService.SERVICE_NAME[ClusterService.CLUSTER_TYPE_ECM], 
+                           pm.get("ecmclustersize"), 
+                           pm.get("ecmmachinesize"),
+                           pm.get("ecmimagetype"),
+                           pm.get("ecmesbvolumesize"));
+
         return job;
     }
 }

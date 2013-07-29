@@ -46,13 +46,11 @@ class ClusterTypeRepositoryJdbcImpl implements ClusterTypeRepository{
 	RowMapper<ClusterType> clusterTypeRowMapper;
 	
 	private NamedParameterJdbcTemplate jdbcTemplate;
-	private DataSource dataSource;
 	
 	@Autowired
 	public ClusterTypeRepositoryJdbcImpl(@Qualifier("cloudDataSource") DataSource ds) {
 		Assert.notNull(ds, "Please define datasource for machine repository.");
 		this.jdbcTemplate = new NamedParameterJdbcTemplate(ds);
-		this.dataSource = ds;
 	}
 		
 	@AuditTrail

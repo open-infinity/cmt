@@ -126,4 +126,9 @@ public class ClusterServiceImpl implements ClusterService {
 		return clusterRepository.getCluster(id);
 	}
 	
+	@Log
+    public Collection<Integer> getClusterTypes(int instanceId){
+	    return clusterRepository.getClusterTypes(instanceId);
+	}
+	
 }
