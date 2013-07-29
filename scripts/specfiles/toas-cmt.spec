@@ -1,5 +1,5 @@
 %define name	toas_cmt
-%define version 1.2.0.RELEASE
+%define version 1.2.1
 %define release 20
 
 Name:		%{name}

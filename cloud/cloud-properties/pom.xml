@@ -3,12 +3,16 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+	<parent>
+		<artifactId>cloud</artifactId>
+		<groupId>org.openinfinity</groupId>
+		<version>${project.global.version}</version>
+	   	<relativePath>..</relativePath>    	
+	</parent>
+
     <groupId>org.openinfinity</groupId>
     <artifactId>cloud-properties</artifactId>
-    <version>1.2.0.RELEASE</version>
-
     <name>cloud-properties</name>
-
     <packaging>war</packaging>
 
     <properties>
@@ -142,20 +146,20 @@
         <dependency>
             <groupId>org.openinfinity</groupId>
             <artifactId>open-infinity-core</artifactId>
-            <version>1.1.0-RELEASE</version>
+            <version>${open-infinity-core.version}</version>
         </dependency>
      -->
 
         <dependency>
 			<groupId>org.openinfinity</groupId>
 			<artifactId>cloud-service</artifactId>
-			<version>1.2.0.RELEASE</version>
+			<version>${project.parent.version}</version>
         </dependency>
 
         <dependency>
 			<groupId>org.openinfinity</groupId>
 			<artifactId>cloud-domain</artifactId>
-			<version>1.2.0.RELEASE</version>
+			<version>${project.parent.version}</version>
         </dependency>
 
         <!-- Logging third-party libraries-->

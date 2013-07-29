@@ -5,7 +5,6 @@
 
     <groupId>org.openinfinity</groupId>
     <artifactId>cloud-connectionpool-manager</artifactId>
-    <version>1.2.0.RELEASE</version>
 
     <name>cloud-connectionpool-manager</name>
 
@@ -14,7 +13,9 @@
 	<parent>
 		<artifactId>cloud</artifactId>
 		<groupId>org.openinfinity</groupId>
-		<version>1.2.0.RELEASE</version>
+	    <version>1.2.1</version>    		
+<!-- 	    <version>${project.global.version}</version>    		 -->
+<!--    		<relativePath>..</relativePath>     -->
 	</parent>
 
     <properties>
@@ -77,12 +78,12 @@
 	  	<dependency>
 			<groupId>org.openinfinity</groupId>
 			<artifactId>cloud-service</artifactId>
-			<version>1.2.0.RELEASE</version>
+			<version>${project.parent.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.openinfinity</groupId>
 			<artifactId>open-infinity-core</artifactId>
-			<version>1.1.0.RELEASE</version>
+			<version>${open-infinity-core.version}</version>
 		</dependency>
 
         <!-- Logging third-party libraries-->
