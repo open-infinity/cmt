@@ -194,7 +194,7 @@ function disableGrandpaElements(grandpa){
 	grandpa.find(".toggleEbsRow :radio").attr("disabled", true).button("refresh");
 }
 
-function prepareRequestParameters(outData, o){
+function prepareRequestParameters(outData, dc){
 	var clusters = cloudadmin.resource.clusterTypes;
 	for(var i = 0; i < clusters.length; i++){
 		outData[clusters[i].name]				  	= "false";
@@ -203,27 +203,27 @@ function prepareRequestParameters(outData, o){
 		outData[clusters[i].name + "esb"] 		  	= "false";
 		outData[clusters[i].name + "volumesize"]  	= 0;
 	}
-	outData["instanceid"] = o.instanceId;
+	outData["instanceid"] = dc.instanceId;
 	for(var i = 0; i < clusters.length; i++){
-		if($('#' + o.idPrefix + "togglePlatformRadioOn_" + clusters[i].name).attr('checked')){
+		if($('#' + dc.idPrefix + "togglePlatformRadioOn_" + clusters[i].name).attr('checked')){
 			outData[clusters[i].name] = "true";
 			outData[clusters[i].name + "clustersize"] = 
-				$('#' + o.idPrefix + clusters[i].name + ' .clusterSizeRow .jq_slider').parent().next().text();
-			outData[clusters[i].name + "machinesize"] = machineSize(o.idPrefix, clusters[i].name, 1);
+				$('#' + dc.idPrefix + clusters[i].name + ' .clusterSizeRow .jq_slider').parent().next().text();
+			outData[clusters[i].name + "machinesize"] = machineSize(dc.idPrefix, clusters[i].name, 1);
 			
 			if (clusters[i].replicated == true){
-				outData[clusters[i].name + "replclustersize"] = $('#' + o.idPrefix + clusters[i].name + 
+				outData[clusters[i].name + "replclustersize"] = $('#' + dc.idPrefix + clusters[i].name + 
 					' .replicationClusterSizeRow .jq_slider').parent().next().text();
-				outData[clusters[i].name + "replmachinesize"] = machineSize(o.idPrefix, clusters[i].name, 2);
+				outData[clusters[i].name + "replmachinesize"] = machineSize(dc.idPrefix, clusters[i].name, 2);
 			}
-			if($('#' + o.idPrefix + "imageTypeEphemeral_" + clusters[i].name).attr('checked')){
+			if($('#' + dc.idPrefix + "imageTypeEphemeral_" + clusters[i].name).attr('checked')){
 				outData[clusters[i].name + "imagetype"] = "0";
 			}
 			else
 				outData[clusters[i].name + "imagetype"] = "1";
-			if($('#' + o.idPrefix + "toggleEbsRadioOn_" + clusters[i].name).attr('checked')){
+			if($('#' + dc.idPrefix + "toggleEbsRadioOn_" + clusters[i].name).attr('checked')){
 				outData[clusters[i].name + "esbvolumesize"] = 
-					$('#' + o.idPrefix + clusters[i].name + ' .ebsSizeRow .jq_slider').parent().next().text();
+					$('#' + dc.idPrefix + clusters[i].name + ' .ebsSizeRow .jq_slider').parent().next().text();
 			}
 		}
 	}

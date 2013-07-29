@@ -17,6 +17,7 @@
 package org.openinfinity.cloud.domain.repository.administrator;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.openinfinity.cloud.domain.Cluster;
 
@@ -47,5 +48,7 @@ public interface ClusterRepository {
 	void updatePublished(int id, int pubValue);
 	
 	Cluster getClusterByLoadBalancerId(int loadBalancerId);
+	
+	Collection<Integer> getClusterTypes(int instanceId);
 	
 }

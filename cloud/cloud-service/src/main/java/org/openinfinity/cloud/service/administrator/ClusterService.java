@@ -17,6 +17,7 @@
 package org.openinfinity.cloud.service.administrator;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.openinfinity.cloud.domain.Cluster;
 import org.openinfinity.cloud.domain.Machine;
@@ -90,5 +91,7 @@ public interface ClusterService {
 	Cluster getClusterByLoadBalancerId(int id);
 	
 	Cluster getClusterByClusterId(int id);
+	
+    Collection<Integer> getClusterTypes(int instanceId);
 	
 }
