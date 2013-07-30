@@ -33,22 +33,28 @@
 		// This function is called at dialog creation. It creates and initializes all the html and css elements 
 		// and defines event handling
 		initInstanceCreationDialog: function() {
+			var o = new Object();
+			o.dialog = $("#addInstanceDialog");
+			o.accordion = $("#cloudTypesSelectionAccordion");
+			o.dialog.dialog({		
+				autoOpen : false,
+				height : 745,
+				width : 710,
+				modal : true,
+				buttons : cloudadmin.dialog.instanceAddButtons
+			});	
+			
+			// Initialize accordion once the data from db arrives
 			$.when(
 				$.ajax({dataType: "json", url: portletURL.url.instance.getCloudProvidersURL}),
 				$.ajax({dataType: "json", url: portletURL.url.instance.getClusterTypesURL}),
 				$.ajax({dataType: "json", url: portletURL.url.instance.getMachineTypesURL}))
 				.done(function(resultCloudProviders, resultClusterTypes, resultMachineTypes) {
-					
-					
-					// Initialize widgets 
-					
+											
 					var cloudProviders = cloudadmin.resource.cloudProviders = resultCloudProviders[0];
 					var clusters = cloudadmin.resource.clusterTypes = resultClusterTypes[0];
 					var machineTypes = cloudadmin.resource.machineTypes = resultMachineTypes[0];
-					var o = new Object();
-					o.dialog = $("#addInstanceDialog");
-					o.accordion = $("#cloudTypesSelectionAccordion");
-					
+						
 					var cloudSelect = o.dialog.find("#cloudSelect");
 					$.each(cloudProviders, function(index, provider) {
 						cloudSelect.append("<option value='" + provider.id + "'>" + provider.name + "</option>");
@@ -62,13 +68,7 @@
 					    $("#addInstanceDialog .valueDisplayButtonSet").text(cloudadmin.resource.machineTypes[0].specification);
 	
 					o.accordion.accordion({collapsible: true, autoHeight:false, heightStyle: "content", active:false});
-					o.dialog.dialog({		
-						autoOpen : false,
-						height : 745,
-						width : 710,
-						modal : true,
-						buttons : cloudadmin.dialog.instanceAddButtons
-					});	
+					
 					
 					// Makes elements of accordion dimmed - unselected by default
 					dimElements();		
@@ -254,7 +254,8 @@
 		// from "create new instance" button.
 		// The function clears resets all dialog element values and styles to defaults,
 		// and finally opens the dialog
-		createNewInstance: function() {				
+		createNewInstance: function() {
+			
 			$("#instanceName").val('');
 			var clusters = cloudadmin.resource.clusterTypes;
 			for(var i = 0; i < clusters.length; i++){
