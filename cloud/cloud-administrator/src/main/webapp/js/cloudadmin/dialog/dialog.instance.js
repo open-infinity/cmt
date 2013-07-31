@@ -33,7 +33,6 @@
 		// This function is called at dialog creation. It creates and initializes all the html and css elements 
 		// and defines event handling
 		initInstanceCreationDialog: function() {
-			// dc is a dialog container -> useful objects are stored here
 			var dc = new Object();
 			dc.idPrefix = '';
 			dc.dialog = $("#addInstanceDialog");
@@ -57,12 +56,13 @@
 					var clusterTypes = cloudadmin.resource.clusterTypes = resultClusterTypes[0];
 					var machineTypes = cloudadmin.resource.machineTypes = resultMachineTypes[0];
 						
-					createPlatformSelectAccordion(o, clusterTypes, machineTypes, dc.idPrefix);
-
 					var cloudSelect = dc.dialog.find("#cloudSelect");
 					$.each(cloudProviders, function(index, provider) {
 						cloudSelect.append("<option value='" + provider.id + "'>" + provider.name + "</option>");
-					});												
+					});			
+
+					createPlatformSelectAccordion(dc, clusterTypes, machineTypes, dc.idPrefix);
+									
 					cloudSelect.change(function() {
 						var cloudId = $('#cloudSelect option:selected').val();
 						if (!cloudId) { 
@@ -84,10 +84,12 @@
 			});
 		},
 		
-
+		// This function is called when dialog is already created. It is called from instances page, 
+		// from "create new instance" button.
 		// The function clears resets all dialog element values and styles to defaults,
 		// and finally opens the dialog
-		createNewInstance: function() {		
+		createNewInstance: function() {
+			
 			$("#instanceName").val('');
 			var clusters = cloudadmin.resource.clusterTypes;
 			for(var i = 0; i < clusters.length; i++){
@@ -230,5 +232,5 @@
 		}
 		else return true;
 	}
-	
+		
 })(jQuery);

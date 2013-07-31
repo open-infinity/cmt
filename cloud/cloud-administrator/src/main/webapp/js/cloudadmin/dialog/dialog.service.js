@@ -26,11 +26,7 @@
 	var cloudadmin = window.cloudadmin || {};
 	
 	$.extend(cloudadmin.dialog, {
-		initAddServiceDialog: function () {		
-			var clusterTypes = cloudadmin.resource.clusterTypes;
-			var machineTypes = cloudadmin.resource.machineTypes;
-			
-			// dc is a dialog container -> useful objects used in the dialog are stored here 
+		initAddServiceDialog: function () {
 			var dc = new Object();	
 			dc.dialog = $("#addServicesDialog");
 			dc.accordion = $("#addServicesAccordion");	
@@ -70,8 +66,7 @@
 					}
 				}
 			});
-			
-			createPlatformSelectAccordion(dc, clusterTypes, machineTypes, dc.idPrefix);			
+			createPlatformSelectAccordion(dc, cloudadmin.resource.clusterTypes, cloudadmin.resource.machineTypes, dc.idPrefix);
 			cloudadmin.dialog.addServiceDialog = dc;	
 		},
 		
@@ -120,7 +115,8 @@
 
             dimAccordionElements(dc.accordion);
             dc.dialog.dialog("open");
-		}	
+		}
+	
 	});
 
 })(jQuery);
