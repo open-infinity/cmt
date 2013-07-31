@@ -18,7 +18,28 @@
  * @since 1.2.1
  */
 
+// TODO: Make a truly stand-alone widget for this
+
 // Creation 
+
+function createPlatformSelectAccordion(element, clusterTypes, machineTypes, identificationPrefix){
+	populateAccordion(element, clusterTypes, machineTypes, identificationPrefix);
+	element.accordion.accordion({collapsible: true, autoHeight:false, heightStyle: "content", active:false});
+	
+	// Events 
+	
+	element.accordion.find(".togglePlatformSelectionRow :radio").change(function(e){
+		handlePlatformSelectionChange($(this), identificationPrefix);
+	});	
+	
+	element.accordion.find(".toggleEbsRow :radio").change(function(e) {
+		handleEbsSelectionChange($(this));
+	});
+
+	element.accordion.find(".machineSizeRow :radio").change(function(e) {
+		handleMachineSizeChange($(this));
+	});	 	
+}
 
 function populateAccordion(element, clusterTypes, machineTypes, identificationPrefix){
 	for(var i = 0; i < clusterTypes.length; i++){
@@ -63,7 +84,8 @@ function populateAccordion(element, clusterTypes, machineTypes, identificationPr
         
 		body.data('clusterConfiguration', cloudadmin.resource.clusterTypes[i]);
 		element.accordion.append(header);
-		element.accordion.append(body);		
+		element.accordion.append(body);
+		dimAccordionElements(element.accordion);
 	} 
 }
 

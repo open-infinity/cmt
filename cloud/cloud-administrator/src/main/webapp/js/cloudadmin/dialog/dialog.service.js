@@ -26,23 +26,16 @@
 	var cloudadmin = window.cloudadmin || {};
 	
 	$.extend(cloudadmin.dialog, {
-		initAddServiceDialog: function () {
-			
-			// Creation
-			
+		initAddServiceDialog: function () {		
 			var clusterTypes = cloudadmin.resource.clusterTypes;
 			var machineTypes = cloudadmin.resource.machineTypes;
 			
-			// Initialize dialog container
-			var dc = new Object();
-			
+			// dc is a dialog container -> useful objects used in the dialog are stored here 
+			var dc = new Object();	
 			dc.dialog = $("#addServicesDialog");
 			dc.accordion = $("#addServicesAccordion");	
 			dc.idPrefix = 'sa_';
 			dc.instanceId = 0;
-			
-			populateAccordion(dc, clusterTypes, machineTypes, dc.idPrefix);
-			dc.accordion.accordion({collapsible: true, autoHeight:false, heightStyle: "content", active:false});
 			dc.dialog.dialog({
 				autoOpen: false,
 				resizable: true,
@@ -77,22 +70,9 @@
 					}
 				}
 			});
-			dimAccordionElements(dc.accordion);
-			cloudadmin.dialog.addServiceDialog = dc;
-
-			// Events 
-					
-			dc.dialog.find(".togglePlatformSelectionRow :radio").change(function(e){
-				handlePlatformSelectionChange($(this), dc.idPrefix);
-			});	
 			
-			dc.dialog.find(".toggleEbsRow :radio").change(function(e) {
-				handleEbsSelectionChange($(this));
-			});
-
-			dc.dialog.find(".machineSizeRow :radio").change(function(e) {
-				handleMachineSizeChange($(this));
-			});	 		
+			createPlatformSelectAccordion(dc, clusterTypes, machineTypes, dc.idPrefix);			
+			cloudadmin.dialog.addServiceDialog = dc;	
 		},
 		
 		addNewService: function(dc) {	
@@ -140,8 +120,7 @@
 
             dimAccordionElements(dc.accordion);
             dc.dialog.dialog("open");
-		}
-	
+		}	
 	});
 
 })(jQuery);
