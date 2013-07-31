@@ -463,12 +463,21 @@ public class CloudAdminController {
         }
         
         if ("true".equals(pm.get("rdbms"))) {
-            checkIfClusterTypeCreated(instanceClusterTypes, ClusterService.CLUSTER_TYPE_DATABASE);
-            job.addService(ClusterService.SERVICE_NAME[ClusterService.CLUSTER_TYPE_DATABASE],
-                           pm.get("rdbmsclustersize"),
-                           pm.get("rdbmsmachinesize"),
-                           pm.get("rdbmsimagetype"),
-                           pm.get("rdbmsesbvolumesize"));
+            boolean dbExists = instanceClusterTypes.contains(new Integer(ClusterService.CLUSTER_TYPE_DATABASE));
+            boolean portalExists = instanceClusterTypes.contains(new Integer(ClusterService.CLUSTER_TYPE_PORTAL));
+            boolean mqExists = instanceClusterTypes.contains(new Integer(ClusterService.CLUSTER_TYPE_MULE_MQ));
+            boolean createDb = false;
+            
+            if (!dbExists){
+                job.addService(ClusterService.SERVICE_NAME[ClusterService.CLUSTER_TYPE_DATABASE],
+                        pm.get("rdbmsclustersize"),
+                        pm.get("rdbmsmachinesize"),
+                        pm.get("rdbmsimagetype"),
+                        pm.get("rdbmsesbvolumesize"));
+            }
+            else if(!( ("true".equals(pm.get("portal")) && mqExists) || ("true".equals(pm.get("mq")) && portalExists))) {
+                throw new AdminException("DB already created for the instance"); 
+            }          
         }
         
         if ("true".equals(pm.get("portal"))){
