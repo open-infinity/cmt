@@ -33,7 +33,7 @@ public class ApplicationContextProvider implements ApplicationContextAware {
     private static void setContext(ApplicationContext context) {
         ApplicationContextProvider.context = context;
     }
-    
+
     /**
      * Returns application context.
      * @return ApplicationContext

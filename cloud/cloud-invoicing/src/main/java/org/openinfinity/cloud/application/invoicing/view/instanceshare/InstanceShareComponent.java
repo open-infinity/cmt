@@ -1,22 +1,28 @@
 package org.openinfinity.cloud.application.invoicing.view.instanceshare;
 
 import java.util.Collection;
-import java.util.Date;
+import java.util.Collections;
 
 import org.openinfinity.cloud.application.invoicing.view.InvoiceShareViewImpl;
 import org.openinfinity.cloud.domain.InstanceShare;
 import org.openinfinity.cloud.domain.InstanceShareDetail;
 
 import com.vaadin.data.Item;
+import com.vaadin.data.fieldgroup.FieldGroup;
+import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
+import com.vaadin.data.util.BeanItem;
+import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
+import com.vaadin.ui.DateField;
+import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.Table;
-import com.vaadin.ui.Table.ColumnGenerator;
+import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 
 public class InstanceShareComponent extends CustomComponent{
@@ -27,186 +33,331 @@ public class InstanceShareComponent extends CustomComponent{
 
     /* User interface components are stored in session. */
     private Table sharesTable;
-    private Table shareDetailsTable;	
+    private FieldGroup instanceShareFieldGroup=new FieldGroup();
+    private FieldGroup instanceShareDetailFieldGroup=new FieldGroup();
 
-    public void setInstanceShareDetails(Collection<InstanceShareDetail> details){
+    private Table shareDetailsTable;
+
+    private long newShareDetailId=-1;
+    private long newShareId=-1;
+
+    private GridLayout shareForm;
+    private GridLayout shareDetailForm;
+
+    private HorizontalLayout instanceShareFormControls;
+    private HorizontalLayout instanceShareDetailFormControls;
+
+    private HorizontalLayout instanceShareTableControls;
+    private HorizontalLayout instanceShareDetailTableControls;
+
+    private Button saveInstanceShareBtn;
+
+
+    public Table getSharesTable() {
+        return sharesTable;
+    }
+
+    public Table getShareDetailsTable() {
+        return shareDetailsTable;
+    }
+
+
+    public void setInstanceShareDetails(InstanceShare item){
         shareDetailsTable.removeAllItems();
 
+        Collection<InstanceShareDetail> details= (item==null ? Collections.<InstanceShareDetail>emptyList() : item.getInstanceShareDetails() );
+
+        BeanItemContainer<InstanceShareDetailBean> beans=new BeanItemContainer<InstanceShareDetailBean>(InstanceShareDetailBean.class);
+
         for (InstanceShareDetail detail:details){
-            shareDetailsTable.addItem(new Object[]{detail.getOrderNumber(),detail.getCostPool(),detail.getSharePercent(), detail.getDescription()},detail.getId());
+            beans.addBean(new InstanceShareDetailBean(detail));
         }
-        
-        //add empty item
-        if (details.size()==0)
-            shareDetailsTable.addItem();
+
+        shareDetailsTable.setContainerDataSource(beans);
+        shareDetailsTable.setColumnHeader("orderNumber", "Order No");
+        shareDetailsTable.setColumnHeader("costPool", "Cost Pool");
+        shareDetailsTable.setColumnHeader("description", "Description");
+        shareDetailsTable.setColumnHeader("sharePercent", "Share %");
+        shareDetailsTable.setVisibleColumns(new Object[]{"orderNumber","costPool","sharePercent","description"});
+
+        if (item!=null && item.getInstanceShareInvoices()!=null && item.getInstanceShareInvoices().size()>0){
+            setControlsEnabled(new Component[]{deleteInstanceShareBtn, saveInstanceShareBtn,addInstanceShareDetailBtn, deleteInstanceShareDetailBtn,saveInstanceShareDetailBtn},false);
+        }else{
+            setControlsEnabled(new Component[]{deleteInstanceShareBtn, saveInstanceShareBtn,addInstanceShareDetailBtn, deleteInstanceShareDetailBtn,saveInstanceShareDetailBtn},true);
+        }
+
+    }   
+
+    private void setControlsEnabled(Component[] objects, boolean enabled) {
+        // TODO Auto-generated method stub
+        for (int i=0;i<objects.length;i++){
+            objects[i].setEnabled(enabled);
+        }
+
     }
 
     public void setInstanceShares(Collection<InstanceShare> instanceShares) {
-        // first clean up and then insert all rows from collection
+
         sharesTable.removeAllItems();
 
-        for (InstanceShare share:instanceShares){
-            sharesTable.addItem(new Object[]{share.getPeriodStart()},share.getId().intValue());
+        BeanItemContainer<InstanceShareBean> beans=new BeanItemContainer<InstanceShareBean>(InstanceShareBean.class);
+        for (InstanceShare item:instanceShares){
+            beans.addBean(new InstanceShareBean(item));
         }
-        
-        if (instanceShares.size()==0)
-            sharesTable.addItem();
 
-        sharesTable.setPageLength(8);
+        sharesTable.setContainerDataSource(beans);
+
+    }
 
 
-        // Create a Collection container using id property as the key
-        /*instanceShareContainer = new BeanItemContainer<InstanceShareBean>(InstanceShareBean.class);
-        instanceShareContainer.addAll(instanceShareBeans);*/
-        /*
-        if (instanceShareContainer.size() == 0) {
-            sharesList.setVisible(false);
-        }
-        else {
-            sharesList.setVisible(true);
-            sharesList.setContainerDataSource(instanceShareContainer);
-            sharesList.setVisibleColumns(new String[] { "periodStart" });
-            sharesList.setColumnHeaderMode(ColumnHeaderMode.HIDDEN);
-            sharesList.setSelectable(true);
-            sharesList.setImmediate(true);
+    public Item getInstanceShareItemDataSource() {
+        return instanceShareFieldGroup.getItemDataSource();
+    }
 
-            sharesList.addValueChangeListener(new Property.ValueChangeListener() {
-                public void valueChange(ValueChangeEvent event) {
-                    Object id = sharesList.getValue();
+    public Item getInstanceShareDetailItemDataSource() {
+        return instanceShareDetailFieldGroup.getItemDataSource();
+    }
+
+    public Button getSaveInstanceShareBtn() {
+        return saveInstanceShareBtn;
+    }
+
+    private Button deleteInstanceShareBtn;
+    public Button getDeleteInstanceShareBtn() {
+        return deleteInstanceShareBtn;
+    }
+
+    private Button saveInstanceShareDetailBtn;
+
+    private DateField periodStart;
+
+    private TextField orderNo;
+
+    private Button deleteInstanceShareDetailBtn;
+
+    private Button addInstanceShareDetailBtn;
+
+
+    private Component buildInstanceShareForm(){
+        shareForm=new GridLayout(2,3);
+        shareForm.setSpacing(true);
+        periodStart=new DateField("Start of period:");
+
+        instanceShareFieldGroup.bind(periodStart, "periodStart");
+        shareForm.addComponent(periodStart);
+
+        return shareForm;
+    }
+
+    private Component buildInstanceShareTableControls(InvoiceShareViewImpl invoiceShareViewImpl) {
+        instanceShareTableControls=new HorizontalLayout();
+        instanceShareTableControls.setSpacing(true);
+        Button add = new Button("Add", new ClickListener() {
+            public void buttonClick(ClickEvent event) {
+                editInstanceShare(null);
+                periodStart.focus();
+            }
+        });
+
+        deleteInstanceShareBtn = new Button("Delete");
+        deleteInstanceShareBtn.addClickListener(invoiceShareViewImpl);
+
+        instanceShareTableControls.addComponent(add);
+        instanceShareTableControls.addComponent(deleteInstanceShareBtn);
+        return instanceShareTableControls;
+    }
+
+    private Component buildInstanceShareFormControls(ClickListener clickListener) {
+        instanceShareFormControls=new HorizontalLayout();
+        instanceShareFormControls.setSpacing(true);
+        saveInstanceShareBtn = new Button("Save", new ClickListener() {
+            public void buttonClick(ClickEvent event) {
+                try {
+                    instanceShareFieldGroup.commit();
+                } catch (CommitException e) {
+                    throw new IllegalArgumentException(e);
                 }
-            });
+            }
+        });
+        saveInstanceShareBtn.addClickListener(clickListener);
+        Button discard = new Button("Discard", new ClickListener() {
+            public void buttonClick(ClickEvent event) {
+                instanceShareFieldGroup.discard();
+            }
+        });
+        instanceShareFormControls.addComponent(saveInstanceShareBtn);
+        instanceShareFormControls.addComponent(discard);
+        return instanceShareFormControls;
+    }
+
+    public void editInstanceShare(InstanceShareBean instanceShare){
+        if (instanceShare==null){
+            instanceShare=new InstanceShareBean(newShareId--);
         }
-         */
+        BeanItem<InstanceShareBean> item=new BeanItem<InstanceShareBean>(instanceShare);
+        instanceShareFieldGroup.setItemDataSource(item);
+
+    }
+
+    private TextField createTextField(String caption){
+        TextField field=new TextField(caption);
+        field.setNullRepresentation("");
+        return field;
+
+    }
+    private Component buildInstanceShareDetailForm(){
+        shareDetailForm=new GridLayout(2,3);
+        shareDetailForm.setSpacing(true);
+        orderNo=createTextField("Order No:");
+        TextField costPool=createTextField("Cost Pool:");
+        TextField sharePercent=createTextField("Share %:");
+        TextField description=createTextField("Description:");
+
+        instanceShareDetailFieldGroup.bind(orderNo, "orderNumber");
+        instanceShareDetailFieldGroup.bind(costPool, "costPool");
+        instanceShareDetailFieldGroup.bind(sharePercent, "sharePercent");
+        instanceShareDetailFieldGroup.bind(description, "description");
+
+        shareDetailForm.addComponent(orderNo);
+        shareDetailForm.addComponent(costPool);
+        shareDetailForm.addComponent(sharePercent);
+        shareDetailForm.addComponent(description);
+
+        return shareDetailForm;
+    }
+
+    private Component buildInstanceShareDetailTableControls(InvoiceShareViewImpl invoiceShareViewImpl) {
+        instanceShareDetailTableControls=new HorizontalLayout();
+        instanceShareDetailTableControls.setSpacing(true);
+        addInstanceShareDetailBtn = new Button("Add", new ClickListener() {
+            public void buttonClick(ClickEvent event) {
+                editInstanceShareDetail(null);
+                orderNo.focus();
+            }
+        });
+
+        deleteInstanceShareDetailBtn = new Button("Delete");
+        deleteInstanceShareDetailBtn.addClickListener(invoiceShareViewImpl);
+
+        instanceShareDetailTableControls.addComponent(addInstanceShareDetailBtn);
+        instanceShareDetailTableControls.addComponent(deleteInstanceShareDetailBtn);
+        return instanceShareDetailTableControls;
+    }
+
+    private Component buildInstanceShareDetailFormControls(ClickListener clickListener) {
+        instanceShareDetailFormControls = new HorizontalLayout();
+        instanceShareDetailFormControls.setSpacing(true);
+        saveInstanceShareDetailBtn = new Button("Save", new ClickListener() {
+            public void buttonClick(ClickEvent event) {
+                try {
+                    instanceShareDetailFieldGroup.commit();
+                } catch (CommitException e) {
+                    throw new IllegalArgumentException(e);
+                }
+            }
+        });
+        saveInstanceShareDetailBtn.addClickListener(clickListener);
+        Button discard = new Button("Discard", new ClickListener() {
+            public void buttonClick(ClickEvent event) {
+                instanceShareDetailFieldGroup.discard();
+            }
+        });
+        instanceShareDetailFormControls.addComponent(saveInstanceShareDetailBtn);
+        instanceShareDetailFormControls.addComponent(discard);
+        return instanceShareDetailFormControls;
+    }
+
+    public void editInstanceShareDetail(InstanceShareDetailBean instanceShareDetail){
+        if (instanceShareDetail==null){
+            instanceShareDetail=new InstanceShareDetailBean(newShareDetailId--);
+        }
+        BeanItem<InstanceShareDetailBean> item=new BeanItem<InstanceShareDetailBean>(instanceShareDetail);
+        instanceShareDetailFieldGroup.setItemDataSource(item);
     }
 
 
     public InstanceShareComponent(InvoiceShareViewImpl invoiceShareViewImpl){
-
-        //Initialize shares table
-        sharesTable=new Table();
-        //sharesTable.setEditable(true);
-        sharesTable.setSelectable(true);
-
-        // Handle selection change.
-        sharesTable.addItemClickListener(invoiceShareViewImpl);
-
-        // Define the names and data types of columns.
-        sharesTable.addContainerProperty("Period",     Date.class,  null); 
-        sharesTable.addContainerProperty("Add Row",        Button.class,    null);
-        sharesTable.addContainerProperty("Remove Row",        Button.class,    null);
-        
-        sharesTable.addGeneratedColumn("Add", new ColumnGenerator() {            
-            @Override public Object generateCell(final Table source, final Object itemId, Object columnId) {
-                Button button = new Button("Add");
-                button.addClickListener(new ClickListener() {
-                    @Override public void buttonClick(ClickEvent event) {
-                        Notification.show("item= " +
-                                itemId + " clicked.");
-                        //sharesTable.addItem(createSharesItem(new Date(),new Long(sharesTable.size()+1)),new Long(sharesTable.size()+1));
-                        source.getContainerDataSource().addItem();
-                        //source.getContainerDataSource().removeItem(itemId);
-                    }
-                });
-                return button;
-            }
-        });
-        sharesTable.addGeneratedColumn("Delete", new ColumnGenerator() {
-            @Override public Object generateCell(final Table source, final Object itemId, Object columnId) {
-                Button button = new Button("Delete");
-                button.addClickListener(new ClickListener() {
-                    @Override public void buttonClick(ClickEvent event) {
-                        Notification.show("item= " +
-                                itemId + " clicked.");
-                        source.getContainerDataSource().removeItem(itemId);
-                    }
-                });
-                return button;
-            }
-        });
-
- 
-        sharesTable.setVisibleColumns(new String[]{"Period", "Add", "Delete"});
-        //Initialize details table
-        shareDetailsTable=new Table();
-        shareDetailsTable.setEditable(true);
-
-        // Define the names and data types of columns.
-        shareDetailsTable.addContainerProperty("Order No", String.class,  null); 
-        shareDetailsTable.addContainerProperty("Cost Pool", String.class,    null);
-        shareDetailsTable.addContainerProperty("Share %", Integer.class,    null);
-        shareDetailsTable.addContainerProperty("Description", String.class,    null);
-
-        shareDetailsTable.addGeneratedColumn("Add", new ColumnGenerator() {            
-            @Override public Object generateCell(final Table source, final Object itemId, Object columnId) {
-                Button button = new Button("Add");
-                button.addClickListener(new ClickListener() {
-                    @Override public void buttonClick(ClickEvent event) {
-                        Notification.show("item= " +
-                                itemId + " clicked.");
-                        //sharesTable.addItem(createSharesItem(new Date(),new Long(sharesTable.size()+1)),new Long(sharesTable.size()+1));
-                        source.getContainerDataSource().addItem();
-                        //source.getContainerDataSource().removeItem(itemId);
-                    }
-                });
-                return button;
-            }
-        });
-        shareDetailsTable.addGeneratedColumn("Delete", new ColumnGenerator() {
-            @Override public Object generateCell(final Table source, final Object itemId, Object columnId) {
-                Button button = new Button("Delete");
-                button.addClickListener(new ClickListener() {
-                    @Override public void buttonClick(ClickEvent event) {
-                        Notification.show("item= " +
-                                itemId + " clicked.");
-                        source.getContainerDataSource().removeItem(itemId);
-                    }
-                });
-                return button;
-            }
-        });
-
- 
-        
-        //shareDetailsTable.setVisibleColumns(new String[]{"Order No","Cost Pool","Share %","Description"});
-
-        
-        shareDetailsTable.addItem(new Object[]{},1);
-        shareDetailsTable.setPageLength(8);
-        shareDetailsTable.setEditable(true);
-
         // A layout structure used for composition
         HorizontalLayout mainLayout = new HorizontalLayout();
+        mainLayout.setSpacing(true);
 
         // Shares
         Panel sharePanel = new Panel("Shares");
         mainLayout.addComponent(sharePanel);                       
         VerticalLayout shareLayout = new VerticalLayout();
+        shareLayout.setSpacing(true);
         sharePanel.setContent(shareLayout);
 
         // Compose from multiple components
-        shareLayout.addComponent(sharesTable);
-        shareLayout.addComponent(new Button("Create new"));
+        shareLayout.addComponent(buildInstanceShareTableControls(invoiceShareViewImpl));
+        shareLayout.addComponent(buildSharesTable(invoiceShareViewImpl));
+        shareLayout.addComponent(buildInstanceShareForm());
+        shareLayout.addComponent(buildInstanceShareFormControls(invoiceShareViewImpl));
 
         // Share details
         Panel detailPanel = new Panel("Details");
         mainLayout.addComponent(detailPanel);        
         VerticalLayout detailLayout = new VerticalLayout();
+        detailLayout.setSpacing(true);
         detailPanel.setContent(detailLayout);
 
         // Compose from multiple components
-        detailLayout.addComponent(shareDetailsTable);
-        detailLayout.addComponent(new Button("Save"));
+        detailLayout.addComponent(buildInstanceShareDetailTableControls(invoiceShareViewImpl));
+        detailLayout.addComponent(buildShareDetailsTable(invoiceShareViewImpl));
+        detailLayout.addComponent(buildInstanceShareDetailForm());
+        detailLayout.addComponent(buildInstanceShareDetailFormControls(invoiceShareViewImpl));
 
         // Set the size as undefined at all levels
         sharePanel.getContent().setSizeUndefined();
         sharePanel.setSizeUndefined();
+
         detailPanel.getContent().setSizeUndefined();
         detailPanel.setSizeUndefined();
-        mainLayout.setSizeFull();
+        mainLayout.setSizeUndefined();
         setSizeUndefined();
 
         // The composition root MUST be set
         setCompositionRoot(mainLayout);
     }
+
+    private Component buildShareDetailsTable(
+            InvoiceShareViewImpl invoiceShareViewImpl) {
+        //Setup shareDetailsTable
+        shareDetailsTable=new Table();
+        shareDetailsTable.setSelectable(true);
+        shareDetailsTable.setPageLength(8);
+
+        // Handle selection change.
+        shareDetailsTable.addItemClickListener(invoiceShareViewImpl);
+
+        BeanItemContainer<InstanceShareDetailBean> beans=new BeanItemContainer<InstanceShareDetailBean>(InstanceShareDetailBean.class);
+        shareDetailsTable.setContainerDataSource(beans);
+        shareDetailsTable.setColumnHeader("orderNumber", "Order No");
+        shareDetailsTable.setColumnHeader("costPool", "Cost Pool");
+        shareDetailsTable.setColumnHeader("description", "Description");
+        shareDetailsTable.setColumnHeader("sharePercent", "Share %");
+        shareDetailsTable.setVisibleColumns(new Object[]{"orderNumber","costPool","sharePercent","description"});
+
+        return shareDetailsTable;
+    }
+
+    private Component buildSharesTable(InvoiceShareViewImpl invoiceShareViewImpl) {
+        //Initialize shares table
+        sharesTable=new Table();
+        sharesTable.setSelectable(true);
+        sharesTable.setPageLength(8);
+
+        // Handle selection change.
+        sharesTable.addItemClickListener(invoiceShareViewImpl);
+
+        BeanItemContainer<InstanceShareBean> shareBeans=new BeanItemContainer<InstanceShareBean>(InstanceShareBean.class);
+        sharesTable.setContainerDataSource(shareBeans);
+        sharesTable.setColumnHeader("periodStart", "Period");
+
+        sharesTable.setVisibleColumns(new Object[]{"periodStart"});
+
+        return sharesTable;
+    }
+
 
 }

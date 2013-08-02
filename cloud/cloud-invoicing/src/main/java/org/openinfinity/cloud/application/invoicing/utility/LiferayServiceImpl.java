@@ -16,17 +16,19 @@
 
 package org.openinfinity.cloud.application.invoicing.utility;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import javax.portlet.PortletRequest;
-import com.liferay.portal.model.Organization;
-import com.liferay.portal.service.OrganizationLocalServiceUtil;
+
 import org.apache.log4j.Logger;
+import org.openinfinity.cloud.application.invoicing.model.user.LiferayUserImpl;
+import org.openinfinity.cloud.application.invoicing.model.user.User;
 
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.model.User;
-
-import java.util.LinkedList;
-import java.util.List;
+import com.liferay.portal.model.Organization;
+import com.liferay.portal.service.OrganizationLocalServiceUtil;
 
 /**
  * Liferay related utilities
@@ -36,26 +38,27 @@ import java.util.List;
  * @since 1.0.0
  */
 public abstract class LiferayServiceImpl {
-	private static final Logger LOG = Logger.getLogger(LiferayServiceImpl.class.getName());
-	
-	public static User getUser(PortletRequest request) {
-		User user = null;
-		
-		try {
-			user = com.liferay.portal.util.PortalUtil.getUser(request);
-		} catch (PortalException e) {
-			LOG.error("User not found, not logged in? "+e.getLocalizedMessage());
-			return null;
-		} catch (SystemException e) {
-			LOG.error("Someting is wrong: "+e.getLocalizedMessage());
-			return null;
-		}
-		
-		return user;	
-	}
-	
+    private static final Logger LOG = Logger.getLogger(LiferayServiceImpl.class.getName());
 
-    public static List<String> getOrganizationNames(User user) {
+    public static User getUser(PortletRequest request) {
+        User user = null;
+
+        try {
+            com.liferay.portal.model.User portaluser = com.liferay.portal.util.PortalUtil.getUser(request);
+            user=new LiferayUserImpl(portaluser);
+        } catch (PortalException e) {
+            LOG.error("User not found, not logged in? "+e.getLocalizedMessage());
+            return null;
+        } catch (SystemException e) {
+            LOG.error("Someting is wrong: "+e.getLocalizedMessage());
+            return null;
+        }
+
+        return user;	
+    }
+
+
+    public static List<String> getOrganizationNames(LiferayUserImpl user) {
         List<Organization> userOrganizations = null;
         List<Organization> subOrganizations = null;
         try {

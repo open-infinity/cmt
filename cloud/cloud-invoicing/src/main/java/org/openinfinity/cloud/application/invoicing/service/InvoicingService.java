@@ -1,39 +1,70 @@
 package org.openinfinity.cloud.application.invoicing.service;
 
 import java.util.Collection;
-import java.util.List;
 
 import org.openinfinity.cloud.domain.Instance;
-import org.openinfinity.cloud.domain.InstanceShare;
 import org.openinfinity.cloud.service.administrator.InstanceService;
+import org.openinfinity.cloud.service.invoicing.InstanceShareDetailService;
 import org.openinfinity.cloud.service.invoicing.InstanceShareService;
+import org.openinfinity.cloud.service.invoicing.InstanceTblService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 @Component("invoicingService")
 public class InvoicingService {
-   
+
+    @Autowired
+    @Qualifier("instanceTblService")
+    private InstanceTblService instanceTblService;
+
     @Autowired
     @Qualifier("instanceService")
     private InstanceService instanceService;
-    
+
+    public Collection<Instance> getUserInstances(
+            Collection<Long> organizationIds) {
+        return instanceService.getUserInstances(organizationIds);
+    }
+
     @Autowired
     @Qualifier("instanceShareService")
-    private InstanceShareService instanceShareService;	
+    private InstanceShareService instanceShareService;
 
-	public InstanceShareService getInstanceShareService() {
-		return instanceShareService;
-	}
+    @Autowired
+    @Qualifier("instanceShareDetailService")
+    private InstanceShareDetailService instanceShareDetailService;
 
-	public void setInstanceShareService(InstanceShareService instanceShareService) {
-		this.instanceShareService = instanceShareService;
-	}
+    public InstanceTblService getInstanceTblService() {
+        return instanceTblService;
+    }
 
-	public Collection<Instance> getOrganizationInstances(Long organizationId) {
+    public void setInstanceTblService(InstanceTblService instanceTblService) {
+        this.instanceTblService = instanceTblService;
+    }
+
+    public InstanceShareDetailService getInstanceShareDetailService() {
+        return instanceShareDetailService;
+    }
+
+    public void setInstanceShareDetailService(
+            InstanceShareDetailService instanceShareDetailService) {
+        this.instanceShareDetailService = instanceShareDetailService;
+    }
+
+    public InstanceShareService getInstanceShareService() {
+        return instanceShareService;
+    }
+
+    public void setInstanceShareService(
+            InstanceShareService instanceShareService) {
+        this.instanceShareService = instanceShareService;
+    }
+
+    public Collection<Instance> getOrganizationInstances(Long organizationId) {
         return instanceService.getOrganizationInstances(organizationId);
     }
-    
+
     public InstanceService getInstanceService() {
         return instanceService;
     }
@@ -41,5 +72,5 @@ public class InvoicingService {
     public void setInstanceService(InstanceService instanceService) {
         this.instanceService = instanceService;
     }
-    
+
 }

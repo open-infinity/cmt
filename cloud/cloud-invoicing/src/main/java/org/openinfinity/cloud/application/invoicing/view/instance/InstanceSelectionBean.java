@@ -45,6 +45,9 @@ public class InstanceSelectionBean {
     public String getZone() {
         return instance.getZone();
     }
-    
-  
+    public Instance toDomainObject() {
+        return instance;
+    }
+
+
 }

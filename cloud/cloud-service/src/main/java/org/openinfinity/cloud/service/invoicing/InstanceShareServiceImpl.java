@@ -72,8 +72,10 @@ public class InstanceShareServiceImpl implements InstanceShareService{
     public InstanceShare findOne(Long arg0) {
         InstanceShare findOne = repository.findOne(arg0);
         
-        if (findOne!=null)//triggers details fetch
+        if (findOne!=null){//triggers details and share invoices fetch
             findOne.getInstanceShareDetails().size();
+            findOne.getInstanceShareInvoices().size();
+        }
         return findOne;
     }
 
