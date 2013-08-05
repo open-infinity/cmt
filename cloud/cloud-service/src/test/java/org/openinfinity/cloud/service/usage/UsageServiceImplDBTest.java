@@ -98,7 +98,7 @@ public class UsageServiceImplDBTest {
 		usagePeriod.setEndTime(periodEnd);
 		Map<Integer, MachineUsage> actual = usagePeriod.getUptimeHoursPerMachine();
 		
-		assertEquals(21600, actual.get(1).getUptimeInMinutes());
+		assertEquals(20880, actual.get(1).getUptimeInMinutes());
 		
 		//peekToHSQL();
 	}
@@ -152,8 +152,7 @@ public class UsageServiceImplDBTest {
 		usagePeriod.setEndTime(periodEnd);
 		Map<Integer, MachineUsage> actual = usagePeriod.getUptimeHoursPerMachine();
 		
-		// FIXME: uncomment the assert when the implementation is fixed so that the assertion passes.
-		//assertEquals(7200, actual.get(1).getUptimeInMinutes());
+		assertEquals(7200, actual.get(1).getUptimeInMinutes());
 	}
 	
 	/**
@@ -179,8 +178,7 @@ public class UsageServiceImplDBTest {
 		usagePeriod.setEndTime(periodEnd);
 		Map<Integer, MachineUsage> actual = usagePeriod.getUptimeHoursPerMachine();
 		
-		// FIXME: uncomment the assert when the implementation is fixed so that the assertion passes.
-		//assertEquals(13680, actual.get(1).getUptimeInMinutes());
+		assertEquals(13680, actual.get(1).getUptimeInMinutes());
 	}
 	
 	/**
@@ -206,8 +204,7 @@ public class UsageServiceImplDBTest {
 		usagePeriod.setEndTime(periodEnd);
 		Map<Integer, MachineUsage> actual = usagePeriod.getUptimeHoursPerMachine();
 		
-		// FIXME: uncomment the assert when the implementation is fixed so that the assertion passes.
-		//assertEquals(15120, actual.get(1).getUptimeInMinutes());
+		assertEquals(15120, actual.get(1).getUptimeInMinutes());
 	}
 	
 	/**

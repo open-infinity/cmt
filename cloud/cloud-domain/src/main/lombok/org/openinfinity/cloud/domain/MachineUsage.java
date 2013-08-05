@@ -36,6 +36,8 @@ public final class MachineUsage {
 	
 	@Getter private final Date started;
 	@Getter private final Date stopped;
+	@Getter private final Date periodStart;
+	@Getter private final Date periodEnd;
 	
 	@Getter private final long uptime; // Milliseconds
 	
@@ -57,6 +59,8 @@ public final class MachineUsage {
 			
 			Date started,
 			Date stopped,
+			Date periodStart,
+			Date periodEnd,
 			long uptime,
 			int errorCount,
 			String errorMessage
@@ -84,6 +88,8 @@ public final class MachineUsage {
 		
 		this.started = started;
 		this.stopped = stopped;
+		this.periodStart = periodStart;
+		this.periodEnd = periodEnd;
 		this.uptime = uptime;
 		this.errorCount = errorCount;
 		this.errorMessage = errorMessage;
@@ -112,6 +118,8 @@ public final class MachineUsage {
 				clusterEbsVolumesUsed + delimiter +
 				started + delimiter +
 				stopped + delimiter +
+				periodStart + delimiter +
+				periodEnd + delimiter +
 				getUptimeInMinutes() + delimiter +
 				errorCount + delimiter +
 				errorMessage;

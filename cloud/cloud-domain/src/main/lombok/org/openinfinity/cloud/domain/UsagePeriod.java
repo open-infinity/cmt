@@ -144,12 +144,21 @@ public class UsagePeriod {
 			
 			long uptime = 0;
 			if (machineStartTime != null) {
-				if (machineStopTime != null) {
-					uptime = machineStopTime.getTime() - machineStartTime.getTime();
+				Date countStartTime;
+				Date countEndTime;				
+				if (machineStartTime.getTime() > startTime.getTime()) {
+					countStartTime = machineStartTime;
+				} else {
+					// The machine has been started in previous period. Using period start time for calculation.
+					countStartTime = startTime;
+				}
+				if (machineStopTime != null && machineStopTime.getTime() < endTime.getTime()) {
+					countEndTime = machineStopTime;
 				} else {
 					// The machine is still running. Using period end time for calculation.
-					uptime = endTime.getTime() - machineStartTime.getTime();
+					countEndTime = endTime;
 				}
+				uptime = countEndTime.getTime() - countStartTime.getTime();				
 			}
 			
 			MachineUsage mu = new MachineUsage(
@@ -165,6 +174,8 @@ public class UsagePeriod {
 					uh.getClusterEbsVolumesUsed(),
 					machineStartTime,
 					machineStopTime,
+					startTime,
+					endTime,
 					uptime,
 					errorCount,
 					errorMessage
