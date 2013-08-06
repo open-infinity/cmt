@@ -44,7 +44,7 @@ public class InstanceShareDetail implements Serializable {
 	private String orderNumber;
 
 	@Column(name="share_percent")
-	private Integer sharePercent;
+	private BigDecimal sharePercent;
 
 	//bi-directional many-to-one association to InstanceShareTbl
 	@ManyToOne

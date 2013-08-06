@@ -12,6 +12,8 @@ import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.data.validator.StringLengthValidator;
+import com.vaadin.server.UserError;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
@@ -34,7 +36,15 @@ public class InstanceShareComponent extends CustomComponent{
     /* User interface components are stored in session. */
     private Table sharesTable;
     private FieldGroup instanceShareFieldGroup=new FieldGroup();
+    public FieldGroup getInstanceShareFieldGroup() {
+        return instanceShareFieldGroup;
+    }
+
     private FieldGroup instanceShareDetailFieldGroup=new FieldGroup();
+
+    public FieldGroup getInstanceShareDetailFieldGroup() {
+        return instanceShareDetailFieldGroup;
+    }
 
     private Table shareDetailsTable;
 
@@ -89,7 +99,7 @@ public class InstanceShareComponent extends CustomComponent{
     }   
 
     private void setControlsEnabled(Component[] objects, boolean enabled) {
-        // TODO Auto-generated method stub
+
         for (int i=0;i<objects.length;i++){
             objects[i].setEnabled(enabled);
         }
@@ -142,7 +152,9 @@ public class InstanceShareComponent extends CustomComponent{
         shareForm=new GridLayout(2,3);
         shareForm.setSpacing(true);
         periodStart=new DateField("Start of period:");
-
+        periodStart.setRequired(true);
+        periodStart.setRequiredError("Start of period is mandatory");
+        periodStart.setImmediate(true);
         instanceShareFieldGroup.bind(periodStart, "periodStart");
         shareForm.addComponent(periodStart);
 
@@ -173,9 +185,9 @@ public class InstanceShareComponent extends CustomComponent{
         saveInstanceShareBtn = new Button("Save", new ClickListener() {
             public void buttonClick(ClickEvent event) {
                 try {
-                    instanceShareFieldGroup.commit();
+                        instanceShareFieldGroup.commit();
                 } catch (CommitException e) {
-                    throw new IllegalArgumentException(e);
+                    saveInstanceShareBtn.setComponentError(new UserError(e.getMessage()));
                 }
             }
         });
@@ -196,22 +208,39 @@ public class InstanceShareComponent extends CustomComponent{
         }
         BeanItem<InstanceShareBean> item=new BeanItem<InstanceShareBean>(instanceShare);
         instanceShareFieldGroup.setItemDataSource(item);
+        
+        //make sure that right row is selected
+        sharesTable.select(instanceShare);
+        
+        //remove error from btn
+        saveInstanceShareBtn.setComponentError(null);
+        
 
     }
 
-    private TextField createTextField(String caption){
+    private TextField createTextField(String caption, boolean required, String requiredMessage){
         TextField field=new TextField(caption);
         field.setNullRepresentation("");
+        field.setRequired(required);
+        if (required && requiredMessage!=null){
+            field.setRequiredError(requiredMessage);
+        }
+        
+        if (required){
+            field.addValidator(new StringLengthValidator(requiredMessage,1,255, required));
+        }
+        field.setImmediate(true);
         return field;
 
     }
     private Component buildInstanceShareDetailForm(){
         shareDetailForm=new GridLayout(2,3);
         shareDetailForm.setSpacing(true);
-        orderNo=createTextField("Order No:");
-        TextField costPool=createTextField("Cost Pool:");
-        TextField sharePercent=createTextField("Share %:");
-        TextField description=createTextField("Description:");
+        orderNo=createTextField("Order No:", true, "Order no is mandatory");
+        TextField costPool=createTextField("Cost Pool:", true, "Cost pool is mandatory");
+        costPool.setRequired(true);
+        TextField sharePercent=createTextField("Share %:", true,"Share % is mandatory");
+        TextField description=createTextField("Description:",false,null);
 
         instanceShareDetailFieldGroup.bind(orderNo, "orderNumber");
         instanceShareDetailFieldGroup.bind(costPool, "costPool");
@@ -247,13 +276,17 @@ public class InstanceShareComponent extends CustomComponent{
     private Component buildInstanceShareDetailFormControls(ClickListener clickListener) {
         instanceShareDetailFormControls = new HorizontalLayout();
         instanceShareDetailFormControls.setSpacing(true);
+//        saveInstanceShareDetailBtn = new Button("Save");
         saveInstanceShareDetailBtn = new Button("Save", new ClickListener() {
             public void buttonClick(ClickEvent event) {
                 try {
                     instanceShareDetailFieldGroup.commit();
-                } catch (CommitException e) {
-                    throw new IllegalArgumentException(e);
-                }
+                } catch (CommitException e1) {
+         
+                    saveInstanceShareDetailBtn.setComponentError(new UserError(e1.getMessage()));
+
+                    //e1.printStackTrace();
+                };
             }
         });
         saveInstanceShareDetailBtn.addClickListener(clickListener);
@@ -273,6 +306,9 @@ public class InstanceShareComponent extends CustomComponent{
         }
         BeanItem<InstanceShareDetailBean> item=new BeanItem<InstanceShareDetailBean>(instanceShareDetail);
         instanceShareDetailFieldGroup.setItemDataSource(item);
+        
+        //clear error from save button
+        saveInstanceShareDetailBtn.setComponentError(null);
     }
 
 

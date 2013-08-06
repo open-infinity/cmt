@@ -8,13 +8,30 @@ import org.openinfinity.cloud.application.invoicing.view.InvoiceShareViewImpl;
 import org.openinfinity.cloud.domain.Instance;
 
 import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.ui.AbstractSelect;
+import com.vaadin.ui.AbstractSelect.ItemCaptionMode;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.NativeSelect;
 import com.vaadin.ui.VerticalLayout;
 
 public class InstanceSelectionComponent extends CustomComponent{
 
+    private Component buildSelectionList(InvoiceShareViewImpl view){
+        selectInstance = new NativeSelect("Select an instance:");
+        selectInstance.setNullSelectionAllowed(false);
+        selectInstance.setImmediate(true);
+        
+        selectInstance.setItemCaptionMode(ItemCaptionMode.PROPERTY);
+        selectInstance.setItemCaptionPropertyId("name");
+        
+        BeanItemContainer<InstanceSelectionBean> instanceContainer = new BeanItemContainer<InstanceSelectionBean>(InstanceSelectionBean.class);
+        selectInstance.setContainerDataSource(instanceContainer);
+
+        selectInstance.addValueChangeListener(view);
+        return selectInstance;
+
+        
+    }
 
     public void setInstances(Collection<Instance> instances) {
 
@@ -28,10 +45,10 @@ public class InstanceSelectionComponent extends CustomComponent{
 
         selectInstance.setContainerDataSource(instanceContainer);
         selectInstance.sanitizeSelection();
-        selectInstance.setValue("id1");
+        //selectInstance.setValue("id1");
     }
 
-    private AbstractSelect selectInstance;
+    private NativeSelect selectInstance;
 
 
     /**
@@ -39,18 +56,11 @@ public class InstanceSelectionComponent extends CustomComponent{
      */
     private static final long serialVersionUID = 1L;
 
-    public InstanceSelectionComponent(InvoiceShareViewImpl invoiceShareViewImpl){
+    public InstanceSelectionComponent(InvoiceShareViewImpl view){
         VerticalLayout main=new VerticalLayout();
         this.setCompositionRoot(main);
 
-        // Select using the container and "stateFullName" property as caption        //Instances drop down
-        selectInstance = new NativeSelect("Select an instance:");
-
-        selectInstance.setNullSelectionAllowed(false);
-        selectInstance.setImmediate(true);
-
-        selectInstance.addValueChangeListener(invoiceShareViewImpl);
-        main.addComponent(selectInstance);
+        main.addComponent(buildSelectionList(view));
 
     }
 

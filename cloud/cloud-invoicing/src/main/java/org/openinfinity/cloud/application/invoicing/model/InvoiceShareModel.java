@@ -13,6 +13,7 @@ import org.openinfinity.cloud.domain.Instance;
 import org.openinfinity.cloud.domain.InstanceShare;
 import org.openinfinity.cloud.domain.InstanceShareDetail;
 import org.openinfinity.cloud.domain.InstanceTbl;
+import org.openinfinity.cloud.domain.Job;
 import org.openinfinity.cloud.service.invoicing.InstanceShareDetailService;
 import org.openinfinity.cloud.service.invoicing.InstanceShareService;
 import org.openinfinity.cloud.service.invoicing.InstanceTblService;
@@ -23,6 +24,20 @@ import org.openinfinity.cloud.service.invoicing.InstanceTblService;
  *
  */
 public class InvoiceShareModel{
+
+    private InvoicingService invoicingService;
+
+    public void updateInstanceStatus(int instanceId, String status) {
+        invoicingService.updateInstanceStatus(instanceId, status);
+    }
+
+    public Collection<Job> getJobsForInstance(int instanceId) {
+        return invoicingService.getJobsForInstance(instanceId);
+    }
+
+    public void updateJobStatus(int id, int status) {
+        invoicingService.updateJobStatus(id, status);
+    }
 
     private Collection<Instance> instances=null;
     private Collection<InstanceShare> instanceShares;
@@ -54,29 +69,28 @@ public class InvoiceShareModel{
         this.instanceShares = instanceShares;
     }
 
-    private InvoicingService invoicingService;
-
     private User user;
 
-    private InstanceShare selectedInstanceShare;
+    private InstanceShareBean selectedInstanceShare;
     private InstanceTbl selectedInstance;
 
     public InstanceTbl getSelectedInstance() {
         return selectedInstance;
     }
 
-    public InstanceShare getSelectedInstanceShare() {
+    public InstanceShareBean getSelectedInstanceShare() {
         return selectedInstanceShare;
     }
 
-    public InvoiceShareModel(){
+    public InvoiceShareModel(User user){
+        this.user=user;
         //Initialize instances list for selection
         invoicingService = ApplicationContextProvider.getContext().getBean(InvoicingService.class);
         instances = invoicingService.getUserInstances(user.getOrganizationIds());
     }
 
     public void setSelectedInstanceShare(InstanceShareBean bean) {
-        this.selectedInstanceShare=bean.toDomainObject();
+        this.selectedInstanceShare=bean;
 
     }
 
@@ -108,7 +122,7 @@ public class InvoiceShareModel{
         invoicingService = ApplicationContextProvider.getContext().getBean(InvoicingService.class);        
         InstanceShareDetailService instanceShareDetailService = invoicingService.getInstanceShareDetailService();
         if (item.toDomainObject().getInstanceShare()==null){
-            item.toDomainObject().setInstanceShare(this.selectedInstanceShare);
+            item.toDomainObject().setInstanceShare(this.selectedInstanceShare.toDomainObject());
         }
         instanceShareDetailService.save(item.toDomainObject());
 

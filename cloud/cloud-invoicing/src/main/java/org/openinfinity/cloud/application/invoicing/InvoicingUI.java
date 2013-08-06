@@ -62,8 +62,8 @@ public class InvoicingUI extends UI{
         // Create the model and the Vaadin view implementation
 
 
-        InvoiceShareModel    model = new InvoiceShareModel();
-        InvoiceShareViewImpl view  = new InvoiceShareViewImpl();
+        InvoiceShareModel    model = new InvoiceShareModel(user);
+        InvoiceShareViewImpl view  = new InvoiceShareViewImpl(this);
 
         // The presenter binds the model and view together
         new InvoiceSharePresenter(model, view);
@@ -72,5 +72,6 @@ public class InvoicingUI extends UI{
         main.addComponent(view);
 
     }
+
 
 }

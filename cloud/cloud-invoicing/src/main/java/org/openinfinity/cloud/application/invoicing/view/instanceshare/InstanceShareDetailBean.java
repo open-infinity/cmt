@@ -1,5 +1,6 @@
 package org.openinfinity.cloud.application.invoicing.view.instanceshare;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 
 import org.openinfinity.cloud.domain.InstanceShareDetail;
@@ -19,16 +20,7 @@ public class InstanceShareDetailBean {
         this.detail.setId(id);
     }
 
-    /*
-    public InstanceShareDetail getDetail() {
-        return detail;
-    }
-
-    public void setDetail(InstanceShareDetail detail) {
-        this.detail = detail;
-    }
-     */
-
+ 
     public String getCostPool() {
         return detail.getCostPool();
     }
@@ -61,8 +53,8 @@ public class InstanceShareDetailBean {
         return detail.getOrderNumber();
     }
 
-    public Integer getSharePercent() {
-        return detail.getSharePercent();
+    public String getSharePercent() {
+        return detail.getSharePercent()==null ? null :detail.getSharePercent().toString();
     }
 
     public void setCostPool(String costPool) {
@@ -97,8 +89,8 @@ public class InstanceShareDetailBean {
         detail.setOrderNumber(orderNumber);
     }
 
-    public void setSharePercent(Integer sharePercent) {
-        detail.setSharePercent(sharePercent);
+    public void setSharePercent(String sharePercent) {
+        detail.setSharePercent(new BigDecimal(sharePercent));
     }
 
     public String toString() {

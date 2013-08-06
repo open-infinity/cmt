@@ -78,6 +78,12 @@
             <version>${vaadin.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.vaadin.addon</groupId>
+            <artifactId>confirmdialog</artifactId>
+            <version>2.0.4</version>
+        </dependency>
+        
+        <dependency>
             <groupId>com.liferay.portal</groupId>
             <artifactId>portal-service</artifactId>
             <version>${liferay.version}</version>

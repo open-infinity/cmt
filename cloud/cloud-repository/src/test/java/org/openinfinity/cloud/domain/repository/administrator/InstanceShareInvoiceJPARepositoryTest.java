@@ -2,6 +2,7 @@ package org.openinfinity.cloud.domain.repository.administrator;
 
 import static org.junit.Assert.*;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
@@ -10,6 +11,7 @@ import javax.sql.DataSource;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.openinfinity.cloud.domain.InstanceShareDetail;
 import org.openinfinity.cloud.domain.InstanceShareInvoice;
 import org.openinfinity.cloud.domain.InstanceShare;
 import org.openinfinity.cloud.domain.InstanceTbl;
@@ -81,6 +83,12 @@ public class InstanceShareInvoiceJPARepositoryTest {
         
         return instanceShareInvoice;
     }
+    
+    private InstanceShareDetail createInstanceShareDetail(){
+        InstanceShareDetail detail=new InstanceShareDetail();
+        detail.setSharePercent(new BigDecimal("0.999"));
+        return detail;
+    }
 
     @Transactional
     private InstanceTbl createInstanceAndSave(String instanceName){
@@ -127,7 +135,13 @@ public class InstanceShareInvoiceJPARepositoryTest {
             InstanceShareInvoice invoice = createInstanceShareInvoice();
             invoice.setInstanceShare(instanceShare2);
             instanceShare2.addInstanceShareInvoice(invoice);
-            instanceShareRepository.save(instanceShare);
+            
+            InstanceShareDetail detail = createInstanceShareDetail();
+            detail.setInstanceShare(instanceShare2);
+            instanceShare2.addInstanceShareDetail(detail);
+            
+            
+            instanceShareRepository.save(instanceShare2);
         }
         
         //delete rows that this test case added

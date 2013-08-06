@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.openinfinity.cloud.application.invoicing.InvoicingUI;
 import org.openinfinity.cloud.application.invoicing.view.instance.InstanceSelectionBean;
 import org.openinfinity.cloud.application.invoicing.view.instance.InstanceSelectionComponent;
 import org.openinfinity.cloud.application.invoicing.view.instanceshare.InstanceShareBean;
@@ -11,9 +12,11 @@ import org.openinfinity.cloud.application.invoicing.view.instanceshare.InstanceS
 import org.openinfinity.cloud.application.invoicing.view.instanceshare.InstanceShareDetailBean;
 import org.openinfinity.cloud.domain.Instance;
 import org.openinfinity.cloud.domain.InstanceShare;
+import org.vaadin.dialogs.ConfirmDialog;
 
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
+import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.event.ItemClickEvent.ItemClickListener;
@@ -36,9 +39,11 @@ public class InvoiceShareViewImpl extends CustomComponent implements InvoiceShar
 
     InstanceSelectionComponent instanceSelectionComponent;
     InstanceShareComponent instanceShareComponent;
+    private InvoicingUI ui;
 
-    public InvoiceShareViewImpl() {
+    public InvoiceShareViewImpl(InvoicingUI invoicingUI) {
         super();
+        this.ui=invoicingUI;
 
         Panel mainPanel=new Panel();
 
@@ -75,12 +80,27 @@ public class InvoiceShareViewImpl extends CustomComponent implements InvoiceShar
     @Override
     public void buttonClick(ClickEvent event) {
         Object item=null;
+        
+        boolean valid=true;
         if ("Save".equals(event.getButton().getCaption())){
 
             //Saving of InstanceShare; get InstanceShareBean from form data
             if (event.getButton().equals(instanceShareComponent.getSaveInstanceShareBtn())){
+                //TODO: now doing extra commit; which is already done from InstanceShareComponent side to handle validations
+               try {
+                   instanceShareComponent.getInstanceShareFieldGroup().commit();
+               } catch (CommitException e) {
+                   valid=false;
+               }
+
                 item= ((BeanItem<InstanceShareBean>)instanceShareComponent.getInstanceShareItemDataSource()).getBean();                
             }else{
+                 //TODO: now doing extra commit; which is already done from InstanceShareComponent side to handle validations
+                try {
+                    instanceShareComponent.getInstanceShareDetailFieldGroup().commit();
+                } catch (CommitException e) {
+                    valid=false;
+                }
                 item= ((BeanItem<InstanceShareDetailBean>)instanceShareComponent.getInstanceShareDetailItemDataSource()).getBean();
             }
         }
@@ -92,8 +112,10 @@ public class InvoiceShareViewImpl extends CustomComponent implements InvoiceShar
             }
         }
 
-        for (InvoiceShareViewListener listener: listeners)
-            listener.buttonClick(event.getButton().getCaption(),item);
+        if (valid){//call listeners if valid
+            for (InvoiceShareViewListener listener: listeners)
+                listener.buttonClick(event.getButton().getCaption(),item);
+        }
     }
 
     public void setInstances(Collection<Instance> instances) {
@@ -117,7 +139,7 @@ public class InvoiceShareViewImpl extends CustomComponent implements InvoiceShar
     public void itemClick(ItemClickEvent event) {
         for (InvoiceShareViewListener listener: listeners){
             if (event.getItemId() instanceof InstanceShareBean){
-                listener.instanceShareSelected((InstanceShareBean)event.getItemId());
+                listener.instanceShareSelected((InstanceShareBean)event.getItemId(),false);
             }else if (event.getItemId() instanceof InstanceShareDetailBean) {
                 listener.instanceShareDetailSelected((InstanceShareDetailBean)event.getItemId());               
             }
@@ -132,18 +154,41 @@ public class InvoiceShareViewImpl extends CustomComponent implements InvoiceShar
     }
     @Override
     public void setInstanceShareDetails(InstanceShare item) {
-        instanceShareComponent.setInstanceShareDetails(item);     
-
+        instanceShareComponent.setInstanceShareDetails(item); 
+        
     }
 
     @Override
     public void editInstanceShare(InstanceShareBean instanceShare){
         instanceShareComponent.editInstanceShare(instanceShare);
+        
+        //make sure that this instanceShare is selected
+        //instanceShareComponent.getSharesTable().select(instanceShare);
+
     }
 
     @Override
     public void editInstanceShareDetail(InstanceShareDetailBean instanceShareDetail){
         instanceShareComponent.editInstanceShareDetail(instanceShareDetail);
+    }
+
+    @Override
+    public void showConfirmDialog(final Object item, final Object previousItem, String message1, String message2, String okCaption, String cancelCaption) {
+        ConfirmDialog.show(ui, message1, message2, okCaption, cancelCaption, new ConfirmDialog.Listener() {
+
+                    public void onClose(ConfirmDialog dialog) {
+                        if (dialog.isConfirmed()) {
+                            for (InvoiceShareViewListener listener: listeners){
+                                listener.instanceShareSelected((InstanceShareBean)item,true);
+                            }
+                            // Confirmed to continue
+                        } else {
+                            for (InvoiceShareViewListener listener: listeners){
+                                listener.instanceShareSelected((InstanceShareBean)previousItem,true);
+                            }
+                        }
+                    }
+                });
     }
 
 }

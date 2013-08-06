@@ -20,7 +20,7 @@ public interface InvoiceShareView{
     public interface InvoiceShareViewListener{
         public void buttonClick(final String buttonName, final Object item);
         public void instanceSelected(InstanceSelectionBean value);
-        public void instanceShareSelected(InstanceShareBean value);
+        public void instanceShareSelected(InstanceShareBean value, boolean force);
         public void instanceShareDetailSelected(InstanceShareDetailBean itemId);
     }
 
@@ -37,5 +37,7 @@ public interface InvoiceShareView{
     public void editInstanceShare(InstanceShareBean instanceShare);
 
     public void editInstanceShareDetail(InstanceShareDetailBean item);
+
+    public void showConfirmDialog(final Object item, final Object previousItem, String message1, String message2,String okCaption, String cancelCaption);
 
 }

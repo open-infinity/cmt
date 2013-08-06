@@ -1,7 +1,10 @@
 package org.openinfinity.cloud.domain;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -37,6 +40,7 @@ public class InstanceShare implements Serializable {
 	@Column(name="modified_by")
 	private int modifiedBy;
 
+	@NotNull(message="Start of period is mandatory")
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name="period_start")
 	private Date periodStart;
@@ -90,6 +94,16 @@ public class InstanceShare implements Serializable {
 		instanceShareInvoiceTbl.setInstanceShare(null);
 
 		return instanceShareInvoiceTbl;
+	}
+	
+	public BigDecimal calculateSharePercent(){
+	    BigDecimal ret = new BigDecimal("0");
+	    for (InstanceShareDetail detail: this.instanceShareDetails){
+	        ret=ret.add(detail.getSharePercent());
+	    }
+	    
+	    //round up to 2 decimal places (causes 99.999 to round up to 100)
+	    return ret.setScale(2, BigDecimal.ROUND_HALF_UP);
 	}
 	
 	public String toCSV(String delimiter) {
