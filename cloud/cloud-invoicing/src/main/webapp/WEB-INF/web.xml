@@ -30,6 +30,12 @@
             <!--<param-value>com.vaadin.tutorial.addressbook.AddressbookUI</param-value>-->
             <param-value>org.openinfinity.cloud.application.invoicing.InvoicingUI</param-value>
         </init-param>
+        <init-param>
+        	<description>
+        	Application widgetset</description>
+        	<param-name>widgetset</param-name>
+        	<param-value>org.openinfinity.cloud.application.invoicing.widgetset.Cloud_invoicingWidgetset</param-value>
+        </init-param>
     </servlet>
 
     <servlet-mapping>
