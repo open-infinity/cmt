@@ -22,6 +22,9 @@ public interface InvoiceShareView{
         public void instanceSelected(InstanceSelectionBean value);
         public void instanceShareSelected(InstanceShareBean value, boolean force);
         public void instanceShareDetailSelected(InstanceShareDetailBean itemId);
+        
+        //reverts possible changes by re-fetching information
+        public void cancelChanges();
     }
 
     public void addListener(InvoiceShareViewListener listener);
@@ -38,6 +41,26 @@ public interface InvoiceShareView{
 
     public void editInstanceShareDetail(InstanceShareDetailBean item);
 
-    public void showConfirmDialog(final Object item, final Object previousItem, String message1, String message2,String okCaption, String cancelCaption);
+    /**
+     * Shows config dialog for selection of instance share when user has uncommitted changes
+     * @param item
+     * @param previousItem
+     * @param message1
+     * @param message2
+     * @param okCaption
+     * @param cancelCaption
+     */
+    public void showConfirmDialogForShareSelection(final Object item, final Object previousItem, String message1, String message2,String okCaption, String cancelCaption);
+    
+    /**
+     * Shows config dialog for selection of instance share when user has uncommitted changes
+     * @param item
+     * @param previousItem
+     * @param message1
+     * @param message2
+     * @param okCaption
+     * @param cancelCaption
+     */
+    public void showConfirmDialog(String message1, String message2,String okCaption, String cancelCaption);
 
 }

@@ -23,6 +23,10 @@ public class InstanceShareBean {
 
     private InstanceShare instanceShare;
 
+    public void setInstanceShare(InstanceShare instanceShare) {
+        this.instanceShare = instanceShare;
+    }
+
     public long getId() {
         return instanceShare.getId();
     }

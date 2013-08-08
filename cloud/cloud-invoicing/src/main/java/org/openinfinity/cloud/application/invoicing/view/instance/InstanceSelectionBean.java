@@ -15,6 +15,9 @@ public class InstanceSelectionBean {
         this.instance=instance;
     }
     private Instance instance;
+    public void setStatus(String status) {
+        instance.setStatus(status);
+    }
     public int getCloudType() {
         return instance.getCloudType();
     }
