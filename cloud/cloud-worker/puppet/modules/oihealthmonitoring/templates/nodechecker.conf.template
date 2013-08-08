@@ -31,14 +31,10 @@ dead_node_string = has not been updated for
 
 
 [email]
-#subject = TOAS Health Monitoring Notification
-#from = <%=mail_from%>
-#to = <%=default_mail_recepient%>
-#smpt_server = <%=mail_host%>
 subject = TOAS Health Monitoring Notification
-from = k@t.com
-to = v@t.com
-smpt_server = s.com
+from = <%=mail_from%>
+to = <%=default_mail_recepient%>
+smpt_server = <%=mail_host%>
 
 
 [collectd]
