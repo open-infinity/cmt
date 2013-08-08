@@ -32,16 +32,33 @@ import com.vaadin.ui.VerticalLayout;
 
 public class InvoiceShareViewImpl extends CustomComponent implements InvoiceShareView, ClickListener,ValueChangeListener,ItemClickListener {
 
-    public InstanceSelectionComponent getInstanceSelectionComponent() {
-        return instanceSelectionComponent;
-    }
-
-    public InstanceShareComponent getInstanceShareComponent() {
-        return instanceShareComponent;
-    }
-
     InstanceSelectionComponent instanceSelectionComponent;
     InstanceShareComponent instanceShareComponent;
+
+    public void addShareToView(InstanceShareBean item) {
+        instanceShareComponent.addShareToView(item);
+    }
+
+    public Collection<InstanceShareBean> getInstanceSharesFromView() {
+        return instanceShareComponent.getInstanceSharesFromView();
+    }
+
+    public Collection<InstanceShareDetailBean> getInstanceShareDetailsFromView() {
+        return instanceShareComponent.getInstanceShareDetailsFromView();
+    }
+
+    public void addShareDetailToView(InstanceShareDetailBean item) {
+        instanceShareComponent.addShareDetailToView(item);
+    }
+
+    public void removeShareDetailFromView(InstanceShareDetailBean item) {
+        instanceShareComponent.removeShareDetailFromView(item);
+    }
+
+    public Collection<InstanceShareDetailBean> getRemovedShareDetails() {
+        return instanceShareComponent.getRemovedShareDetails();
+    }
+
     private InvoicingUI ui;
     private Button saveFormBtn;
     private Button cancelFormBtn;

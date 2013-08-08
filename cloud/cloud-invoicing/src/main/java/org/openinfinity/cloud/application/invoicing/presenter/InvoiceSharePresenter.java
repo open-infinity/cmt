@@ -51,7 +51,7 @@ public class InvoiceSharePresenter implements InvoiceShareViewListener {
 
                 view.editInstanceShare(null);
                 */
-                view.getInstanceShareComponent().addShareToView((InstanceShareBean) item);
+                view.addShareToView((InstanceShareBean) item);
                 view.editInstanceShare(null);
                 
                 
@@ -82,7 +82,7 @@ public class InvoiceSharePresenter implements InvoiceShareViewListener {
                     }
                     
                 }*/
-                view.getInstanceShareComponent().addShareDetailToView((InstanceShareDetailBean) item);
+                view.addShareDetailToView((InstanceShareDetailBean) item);
                 view.editInstanceShareDetail(null);
 
                 
@@ -95,17 +95,23 @@ public class InvoiceSharePresenter implements InvoiceShareViewListener {
                 view.setInstanceShares(model.getInstanceShares(model.getSelectedInstance().getInstanceId()));
                 view.editInstanceShare(null);
             }else if (item instanceof InstanceShareDetailBean){
+                
+                /*
                 model.deleteInstanceShareDetail((InstanceShareDetailBean)item);
 
                 InstanceShare instanceShare = model.getInstanceShare(model.getSelectedInstanceShare().getId());
                 view.setInstanceShareDetails( instanceShare);
                 view.editInstanceShareDetail(null);
+                */
+                view.removeShareDetailFromView((InstanceShareDetailBean) item);
+                view.editInstanceShareDetail(null);
+                
             }
         }
         
         if ("Submit".equals(buttonName)){
             //validate submit
-            BigDecimal sumOfShares=calculateSharePercent(view.getInstanceShareComponent().getInstanceShareDetailsFromView());
+            BigDecimal sumOfShares=calculateSharePercent(view.getInstanceShareDetailsFromView());
             if (sumOfShares.compareTo(BIGDECIMAL100)==0){
                 //TODO: notification to user
                 if ("Pending".equals(model.getSelectedInstance().getStatus())){
@@ -121,13 +127,22 @@ public class InvoiceSharePresenter implements InvoiceShareViewListener {
                     model.getSelectedInstance().setStatus("Starting");
                     
                 }
-                for (InstanceShareBean share:view.getInstanceShareComponent().getInstanceSharesFromView()){
+                for (InstanceShareBean share:view.getInstanceSharesFromView()){
                     InstanceShare saveInstanceShare = model.saveInstanceShare(share.toDomainObject());
                     share.setInstanceShare(saveInstanceShare);
 
                 }
                 
-                for (InstanceShareDetailBean detail: view.getInstanceShareComponent().getInstanceShareDetailsFromView()){
+                //first remove items
+                for (InstanceShareDetailBean detail: view.getRemovedShareDetails()){
+                    if (detail.getId().intValue()!=-1){
+                        model.deleteInstanceShareDetail(detail);
+                    }
+                    
+                }
+                
+                //then save from view
+                for (InstanceShareDetailBean detail: view.getInstanceShareDetailsFromView()){
                     model.saveInstanceShareDetail(detail);
                     
                 }

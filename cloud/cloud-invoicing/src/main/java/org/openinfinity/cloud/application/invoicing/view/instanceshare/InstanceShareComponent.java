@@ -1,5 +1,6 @@
 package org.openinfinity.cloud.application.invoicing.view.instanceshare;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -47,6 +48,7 @@ public class InstanceShareComponent extends CustomComponent{
     }
 
     private Table shareDetailsTable;
+    private Collection<InstanceShareDetailBean> removedShareDetails;
 
     private long newShareDetailId=-1;
     private long newShareId=-1;
@@ -88,7 +90,11 @@ public class InstanceShareComponent extends CustomComponent{
     }
 
     public void setInstanceShareDetails(InstanceShare item){
+        
+        //remove items from view
         shareDetailsTable.removeAllItems();
+        //remove also items from list that contains removed items
+        removedShareDetails=null;
 
         Collection<InstanceShareDetail> details= (item==null ? Collections.<InstanceShareDetail>emptyList() : item.getInstanceShareDetails() );
 
@@ -423,5 +429,19 @@ public class InstanceShareComponent extends CustomComponent{
         
     }
 
+    public void removeShareDetailFromView(InstanceShareDetailBean item) {
+        if (shareDetailsTable.getContainerDataSource().containsId(item)){
+            shareDetailsTable.getContainerDataSource().removeItem(item);
+            if (removedShareDetails==null){
+                removedShareDetails=new ArrayList<InstanceShareDetailBean>();
+            }
+            removedShareDetails.add(item);
+            
+        }        
+    }
+    
+    public Collection<InstanceShareDetailBean> getRemovedShareDetails(){
+        return (removedShareDetails==null ? Collections.<InstanceShareDetailBean>emptyList() : removedShareDetails);
+    }
 
 }

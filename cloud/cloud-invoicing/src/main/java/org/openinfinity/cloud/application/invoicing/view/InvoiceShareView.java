@@ -34,12 +34,23 @@ public interface InvoiceShareView{
     public void setInstanceShares(Collection<InstanceShare> instanceShares);
 
     public void setInstanceShareDetails(InstanceShare instanceShare);
-
-    public InstanceShareComponent getInstanceShareComponent();
-
+    
     public void editInstanceShare(InstanceShareBean instanceShare);
 
     public void editInstanceShareDetail(InstanceShareDetailBean item);
+    
+    public void addShareToView(InstanceShareBean item);
+
+    public Collection<InstanceShareBean> getInstanceSharesFromView();
+
+    public Collection<InstanceShareDetailBean> getInstanceShareDetailsFromView();
+
+    public void addShareDetailToView(InstanceShareDetailBean item);
+
+    public void removeShareDetailFromView(InstanceShareDetailBean item);
+
+    public Collection<InstanceShareDetailBean> getRemovedShareDetails();
+
 
     /**
      * Shows config dialog for selection of instance share when user has uncommitted changes
