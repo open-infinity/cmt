@@ -56,7 +56,7 @@ class oiportal::config {
                 owner => 'toas',
                 group => 'toas',
                 mode => 0755,
-                source => "puppet:///modules/oiportal/setenv.sh",
+                content => template("oiportal/setenv.sh.erb"),
                 require => Class["oiportal::install"],
         }
 

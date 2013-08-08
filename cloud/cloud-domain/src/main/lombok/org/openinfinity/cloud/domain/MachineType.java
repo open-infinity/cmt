@@ -40,5 +40,10 @@ public class MachineType implements Serializable {
 	private String name;
 	@NotScript
 	private String specification;
-		
+	@NotScript
+	private int cores;
+	@NotScript
+	private int ram;
+	@NotScript
+	private int disk;
 }
