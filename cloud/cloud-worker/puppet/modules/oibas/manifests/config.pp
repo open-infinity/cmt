@@ -9,7 +9,7 @@ class oibas::config {
                 owner => 'toas',
                 group => 'toas',
                 mode => 0755,
-                source => "puppet:///modules/oibas/setenv.sh",
+                content => template("oibas/setenv.sh.erb"),
                 require => Class["oibas::install"],
         }
 

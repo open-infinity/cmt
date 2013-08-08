@@ -69,6 +69,9 @@ class MachineTypeRepositoryJdbcImpl implements MachineTypeRepository{
             mt.setId(rs.getInt("id"));
             mt.setName(rs.getString("name"));
             mt.setSpecification(rs.getString("spec"));
+            mt.setCores(rs.getInt("cores"));
+            mt.setRam(rs.getInt("ram"));
+            mt.setDisk(rs.getInt("disk"));
             return mt;
         }
     }
