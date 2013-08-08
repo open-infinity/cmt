@@ -71,6 +71,21 @@ public class InstanceShareComponent extends CustomComponent{
         return shareDetailsTable;
     }
 
+    public void setInstanceShares(Collection<InstanceShare> instanceShares) {
+
+        sharesTable.removeAllItems();
+
+        BeanItemContainer<InstanceShareBean> beans=new BeanItemContainer<InstanceShareBean>(InstanceShareBean.class);
+        for (InstanceShare item:instanceShares){
+            beans.addBean(new InstanceShareBean(item));
+        }
+
+        sharesTable.setContainerDataSource(beans);
+        sharesTable.setColumnHeader("periodStart", "Period");
+        sharesTable.setVisibleColumns(new Object[]{"periodStart"});
+
+
+    }
 
     public void setInstanceShareDetails(InstanceShare item){
         shareDetailsTable.removeAllItems();
@@ -106,18 +121,6 @@ public class InstanceShareComponent extends CustomComponent{
 
     }
 
-    public void setInstanceShares(Collection<InstanceShare> instanceShares) {
-
-        sharesTable.removeAllItems();
-
-        BeanItemContainer<InstanceShareBean> beans=new BeanItemContainer<InstanceShareBean>(InstanceShareBean.class);
-        for (InstanceShare item:instanceShares){
-            beans.addBean(new InstanceShareBean(item));
-        }
-
-        sharesTable.setContainerDataSource(beans);
-
-    }
 
 
     public Item getInstanceShareItemDataSource() {
@@ -182,7 +185,7 @@ public class InstanceShareComponent extends CustomComponent{
     private Component buildInstanceShareFormControls(ClickListener clickListener) {
         instanceShareFormControls=new HorizontalLayout();
         instanceShareFormControls.setSpacing(true);
-        saveInstanceShareBtn = new Button("Save", new ClickListener() {
+        saveInstanceShareBtn = new Button("OK", new ClickListener() {
             public void buttonClick(ClickEvent event) {
                 try {
                         instanceShareFieldGroup.commit();
@@ -195,6 +198,7 @@ public class InstanceShareComponent extends CustomComponent{
         Button discard = new Button("Discard", new ClickListener() {
             public void buttonClick(ClickEvent event) {
                 instanceShareFieldGroup.discard();
+                editInstanceShare(null);
             }
         });
         instanceShareFormControls.addComponent(saveInstanceShareBtn);
@@ -277,7 +281,7 @@ public class InstanceShareComponent extends CustomComponent{
         instanceShareDetailFormControls = new HorizontalLayout();
         instanceShareDetailFormControls.setSpacing(true);
 //        saveInstanceShareDetailBtn = new Button("Save");
-        saveInstanceShareDetailBtn = new Button("Save", new ClickListener() {
+        saveInstanceShareDetailBtn = new Button("OK", new ClickListener() {
             public void buttonClick(ClickEvent event) {
                 try {
                     instanceShareDetailFieldGroup.commit();
@@ -293,6 +297,7 @@ public class InstanceShareComponent extends CustomComponent{
         Button discard = new Button("Discard", new ClickListener() {
             public void buttonClick(ClickEvent event) {
                 instanceShareDetailFieldGroup.discard();
+                editInstanceShareDetail(null);
             }
         });
         instanceShareDetailFormControls.addComponent(saveInstanceShareDetailBtn);
@@ -388,11 +393,34 @@ public class InstanceShareComponent extends CustomComponent{
 
         BeanItemContainer<InstanceShareBean> shareBeans=new BeanItemContainer<InstanceShareBean>(InstanceShareBean.class);
         sharesTable.setContainerDataSource(shareBeans);
-        sharesTable.setColumnHeader("periodStart", "Period");
 
+        sharesTable.setColumnHeader("periodStart", "Period");
         sharesTable.setVisibleColumns(new Object[]{"periodStart"});
 
         return sharesTable;
+    }
+
+    public void addShareToView(InstanceShareBean item) {
+        sharesTable.getContainerDataSource().addItem(item);
+        
+    }
+    
+    public Collection<InstanceShareBean> getInstanceSharesFromView(){
+        Collection<InstanceShareBean> itemIds = (Collection<InstanceShareBean>) sharesTable.getContainerDataSource().getItemIds();
+        return itemIds;
+    }
+
+    public Collection<InstanceShareDetailBean> getInstanceShareDetailsFromView() {
+        Collection<InstanceShareDetailBean> itemIds = (Collection<InstanceShareDetailBean>) shareDetailsTable.getContainerDataSource().getItemIds();
+        return itemIds;
+    }
+
+    public void addShareDetailToView(InstanceShareDetailBean item) {
+        if (shareDetailsTable.getContainerDataSource().containsId(item)){
+            shareDetailsTable.getContainerDataSource().removeItem(item);
+        }
+        shareDetailsTable.getContainerDataSource().addItem(item);
+        
     }
 
 

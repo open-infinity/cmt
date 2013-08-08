@@ -20,9 +20,12 @@ import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.event.ItemClickEvent.ItemClickListener;
+import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
+import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
 
@@ -40,6 +43,8 @@ public class InvoiceShareViewImpl extends CustomComponent implements InvoiceShar
     InstanceSelectionComponent instanceSelectionComponent;
     InstanceShareComponent instanceShareComponent;
     private InvoicingUI ui;
+    private Button saveFormBtn;
+    private Button cancelFormBtn;
 
     public InvoiceShareViewImpl(InvoicingUI invoicingUI) {
         super();
@@ -56,12 +61,46 @@ public class InvoiceShareViewImpl extends CustomComponent implements InvoiceShar
 
         instanceShareComponent = new InstanceShareComponent(this);
         mainLayout.addComponent(instanceShareComponent);
+        
+        mainLayout.addComponent(buildFormControls());
 
         // Set the size as undefined at all levels
         mainPanel.getContent().setSizeUndefined();
         mainPanel.setSizeUndefined();
         setSizeUndefined();
 
+    }
+
+    private Component buildFormControls() {
+        HorizontalLayout controls=new HorizontalLayout();
+        
+        saveFormBtn = new Button("Submit");
+        saveFormBtn.addClickListener(this);
+        controls.addComponent(saveFormBtn);
+        
+        cancelFormBtn = new Button("Cancel",new ClickListener(){
+
+            @Override
+            public void buttonClick(ClickEvent event) {
+                ConfirmDialog.show(ui, "Do you want to cancel all changes", "Press Yes to continue, or No to get back editing", "Yes", "No", new ConfirmDialog.Listener() {
+
+                    public void onClose(ConfirmDialog dialog) {
+                        if (dialog.isConfirmed()) {
+                            for (InvoiceShareViewListener listener: listeners){
+                                listener.cancelChanges();
+                            }
+                        } else {
+                        }
+                    }
+                });
+     
+            }
+            
+        });
+        cancelFormBtn.addClickListener(this);
+        controls.addComponent(cancelFormBtn);
+        // TODO Auto-generated method stub
+        return controls;
     }
 
     private static final long serialVersionUID = 1L;
@@ -82,7 +121,7 @@ public class InvoiceShareViewImpl extends CustomComponent implements InvoiceShar
         Object item=null;
         
         boolean valid=true;
-        if ("Save".equals(event.getButton().getCaption())){
+        if ("OK".equals(event.getButton().getCaption())){
 
             //Saving of InstanceShare; get InstanceShareBean from form data
             if (event.getButton().equals(instanceShareComponent.getSaveInstanceShareBtn())){
@@ -173,7 +212,7 @@ public class InvoiceShareViewImpl extends CustomComponent implements InvoiceShar
     }
 
     @Override
-    public void showConfirmDialog(final Object item, final Object previousItem, String message1, String message2, String okCaption, String cancelCaption) {
+    public void showConfirmDialogForShareSelection(final Object item, final Object previousItem, String message1, String message2, String okCaption, String cancelCaption) {
         ConfirmDialog.show(ui, message1, message2, okCaption, cancelCaption, new ConfirmDialog.Listener() {
 
                     public void onClose(ConfirmDialog dialog) {
@@ -186,6 +225,18 @@ public class InvoiceShareViewImpl extends CustomComponent implements InvoiceShar
                             for (InvoiceShareViewListener listener: listeners){
                                 listener.instanceShareSelected((InstanceShareBean)previousItem,true);
                             }
+                        }
+                    }
+                });
+    }
+    
+    @Override
+    public void showConfirmDialog(String message1, String message2, String okCaption, String cancelCaption) {
+        ConfirmDialog.show(ui, message1, message2, okCaption, cancelCaption, new ConfirmDialog.Listener() {
+
+                    public void onClose(ConfirmDialog dialog) {
+                        if (dialog.isConfirmed()) {
+                        } else {
                         }
                     }
                 });

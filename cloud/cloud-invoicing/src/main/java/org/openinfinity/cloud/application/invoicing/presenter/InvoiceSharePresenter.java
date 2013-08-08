@@ -11,6 +11,7 @@ import org.openinfinity.cloud.application.invoicing.view.instance.InstanceSelect
 import org.openinfinity.cloud.application.invoicing.view.instanceshare.InstanceShareBean;
 import org.openinfinity.cloud.application.invoicing.view.instanceshare.InstanceShareDetailBean;
 import org.openinfinity.cloud.domain.InstanceShare;
+import org.openinfinity.cloud.domain.InstanceShareDetail;
 import org.openinfinity.cloud.domain.Job;
 import org.openinfinity.cloud.service.administrator.JobService;
 
@@ -37,18 +38,28 @@ public class InvoiceSharePresenter implements InvoiceShareViewListener {
     public void buttonClick(String buttonName,Object item) {
         //Notification.show("Button clicked:", buttonName,
         //        Type.TRAY_NOTIFICATION);
-        if ("Save".equals(buttonName)){
+        if ("OK".equals(buttonName)){
 
             if (item instanceof InstanceShareBean){ // save instance share
-                model.saveInstanceShare((InstanceShareBean)item);
+                
+                /* changed to save via additional Submit button
+                model.saveInstanceShare(((InstanceShareBean)item).toDomainObject());
                 view.setInstanceShares(model.getInstanceShares(model.getSelectedInstance().getInstanceId()));
 
                 InstanceShare instanceShare = model.getInstanceShare(model.getSelectedInstanceShare().getId());
                 view.setInstanceShareDetails( instanceShare);
 
                 view.editInstanceShare(null);
+                */
+                view.getInstanceShareComponent().addShareToView((InstanceShareBean) item);
+                view.editInstanceShare(null);
+                
+                
+                
+                
             }else{ //save instance share details
-                //Save from view to model
+                //Save from view to model, commented due to saving first to view
+                /*
                 model.saveInstanceShareDetail((InstanceShareDetailBean) item);
                 InstanceShare instanceShare = model.getInstanceShare(model.getSelectedInstanceShare().getId());
                 view.setInstanceShareDetails( instanceShare);
@@ -70,7 +81,12 @@ public class InvoiceSharePresenter implements InvoiceShareViewListener {
                         
                     }
                     
-                }
+                }*/
+                view.getInstanceShareComponent().addShareDetailToView((InstanceShareDetailBean) item);
+                view.editInstanceShareDetail(null);
+
+                
+                
             }
         }
         if ("Delete".equals(buttonName)){
@@ -86,8 +102,58 @@ public class InvoiceSharePresenter implements InvoiceShareViewListener {
                 view.editInstanceShareDetail(null);
             }
         }
+        
+        if ("Submit".equals(buttonName)){
+            //validate submit
+            BigDecimal sumOfShares=calculateSharePercent(view.getInstanceShareComponent().getInstanceShareDetailsFromView());
+            if (sumOfShares.compareTo(BIGDECIMAL100)==0){
+                //TODO: notification to user
+                if ("Pending".equals(model.getSelectedInstance().getStatus())){
+                    //updating instance state to Starting status
+                    Notification.show("Updating instance to starting state");
+                    Collection<Job> jobsForInstance = model.getJobsForInstance(model.getSelectedInstance().getInstanceId());
+                    for (Job job:jobsForInstance){
+                        if (job.getJobStatus()==JobService.CLOUD_JOB_PENDING && "create_instance".equals(job.getJobType())){
+                            model.updateJobStatus(job.getJobId(),JobService.CLOUD_JOB_CREATED);
+                        }
+                    }
+                    model.updateInstanceStatus(model.getSelectedInstance().getInstanceId(), "Starting");
+                    model.getSelectedInstance().setStatus("Starting");
+                    
+                }
+                for (InstanceShareBean share:view.getInstanceShareComponent().getInstanceSharesFromView()){
+                    InstanceShare saveInstanceShare = model.saveInstanceShare(share.toDomainObject());
+                    share.setInstanceShare(saveInstanceShare);
+
+                }
+                
+                for (InstanceShareDetailBean detail: view.getInstanceShareComponent().getInstanceShareDetailsFromView()){
+                    model.saveInstanceShareDetail(detail);
+                    
+                }
+                
+                //Update view
+                view.setInstanceShares(model.getInstanceShares(model.getSelectedInstance().getInstanceId()));
+                InstanceShare instanceShare = model.getInstanceShare(model.getSelectedInstanceShare().getId());
+                view.setInstanceShareDetails( instanceShare);
+                
+            }else{
+                view.showConfirmDialog("Share percent", "Instance share percent sum must be 100% before submit", "OK", null);
+            }
+        }
 
     }
+    
+    private BigDecimal calculateSharePercent(Collection<InstanceShareDetailBean> details){
+        BigDecimal ret = new BigDecimal("0");
+        for (InstanceShareDetailBean detail: details){
+            ret=ret.add(detail.toDomainObject().getSharePercent());
+        }
+        
+        //round up to 2 decimal places (causes 99.999 to round up to 100)
+        return ret.setScale(2, BigDecimal.ROUND_HALF_UP);
+    }
+
 
     @Override
     public void instanceSelected(InstanceSelectionBean value) {
@@ -112,11 +178,11 @@ public class InvoiceSharePresenter implements InvoiceShareViewListener {
         boolean skipSelection=false;
         
         //check if previous selection was done and it is not complete
-        if (model.getSelectedInstanceShare()!=null){
+        /*if (model.getSelectedInstanceShare()!=null){
             InstanceShare instanceShare = model.getInstanceShare(model.getSelectedInstanceShare().getId());
             if (instanceShare.calculateSharePercent().compareTo(BIGDECIMAL100) != 0  && !force){
                 skipSelection=true;
-                view.showConfirmDialog(item, model.getSelectedInstanceShare(), "Please confirm", "Calculated sum of share detail percents differs from 100 %","Continue","Undo selection");
+                view.showConfirmDialogForShareSelection(item, model.getSelectedInstanceShare(), "Please confirm", "Calculated sum of share detail percents differs from 100 %","Continue","Undo selection");
                 
             }
         } else{
@@ -124,7 +190,7 @@ public class InvoiceSharePresenter implements InvoiceShareViewListener {
             Notification.show("Item " +
                     item + " clicked.");
             
-        }
+        }*/
         if (!skipSelection){
         
             InstanceShare instanceShare = model.getInstanceShare(item.getId());
@@ -134,9 +200,14 @@ public class InvoiceSharePresenter implements InvoiceShareViewListener {
             view.editInstanceShareDetail(null);
         }
 
-
     }
 
+    @Override
+    public void cancelChanges() {
+        instanceSelected(model.getSelectedInstance());
+    }
+
+    
     @Override
     public void instanceShareDetailSelected(InstanceShareDetailBean item) {
         view.editInstanceShareDetail(item);
