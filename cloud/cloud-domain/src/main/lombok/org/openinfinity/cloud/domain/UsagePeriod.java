@@ -139,11 +139,12 @@ public class UsagePeriod {
 				errorCount++; // There should be error count, but increment just in case.
 				errorMessage = "No start time for the machine id : " + uh.getMachineId() + ". Can not calculate uptime.";
 				LOGGER.warn(errorMessage);
-				
 			}
 			
 			long uptime = 0;
-			if (machineStartTime != null) {
+			if (machineStartTime != null &&
+				machineStartTime.getTime() < endTime.getTime() &&
+				(machineStopTime == null || machineStopTime.getTime() > startTime.getTime())) {				
 				Date countStartTime;
 				Date countEndTime;				
 				if (machineStartTime.getTime() > startTime.getTime()) {

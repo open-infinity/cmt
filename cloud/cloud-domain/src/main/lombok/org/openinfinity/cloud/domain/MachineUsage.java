@@ -1,5 +1,6 @@
 package org.openinfinity.cloud.domain;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.validation.constraints.NotNull;
@@ -20,6 +21,7 @@ public final class MachineUsage {
 	public enum State {
 		USAGE_DATA_VALID, USAGE_DATA_INVALID;
 	}
+	private static final SimpleDateFormat DF = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
 	
 	@Getter private final State state;
 	@Getter private final int machineId;
@@ -116,12 +118,20 @@ public final class MachineUsage {
 				machineMachineType + delimiter +
 				clusterEbsImageUsed + delimiter +
 				clusterEbsVolumesUsed + delimiter +
-				started + delimiter +
-				stopped + delimiter +
-				periodStart + delimiter +
-				periodEnd + delimiter +
+				formatDate(started) + delimiter +
+				formatDate(stopped) + delimiter +
+				formatDate(periodStart) + delimiter +
+				formatDate(periodEnd) + delimiter +
 				getUptimeInMinutes() + delimiter +
 				errorCount + delimiter +
 				errorMessage;
+	}
+	
+	private String formatDate(Date d) {
+		String ret = "";
+		if (d != null) {
+			ret = DF.format(d);
+		}
+		return ret;
 	}
 }
