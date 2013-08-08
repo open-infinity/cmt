@@ -87,7 +87,7 @@ public class UsageServiceImplDBTest {
 	 * @throws Exception
 	 */
 	@Test
-	public void testPeriodStartSameAndEndSameAsUsageStartAndStopEvent() throws Exception {
+	public void testPeriodStartSameAndEndSameAsMachineStartAndStopEvent() throws Exception {
 		int organizationId = 10495;
 		
 		Date periodStart = returnDate("5/6/2013"); // Note, 0:00 o'clock
@@ -206,6 +206,60 @@ public class UsageServiceImplDBTest {
 		
 		assertEquals(15120, actual.get(1).getUptimeInMinutes());
 	}
+
+	/**
+	 * Test that the period starts later and than the machine stop event.
+	 * 
+	 * Start event   5.6.2013 12:00:00
+	 * Stop event   20.6.2013 12:00:00
+	 * 
+	 * Period start 22.6.2013  0:00:00
+	 * Period end   30.6.2013  0:00:00
+	 *  
+	 * @throws Exception
+	 */
+	@Test
+	public void testPeriodStartsLaterThanMachineStopEvent() throws Exception {
+		int organizationId = 10495;
+		
+		Date periodStart = returnDate("22/6/2013"); // Note, 0:00 o'clock
+		Date periodEnd = returnDate("30/6/2013");
+		
+		UsagePeriod usagePeriod = usageService.loadUsage(organizationId);
+		usagePeriod.setStartTime(periodStart);
+		usagePeriod.setEndTime(periodEnd);
+		Map<Integer, MachineUsage> actual = usagePeriod.getUptimeHoursPerMachine();
+
+		//There should not be any uptime data
+		assertEquals(0, actual.get(1).getUptimeInMinutes());
+	}
+
+	/**
+	 * Test that the period starts after machine stop event.
+	 * 
+	 * Start event   5.6.2013 12:00:00
+	 * Stop event   20.6.2013 12:00:00
+	 * 
+	 * Period start 22.6.2013  0:00:00
+	 * Period end   30.6.2013  0:00:00
+	 *  
+	 * @throws Exception
+	 */
+	@Test
+	public void testPeriodEndsBeforeMachineStartEvent() throws Exception {
+		int organizationId = 10495;
+		
+		Date periodStart = returnDate("1/6/2013"); // Note, 0:00 o'clock
+		Date periodEnd = returnDate("4/6/2013");
+		
+		UsagePeriod usagePeriod = usageService.loadUsage(organizationId);
+		usagePeriod.setStartTime(periodStart);
+		usagePeriod.setEndTime(periodEnd);
+		Map<Integer, MachineUsage> actual = usagePeriod.getUptimeHoursPerMachine();
+
+		//There should not be any uptime data
+		assertEquals(0, actual.get(1).getUptimeInMinutes());
+	}	
 	
 	/**
 	 * Test that the period start is same as machine start event. The machine has no stop event.
@@ -219,7 +273,7 @@ public class UsageServiceImplDBTest {
 	 * @throws Exception
 	 */
 	@Test
-	public void testPeriodStartSameAsUsageStarEvent() throws Exception {
+	public void testPeriodStartSameAsMachineStartEvent() throws Exception {
 		int organizationId = 10495;
 		
 		Date periodStart = returnDate("5/6/2013"); // Note, 0:00 o'clock
@@ -245,7 +299,7 @@ public class UsageServiceImplDBTest {
 	 * @throws Exception
 	 */
 	@Test
-	public void testPeriodStartEarlierThanUsageStarEvent() throws Exception {
+	public void testPeriodStartEarlierThanMachineStartEvent() throws Exception {
 		int organizationId = 10495;
 		
 		Date periodStart = returnDate("1/6/2013"); // Note, 0:00 o'clock
@@ -258,6 +312,59 @@ public class UsageServiceImplDBTest {
 		
 		assertEquals(35280, actual.get(21).getUptimeInMinutes());
 	}
+
+	/**
+	 * Test that the period starts later than the machine start event. The machine has no stop event.
+	 * 
+	 * Start event   5.6.2013 12:00:00
+	 * Stop event    No stop event for the machine
+	 * 
+	 * Period start  10.6.2013  0:00:00
+	 * Period end    30.6.2013  0:00:00
+	 *  
+	 * @throws Exception
+	 */
+	@Test
+	public void testPeriodStartLaterThanMachineStartEvent() throws Exception {
+		int organizationId = 10495;
+		
+		Date periodStart = returnDate("10/6/2013"); // Note, 0:00 o'clock
+		Date periodEnd = returnDate("30/6/2013");
+		
+		UsagePeriod usagePeriod = usageService.loadUsage(organizationId);
+		usagePeriod.setStartTime(periodStart);
+		usagePeriod.setEndTime(periodEnd);
+		Map<Integer, MachineUsage> actual = usagePeriod.getUptimeHoursPerMachine();
+		
+		assertEquals(28800, actual.get(21).getUptimeInMinutes());
+	}
+	
+	/**
+	 * Test that the period ends earlier than the machine start event. The machine has no stop event.
+	 * 
+	 * Start event   5.6.2013 12:00:00
+	 * Stop event    No stop event for the machine
+	 * 
+	 * Period start  1.6.2013  0:00:00
+	 * Period end    4.6.2013  0:00:00
+	 *  
+	 * @throws Exception
+	 */
+	@Test
+	public void testPeriodEndEarlierThanMachineStartEvent() throws Exception {
+		int organizationId = 10495;
+		
+		Date periodStart = returnDate("1/6/2013"); // Note, 0:00 o'clock
+		Date periodEnd = returnDate("4/6/2013");
+		
+		UsagePeriod usagePeriod = usageService.loadUsage(organizationId);
+		usagePeriod.setStartTime(periodStart);
+		usagePeriod.setEndTime(periodEnd);
+		Map<Integer, MachineUsage> actual = usagePeriod.getUptimeHoursPerMachine();
+		
+		assertEquals(0, actual.get(21).getUptimeInMinutes());
+	}
+	
 	
 	/**
 	 * Read data set xml file from classpath from the same package where the test class is located.
