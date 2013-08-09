@@ -375,6 +375,7 @@ public class CloudAdminController {
 				instance.setOrganizationid(orgIds[0]);
 			
 			instance.setCloudType(Integer.parseInt(pm.get("cloudtype")));
+			//instance.setStatus("Pending");
 			instance.setStatus("Pending");
 
             instanceService.addInstance(instance);
