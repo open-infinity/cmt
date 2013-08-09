@@ -26,6 +26,7 @@
     
     <context:component-scan base-package="org.openinfinity.cloud">
     	<context:exclude-filter type="regex" expression="org.openinfinity.cloud.service.healthmonitoring.*.*"/>
+        <context:exclude-filter type="regex" expression="org.openinfinity.cloud.service.invoicing.*.*" />
     </context:component-scan>
  
 	<task:annotation-driven executor="executorWithPool" scheduler="taskScheduler"/>
