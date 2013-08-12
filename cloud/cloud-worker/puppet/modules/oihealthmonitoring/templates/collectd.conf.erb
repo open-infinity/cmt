@@ -4,8 +4,6 @@
 # http://collectd.org/
 #
 
-# aaaaaaaaaaaaa 
-
 ##############################################################################
 # Global                                                                     #
 #----------------------------------------------------------------------------#
@@ -32,6 +30,8 @@ Interval     10
 Timeout      2
 ReadThreads  5
 
+Include "<%=toas_collectd_root%>/etc/collectd.d/"
+
 ##############################################################################
 # Logging                                                                    #
 #----------------------------------------------------------------------------#
@@ -40,11 +40,11 @@ ReadThreads  5
 # accessed.                                                                  #
 ##############################################################################
 
-LoadPlugin syslog
+#LoadPlugin syslog
 LoadPlugin logfile
 
 <Plugin logfile>
-	LogLevel info
+	LogLevel err
 #	File STDOUT
 #	Timestamp true
 #	PrintSeverity false
@@ -54,8 +54,6 @@ LoadPlugin logfile
 #	LogLevel info
 #</Plugin>
 
-# blablabla
-Include "<%=toas_collectd_root%>/etc/collectd.d/"
 ##############################################################################
 # LoadPlugin section                                                         #
 #----------------------------------------------------------------------------#
@@ -99,7 +97,7 @@ LoadPlugin interface
 ##LoadPlugin ipmi
 #LoadPlugin ipvs
 #LoadPlugin irq
-#LoadPlugin java
+LoadPlugin java
 ##LoadPlugin libvirt
 LoadPlugin load
 ##LoadPlugin lpar
@@ -413,10 +411,10 @@ LoadPlugin rrdtool
 #  Port "7634"
 #</Plugin>
 
-#<Plugin interface>
-#	Interface "eth0"
-#	IgnoreSelected false
-#</Plugin>
+<Plugin interface>
+	Interface "eth0"
+	IgnoreSelected false
+</Plugin>
 
 #<Plugin ipmi>
 #	Sensor "some_sensor"
@@ -438,15 +436,27 @@ LoadPlugin rrdtool
 #	IgnoreSelected true
 #</Plugin>
 
-#<Plugin "java">
-#	JVMArg "-verbose:jni"
-#	JVMArg "-Djava.class.path=/home/vedran/work/toas/packaging/hm/collectd/collectd-5.2.1/install_dir/share/collectd/java/collectd-api.jar"
-#
-#	LoadPlugin "org.collectd.java.Foobar"
-#	<Plugin "org.collectd.java.Foobar">
-#	  # To be parsed by the plugin
-#	</Plugin>
-#</Plugin>
+<Plugin "java">
+       JVMARG "-Djava.class.path=<%=toas_collectd_root%>/share/collectd/java/collectd-api.jar:<%=toas_collectd_root%>/share/collectd/java/generic-jmx.jar"
+       LoadPlugin "org.collectd.java.GenericJMX"  
+       <Plugin "GenericJMX">
+              <MBean "memory">
+                     ObjectName "java.lang:type=Memory"
+      	             <Value>
+                            Type "jmx_memory"
+                            Table true
+                            Attribute "HeapMemoryUsage"
+                     </Value>
+              </MBean>
+              <Connection>
+                     User monitorRole
+                     Password <%=tomcat_monitor_role_pwd%>
+                     Host "<%=hostname%>"
+                     ServiceURL "service:jmx:rmi:///jndi/rmi://localhost:<%=tomcat_jmx_port%>/jmxrmi"
+                     Collect "memory"
+              </Connection>
+       </Plugin>
+</Plugin>
 
 #<Plugin libvirt>
 #	Connection "xen:///"
@@ -458,6 +468,11 @@ LoadPlugin rrdtool
 #	HostnameFormat name
 #	InterfaceFormat name
 #</Plugin>
+
+<Plugin load>
+    ReportAbsoluteLoad false
+    ReportRelativeLoad true
+</Plugin>
 
 #<Plugin lpar>
 #	CpuPoolStats   false
@@ -859,9 +874,9 @@ LoadPlugin rrdtool
 #</Plugin>
 
 <Plugin rrdtool>
-	DataDir "/opt/openinfinity/2.0.0/healthmonitoring/collectd/var/lib/collectd/rrd"
-	CacheTimeout 120
-	CacheFlush   900
+        DataDir "<%=toas_collectd_root%>/var/lib/collectd/rrd"
+	CacheTimeout 0
+	CacheFlush   10
 </Plugin>
 
 #<Plugin sensors>
