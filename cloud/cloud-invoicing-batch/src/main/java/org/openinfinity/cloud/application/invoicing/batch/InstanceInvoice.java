@@ -121,7 +121,11 @@ public class InstanceInvoice {
 		
 		for (MachineUsage machineUsage : machineUsages.values()) {
 			if (instanceShare == null) {				
-				strBuffer.append(instance.toCSV(delimiter) + delimiter + machineUsage.toCSV(delimiter) + delimiter + "NO SHARE DATA" + lineFeed);
+				strBuffer.append(
+						instance.toCSV(delimiter) + delimiter + 
+						machineUsage.toCSV(delimiter) + delimiter + 
+						"NO SHARE DATA" + lineFeed
+						);
 			} else {
 				// Share data was found. Iterate through share data and create row for each share row.
 				List<InstanceShareDetail> shareDetails = instanceShare.getInstanceShareDetails();

@@ -231,7 +231,7 @@ public class UsageServiceImplDBTest {
 		Map<Integer, MachineUsage> actual = usagePeriod.getUptimeHoursPerMachine();
 
 		//There should not be any uptime data
-		assertEquals(0, actual.get(1).getUptimeInMinutes());
+		assertEquals(null, actual.get(1));
 	}
 
 	/**
@@ -258,7 +258,7 @@ public class UsageServiceImplDBTest {
 		Map<Integer, MachineUsage> actual = usagePeriod.getUptimeHoursPerMachine();
 
 		//There should not be any uptime data
-		assertEquals(0, actual.get(1).getUptimeInMinutes());
+		assertEquals(null, actual.get(1));
 	}	
 	
 	/**
@@ -362,7 +362,8 @@ public class UsageServiceImplDBTest {
 		usagePeriod.setEndTime(periodEnd);
 		Map<Integer, MachineUsage> actual = usagePeriod.getUptimeHoursPerMachine();
 		
-		assertEquals(0, actual.get(21).getUptimeInMinutes());
+		//There should not be any uptime data
+		assertEquals(null, actual.get(21));
 	}
 	
 	
