@@ -78,10 +78,10 @@ if (1) {
 	%hm_parameters = (
 		host_group => "cluster_" . $cluster,
                 hostname => $node_hostname,
-		java_home => "/usr/lib/jvm/java-1.6.0-openjdk-1.6.0.0.x86_64/",
+		java_home => "/usr/lib/jvm/java-1.6.0-openjdk-1.6.0.0.x86_64/jre",
 		mail_host => "",
 		mail_from => "",
-		default_mail_recepient => "vedran.bartonicek\@tieto.com",
+		default_mail_recepient => "",
 		toas_collectd_root => "/opt/openinfinity/2.0.0/healthmonitoring/collectd",
                 toas_rrd_http_server_root => "/opt/openinfinity/2.0.0/healthmonitoring/rrd-http-server",
 		toas_monitoring_root => "/opt/openinfinity/2.0.0/healthmonitoring/nodechecker",
