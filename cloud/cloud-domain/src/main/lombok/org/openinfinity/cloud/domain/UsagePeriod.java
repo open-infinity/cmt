@@ -162,29 +162,31 @@ public class UsagePeriod {
 				uptime = countEndTime.getTime() - countStartTime.getTime();				
 			}
 			
-			MachineUsage mu = new MachineUsage(
-					uh.getMachineId(),
-					uh.getInstanceId(),
-					uh.getClusterTypeTitle(),
-					uh.getClusterId(),
-					uh.getMachineTypeId(),
-					uh.getMachineTypeName(),
-					uh.getMachineTypeSpec(),
-					uh.getMachineMachineType(),
-					uh.getClusterEbsImageUsed(),
-					uh.getClusterEbsVolumesUsed(),
-					machineStartTime,
-					machineStopTime,
-					startTime,
-					endTime,
-					uptime,
-					errorCount,
-					errorMessage
-					);
-			LOGGER.debug(mu.toString());
-			LOGGER.debug("Uptime (sec): {}", mu.getUptimeInSeconds());
-			LOGGER.debug("Uptime (min): {}", mu.getUptimeInMinutes());
-			uptimePerMachine.put(mu.getMachineId(), mu);
+			if (uptime > 0 || errorCount > 0) {
+				MachineUsage mu = new MachineUsage(
+						uh.getMachineId(),
+						uh.getInstanceId(),
+						uh.getClusterTypeTitle(),
+						uh.getClusterId(),
+						uh.getMachineTypeId(),
+						uh.getMachineTypeName(),
+						uh.getMachineTypeSpec(),
+						uh.getMachineMachineType(),
+						uh.getClusterEbsImageUsed(),
+						uh.getClusterEbsVolumesUsed(),
+						machineStartTime,
+						machineStopTime,
+						startTime,
+						endTime,
+						uptime,
+						errorCount,
+						errorMessage
+						);
+				LOGGER.debug(mu.toString());
+				LOGGER.debug("Uptime (sec): {}", mu.getUptimeInSeconds());
+				LOGGER.debug("Uptime (min): {}", mu.getUptimeInMinutes());
+				uptimePerMachine.put(mu.getMachineId(), mu);
+			}
 		}
 		
 		return uptimePerMachine;
