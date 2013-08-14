@@ -24,9 +24,9 @@
                         <cloudadmin.worker.service.ee_platform.image.eucalyptus.0>emi-xxxxxxxxxx</cloudadmin.worker.service.ee_platform.image.eucalyptus.0>
                         <cloudadmin.worker.service.ee_platform.image.eucalyptus.1>emi-xxxxxxxxxx</cloudadmin.worker.service.ee_platform.image.eucalyptus.1>
                         <cloudadmin.worker.service.bigdata_platform.image.eucalyptus.0>emi-xxxxxxxxx</cloudadmin.worker.service.bigdata_platform.image.eucalyptus.0>
-			<cloudadmin.worker.service.bigdata_platform.image.eucalyptus.1>emi-xxxxxxxxx</cloudadmin.worker.service.bigdata_platform.image.eucalyptus.1>
+                        <cloudadmin.worker.service.bigdata_platform.image.eucalyptus.1>emi-xxxxxxxxx</cloudadmin.worker.service.bigdata_platform.image.eucalyptus.1>
                         <cloudadmin.worker.service.nosql_platform.image.eucalyptus.0>emi-xxxxxxxxxx</cloudadmin.worker.service.nosql_platform.image.eucalyptus.0>
-			<cloudadmin.worker.service.nosql_platform.image.eucalyptus.1>emi-xxxxxxxxxx</cloudadmin.worker.service.nosql_platform.image.eucalyptus.1>
+                        <cloudadmin.worker.service.nosql_platform.image.eucalyptus.1>emi-xxxxxxxxxx</cloudadmin.worker.service.nosql_platform.image.eucalyptus.1>
                         <euca.accessKey>abc1234567</euca.accessKey>
                         <euca.secretKey>abc1234567</euca.secretKey>
                         <euca.zonelist>zone1</euca.zonelist>
@@ -36,7 +36,12 @@
                         <cmt-admin.jdbc.url>jdbc:mysql://localhost</cmt-admin.jdbc.url>
                         <cmt-admin.jdbc.username>user</cmt-admin.jdbc.username>
                         <cmt-admin.jdbc.password>passwd</cmt-admin.jdbc.password>
-			
+                        
+                        <batch.mail.host>localhost</batch.mail.host>
+						<batch.mail.port>25</batch.mail.port>
+						<batch.invoice.mail.to>receiver1@some.com,receiver2@some.com,receiver3@some.com</batch.invoice.mail.to>
+						<batch.invoice.mail.from>invoice_batch@some.com.invalid</batch.invoice.mail.from>
+									
                         <aws.bucketendpoint>0.0.0.0</aws.bucketendpoint>		  
                         <aws.accessKey>abc1234567</aws.accessKey>
                         <aws.secretKey>abc1234567</aws.secretKey>
