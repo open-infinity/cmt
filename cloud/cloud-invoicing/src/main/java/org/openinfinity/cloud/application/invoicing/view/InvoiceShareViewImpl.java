@@ -26,6 +26,7 @@ import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
 
@@ -34,6 +35,31 @@ public class InvoiceShareViewImpl extends CustomComponent implements InvoiceShar
 
     InstanceSelectionComponent instanceSelectionComponent;
     InstanceShareComponent instanceShareComponent;
+    
+    private InstanceShareBean selectedInstanceShare;
+    private InstanceSelectionBean selectedInstance;
+
+    public InstanceSelectionBean getSelectedInstance() {
+        return selectedInstance;
+    }
+
+    public void setSelectedInstance(InstanceSelectionBean value) {
+        //TODO: optimize, now each select does database query
+        
+        //InstanceTblService instanceTblService = invoicingService.getInstanceTblService();
+        //this.selectedInstanceTbl = instanceTblService.findOne( Integer.valueOf(value.getInstanceId()).longValue());
+        
+        this.selectedInstance=value;
+    }
+
+    public InstanceShareBean getSelectedInstanceShare() {
+        return selectedInstanceShare;
+    }
+    
+    public void setSelectedInstanceShare(InstanceShareBean bean) {
+        this.selectedInstanceShare=bean;
+
+    }
 
     public void addShareToView(InstanceShareBean item) {
         instanceShareComponent.addShareToView(item);
@@ -50,6 +76,14 @@ public class InvoiceShareViewImpl extends CustomComponent implements InvoiceShar
     public void addShareDetailToView(InstanceShareDetailBean item) {
         instanceShareComponent.addShareDetailToView(item);
     }
+    
+    public void removeShareFromView(InstanceShareBean item) {
+        instanceShareComponent.removeShareFromView(item);
+    }
+
+    public Collection<InstanceShareBean> getRemovedShares() {
+        return instanceShareComponent.getRemovedShares();
+    }
 
     public void removeShareDetailFromView(InstanceShareDetailBean item) {
         instanceShareComponent.removeShareDetailFromView(item);
@@ -61,6 +95,14 @@ public class InvoiceShareViewImpl extends CustomComponent implements InvoiceShar
 
     private InvoicingUI ui;
     private Button saveFormBtn;
+    public Button getSaveFormBtn() {
+        return saveFormBtn;
+    }
+
+    public Button getCancelFormBtn() {
+        return cancelFormBtn;
+    }
+
     private Button cancelFormBtn;
 
     public InvoiceShareViewImpl(InvoicingUI invoicingUI) {
@@ -125,6 +167,16 @@ public class InvoiceShareViewImpl extends CustomComponent implements InvoiceShar
     /* Only the presenter registers one listener... */
     List<InvoiceShareViewListener> listeners =
             new ArrayList<InvoiceShareViewListener>();
+
+    protected boolean changed;
+
+    public void setChanged(boolean changed) {
+        this.changed = changed;
+    }
+
+    public boolean isChanged() {
+        return changed;
+    }
 
     public void addListener(InvoiceShareViewListener listener) {
         listeners.add(listener);
@@ -195,14 +247,21 @@ public class InvoiceShareViewImpl extends CustomComponent implements InvoiceShar
     public void itemClick(ItemClickEvent event) {
         for (InvoiceShareViewListener listener: listeners){
             if (event.getItemId() instanceof InstanceShareBean){
-                listener.instanceShareSelected((InstanceShareBean)event.getItemId(),false);
+                if (this.isChanged()){
+                    //reverts selection
+                    //Notification.show("You might have uncommitted changes, pls either Submit or Cancel those before selection");
+                    listener.instanceShareSelected((InstanceShareBean)event.getItemId(),false);
+                                        
+                }else{
+                    listener.instanceShareSelected((InstanceShareBean)event.getItemId(),false);
+                }
             }else if (event.getItemId() instanceof InstanceShareDetailBean) {
                 listener.instanceShareDetailSelected((InstanceShareDetailBean)event.getItemId());               
             }
         }
 
     }
-
+    
     @Override
     public void setInstanceShares(Collection<InstanceShare> instanceShares) {
         instanceShareComponent.setInstanceShares(instanceShares);       
@@ -239,9 +298,8 @@ public class InvoiceShareViewImpl extends CustomComponent implements InvoiceShar
                             }
                             // Confirmed to continue
                         } else {
-                            for (InvoiceShareViewListener listener: listeners){
-                                listener.instanceShareSelected((InstanceShareBean)previousItem,true);
-                            }
+                            //Just revert selection
+                            instanceShareComponent.getSharesTable().select(previousItem);
                         }
                     }
                 });
@@ -257,6 +315,12 @@ public class InvoiceShareViewImpl extends CustomComponent implements InvoiceShar
                         }
                     }
                 });
+    }
+
+    @Override
+    public void setInstanceShareSelectable(boolean selectable) {
+        this.instanceShareComponent.setInstanceShareSelectable(selectable);
+        
     }
 
 }

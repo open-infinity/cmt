@@ -75,7 +75,7 @@ public class InvoiceShareModel{
 
     private User user;
 
-    private InstanceShareBean selectedInstanceShare;
+    /*private InstanceShareBean selectedInstanceShare;
     private InstanceSelectionBean selectedInstance;
     private InstanceTbl selectedInstanceTbl;
 
@@ -95,17 +95,26 @@ public class InvoiceShareModel{
     public InstanceShareBean getSelectedInstanceShare() {
         return selectedInstanceShare;
     }
+    
+    public void setSelectedInstanceShare(InstanceShareBean bean) {
+        this.selectedInstanceShare=bean;
+
+    }
+
+    *
+    */
+    
+    public InstanceTbl getInstanceTbl(InstanceSelectionBean value){
+        InstanceTblService instanceTblService = invoicingService.getInstanceTblService();
+        return instanceTblService.findOne( Integer.valueOf(value.getInstanceId()).longValue());
+
+    }
 
     public InvoiceShareModel(User user){
         this.user=user;
         //Initialize instances list for selection
         invoicingService = ApplicationContextProvider.getContext().getBean(InvoicingService.class);
         instances = invoicingService.getUserInstances(user.getOrganizationIds());
-    }
-
-    public void setSelectedInstanceShare(InstanceShareBean bean) {
-        this.selectedInstanceShare=bean;
-
     }
 
     public void deleteInstanceShare(InstanceShareBean item) {
@@ -119,9 +128,6 @@ public class InvoiceShareModel{
     public InstanceShare saveInstanceShare(InstanceShare item) {
         invoicingService = ApplicationContextProvider.getContext().getBean(InvoicingService.class);        
         InstanceShareService instanceShareService = invoicingService.getInstanceShareService();
-        if (item.getInstanceTbl()==null){
-            item.setInstanceTbl(this.selectedInstanceTbl);
-        }
         InstanceShare share = instanceShareService.save(item);
         return share;
 
@@ -130,9 +136,6 @@ public class InvoiceShareModel{
     public void saveInstanceShareDetail(InstanceShareDetailBean item) {
         invoicingService = ApplicationContextProvider.getContext().getBean(InvoicingService.class);        
         InstanceShareDetailService instanceShareDetailService = invoicingService.getInstanceShareDetailService();
-        if (item.toDomainObject().getInstanceShare()==null){
-            item.toDomainObject().setInstanceShare(this.selectedInstanceShare.toDomainObject());
-        }
         instanceShareDetailService.save(item.toDomainObject());
 
     }

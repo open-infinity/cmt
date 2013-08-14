@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.openinfinity.cloud.domain.Instance;
 import org.openinfinity.cloud.domain.InstanceParameter;
+import org.openinfinity.cloud.domain.InstanceTbl;
 
 public class InstanceSelectionBean {
     @Override
@@ -15,6 +16,16 @@ public class InstanceSelectionBean {
         this.instance=instance;
     }
     private Instance instance;
+    
+    private InstanceTbl instanceTbl;
+    
+    
+    public InstanceTbl toInstanceTbl() {
+        return instanceTbl;
+    }
+    public void setInstanceTbl(InstanceTbl instanceTbl) {
+        this.instanceTbl = instanceTbl;
+    }
     public void setStatus(String status) {
         instance.setStatus(status);
     }

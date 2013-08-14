@@ -26,6 +26,9 @@ public interface InvoiceShareView{
         //reverts possible changes by re-fetching information
         public void cancelChanges();
     }
+    
+    public boolean isChanged();
+    public void setChanged(boolean b);
 
     public void addListener(InvoiceShareViewListener listener);
 
@@ -47,8 +50,28 @@ public interface InvoiceShareView{
 
     public void addShareDetailToView(InstanceShareDetailBean item);
 
+    /**
+     * Adds to removed shares
+     * @param item
+     */
+    public void removeShareFromView(InstanceShareBean item);
+    
+    /**
+     * Gets removed shares
+     * @return
+     */
+    public Collection<InstanceShareBean> getRemovedShares();
+    
+    /**
+     * Add to removed share details
+     * @param item
+     */
     public void removeShareDetailFromView(InstanceShareDetailBean item);
 
+    /**
+     * Gets removed share details
+     * @return
+     */
     public Collection<InstanceShareDetailBean> getRemovedShareDetails();
 
 
@@ -73,5 +96,10 @@ public interface InvoiceShareView{
      * @param cancelCaption
      */
     public void showConfirmDialog(String message1, String message2,String okCaption, String cancelCaption);
+    public void setSelectedInstanceShare(InstanceShareBean item);
+    public InstanceShareBean getSelectedInstanceShare();
+    public InstanceSelectionBean getSelectedInstance();
+    public void setSelectedInstance(InstanceSelectionBean value);
+    public void setInstanceShareSelectable(boolean b);
 
 }

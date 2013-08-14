@@ -3,6 +3,7 @@ package org.openinfinity.cloud.application.invoicing.view.instanceshare;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 import org.openinfinity.cloud.application.invoicing.view.InvoiceShareViewImpl;
 import org.openinfinity.cloud.domain.InstanceShare;
@@ -85,6 +86,9 @@ public class InstanceShareComponent extends CustomComponent{
         sharesTable.setContainerDataSource(beans);
         sharesTable.setColumnHeader("periodStart", "Period");
         sharesTable.setVisibleColumns(new Object[]{"periodStart"});
+        
+        //Enable add button
+        setControlsEnabled(new Component[]{addInstanceShareBtn},true);
 
 
     }
@@ -112,9 +116,10 @@ public class InstanceShareComponent extends CustomComponent{
         shareDetailsTable.setVisibleColumns(new Object[]{"orderNumber","costPool","sharePercent","description"});
 
         if (item!=null && item.getInstanceShareInvoices()!=null && item.getInstanceShareInvoices().size()>0){
-            setControlsEnabled(new Component[]{deleteInstanceShareBtn, saveInstanceShareBtn,addInstanceShareDetailBtn, deleteInstanceShareDetailBtn,saveInstanceShareDetailBtn},false);
+            //if there is invoices for share then disable buttons so that user cannot make changes to this share
+            setControlsEnabled(new Component[]{deleteInstanceShareBtn, saveInstanceShareBtn,addInstanceShareDetailBtn, deleteInstanceShareDetailBtn,saveInstanceShareDetailBtn, this.invoiceShareViewImpl.getSaveFormBtn(), this.invoiceShareViewImpl.getCancelFormBtn()},false);
         }else{
-            setControlsEnabled(new Component[]{deleteInstanceShareBtn, saveInstanceShareBtn,addInstanceShareDetailBtn, deleteInstanceShareDetailBtn,saveInstanceShareDetailBtn},true);
+            setControlsEnabled(new Component[]{deleteInstanceShareBtn, saveInstanceShareBtn,addInstanceShareDetailBtn, deleteInstanceShareDetailBtn,saveInstanceShareDetailBtn,this.invoiceShareViewImpl.getSaveFormBtn(), this.invoiceShareViewImpl.getCancelFormBtn()},true);
         }
 
     }   
@@ -156,6 +161,12 @@ public class InstanceShareComponent extends CustomComponent{
 
     private Button addInstanceShareDetailBtn;
 
+    private InvoiceShareViewImpl invoiceShareViewImpl;
+
+    private List<InstanceShareBean> removedShares;
+
+    private Button addInstanceShareBtn;
+
 
     private Component buildInstanceShareForm(){
         shareForm=new GridLayout(2,3);
@@ -170,20 +181,23 @@ public class InstanceShareComponent extends CustomComponent{
         return shareForm;
     }
 
-    private Component buildInstanceShareTableControls(InvoiceShareViewImpl invoiceShareViewImpl) {
+    private Component buildInstanceShareTableControls(final InvoiceShareViewImpl invoiceShareViewImpl) {
         instanceShareTableControls=new HorizontalLayout();
         instanceShareTableControls.setSpacing(true);
-        Button add = new Button("Add", new ClickListener() {
+        addInstanceShareBtn = new Button("Add", new ClickListener() {
             public void buttonClick(ClickEvent event) {
                 editInstanceShare(null);
                 periodStart.focus();
+                setControlsEnabled(new Component[]{deleteInstanceShareBtn, addInstanceShareDetailBtn, deleteInstanceShareDetailBtn,saveInstanceShareDetailBtn, invoiceShareViewImpl.getSaveFormBtn(), invoiceShareViewImpl.getCancelFormBtn()},false);
+                setControlsEnabled(new Component[]{saveInstanceShareBtn},true);
+
             }
         });
 
         deleteInstanceShareBtn = new Button("Delete");
         deleteInstanceShareBtn.addClickListener(invoiceShareViewImpl);
 
-        instanceShareTableControls.addComponent(add);
+        instanceShareTableControls.addComponent(addInstanceShareBtn);
         instanceShareTableControls.addComponent(deleteInstanceShareBtn);
         return instanceShareTableControls;
     }
@@ -195,6 +209,8 @@ public class InstanceShareComponent extends CustomComponent{
             public void buttonClick(ClickEvent event) {
                 try {
                         instanceShareFieldGroup.commit();
+                        setControlsEnabled(new Component[]{deleteInstanceShareBtn, addInstanceShareDetailBtn, deleteInstanceShareDetailBtn,saveInstanceShareDetailBtn, invoiceShareViewImpl.getSaveFormBtn(), invoiceShareViewImpl.getCancelFormBtn()},true);
+                        setControlsEnabled(new Component[]{addInstanceShareBtn},false);
                 } catch (CommitException e) {
                     saveInstanceShareBtn.setComponentError(new UserError(e.getMessage()));
                 }
@@ -205,6 +221,9 @@ public class InstanceShareComponent extends CustomComponent{
             public void buttonClick(ClickEvent event) {
                 instanceShareFieldGroup.discard();
                 editInstanceShare(null);
+                setControlsEnabled(new Component[]{deleteInstanceShareBtn, addInstanceShareDetailBtn, deleteInstanceShareDetailBtn,saveInstanceShareDetailBtn, invoiceShareViewImpl.getSaveFormBtn(), invoiceShareViewImpl.getCancelFormBtn()},true);
+                sharesTable.setSelectable(true);
+
             }
         });
         instanceShareFormControls.addComponent(saveInstanceShareBtn);
@@ -265,7 +284,7 @@ public class InstanceShareComponent extends CustomComponent{
         return shareDetailForm;
     }
 
-    private Component buildInstanceShareDetailTableControls(InvoiceShareViewImpl invoiceShareViewImpl) {
+    private Component buildInstanceShareDetailTableControls(final InvoiceShareViewImpl invoiceShareViewImpl) {
         instanceShareDetailTableControls=new HorizontalLayout();
         instanceShareDetailTableControls.setSpacing(true);
         addInstanceShareDetailBtn = new Button("Add", new ClickListener() {
@@ -324,6 +343,7 @@ public class InstanceShareComponent extends CustomComponent{
 
 
     public InstanceShareComponent(InvoiceShareViewImpl invoiceShareViewImpl){
+        this.invoiceShareViewImpl=invoiceShareViewImpl;
         // A layout structure used for composition
         HorizontalLayout mainLayout = new HorizontalLayout();
         mainLayout.setSpacing(true);
@@ -392,6 +412,7 @@ public class InstanceShareComponent extends CustomComponent{
         //Initialize shares table
         sharesTable=new Table();
         sharesTable.setSelectable(true);
+        sharesTable.setImmediate(true);
         sharesTable.setPageLength(8);
 
         // Handle selection change.
@@ -407,6 +428,9 @@ public class InstanceShareComponent extends CustomComponent{
     }
 
     public void addShareToView(InstanceShareBean item) {
+        if (sharesTable.getContainerDataSource().containsId(item)){
+            sharesTable.getContainerDataSource().removeItem(item);
+        }
         sharesTable.getContainerDataSource().addItem(item);
         
     }
@@ -426,7 +450,25 @@ public class InstanceShareComponent extends CustomComponent{
             shareDetailsTable.getContainerDataSource().removeItem(item);
         }
         shareDetailsTable.getContainerDataSource().addItem(item);
-        
+    }
+
+    public void removeShareFromView(InstanceShareBean item) {
+        if (sharesTable.getContainerDataSource().containsId(item)){
+            sharesTable.getContainerDataSource().removeItem(item);
+            if (removedShares==null){
+                removedShares=new ArrayList<InstanceShareBean>();
+            }
+            removedShares.add(item);
+            
+            setInstanceShareSelectable(true);
+            setControlsEnabled(new Component[]{addInstanceShareBtn},true);
+            
+            
+        }
+    }
+
+    public Collection<InstanceShareBean> getRemovedShares() {
+        return (removedShares==null ? Collections.<InstanceShareBean>emptyList() : removedShares);
     }
 
     public void removeShareDetailFromView(InstanceShareDetailBean item) {
@@ -436,12 +478,21 @@ public class InstanceShareComponent extends CustomComponent{
                 removedShareDetails=new ArrayList<InstanceShareDetailBean>();
             }
             removedShareDetails.add(item);
-            
-        }        
+        }
     }
     
     public Collection<InstanceShareDetailBean> getRemovedShareDetails(){
         return (removedShareDetails==null ? Collections.<InstanceShareDetailBean>emptyList() : removedShareDetails);
     }
+
+    public void setInstanceShareSelectable(boolean selectable) {
+        this.sharesTable.setSelectable(selectable);
+        this.sharesTable.markAsDirty();
+        if (selectable=false){
+            addInstanceShareBtn.setEnabled(false);
+        }
+        
+    }
+
 
 }

@@ -12,6 +12,7 @@ import org.openinfinity.cloud.application.invoicing.view.instanceshare.InstanceS
 import org.openinfinity.cloud.application.invoicing.view.instanceshare.InstanceShareDetailBean;
 import org.openinfinity.cloud.domain.InstanceShare;
 import org.openinfinity.cloud.domain.InstanceShareDetail;
+import org.openinfinity.cloud.domain.InstanceTbl;
 import org.openinfinity.cloud.domain.Job;
 import org.openinfinity.cloud.service.administrator.JobService;
 
@@ -40,7 +41,7 @@ public class InvoiceSharePresenter implements InvoiceShareViewListener {
         //        Type.TRAY_NOTIFICATION);
         if ("OK".equals(buttonName)){
 
-            if (item instanceof InstanceShareBean){ // save instance share
+            if (item instanceof InstanceShareBean){ // Adding share to table
                 
                 /* changed to save via additional Submit button
                 model.saveInstanceShare(((InstanceShareBean)item).toDomainObject());
@@ -52,7 +53,16 @@ public class InvoiceSharePresenter implements InvoiceShareViewListener {
                 view.editInstanceShare(null);
                 */
                 view.addShareToView((InstanceShareBean) item);
-                view.editInstanceShare(null);
+                view.editInstanceShare((InstanceShareBean) item);
+                //if share does not contain any detail the details table in view is initialized, otherwise it is left empty
+                if (((InstanceShareBean) item).toDomainObject().getInstanceShareDetails()==null){
+                    view.setInstanceShareDetails(null);
+                }
+                view.setChanged(true);
+                
+                //consider capturing of editInstanceShare and model.setSelectedInstanceShare to same method etc
+                view.setSelectedInstanceShare((InstanceShareBean) item);
+                view.setInstanceShareSelectable(false);
                 
                 
                 
@@ -84,6 +94,7 @@ public class InvoiceSharePresenter implements InvoiceShareViewListener {
                 }*/
                 view.addShareDetailToView((InstanceShareDetailBean) item);
                 view.editInstanceShareDetail(null);
+                view.setChanged(true);
 
                 
                 
@@ -91,9 +102,21 @@ public class InvoiceSharePresenter implements InvoiceShareViewListener {
         }
         if ("Delete".equals(buttonName)){
             if (item instanceof InstanceShareBean){
-                model.deleteInstanceShare((InstanceShareBean)item);
+                /*model.deleteInstanceShare((InstanceShareBean)item);
                 view.setInstanceShares(model.getInstanceShares(model.getSelectedInstance().getInstanceId()));
-                view.editInstanceShare(null);
+                view.editInstanceShare(null);*/
+                Collection<InstanceShareBean> instanceSharesFromView = view.getInstanceSharesFromView();
+                if (instanceSharesFromView.size()<2){
+                    Notification.show("You cannot delete last share");
+                }else{
+                
+                    view.removeShareFromView((InstanceShareBean) item);                
+                    view.setInstanceShareDetails(null);
+                    view.setSelectedInstanceShare(null);
+                    view.editInstanceShare(null);
+                    view.editInstanceShareDetail(null);
+                }
+
             }else if (item instanceof InstanceShareDetailBean){
                 
                 /*
@@ -105,33 +128,16 @@ public class InvoiceSharePresenter implements InvoiceShareViewListener {
                 */
                 view.removeShareDetailFromView((InstanceShareDetailBean) item);
                 view.editInstanceShareDetail(null);
+
                 
             }
         }
         
         if ("Submit".equals(buttonName)){
             //validate submit
-            BigDecimal sumOfShares=calculateSharePercent(view.getInstanceShareDetailsFromView());
-            if (sumOfShares.compareTo(BIGDECIMAL100)==0){
+            //BigDecimal sumOfShares=calculateSharePercent(view.getInstanceShareDetailsFromView());
+            if (view.getSelectedInstanceShare()==null || (view.getSelectedInstanceShare()!=null && calculateSharePercent(view.getInstanceShareDetailsFromView()).compareTo(BIGDECIMAL100)==0)){
                 //TODO: notification to user
-                if ("Pending".equals(model.getSelectedInstance().getStatus())){
-                    //updating instance state to Starting status
-                    Notification.show("Updating instance to starting state");
-                    Collection<Job> jobsForInstance = model.getJobsForInstance(model.getSelectedInstance().getInstanceId());
-                    for (Job job:jobsForInstance){
-                        if (job.getJobStatus()==JobService.CLOUD_JOB_PENDING && "create_instance".equals(job.getJobType())){
-                            model.updateJobStatus(job.getJobId(),JobService.CLOUD_JOB_CREATED);
-                        }
-                    }
-                    model.updateInstanceStatus(model.getSelectedInstance().getInstanceId(), "Starting");
-                    model.getSelectedInstance().setStatus("Starting");
-                    
-                }
-                for (InstanceShareBean share:view.getInstanceSharesFromView()){
-                    InstanceShare saveInstanceShare = model.saveInstanceShare(share.toDomainObject());
-                    share.setInstanceShare(saveInstanceShare);
-
-                }
                 
                 //first remove items
                 for (InstanceShareDetailBean detail: view.getRemovedShareDetails()){
@@ -141,19 +147,63 @@ public class InvoiceSharePresenter implements InvoiceShareViewListener {
                     
                 }
                 
+                //remove shares
+                for (InstanceShareBean share:view.getRemovedShares()){
+                    //if share id is greater than zero, it has been persisten and need to remove it
+                    if (share.getId()>0){
+                        model.deleteInstanceShare(share);
+                    }
+                }
+                
+                //and then save shares from view
+                for (InstanceShareBean share:view.getInstanceSharesFromView()){
+                    if (share.toDomainObject().getInstanceTbl()==null){
+                        share.toDomainObject().setInstanceTbl(view.getSelectedInstance().toInstanceTbl());
+                    }
+
+                    InstanceShare saveInstanceShare = model.saveInstanceShare(share.toDomainObject());
+                    
+                    share.setInstanceShare(saveInstanceShare);
+
+                }
+                
+                
                 //then save from view
                 for (InstanceShareDetailBean detail: view.getInstanceShareDetailsFromView()){
+                    if (detail.toDomainObject().getInstanceShare()==null){
+                        detail.toDomainObject().setInstanceShare(view.getSelectedInstanceShare().toDomainObject());
+                    }
+
                     model.saveInstanceShareDetail(detail);
                     
                 }
-                
+
+                //update instance to starting stage
+                if ("Pending".equals(view.getSelectedInstance().getStatus())){
+                    //updating instance state to Starting status
+                    Notification.show("Updating instance to starting state");
+                    Collection<Job> jobsForInstance = model.getJobsForInstance(view.getSelectedInstance().getInstanceId());
+                    for (Job job:jobsForInstance){
+                        if (job.getJobStatus()==JobService.CLOUD_JOB_PENDING && "create_instance".equals(job.getJobType())){
+                            model.updateJobStatus(job.getJobId(),JobService.CLOUD_JOB_CREATED);
+                        }
+                    }
+                    model.updateInstanceStatus(view.getSelectedInstance().getInstanceId(), "Starting");
+                    view.getSelectedInstance().setStatus("Starting");
+                    
+                }
+
                 //Update view
-                view.setInstanceShares(model.getInstanceShares(model.getSelectedInstance().getInstanceId()));
-                InstanceShare instanceShare = model.getInstanceShare(model.getSelectedInstanceShare().getId());
-                view.setInstanceShareDetails( instanceShare);
+                view.setInstanceShares(model.getInstanceShares(view.getSelectedInstance().getInstanceId()));
+                if (view.getSelectedInstanceShare()!=null){
+                    InstanceShare instanceShare = model.getInstanceShare(view.getSelectedInstanceShare().getId());
+                    view.setInstanceShareDetails( instanceShare);
+                }
+                view.setInstanceShareSelectable(true);
+                view.setChanged(false);
                 
             }else{
-                view.showConfirmDialog("Share percent", "Instance share percent sum must be 100% before submit", "OK", null);
+                view.showConfirmDialog("Check share percent", "Instance share percent sum must be 100% before submit", "OK", null);
             }
         }
 
@@ -177,7 +227,12 @@ public class InvoiceSharePresenter implements InvoiceShareViewListener {
         view.setInstanceShareDetails(null);
 
         //TODO: now this causes database fetch each time instance is selected; instead should populate it when popuating drop down list
-        model.setSelectedInstance(value);
+        if (value.toInstanceTbl()==null){
+            InstanceTbl instanceTbl = model.getInstanceTbl(value);
+            value.setInstanceTbl(instanceTbl);
+        }
+
+        view.setSelectedInstance(value);
 
         view.editInstanceShare(null);
         view.editInstanceShareDetail(null);
@@ -193,33 +248,33 @@ public class InvoiceSharePresenter implements InvoiceShareViewListener {
         boolean skipSelection=false;
         
         //check if previous selection was done and it is not complete
-        /*if (model.getSelectedInstanceShare()!=null){
-            InstanceShare instanceShare = model.getInstanceShare(model.getSelectedInstanceShare().getId());
-            if (instanceShare.calculateSharePercent().compareTo(BIGDECIMAL100) != 0  && !force){
-                skipSelection=true;
-                view.showConfirmDialogForShareSelection(item, model.getSelectedInstanceShare(), "Please confirm", "Calculated sum of share detail percents differs from 100 %","Continue","Undo selection");
+        //if (view.isChanged()&&!force){
+            //TODO: does not work
+                //skipSelection=true;
+                //view.editInstanceShare(view.getSelectedInstanceShare());
+                //TODO: not needed if implement this by changing table mode to not selectable
+                //view.showConfirmDialogForShareSelection(item, view.getSelectedInstanceShare(), "Please confirm", "There might be uncommitted changed: Are you sure you want to continue","OK","Cancel");
                 
-            }
-        } else{
-
-            Notification.show("Item " +
-                    item + " clicked.");
-            
-        }*/
+        //}
         if (!skipSelection){
         
             InstanceShare instanceShare = model.getInstanceShare(item.getId());
             view.setInstanceShareDetails(instanceShare);
-            model.setSelectedInstanceShare(item);
+            //set details from instance share fetched from database
+            item.toDomainObject().setInstanceShareDetails(instanceShare.getInstanceShareDetails());
+            view.setSelectedInstanceShare(item);
             view.editInstanceShare(item);
             view.editInstanceShareDetail(null);
+            view.setChanged(false);
         }
 
     }
 
     @Override
     public void cancelChanges() {
-        instanceSelected(model.getSelectedInstance());
+        instanceSelected(view.getSelectedInstance());
+        view.setInstanceShareSelectable(true);
+
     }
 
     
