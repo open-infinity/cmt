@@ -101,5 +101,6 @@ public interface InvoiceShareView{
     public InstanceSelectionBean getSelectedInstance();
     public void setSelectedInstance(InstanceSelectionBean value);
     public void setInstanceShareSelectable(boolean b);
+    public void removeAllFromDeletedSharesAndDetails();
 
 }

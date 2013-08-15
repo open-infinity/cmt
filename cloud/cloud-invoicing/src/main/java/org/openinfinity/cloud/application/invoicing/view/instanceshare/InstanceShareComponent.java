@@ -266,10 +266,13 @@ public class InstanceShareComponent extends CustomComponent{
         shareDetailForm=new GridLayout(2,3);
         shareDetailForm.setSpacing(true);
         orderNo=createTextField("Order No:", true, "Order no is mandatory");
+        orderNo.setMaxLength(8);
         TextField costPool=createTextField("Cost Pool:", true, "Cost pool is mandatory");
         costPool.setRequired(true);
+        costPool.setMaxLength(10);
         TextField sharePercent=createTextField("Share %:", true,"Share % is mandatory");
         TextField description=createTextField("Description:",false,null);
+        description.setMaxLength(256);
 
         instanceShareDetailFieldGroup.bind(orderNo, "orderNumber");
         instanceShareDetailFieldGroup.bind(costPool, "costPool");
@@ -310,6 +313,9 @@ public class InstanceShareComponent extends CustomComponent{
             public void buttonClick(ClickEvent event) {
                 try {
                     instanceShareDetailFieldGroup.commit();
+                    setControlsEnabled(new Component[]{addInstanceShareDetailBtn, deleteInstanceShareDetailBtn,saveInstanceShareDetailBtn, invoiceShareViewImpl.getSaveFormBtn(), invoiceShareViewImpl.getCancelFormBtn()},true);
+                    setControlsEnabled(new Component[]{addInstanceShareBtn,deleteInstanceShareBtn},false);
+
                 } catch (CommitException e1) {
          
                     saveInstanceShareDetailBtn.setComponentError(new UserError(e1.getMessage()));
@@ -491,6 +497,12 @@ public class InstanceShareComponent extends CustomComponent{
         if (selectable=false){
             addInstanceShareBtn.setEnabled(false);
         }
+        
+    }
+
+    public void removeAllFromDeletedSharesAndDetails() {
+        removedShares=null;
+        removedShareDetails=null;
         
     }
 

@@ -95,6 +95,7 @@ public class InvoiceSharePresenter implements InvoiceShareViewListener {
                 view.addShareDetailToView((InstanceShareDetailBean) item);
                 view.editInstanceShareDetail(null);
                 view.setChanged(true);
+                view.setInstanceShareSelectable(false);
 
                 
                 
@@ -127,7 +128,11 @@ public class InvoiceSharePresenter implements InvoiceShareViewListener {
                 view.editInstanceShareDetail(null);
                 */
                 view.removeShareDetailFromView((InstanceShareDetailBean) item);
+                InstanceShareBean selectedInstanceShare = view.getSelectedInstanceShare();
+                selectedInstanceShare.toDomainObject().removeInstanceShareDetail(((InstanceShareDetailBean) item).toDomainObject());
+
                 view.editInstanceShareDetail(null);
+                view.setInstanceShareSelectable(false);
 
                 
             }
@@ -137,62 +142,10 @@ public class InvoiceSharePresenter implements InvoiceShareViewListener {
             //validate submit
             //BigDecimal sumOfShares=calculateSharePercent(view.getInstanceShareDetailsFromView());
             if (view.getSelectedInstanceShare()==null || (view.getSelectedInstanceShare()!=null && calculateSharePercent(view.getInstanceShareDetailsFromView()).compareTo(BIGDECIMAL100)==0)){
-                //TODO: notification to user
                 
-                //first remove items
-                for (InstanceShareDetailBean detail: view.getRemovedShareDetails()){
-                    if (detail.getId().intValue()!=-1){
-                        model.deleteInstanceShareDetail(detail);
-                    }
-                    
-                }
+                //save changes in transaction
+                model.saveChanges(model, view);
                 
-                //remove shares
-                for (InstanceShareBean share:view.getRemovedShares()){
-                    //if share id is greater than zero, it has been persisten and need to remove it
-                    if (share.getId()>0){
-                        model.deleteInstanceShare(share);
-                    }
-                }
-                
-                //and then save shares from view
-                for (InstanceShareBean share:view.getInstanceSharesFromView()){
-                    if (share.toDomainObject().getInstanceTbl()==null){
-                        share.toDomainObject().setInstanceTbl(view.getSelectedInstance().toInstanceTbl());
-                    }
-
-                    InstanceShare saveInstanceShare = model.saveInstanceShare(share.toDomainObject());
-                    
-                    share.setInstanceShare(saveInstanceShare);
-
-                }
-                
-                
-                //then save from view
-                for (InstanceShareDetailBean detail: view.getInstanceShareDetailsFromView()){
-                    if (detail.toDomainObject().getInstanceShare()==null){
-                        detail.toDomainObject().setInstanceShare(view.getSelectedInstanceShare().toDomainObject());
-                    }
-
-                    model.saveInstanceShareDetail(detail);
-                    
-                }
-
-                //update instance to starting stage
-                if ("Pending".equals(view.getSelectedInstance().getStatus())){
-                    //updating instance state to Starting status
-                    Notification.show("Updating instance to starting state");
-                    Collection<Job> jobsForInstance = model.getJobsForInstance(view.getSelectedInstance().getInstanceId());
-                    for (Job job:jobsForInstance){
-                        if (job.getJobStatus()==JobService.CLOUD_JOB_PENDING && "create_instance".equals(job.getJobType())){
-                            model.updateJobStatus(job.getJobId(),JobService.CLOUD_JOB_CREATED);
-                        }
-                    }
-                    model.updateInstanceStatus(view.getSelectedInstance().getInstanceId(), "Starting");
-                    view.getSelectedInstance().setStatus("Starting");
-                    
-                }
-
                 //Update view
                 view.setInstanceShares(model.getInstanceShares(view.getSelectedInstance().getInstanceId()));
                 if (view.getSelectedInstanceShare()!=null){
@@ -201,6 +154,7 @@ public class InvoiceSharePresenter implements InvoiceShareViewListener {
                 }
                 view.setInstanceShareSelectable(true);
                 view.setChanged(false);
+                view.removeAllFromDeletedSharesAndDetails();
                 
             }else{
                 view.showConfirmDialog("Check share percent", "Instance share percent sum must be 100% before submit", "OK", null);
@@ -225,6 +179,7 @@ public class InvoiceSharePresenter implements InvoiceShareViewListener {
 
         view.setInstanceShares(model.getInstanceShares(value.getInstanceId()));
         view.setInstanceShareDetails(null);
+        view.removeAllFromDeletedSharesAndDetails();
 
         //TODO: now this causes database fetch each time instance is selected; instead should populate it when popuating drop down list
         if (value.toInstanceTbl()==null){

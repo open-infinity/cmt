@@ -323,4 +323,10 @@ public class InvoiceShareViewImpl extends CustomComponent implements InvoiceShar
         
     }
 
+    @Override
+    public void removeAllFromDeletedSharesAndDetails() {
+        instanceShareComponent.removeAllFromDeletedSharesAndDetails();
+        
+    }
+
 }

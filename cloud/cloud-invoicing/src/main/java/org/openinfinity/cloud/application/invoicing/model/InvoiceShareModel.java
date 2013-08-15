@@ -6,6 +6,7 @@ import java.util.Collections;
 import org.openinfinity.cloud.application.invoicing.model.user.User;
 import org.openinfinity.cloud.application.invoicing.service.InvoicingService;
 import org.openinfinity.cloud.application.invoicing.utility.ApplicationContextProvider;
+import org.openinfinity.cloud.application.invoicing.view.InvoiceShareView;
 import org.openinfinity.cloud.application.invoicing.view.instance.InstanceSelectionBean;
 import org.openinfinity.cloud.application.invoicing.view.instanceshare.InstanceShareBean;
 import org.openinfinity.cloud.application.invoicing.view.instanceshare.InstanceShareDetailBean;
@@ -26,6 +27,10 @@ import org.openinfinity.cloud.service.invoicing.InstanceTblService;
 public class InvoiceShareModel{
 
     private InvoicingService invoicingService;
+
+    public void saveChanges(InvoiceShareModel model, InvoiceShareView view) {
+        invoicingService.saveChanges(model, view);
+    }
 
     public void updateInstanceStatus(int instanceId, String status) {
         invoicingService.updateInstanceStatus(instanceId, status);
