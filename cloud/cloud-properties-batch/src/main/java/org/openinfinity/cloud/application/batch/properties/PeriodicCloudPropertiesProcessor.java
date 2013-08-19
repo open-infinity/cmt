@@ -39,11 +39,11 @@ import org.springframework.stereotype.Component;
  * Periodic cloud properties processor turns key value pairs to tmp-files (infrastructure.properties).
  * 
  * @author Ilkka Leinonen
+ * @author Tommi Siitonen
  * @version 1.0.0
  * @since 1.2.0
  */
 @Component("periodicCloudPropertiesProcessor")
-//public class PeriodicCloudPropertiesProcessor implements ItemProcessor<Collection<SharedProperty>, Map<File, Deployment>>{
 public class PeriodicCloudPropertiesProcessor implements ItemProcessor<Collection<SharedProperty>, Map<Deployment, File>>{
 
 	private static final String EXCEPTION_MESSAGE_TEMPORARY_FILESYSTEM_DOES_NOT_EXIST = "Local temporary file system for storing key-value pairs is not existing. Please refine your setup: ";
@@ -55,7 +55,6 @@ public class PeriodicCloudPropertiesProcessor implements ItemProcessor<Collectio
 	
 	@Log
 	@Override
-	//public Map<File, Deployment> process(Collection<SharedProperty> sharedProperties) throws Exception {
 	public Map<Deployment, File> process(Collection<SharedProperty> sharedProperties) throws Exception {
 		File localDiskTempFileSystemDirectory = new File(localDiskTempFileSystem); 
 		if (! localDiskTempFileSystemDirectory.exists()) {
@@ -75,8 +74,6 @@ public class PeriodicCloudPropertiesProcessor implements ItemProcessor<Collectio
 			
 			// update state for deleted properties and build content file for others
 			if (sharedProperty.getState()==-1) {
-				// mark for deletion and skip key-value from content
-				//sharedProperty.setState(-2);				
 				LOGGER.debug("Deleted property with key["+sharedProperty.getKey()+"] and value["+sharedProperty.getValue()+"] for clusterId: " + clusterId);				
 			} else {		
 				isEmpty=false;
@@ -87,7 +84,6 @@ public class PeriodicCloudPropertiesProcessor implements ItemProcessor<Collectio
 					.append("\n");
 				LOGGER.debug("Adding key["+sharedProperty.getKey()+"] and value["+sharedProperty.getValue()+"] for clusterId: " + clusterId);
 				lastModifiedTimeStamp = sharedProperty.getPropertyTimestamp().after(lastModifiedTimeStamp)?sharedProperty.getPropertyTimestamp():lastModifiedTimeStamp;
-				//lastModifiedTimeStamp = sharedProperty.getTimestamp().after(lastModifiedTimeStamp)?sharedProperty.getTimestamp():lastModifiedTimeStamp;
 				sharedProperty.setState(2);
 			}
 		}
@@ -99,19 +95,16 @@ public class PeriodicCloudPropertiesProcessor implements ItemProcessor<Collectio
 		// do not generate file for empty content
 		if(isEmpty) {
 			// TODO - final state should be DELETED but UNDEPLOY it first
-			LOGGER.debug("Only deleted properties left for cluster: " + clusterId + ". Setting properties to be undeployed.");			
+			LOGGER.info("Only deleted properties left for cluster: " + clusterId + ". Setting properties to be undeployed.");			
 			deployment.setState(DeployerService.DEPLOYMENT_STATE_UNDEPLOY);
 			Map<Deployment, File> fileAndDeployment = populateMapWithDeploymentAndTempFile(deployment, null);			
 			return fileAndDeployment;
 		}
 		
-		//populateDeploymentMetadataAndTempFileContent(sharedProperties, organizationId, instanceId, clusterId, lastModifiedTimeStamp, contentBuilder);
 		File tmp = initializeTempFile(localDiskTempFileSystemDirectory, clusterId);
 		FileUtil.store(tmp.getAbsolutePath(), contentBuilder.toString());
-		//Deployment deployment = populateDeployment(organizationId, instanceId, clusterId);
 		deployment.setInputStream(new FileInputStream(tmp));
 		
-		//Map<File, Deployment> fileAndDeployment = populateMapWithTempFileAndDeployment(tmp, deployment);
 		Map<Deployment, File> fileAndDeployment = populateMapWithDeploymentAndTempFile(deployment, tmp);
 		
 		LOGGER.debug("Returning tmp Properties file for cluster [" + clusterId +"]:"+tmp.getName());		
@@ -124,12 +117,6 @@ public class PeriodicCloudPropertiesProcessor implements ItemProcessor<Collectio
 		File tmp = File.createTempFile(tmpFilenameBuilder.toString(), ".tmp", localDiskTempFileSystemDirectory);
 		tmp.createNewFile();
 		return tmp;
-	}
-
-	private Map<File, Deployment> populateMapWithTempFileAndDeployment(File tmp, Deployment deployment) {
-		Map<File, Deployment> fileAndDeployment = new HashMap<File, Deployment>();
-		fileAndDeployment.put(tmp, deployment);
-		return fileAndDeployment;
 	}
 
 	private Map<Deployment, File> populateMapWithDeploymentAndTempFile(Deployment deployment, File tmp) {
@@ -146,22 +133,6 @@ public class PeriodicCloudPropertiesProcessor implements ItemProcessor<Collectio
 		deployment.setType("properties");
 		deployment.setName("application");
 		return deployment;
-	}
-
-	private void populateDeploymentMetadataAndTempFileContent(Collection<SharedProperty> sharedProperties, long organizationId, int instanceId, int clusterId, Date lastModifiedTimeStamp, StringBuilder contentBuilder) {		
-		for (SharedProperty sharedProperty : sharedProperties) {
-			contentBuilder
-				.append(sharedProperty.getKey())
-				.append("=")
-				.append(sharedProperty.getValue())
-				.append("\n");
-			organizationId = sharedProperty.getOrganizationId();
-			instanceId = sharedProperty.getInstanceId();
-			clusterId = sharedProperty.getClusterId();
-			LOGGER.debug("Creating properties properties file for unique cluster: " + clusterId);
-			lastModifiedTimeStamp = sharedProperty.getPropertyTimestamp().after(lastModifiedTimeStamp)?sharedProperty.getPropertyTimestamp():lastModifiedTimeStamp;
-			//lastModifiedTimeStamp = sharedProperty.getTimestamp().after(lastModifiedTimeStamp)?sharedProperty.getTimestamp():lastModifiedTimeStamp;
-		}
 	}
 	
 }

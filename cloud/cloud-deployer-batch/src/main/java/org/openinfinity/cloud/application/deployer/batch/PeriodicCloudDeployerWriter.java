@@ -25,6 +25,7 @@ import java.util.regex.Pattern;
 
 import org.openinfinity.cloud.domain.DeploymentStatus;
 import org.openinfinity.cloud.domain.DeploymentStatus.DeploymentState;
+import org.openinfinity.cloud.domain.repository.deployer.BucketRepository;
 import org.openinfinity.cloud.domain.Cluster;
 import org.openinfinity.cloud.domain.Key;
 import org.openinfinity.cloud.domain.Machine;
@@ -96,6 +97,11 @@ public class PeriodicCloudDeployerWriter implements ItemWriter<DeploymentStatus>
 	
 	@Autowired
 	DeployerService deployerService;
+
+	@Autowired
+	@Qualifier("jetS3Repository")
+	private BucketRepository bucketRepository;
+	
 	
 	public void setFileSystemUser(String fileSystemUser) {
 		this.fileSystemUser = fileSystemUser;
@@ -164,9 +170,25 @@ public class PeriodicCloudDeployerWriter implements ItemWriter<DeploymentStatus>
 			
 			LOGGER.info("Processing write of deployment <"+deploymentStatus.getDeployment().getId()+"> deploymentStatus [" + deploymentStatus.getId() + "] in state <"+deploymentStatus.getDeploymentState()+"> and machineId ["+deploymentStatus.getMachineId()+"] started.");
 						
+			// just let CLUSTER_TERMINATED statuses to be handled so that status of deployment is updated
+			if (deploymentStatus.getDeploymentState()==DeploymentState.CLUSTER_TERMINATED) {
+				//LOGGER.info("Writing deploymentStatus with [" + deploymentStatus.getId() + "]. State CLUSTER_TERMINATED.");				
+				try {
+					LOGGER.info("Processing deploymentStatus with [" + deploymentStatus.getId() + "]. State CLUSTER_TERMINATED. Deleting objects and bucket of deployment with id <"+deploymentStatus.getDeployment().getId()+"> and name <"+deploymentStatus.getDeployment().getName()+">.");				
+					bucketRepository.deleteBucketAndObjects(String.valueOf(deploymentStatus.getDeployment().getClusterId()));
+					deploymentStatus.getDeployment().setState(DeployerService.DEPLOYMENT_STATE_TERMINATED);
+				} catch (Exception e) {
+					LOGGER.warn("Error cleaning walrus for terminated cluster: <"+deploymentStatus.getDeployment().getClusterId()+"> Error: "+e);
+					deploymentStatus.getDeployment().setState(DeployerService.DEPLOYMENT_STATE_ERROR);
+				}							
+				LOGGER.info("Writing deploymentStatus with [" + deploymentStatus.getId() + "]. State of deployment was CLUSTER_TERMINATED. Updating state of deployment to <"+deploymentStatus.getDeployment().getState()+">.");				
+				deployerService.updateDeploymentState(deploymentStatus.getDeployment());				
+				continue;				
+			}
+			
 			// just update TERMINATED deploymentStatus states to db
 			if (deploymentStatus.getDeploymentState()==DeploymentState.TERMINATED) {
-				LOGGER.debug("Processing deploymentStatus with [" + deploymentStatus.getId() + "] and machineId ["+deploymentStatus.getMachineId()+"]. State TERMINATED, storing status.");				
+				LOGGER.info("Writing deploymentStatus with [" + deploymentStatus.getId() + "] and machineId ["+deploymentStatus.getMachineId()+"]. State TERMINATED, storing status.");				
 				try {
 					deployerService.storeDeploymentStatus(deploymentStatus);					
 				} catch(SystemException se) {

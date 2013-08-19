@@ -3,9 +3,12 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.openinfinity</groupId>
 	<artifactId>cloud</artifactId>
-	<version>1.2.0.RELEASE</version>
+	<version>${project.global.version}</version>
+<!-- 	<version>1.2.1</version> -->
 	<packaging>pom</packaging>
 	<properties>
+		<project.global.version>1.2.1</project.global.version>
+		<open-infinity-core.version>1.1.0.RELEASE</open-infinity-core.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<slf4j.version>1.6.4</slf4j.version>
 		<spring.maven.artifact.version>3.1.1.RELEASE</spring.maven.artifact.version>
@@ -32,7 +35,7 @@
 		<dependency>
 			<groupId>org.openinfinity</groupId>
 			<artifactId>open-infinity-core</artifactId>
-			<version>1.1.0.RELEASE</version>
+			<version>${open-infinity-core.version}</version>
 		</dependency>
 	</dependencies>
 	<build>

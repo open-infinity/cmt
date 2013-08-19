@@ -51,6 +51,7 @@ public class DeploymentTableData extends Deployment{
 		  aMap.put(13, "DELETED");
 		  aMap.put(15, "ERROR");
 		  aMap.put(-1, "TERMINATED");
+		  aMap.put(-10, "CLUSTER_TERMINATED");
 		  stateMap = Collections.unmodifiableMap(aMap);
     }
     

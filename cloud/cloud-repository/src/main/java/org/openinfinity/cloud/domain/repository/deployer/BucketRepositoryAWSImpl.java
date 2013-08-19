@@ -18,6 +18,7 @@ package org.openinfinity.cloud.domain.repository.deployer;
 import java.io.InputStream;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 //import org.jets3t.service.impl.rest.httpclient.RestS3Service;
 //import org.jets3t.service.model.S3Object;
 import org.openinfinity.cloud.util.credentials.ProviderCredentialsImpl;
@@ -45,6 +46,7 @@ import com.amazonaws.services.s3.model.S3ObjectSummary;
  */
 @Repository
 public class BucketRepositoryAWSImpl implements BucketRepository {
+	private static final Logger LOGGER = Logger.getLogger(BucketRepositoryAWSImpl.class.getName());
 	
 	private AmazonS3 simpleStorageService;
 	
@@ -93,10 +95,12 @@ public class BucketRepositoryAWSImpl implements BucketRepository {
 	public void deleteBucketAndObjects(String bucketName) {
 		try {
 			// list and delete objects in a bucket 
+			LOGGER.debug("deleteBucketAndObjects called for bucket: <"+bucketName+">.");
 			ObjectListing objects = simpleStorageService.listObjects(bucketName);
 			
 			do {
 		        for (S3ObjectSummary objectSummary : objects.getObjectSummaries()) {
+					LOGGER.debug("Trying to delete object <"+objectSummary.getKey()+"> from bucket <: "+objectSummary.getBucketName()+">.");
 					simpleStorageService.deleteObject(bucketName, objectSummary.getKey());
 		        }
 		        objects = simpleStorageService.listNextBatchOfObjects(objects);
@@ -104,11 +108,13 @@ public class BucketRepositoryAWSImpl implements BucketRepository {
 						
 				
 			// Now that the bucket is empty, you can delete it. If you try to delete your bucket before it is empty, it will fail.
+			LOGGER.debug("Trying to delete bucket <: "+bucketName+">.");
 			simpleStorageService.deleteBucket(bucketName);
 			//System.out.println("Deleted bucket " + testBucket.getName());		
 			
 		} catch (Exception e) {
 			// TODO: handle exception
+			LOGGER.warn("Error in deleting objects and bucket: "+e+" -- "+e.getStackTrace().toString());
 			e.printStackTrace();
 			ExceptionUtil.throwSystemException(e.getMessage(), ExceptionLevel.ERROR, BucketRepository.EXCEPTION_MESSAGE_CONNECTION_FAILURE);						
 		}			

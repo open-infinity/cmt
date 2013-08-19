@@ -21,10 +21,12 @@ import java.io.InputStream;
 import org.openinfinity.cloud.domain.DeploymentStatus;
 import org.openinfinity.cloud.domain.DeploymentStatus.DeploymentState;
 import org.openinfinity.cloud.service.deployer.DeployerService;
+import org.openinfinity.core.util.ExceptionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 /**
@@ -41,12 +43,16 @@ public class PeriodicCloudDeployerProcessor implements ItemProcessor<DeploymentS
 	private static final Logger LOGGER = LoggerFactory.getLogger(PeriodicCloudDeployerProcessor.class);
 	
 	@Autowired
-	DeployerService deployerService;
+	DeployerService deployerService;	
 	
 	public DeploymentStatus process(DeploymentStatus deploymentStatus) throws Exception {
 		LOGGER.info("Processing of deployment <"+deploymentStatus.getDeployment().getId()+"> deploymentStatus [" + deploymentStatus.getId() + "] in state <"+deploymentStatus.getDeploymentState()+"> and machineId ["+deploymentStatus.getMachineId()+"] started. Setting inputstream for deploymentStatus.");
 		
 		switch (deploymentStatus.getDeploymentState()) {
+		case CLUSTER_TERMINATED:
+			// skip deployment to terminated machines, just leave for writer for walrus cleaning and updating state to db
+			LOGGER.info("Processing of deployment with deployment status [" + deploymentStatus.getId() + "] and machineId ["+deploymentStatus.getMachineId()+"] started. State is CLUSTER_TERMINATED, passing to writer without modifications.");						
+			break;
 		case TERMINATED:
 			// skip deployment to terminated machines, just leave for writer for updating state to db
 			LOGGER.info("Processing of deployment with deployment status [" + deploymentStatus.getId() + "] and machineId ["+deploymentStatus.getMachineId()+"] started. State is TERMINATED, passing to writer without modifications.");						

@@ -20,6 +20,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.sql.DataSource;
 
@@ -31,6 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.Assert;
 
@@ -50,6 +53,7 @@ DeploymentRepository {
 	 * Represents the JDBC template util.
 	 */
 	private JdbcTemplate jdbcTemplate;
+	private SimpleJdbcInsert deploymentInsert;
 	
 	/**
 	 * Represents the SQL script for storing Deployment object.
@@ -75,7 +79,7 @@ DeploymentRepository {
 	/**
 	 * Represents the SQL script for updating the state of the Deployment object.
 	 */
-	private static final String UPDATE_STATE_1_TO_10_SQL = "UPDATE DEPLOYMENT SET STATE = 10  WHERE NAME = ? AND ORGANIZATION_ID = ? AND INSTANCE_ID = ? AND CLUSTER_ID = ? AND STATE=1";
+	private static final String UPDATE_STATE_1_TO_10_SQL = "UPDATE DEPLOYMENT SET STATE = 10  WHERE NAME = ? AND ORGANIZATION_ID = ? AND INSTANCE_ID = ? AND CLUSTER_ID = ? AND TYPE=? AND STATE=1";
 	
 	/**
 	 * Represents the SQL script for storing Deployment object.
@@ -176,6 +180,7 @@ DeploymentRepository {
 	public DeploymentRepositoryJdbcImpl(@Qualifier("cloudDataSource") DataSource dataSource) {
 		Assert.notNull(dataSource, "Please define datasource for deployer repository.");
 		this.jdbcTemplate = new JdbcTemplate(dataSource);
+		this.deploymentInsert = new SimpleJdbcInsert(dataSource).withTableName("DEPLOYMENT").usingGeneratedKeyColumns("id");
 	}
 	
 	/**
@@ -188,9 +193,19 @@ DeploymentRepository {
 	//@Transactional(isolation=Isolation.REPEATABLE_READ)
 	public Deployment store(Deployment deployment) {
 		// Update existing deployment with same name and target not necessary if bucket versioning is used
-		//jdbcTemplate.update(UPDATE_STATE_0_SQL, deployment.getName(), deployment.getOrganizationId(), deployment.getInstanceId(), deployment.getClusterId());
-		jdbcTemplate.update(STORE_SQL, 1, deployment.getOrganizationId(), deployment.getInstanceId(), deployment.getClusterId(), deployment.getLocation(), deployment.getName(), deployment.getType());
-		deployment.setId(jdbcTemplate.queryForInt(LOAD_LAST_UPDATED_ID));
+		//jdbcTemplate.update(STORE_SQL, deployment.getState(), deployment.getOrganizationId(), deployment.getInstanceId(), deployment.getClusterId(), deployment.getLocation(), deployment.getName(), deployment.getType());
+		//deployment.setId(jdbcTemplate.queryForInt(LOAD_LAST_UPDATED_ID));
+		Map parameters = new HashMap(7);
+		parameters.put("STATE", deployment.getState());
+		parameters.put("ORGANIZATION_ID", deployment.getOrganizationId());
+		parameters.put("INSTANCE_ID", deployment.getInstanceId());
+		parameters.put("CLUSTER_ID", deployment.getClusterId());
+		parameters.put("LOCATION", deployment.getLocation());
+		parameters.put("NAME", deployment.getName());
+		parameters.put("TYPE", deployment.getType());
+		Number newId = deploymentInsert.executeAndReturnKey(parameters);
+		
+		deployment.setId(newId.intValue());		
 		return deployment;
 	}
 
@@ -202,12 +217,23 @@ DeploymentRepository {
 	 * @return Deployment Represents the created object with unique id.
 	 */
 	@AuditTrail
-	public Deployment storeAndUpdate(Deployment deployment) {
-		jdbcTemplate.update(UPDATE_STATE_1_TO_10_SQL, deployment.getName(), deployment.getOrganizationId(), deployment.getInstanceId(), deployment.getClusterId());		
-		jdbcTemplate.update(STORE_SQL, 1, deployment.getOrganizationId(), deployment.getInstanceId(), deployment.getClusterId(), deployment.getLocation(), deployment.getName(), deployment.getType());
-		deployment.setId(jdbcTemplate.queryForInt(LOAD_LAST_UPDATED_ID));
-		return deployment;		
-	}
+	public void storeAndUpdate(Deployment deployment) {
+		// if existing deployments with the same name, and type for the same target exist update those for undeployment
+		jdbcTemplate.update(UPDATE_STATE_1_TO_10_SQL, deployment.getName(), deployment.getOrganizationId(), deployment.getInstanceId(), deployment.getClusterId(), deployment.getType());		
+		
+		// store new deployment
+		Map parameters = new HashMap(7);
+		parameters.put("STATE", deployment.getState());
+		parameters.put("ORGANIZATION_ID", deployment.getOrganizationId());
+		parameters.put("INSTANCE_ID", deployment.getInstanceId());
+		parameters.put("CLUSTER_ID", deployment.getClusterId());
+		parameters.put("LOCATION", deployment.getLocation());
+		parameters.put("NAME", deployment.getName());
+		parameters.put("TYPE", deployment.getType());
+		Number newId = deploymentInsert.executeAndReturnKey(parameters);
+		
+		deployment.setId(newId.intValue());
+	}	
 	
 	/**
 	 * Updates deployment <code>org.openinfinity.core.cloud.domain.Deployment</code>  location and to DEPLOYED state 
@@ -227,6 +253,7 @@ DeploymentRepository {
 	 * @param deployment Represents the deployment information.
 	 * @return Deployment Represents the created object with unique id.
 	 */
+	
 	@AuditTrail
 	public void updateExistingDeployedDeploymentState(Deployment deployment, int newState) {
 		jdbcTemplate.update(UPDATE_STATE_1_SQL, newState, deployment.getName(), deployment.getOrganizationId(), deployment.getInstanceId(), deployment.getClusterId(), deployment.getType());		

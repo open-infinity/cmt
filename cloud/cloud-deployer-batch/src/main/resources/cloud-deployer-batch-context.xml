@@ -143,7 +143,8 @@
 <!-- 				<entry key="0-war.1" value="su toas -c 'rm  #%unDeploymentDirectory%#/#%deploymentName%#.#%deploymentType%#'"/> -->
 <!-- 				<entry key="0-war.2" value="su toas -c 'rm -r #%unDeploymentDirectory%#/#%deploymentName%#'"/>				 -->
 				<entry key="0-war.1" value="su toas -c 'rm -r #%unDeploymentDirectory%#/#%deploymentName%#'"/>				
-				<entry key="3-properties.1" value="su toas -c 'rm #%deploymentDirectory%#/#%deploymentName%#.#%deploymentType%#'"/>
+				<entry key="0-war.2" value="su toas -c 'rm -r #%unDeploymentDirectory%#/../temp/*#%deploymentName%#'"/>				
+				<entry key="0-properties.1" value="su toas -c 'rm #%deploymentDirectory%#/#%deploymentName%#.#%deploymentType%#'"/>
 				<entry key="bas-war.1" value="su toas -c 'rm #%deploymentDirectory%#/#%deploymentName%#.#%deploymentType%#'"/>
 				<entry key="bas-properties.1" value="su toas -c 'rm #%deploymentDirectory%#/#%deploymentName%#.#%deploymentType%#'"/>
 				<entry key="5-war.1" value="su toas -c 'rm #%deploymentDirectory%#/#%deploymentName%#.#%deploymentType%#'"/>
