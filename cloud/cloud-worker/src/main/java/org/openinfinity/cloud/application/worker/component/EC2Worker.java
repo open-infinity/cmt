@@ -1450,6 +1450,10 @@ public class EC2Worker implements Worker {
 				addr.setInstanceId(job.getInstanceId());
 				maService.addAddress(addr);
 			}
+			String databaseUser = PropertyManager.getProperty(PROPERTY_PREFIX+service+".database.user");
+			if(databaseUser != null) {
+				
+			}
 			
 			if(createCluster(cluster, service, ec2, job.getZone(), job.getCloud(), key.getName(), key.getSecret_key(), imageId (job, service, cluster), instanceType, needsLoadBalancer) == true) {
 				cluster.setLive(1);
