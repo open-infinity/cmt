@@ -4,7 +4,7 @@ class oihealthmonitoring::config {
         owner => 'toas',
         group => 'toas',
         mode => 0755,
-        content => template("oihealthmonitoring/toas.sh.template"),
+        content => template("oihealthmonitoring/toas.sh.erb"),
         require => Class["oihealthmonitoring::install"],
     } 
     file { "/opt/openinfinity/2.0.0/healthmonitoring/collectd/etc/collectd.conf":
@@ -12,7 +12,7 @@ class oihealthmonitoring::config {
         owner => 'toas',
         group => 'toas',
         mode => 0644,
-        content => template("oihealthmonitoring/collectd.conf.template"),
+        content => template("oihealthmonitoring/collectd.conf.erb"),
         require => Class["oihealthmonitoring::install"],
     } 
     file { "/opt/openinfinity/2.0.0/healthmonitoring/nodechecker/etc/nodechecker.conf":
@@ -20,7 +20,7 @@ class oihealthmonitoring::config {
         owner => 'toas',
         group => 'toas',
         mode => 0744,
-        content => template("oihealthmonitoring/nodechecker.conf.template"),
+        content => template("oihealthmonitoring/nodechecker.conf.erb"),
         require => Class["oihealthmonitoring::install"],
     } 
     file { "/opt/openinfinity/2.0.0/healthmonitoring/nodechecker/etc/nodelist.conf":
@@ -28,7 +28,16 @@ class oihealthmonitoring::config {
         owner => 'toas',
         group => 'toas',
         mode => 0744,
-        content => template("oihealthmonitoring/nodelist.conf.template"),
+        content => template("oihealthmonitoring/nodelist.conf.erb"),
+        require => Class["oihealthmonitoring::install"],
+    }
+
+    file { "/opt/openinfinity/2.0.0/healthmonitoring/collectd/etc/collectd.d/threshold.conf":
+        ensure => file,
+        owner => 'toas',
+        group => 'toas',
+        mode => 0644,
+        content => template("oihealthmonitoring/threshold.conf.erb"),
         require => Class["oihealthmonitoring::install"],
     }
 }

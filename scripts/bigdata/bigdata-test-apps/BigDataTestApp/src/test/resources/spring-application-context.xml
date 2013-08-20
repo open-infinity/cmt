@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+                                http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+                                http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd
+								http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+    							http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd"
+	xmlns:hdp="http://www.springframework.org/schema/hadoop">
+
+
+	<context:property-placeholder location="classpath:hadoop.properties" />
+
+	<hdp:configuration>
+		fs.defaultFS=${fs.defaultFS}
+		mapred.job.tracker=${mapred.job.tracker}
+	</hdp:configuration>
+
+	<hdp:job id="hadoopTestJob" input-path="${input.path}"
+		output-path="${output.path}" jar-by-class="org.openinfinity.test.bigdata.hadoop.TestMapper"
+		mapper="org.openinfinity.test.bigdata.hadoop.TestMapper" reducer="org.openinfinity.test.bigdata.hadoop.TestReducer" />
+
+	<hdp:job-runner id="hadoopTestJobRunner" job-ref="hadoopTestJob"
+		run-at-startup="false" />
+
+	<bean id="hadoopProperties" class="org.openinfinity.test.bigdata.hadoop.HadoopProperties">
+		<property name="hmasterHost" value="${hmaster.namenode}" />
+		<property name="hmasterSshKeyFilename" value="${hmaster.sshKeyFilename}" />
+	</bean>
+
+</beans>

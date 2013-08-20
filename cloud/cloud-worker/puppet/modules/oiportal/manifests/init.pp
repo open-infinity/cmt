@@ -103,6 +103,24 @@ class oiportal::config {
                 require => Class["oiportal::install"],
         }
 
+        file {"/opt/openinfinity/2.0.0/tomcat/conf/jmxremote.password":
+                ensure => present,
+                owner => 'toas',
+                group => 'toas',
+                mode => 0600,
+                content => template("oiportal/jmxremote.password.erb"),
+                require => Class["oiportal::install"],
+        }
+        
+        file {"/opt/openinfinity/2.0.0/tomcat/conf/jmxremote.access":
+                ensure => present,
+                owner => 'toas',
+                group => 'toas',
+                mode => 0644,
+                source => "puppet:///modules/oiportal/jmxremote.access",
+                require => Class["oiportal::install"],
+        }
+
         file {"/etc/init.d/oi-tomcat":
                 ensure => present,
                 owner => 'root',
