@@ -18,7 +18,7 @@
 # this script assumes all options are in the config file.
 #CONFIGFILE="/etc/mongod.conf"
 #OPTIONS=" -f $CONFIGFILE"
-OPTIONS=" --fork --port 27018 --rest --replSet [[REPLICASET_NAME]] --dbpath [[MONGO_DBPATH]] --logappend --logpath /var/log/mongo/mongod.log"
+OPTIONS=" --fork --port 27018 --rest --replSet [[REPLICASET_NAME]] --dbpath [[MONGO_DBPATH]] --logappend --logpath [[MONGO_LOGPATH]]/mongod.log"
 SYSCONFIG="/etc/sysconfig/mongod"
 
 # FIXME: 1.9.x has a --shutdown flag that parses the config file and

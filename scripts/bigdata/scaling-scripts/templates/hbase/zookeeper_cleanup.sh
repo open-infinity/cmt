@@ -33,5 +33,5 @@ find /etc -name "*.rpmsave" | xargs rm -fR
 rm -fR /etc/zookeeper.dist
 
 # Delete some other directories
-rm -fR /var/zookeeper
+rm -fR /var/lib/zookeeper /var/zookeeper /etc/zookeeper /var/run/zookeeper /etc/bigdata
 

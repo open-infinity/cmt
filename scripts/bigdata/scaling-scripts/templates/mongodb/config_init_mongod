@@ -11,7 +11,7 @@
 
 . /etc/rc.d/init.d/functions
 
-OPTIONS=" --port 27019 --fork --configsvr --rest --logappend --logpath /var/log/mongo/mongo-cfgsrv.log --dbpath [[MONGO_DBPATH]]"
+OPTIONS=" --port 27019 --fork --configsvr --rest --logappend --logpath [[MONGO_LOGPATH]]/mongo-cfgsrv.log --dbpath [[MONGO_DBPATH]]"
 SYSCONFIG="/etc/sysconfig/mongod"
 
 DBPATH="[[MONGO_DBPATH]]"

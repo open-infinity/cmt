@@ -13,6 +13,6 @@
     </property>
     <property>
         <name>mapred.local.dir</name>
-        <value>/data/1/mapred/local,/data/2/mapred/local,/data/3/mapred/local</value>
+        <value>/opt/openinfinity/2.0.0/bigdata/data/1/mapred/local,/opt/openinfinity/2.0.0/bigdata/data/2/mapred/local,/opt/openinfinity/2.0.0/bigdata/data/3/mapred/local</value>
     </property>
 </configuration>

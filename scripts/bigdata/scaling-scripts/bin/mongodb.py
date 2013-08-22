@@ -522,6 +522,7 @@ def make_template_params(cc, node):
         
     template_params['NODE_HOSTNAME'] = node.hostname
     template_params['REPLICASET_NAME'] = "rs%s" % replsetnum_as_string
+    template_params['MONGO_LOGPATH'] = log_dir
     template_params['MONGO_DBPATH'] = database_dir
     template_params['SHARD_NAME'] = "shard%s" % replsetnum_as_string
     
