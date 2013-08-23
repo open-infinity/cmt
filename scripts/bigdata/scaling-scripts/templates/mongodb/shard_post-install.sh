@@ -26,11 +26,14 @@
 # @since 1.0.0
 #
 
-chmod u+rx /etc/rc.d/init.d/mongod
+chmod u+rx /etc/init.d/mongod
 chmod u+rx /tmp/mongodb/*.sh
 
-mkdir [[MONGO_DBPATH]]
+mkdir -p [[MONGO_DBPATH]]
 chown mongod [[MONGO_DBPATH]]/
 chgrp mongod [[MONGO_DBPATH]]/
 
+mkdir -p [[MONGO_LOGPATH]]
+chown mongod [[MONGO_LOGPATH]]/
+chgrp mongod [[MONGO_LOGPATH]]/
 

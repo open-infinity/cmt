@@ -33,5 +33,7 @@ su - zookeeper -s /bin/bash -c "touch /var/run/zookeeper/.ssh/authorized_keys"
 su - zookeeper -s /bin/bash -c "chmod 0600 /var/run/zookeeper/.ssh/authorized_keys"
 
 echo "Creating myid file for zookeeper process"
-su - zookeeper -s /bin/bash -c "touch /var/zookeeper/myid"
+chown zookeeper /var/lib/zookeeper
+su - zookeeper -s /bin/bash -c "touch /var/lib/zookeeper/myid"
 #su - zookeeper -s /bin/bash -c "echo [[ZOOKEEPER_MYID]] > /var/zookeeper/myid"
+

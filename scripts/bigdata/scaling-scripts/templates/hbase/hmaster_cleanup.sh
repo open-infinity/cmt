@@ -41,5 +41,5 @@ rm -fR /etc/hadoop-0.20 /etc/hbase /etc/zookeeper.dist
 rm -fR /etc/hadoop /etc/hadoop-0.20
 
 # Delete some other directories
-rm -fR /var/zookeeper
+rm -fR /var/lib/zookeeper /opt/openinfinity/2.0.0/bigdata/data /opt/openinfinity/2.0.0/bigdata/tmp
 

@@ -24,6 +24,7 @@
 # @since 1.0.0
 #
 
+
 from os.path import join, exists
 from os import mkdir, makedirs, remove, system
 from dircache import listdir
@@ -201,13 +202,13 @@ class HBaseNode(Node):
                 if self.role == "hmaster":
                     out.info("Installing HMaster RPM files")
                     rpms = [
-                            'hadoop-zookeeper',
-                            'hadoop-0.20-jobtracker',
-                            'hadoop-0.20-namenode',
-                            'hadoop-0.20-secondarynamenode',
-                            'hadoop-hbase',
-                            'hadoop-hbase-master',
-                            'hadoop-0.20',
+                            'zookeeper',
+                            'hadoop-0.20-mapreduce-jobtracker',
+                            'hadoop-hdfs-secondarynamenode',
+                            'hadoop-hdfs-namenode',
+                            'hbase',
+                            'hbase-master',
+                            'hadoop-hdfs',
                     ]
                     ssh.install(rpms)
                     rpms_list.push(rpms)
@@ -215,20 +216,20 @@ class HBaseNode(Node):
                     # Install RPM packages
                     out.info("Installing ZooKeeper RPM files")
                     rpms = [
-                            'hadoop-zookeeper',
-                            'hadoop-zookeeper-server',
+                            'zookeeper',
+                            'zookeeper-server',
                     ]
                     ssh.install(rpms)
                     rpms_list.push(rpms)
                 elif self.role == "slave":
                     # Install RPM packages
                     rpms = [
-                                'hadoop-zookeeper',
-                                'hadoop-0.20',
-                                'hadoop-0.20-datanode',
-                                'hadoop-0.20-tasktracker',
-                                'hadoop-hbase',
-                                'hadoop-hbase-regionserver',
+                                'zookeeper',
+                                'hadoop-hdfs',
+                                'hadoop-hdfs-datanode',
+                                'hadoop-0.20-mapreduce-tasktracker',
+                                'hbase',
+                                'hbase-regionserver',
                     ]
                     ssh.install(rpms)
                     rpms_list.push(rpms)
@@ -237,14 +238,17 @@ class HBaseNode(Node):
                 else:
                     raise "Unknown role: %s" % (self.role)
 
+            hbase_homedir = ssh.get_homedir_of('hbase')
+            hdfs_homedir = ssh.get_homedir_of('hbase')
+            zookeeper_homedir = ssh.get_homedir_of('hbase')
+
             # Ensure that update-alternatives configuration is correct
             if self.role in ['hmaster', 'slave']:
                 out.info("Configure update alternatives")
-                ssh.execute("mkdir -p /etc/hadoop-0.20/conf.cluster")
-                ssh.execute("cp -pfR /etc/hadoop-0.20/conf.empty/* /etc/hadoop-0.20/conf.cluster/")
-                ssh.execute("update-alternatives --install /etc/hadoop-0.20/conf hadoop-0.20-conf /etc/hadoop-0.20/conf.cluster 20")
-                ssh.execute("update-alternatives --set hadoop-0.20-conf /etc/hadoop-0.20/conf.cluster")
-                ssh.execute("rm -fR /etc/hadoop && ln -s /etc/alternatives/hadoop-etc /etc/hadoop")
+                ssh.execute("mkdir -p /etc/hadoop/conf.cluster")
+                ssh.execute("cp -pfR /etc/hadoop/conf.empty/* /etc/hadoop/conf.cluster/")
+                ssh.execute("update-alternatives --install /etc/hadoop/conf hadoop-conf /etc/hadoop/conf.cluster 20")
+                ssh.execute("update-alternatives --set hadoop-conf /etc/hadoop/conf.cluster")
 
             # Wait until expected number of dependencies are ready        
             try:
@@ -307,9 +311,9 @@ class HBaseNode(Node):
                             rssh.send_file_to(content, remote_filename, mode=mode)
 
                         # (Re)start the services                            
-                        rssh.execute("/etc/init.d/hadoop-0.20-datanode restart");                    
-                        rssh.execute("/etc/init.d/hadoop-0.20-tasktracker restart");
-                        rssh.execute("/etc/init.d/hadoop-hbase-regionserver restart");
+                        rssh.execute("service hadoop-hdfs-datanode restart");                    
+                        rssh.execute("service hadoop-0.20-mapreduce-tasktracker restart");
+                        rssh.execute("service hbase-regionserver restart");
                     finally:
                         bigdata.release('node-%s' % snode.hostname)
                         rssh.disconnect()
@@ -325,38 +329,49 @@ class HBaseNode(Node):
                 # Copy SSH keys of hdfs and hbase to the bigdata storage
                 self.config_description = 'sending ssh keys'
                 out.info("Save public SSH keys of hbase and hdfs")
-                self.hdfs_public_ssh_key  = ssh.receive_file_from("/var/run/hbase/.ssh/id_rsa.pub")
-                self.hbase_public_ssh_key = ssh.receive_file_from("/usr/lib/hadoop-0.20/.ssh/id_rsa.pub")
-            
+                self.hdfs_public_ssh_key  = ssh.receive_file_from("%s/.ssh/id_rsa.pub" % hdfs_homedir)
+                self.hbase_public_ssh_key = ssh.receive_file_from("%s/.ssh/id_rsa.pub" % hbase_homedir)
+
                 # Start the services
                 self.config_description = 'starting services'
                 out.info("Starting services in HMaster")
-                ssh.execute("/etc/init.d/hadoop-0.20-namenode restart")
-                ssh.execute("/etc/init.d/hadoop-0.20-secondarynamenode restart")
-                ssh.execute("/etc/init.d/hadoop-0.20-jobtracker restart")
-                ssh.execute("/etc/init.d/hadoop-hbase-master restart")
+                ssh.execute("service hbase-master stop", raise_on_non_zero=False)
+                ssh.execute("/etc/init.d/hadoop-0.20-mapreduce-jobtracker stop", raise_on_non_zero=False)
+                ssh.execute("service hadoop-hdfs-secondarynamenode stop", raise_on_non_zero=False)
+                ssh.execute("service hadoop-hdfs-namenode stop", raise_on_non_zero=False)
+                
+                ssh.execute("service hadoop-hdfs-namenode start")
+                ssh.execute("service hadoop-hdfs-secondarynamenode start")
+                ssh.execute("/etc/init.d/hadoop-0.20-mapreduce-jobtracker restart")
+                ssh.execute("service hbase-master start")
             elif self.role == "zookeeper":
-                # update zookeeper id before start
-                ssh.execute("echo %s > /var/zookeeper/myid" % (cc.zookeepers.index(self)));      
-                # Start the services
+                # Initialize the service
                 self.config_description = 'starting services'
+                out.info("Initiating ZooKeeper")
+                ssh.execute("service zookeeper-server init");      
+
+                # update zookeeper id before start
+                ssh.execute("echo %s > /var/lib/zookeeper/myid" % (cc.zookeepers.index(self)));      
+                
+                # Start the service
                 out.info("Starting services in ZooKeeper")
-                ssh.execute("/etc/init.d/hadoop-zookeeper-server restart");      
+                ssh.execute("service zookeeper-server restart");
             elif self.role == "slave":
                 # Copy SSH public keys
                 out.info("Copying the public SSH keys of hbase and hdfs from master to the node")
                 ssh.send_file_to(self.hbase_public_ssh_key, "/tmp/id_rsa.pub")
-                ssh.execute("cat /tmp/id_rsa.pub >> /var/run/hbase/.ssh/authorized_keys && rm /tmp/id_rsa.pub")
+                ssh.execute("cat /tmp/id_rsa.pub >> %s/.ssh/authorized_keys && rm /tmp/id_rsa.pub" % hbase_homedir)
+                ssh.execute("mkdir %s/.ssh && chmod 0700 %s/.ssh" % (hdfs_homedir, hdfs_homedir), raise_on_non_zero=False)
                 ssh.send_file_to(self.hdfs_public_ssh_key, "/tmp/id_rsa.pub")
-                ssh.execute("cat /tmp/id_rsa.pub >> /usr/lib/hadoop-0.20/.ssh/authorized_keys && rm /tmp/id_rsa.pub")
+                ssh.execute("cat /tmp/id_rsa.pub >> %s/.ssh/authorized_keys && rm /tmp/id_rsa.pub" % hdfs_homedir)
             
                 # Start the services
                 if len(cc.slaves) > 3:
                     self.config_description = 'starting services'
                     out.info("Starting services in HBase slave")
-                    ssh.execute("/etc/init.d/hadoop-0.20-datanode restart");                    
-                    ssh.execute("/etc/init.d/hadoop-0.20-tasktracker restart");
-                    ssh.execute("/etc/init.d/hadoop-hbase-regionserver restart");
+                    ssh.execute("service hadoop-hdfs-datanode restart");                    
+                    ssh.execute("/etc/init.d/hadoop-0.20-mapreduce-tasktracker restart");
+                    ssh.execute("service hbase-regionserver restart");
                 else:
                     out.info("Not starting slave services before HMaster")
             elif self.role == "hive":
@@ -413,7 +428,7 @@ class HBaseNode(Node):
                                     rssh.send_file_to(content, remote_filename, mode=mode)
                                 # restart zookeepers
                                 out.info("Restarting ZooKeeper services in node: %s" % node.hostname)
-                                rssh.execute("/etc/init.d/hadoop-zookeeper-server restart");
+                                rssh.execute("service zookeeper-server restart");
                             finally:
                                 bigdata.release('node-%s' % node.hostname)
                                 rssh.disconnect()                                
@@ -431,7 +446,7 @@ class HBaseNode(Node):
                                 rssh.send_file_to(content, remote_filename, mode=mode)
                                
                             # refresh hmaster (hbase)?? - restart required?
-                            rssh.execute("/etc/init.d/hadoop-hbase-master restart");
+                            rssh.execute("service hbase-master restart");
                         finally:
                             bigdata.release('node-%s' % cc.hmaster.hostname)
                             rssh.disconnect()
@@ -456,7 +471,7 @@ class HBaseNode(Node):
                         # optional: use balacer tool for re-distributing blocks to upscaled cluster
                         
                         ## Name node restart
-                        #ssh.execute("/etc/init.d/hadoop-0.20-namenode restart")
+                        #ssh.execute("service hadoop-hdfs-namenode restart")
                     finally:
                         bigdata.release('node-%s' % cc.hmaster.hostname)
                         rssh.disconnect()
@@ -580,23 +595,23 @@ class HBaseNode(Node):
             ronz = not cc.options.force
             if self.role == "hmaster":
                 out.info("  hmaster...")
-                ssh.execute("/etc/init.d/hadoop-hbase-master stop", raise_on_non_zero=ronz)
+                ssh.execute("service hbase-master stop", raise_on_non_zero=ronz)
                 out.info("  jobtracker...")
-                ssh.execute("/etc/init.d/hadoop-0.20-jobtracker stop", raise_on_non_zero=ronz)
+                ssh.execute("service hadoop-0.20-mapreduce-jobtracker stop", raise_on_non_zero=ronz)
                 out.info("  namenode...")
-                ssh.execute("/etc/init.d/hadoop-0.20-namenode stop", raise_on_non_zero=ronz)
+                ssh.execute("service hadoop-hdfs-namenode stop", raise_on_non_zero=ronz)
                 out.info("  secondarynamenode...")
-                ssh.execute("/etc/init.d/hadoop-0.20-secondarynamenode stop", raise_on_non_zero=ronz)
+                ssh.execute("service hadoop-hdfs-secondarynamenode stop", raise_on_non_zero=ronz)
             elif self.role == "zookeeper":
                 out.info("  zookeeper...")
-                ssh.execute("/etc/init.d/hadoop-zookeeper-server stop", raise_on_non_zero=ronz);      
+                ssh.execute("service zookeeper-server stop", raise_on_non_zero=ronz);      
             elif self.role == "slave":
                 out.info("  regionserver...")
-                ssh.execute("/etc/init.d/hadoop-hbase-regionserver stop", raise_on_non_zero=ronz);
+                ssh.execute("service hbase-regionserver stop", raise_on_non_zero=ronz);
                 out.info("  taskcracker...")
-                ssh.execute("/etc/init.d/hadoop-0.20-tasktracker stop", raise_on_non_zero=ronz);
+                ssh.execute("service hadoop-0.20-mapreduce-tasktracker stop", raise_on_non_zero=ronz);
                 out.info("  datanode...")
-                ssh.execute("/etc/init.d/hadoop-0.20-datanode stop", raise_on_non_zero=ronz);                    
+                ssh.execute("service hadoop-hdfs-datanode stop", raise_on_non_zero=ronz);                    
             elif self.role == "hive":
                 out.warn("  hive stop not implemented")
             
@@ -627,7 +642,7 @@ class HBaseNode(Node):
 
             # Remove update-alternatives config
             if self.role in ['hmaster', 'slave']:
-                ssh.execute("update-alternatives --remove hadoop-0.20-conf /etc/hadoop-0.20/conf.cluster", raise_on_non_zero=False)
+                ssh.execute("update-alternatives --remove hadoop-conf /etc/hadoop/conf.cluster", raise_on_non_zero=False)
 
             # Delete /etc/bigdata file from the server
             ssh.remove_file("/etc/bigdata")
@@ -661,7 +676,7 @@ class HBaseNode(Node):
                                 rssh.send_file_to(content, remote_filename, mode=mode)
                             # restart zookeepers
                             out.info("Restarting ZooKeeper services in node: %s" % node.hostname)
-                            rssh.execute("/etc/init.d/hadoop-zookeeper-server stop", raise_on_non_zero=ronz);
+                            rssh.execute("service zookeeper-server stop", raise_on_non_zero=ronz);
                         finally:
                             rssh.disconnect()                                
                             
@@ -676,7 +691,7 @@ class HBaseNode(Node):
                             rssh.send_file_to(content, remote_filename, mode=mode)
                            
                         # refresh hmaster (hbase)?? - restart required?
-                        rssh.execute("/etc/init.d/hadoop-hbase-master stop", raise_on_non_zero=ronz);
+                        rssh.execute("service hbase-master stop", raise_on_non_zero=ronz);
                     finally:
                         rssh.disconnect()
 
@@ -881,6 +896,7 @@ def initialize_directories(out, options):
     f.write("%s\n" % m.hexdigest())
     f.close()
     return True
+
 
 # ------------------------------------------------------------------------------
 
