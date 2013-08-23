@@ -35,20 +35,34 @@ if (1) {
 	push(@class, "oihealthmonitoring");
 	
         # Query from machine_tbl, create entris for nodelist.conf from results
-        my $sql = "select machine_id, machine_private_dns_name, machine_type from machine_tbl where machine_cluster_id = $cluster and machine_running > 0";
-	my $sth = $dbh->prepare($sql);
+        my $sql = "select machine_id,machine_dns_name,machine_private_dns_name,machine_type,machine_name from machine_tbl where machine_cluster_id = $cluster and machine_running > 0";
+        my $sth = $dbh->prepare($sql);
         $sth->execute() or die "Error in SQL execute: $DBI::errstr";
         my @datalist;
         my $node_hostname = "NA";
-        my ($machine_id, $machine_private_ip, $machine_type);
+        my $dns_name;
+        
+        my ($machine_id, $machine_dns_name, $machine_private_dns_name, $machine_type, $machine_name);
         $sth->bind_col(1, \$machine_id);
-        $sth->bind_col(2, \$machine_private_ip);
-        $sth->bind_col(3, \$machine_type);
+        $sth->bind_col(2, \$machine_dns_name);
+        $sth->bind_col(3, \$machine_private_dns_name);
+        $sth->bind_col(4, \$machine_type);
+        $sth->bind_col(5, \$machine_name);
         while ($sth->fetch) { 
-                my $hostname = $machine_private_ip;
-                $hostname =~ s/\./-/g;
-                $hostname = "ip-" . $hostname;
-                my $hostdata = $machine_private_ip . " " . $hostname . " " . $machine_type;
+                my $hostname;
+                if ($machine == $machine_id){
+                      $dns_name = $machine_dns_name;
+                }
+		if ($machine_name =~ m/^(mongo|hbase)\d+$/){
+                      $hostname = $machine_name;
+                }
+                else{
+                      $hostname = $machine_private_dns_name;
+                      $hostname =~ s/\./-/g;
+                      $hostname = "ip-" . $hostname;
+                }
+                my $hostdata = $machine_private_dns_name . " " . $machine_dns_name . " " . $hostname . " " . 
+                               $machine_type . " " .  $machine_id;
                 if ($machine eq $machine_id) {
                         $node_hostname = $hostname;
                 }
@@ -74,20 +88,34 @@ if (1) {
 	@row = $sth->fetchrow_array();
 	my $ram = $row[0];
 	$sth->finish;
-         
-	%hm_parameters = (
-		host_group => "cluster_" . $cluster,
+        
+        # Query cloud zone
+        $sql = "select cloud_zone from instance_tbl where instance_id = $instance";
+        $sth = $dbh->prepare($sql);
+        $sth->execute() or die "Error in SQL execute: $DBI::errstr";
+        @row = $sth->fetchrow_array();
+        my $cloud = $row[0];
+        $sth->finish; 
+	
+        %hm_parameters = (
+		#FIXME: use cluster_id instead host_group
+                host_group => "cluster_" . $cluster,
+                cloud_zone => $cloud,
+                instance_id => $instance,
+                cluster_id => $cluster,
+                machine_id => $machine,
+                public_ip => $dns_name,
                 hostname => $node_hostname,
 		java_home => "/usr/lib/jvm/java-1.6.0-openjdk-1.6.0.0.x86_64/jre",
-		mail_host => "",
-		mail_from => "",
-		default_mail_recepient => "",
+		mail_host => "gate33.gw.tietoenator.com",
+		mail_from => "support.toas\@tieto.com",
+		default_mail_recepient => "vedran.bartonicek\@tieto.com",
 		toas_collectd_root => "/opt/openinfinity/2.0.0/healthmonitoring/collectd",
                 toas_rrd_http_server_root => "/opt/openinfinity/2.0.0/healthmonitoring/rrd-http-server",
 		toas_monitoring_root => "/opt/openinfinity/2.0.0/healthmonitoring/nodechecker",
                 cluster_member_data => \@datalist,
-                tomcat_monitor_role_pwd => "",
-                tomcat_jmx_port => "",
+                tomcat_monitor_role_pwd => "oy1Eewai",
+                tomcat_jmx_port => "65329",
                 threshold_warn_max_jvm_committed =>, roundup($ram * .75 * .95 * 1000000 , 10),
 	);
 }
