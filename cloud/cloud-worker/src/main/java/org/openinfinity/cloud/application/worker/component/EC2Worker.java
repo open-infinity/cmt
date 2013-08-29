@@ -974,23 +974,19 @@ public class EC2Worker implements Worker {
 		}
 		machine.setRunning(1);
 		machineService.addMachine(machine);
-		String command = null;
-		if(job.getCloud() == InstanceService.CLOUD_TYPE_AMAZON) {
-			command = "/usr/bin/sudo /usr/bin/puppet agent --test --no-daemonize --onetime --certname ";
-		} else {
-			command = "/usr/bin/puppet agent --test --no-daemonize --onetime --certname ";
-		}
-		command += job.getInstanceId()+"_";
-		command += cluster.getId()+"_";
-		command += machine.getId()+"_";
-		command += ClusterService.CLUSTER_TYPE_MACHINE_NAME[cluster.getType()];
-		String output = null;
 		
-		output = sshRunCommand(machine, command, key);
-		if(output == null) {
+		String cmd = (job.getCloud() == InstanceService.CLOUD_TYPE_AMAZON) ?
+		    "/usr/bin/sudo /usr/bin/puppet agent --test --no-daemonize --onetime --certname " :
+		    "/usr/bin/puppet agent --test --no-daemonize --onetime --certname ";
+		cmd += job.getInstanceId() + "_" + cluster.getId() + "_" + machine.getId()+ "_" + 
+		       ClusterService.CLUSTER_TYPE_MACHINE_NAME[cluster.getType()];
+
+		if(sshRunCommand(machine, cmd, key) == null) {
 			machineService.updateMachineConfigure(machine.getId(), MachineService.MACHINE_CONFIGURE_ERROR);
 			return -1;
 		}
+		
+		String command;
 		if(type == ClusterService.CLUSTER_TYPE_BIGDATA) {
 			if(job.getCloud() == InstanceService.CLOUD_TYPE_AMAZON) {
 				command = "/usr/bin/sudo /opt/bigdata/bin/initialize.py hbase";
@@ -1004,8 +1000,7 @@ public class EC2Worker implements Worker {
 				command = "/opt/bigdata/bin/initialize.py mongodb";
 			}
 		}
-		output = sshRunCommand(machine, command, key);
-		if(output == null) {
+		if(sshRunCommand(machine, command, key) == null) {
 			machineService.updateMachineConfigure(machine.getId(), MachineService.MACHINE_CONFIGURE_ERROR);
 			return -1;
 		}
@@ -1019,7 +1014,7 @@ public class EC2Worker implements Worker {
 		} else {
 			command = "/opt/bigdata/bin/ask-roles.py --xml "+cluster.getNumberOfMachines();
 		}
-		output = sshRunCommand(machine, command, key);
+		String output = sshRunCommand(machine, command, key);
 		if(output == null) {
 			machineService.updateMachineConfigure(machine.getId(), MachineService.MACHINE_CONFIGURE_ERROR);
 			return -1;
@@ -1189,6 +1184,13 @@ public class EC2Worker implements Worker {
 				}
 			}
 		}
+		
+		// Finnaly, call puppet agent once more on manager machine to create nodelist.conf file for health monitoring
+		if(sshRunCommand(machine, cmd, key) == null) {
+            machineService.updateMachineConfigure(machine.getId(), MachineService.MACHINE_CONFIGURE_ERROR);
+            return -1;
+        }
+		
 		 
 		return 1;
 	}
