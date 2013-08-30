@@ -712,12 +712,13 @@ public class EC2Worker implements Worker {
 						LOG.error(threadName+": Error starting usage monitoring");
 					}
 					
-				}
-		        // Force reconfigure cluster machines, needed for nodelist.conf from oi-healthmonitoring
-				List<Machine> updatedMachineList = (List<Machine>) machineService.getMachinesInCluster(clusterId);
-				for (Machine m: updatedMachineList) machineService.updateMachineConfigure(m.getId(), MachineService.MACHINE_CONFIGURE_NOT_STARTED);
-			}
+				}		        
+			}	
 		}
+		// Force reconfigure cluster machines, needed for nodelist.conf from oi-healthmonitoring
+		List<Machine> updatedMachineList = (List<Machine>) machineService.getMachinesInCluster(clusterId);
+		for (Machine m: updatedMachineList) 
+		   machineService.updateMachineConfigure(m.getId(), MachineService.MACHINE_CONFIGURE_NOT_STARTED);
 		cluster.setNumberOfMachines(machines);
 		clusterService.updateCluster(cluster);
 		
