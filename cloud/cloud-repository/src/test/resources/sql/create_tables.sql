@@ -201,6 +201,9 @@ CREATE TABLE `machine_type_tbl` (
   `id` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
   `spec` varchar(255) NOT NULL,
+  `cores` int(11) DEFAULT NULL,
+  `ram` int(11) DEFAULT NULL,
+  `disk` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

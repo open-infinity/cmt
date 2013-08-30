@@ -131,8 +131,6 @@ public class ClusterController {
 			response.setProperty(ResourceResponse.HTTP_STATUS_CODE, AdminGeneral.HTTP_ERROR_CODE_SERVER_ERROR);
 		else{
 			try{
-				ElasticIP eip  = arService.getClustersElasticIP(clusterId);
-				LOG.debug("arService.getClustersElasticIP(clusterId) =" + arService.getClustersElasticIP(clusterId));
 				SerializerUtil.jsonSerialize(response.getWriter(), arService.getClustersElasticIP(clusterId));		
 			}
 			catch(Exception e)

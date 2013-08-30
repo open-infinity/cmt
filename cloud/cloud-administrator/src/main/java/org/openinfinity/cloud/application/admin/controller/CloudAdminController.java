@@ -466,7 +466,6 @@ public class CloudAdminController {
             boolean dbExists = instanceClusterTypes.contains(new Integer(ClusterService.CLUSTER_TYPE_DATABASE));
             boolean portalExists = instanceClusterTypes.contains(new Integer(ClusterService.CLUSTER_TYPE_PORTAL));
             boolean mqExists = instanceClusterTypes.contains(new Integer(ClusterService.CLUSTER_TYPE_MULE_MQ));
-            boolean createDb = false;
             
             if (!dbExists){
                 job.addService(ClusterService.SERVICE_NAME[ClusterService.CLUSTER_TYPE_DATABASE],
