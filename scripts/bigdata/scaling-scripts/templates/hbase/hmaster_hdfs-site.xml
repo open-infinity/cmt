@@ -4,11 +4,11 @@
     <configuration>
     <property>
         <name>dfs.name.dir</name>
-        <value>/opt/openinfinity/2.0.0/bigdata/data/1/dfs/nn,/opt/openinfinity/2.0.0/bigdata/data/2/dfs/nn</value>
+        <value>[[DATABASE_DIR]]/1/dfs/nn,[[DATABASE_DIR]]/2/dfs/nn</value>
     </property>
     <property>
         <name>dfs.data.dir</name>
-        <value>/opt/openinfinity/2.0.0/bigdata/data/1/dfs/dn,/opt/openinfinity/2.0.0/bigdata/data/2/dfs/dn,/opt/openinfinity/2.0.0/bigdata/data/3/dfs/dn</value>
+        <value>[[DATABASE_DIR]]/1/dfs/dn,[[DATABASE_DIR]]/2/dfs/dn,[[DATABASE_DIR]]/3/dfs/dn</value>
     </property>
     <property>
         <name>dfs.replication</name>
@@ -16,7 +16,7 @@
     </property>
     <property>
         <name>hadoop.tmp.dir</name>
-        <value>/opt/openinfinity/2.0.0/bigdata/tmp</value>
+        <value>[[TMP_DIR]]</value>
     </property>
     <property>
         <name>dfs.datanode.max.xcievers</name>

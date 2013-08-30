@@ -36,5 +36,5 @@ rm -fR /data
 rm -fR /etc/hadoop-0.20 /etc/hbase /etc/zookeeper.dist
 
 # Delete some other directories
-rm -fR /var/zookeeper /opt/openinfinity/2.0.0/bigdata/data
+rm -fR /var/zookeeper [[DATABASE_DIR]]]
 

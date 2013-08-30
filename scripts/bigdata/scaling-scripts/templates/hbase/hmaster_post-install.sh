@@ -27,7 +27,7 @@
 #
 
 echo "Creating directories"
-export DATADIR=/opt/openinfinity/2.0.0/bigdata/data
+export DATADIR=[[DATABASE_DIR]]
 
 mkdir -p $DATADIR/1/dfs/nn $DATADIR/2/dfs/nn; mkdir -p $DATADIR/1/dfs/dn $DATADIR/2/dfs/dn $DATADIR/3/dfs/dn $DATADIR/4/dfs/dn; 
 chown -R hdfs:hadoop $DATADIR/1/dfs/nn $DATADIR/2/dfs/nn $DATADIR/1/dfs/dn $DATADIR/2/dfs/dn $DATADIR/3/dfs/dn $DATADIR/4/dfs/dn; 
@@ -67,13 +67,13 @@ su - hdfs -s /bin/bash -c 'hadoop fs -mkdir -p /user/hbase'
 su - hdfs -s /bin/bash -c 'hadoop fs -chmod -R 775 /user/hbase' || exit 1
 su - hdfs -s /bin/bash -c 'hadoop fs -chown -R hbase /user/hbase' || exit 1
 
-su - hdfs -s /bin/bash -c 'hadoop fs -mkdir -p /opt/openinfinity/2.0.0/bigdata/tmp'
-su - hdfs -s /bin/bash -c 'hadoop fs -chmod -R 777 /opt/openinfinity/2.0.0/bigdata/tmp' || exit 1
-su - hdfs -s /bin/bash -c 'hadoop fs -chown -R hdfs:hadoop /opt/openinfinity/2.0.0/bigdata/tmp' || exit 1
+su - hdfs -s /bin/bash -c 'hadoop fs -mkdir -p [[TMP_DIR]]'
+su - hdfs -s /bin/bash -c 'hadoop fs -chmod -R 777 [[TMP_DIR]]' || exit 1
+su - hdfs -s /bin/bash -c 'hadoop fs -chown -R hdfs:hadoop [[TMP_DIR]]' || exit 1
 
-mkdir -p /opt/openinfinity/2.0.0/bigdata/tmp
-chown hdfs:hadoop /opt/openinfinity/2.0.0/bigdata/tmp
-chmod 775 /opt/openinfinity/2.0.0/bigdata/tmp
+mkdir -p [[TMP_DIR]]
+chown hdfs:hadoop [[TMP_DIR]]
+chmod 775 [[TMP_DIR]]
 
 service hadoop-hdfs-secondarynamenode stop
 service hadoop-hdfs-namenode stop || exit 1

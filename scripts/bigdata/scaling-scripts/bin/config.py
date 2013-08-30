@@ -28,12 +28,13 @@ import sys
 from os.path import join
 
 # Directories
-storage_dir = "/opt/openinfinity/2.0.0/bigdata/metadata"
+storage_dir = "/opt/openinfinity/3.0.0/bigdata/metadata"
 bundle_root_dir = "/var/tmp/openinfinitybundle"
 template_dir = join(sys.path[0], "../templates")
-log_dir = "/opt/openinfinity/2.0.0/bigdata/log"
-ssh_log_logpath = "/opt/openinfinity/2.0.0/bigdata/log"
-database_dir = "/opt/openinfinity/2.0.0/bigdata/data"
+log_dir = "/opt/openinfinity/3.0.0/bigdata/log"
+ssh_log_logpath = "/opt/openinfinity/3.0.0/bigdata/log"
+database_dir = "/opt/openinfinity/3.0.0/bigdata/data"
+tmp_dir = "/opt/openinfinity/3.0.0/bigdata/tmp"
 
 # Constants
 FILE_LOCK_TIMEOUT = (24 * 3600)

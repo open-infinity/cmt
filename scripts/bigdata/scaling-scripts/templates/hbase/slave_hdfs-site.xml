@@ -4,7 +4,7 @@
     <configuration>
     <property>
         <name>dfs.data.dir</name>
-        <value>/opt/openinfinity/2.0.0/bigdata/data/1/dfs/dn,/opt/openinfinity/2.0.0/bigdata/data/2/dfs/dn,/opt/openinfinity/2.0.0/bigdata/data/3/dfs/dn</value>
+        <value>[[DATABASE_DIR]]/1/dfs/dn,[[DATABASE_DIR]]/2/dfs/dn,[[DATABASE_DIR]]/3/dfs/dn</value>
     </property>
     <property>
         <name>fs.checkpoint.period</name>

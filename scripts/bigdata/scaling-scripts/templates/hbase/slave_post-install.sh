@@ -27,7 +27,7 @@
 #
 
 echo "Creating local directories"
-export DATADIR=/opt/openinfinity/2.0.0/bigdata/data
+export DATADIR=[[DATABASE_DIR]]
 
 mkdir -p $DATADIR/1/dfs/dn $DATADIR/2/dfs/dn $DATADIR/3/dfs/dn ; mkdir -p $DATADIR/1/dfs/dn $DATADIR/2/dfs/dn $DATADIR/3/dfs/dn 
 chown -R hdfs:hadoop $DATADIR/1/dfs/dn $DATADIR/2/dfs/dn $DATADIR/3/dfs/dn

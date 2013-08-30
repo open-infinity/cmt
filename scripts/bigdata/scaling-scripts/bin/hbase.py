@@ -840,6 +840,10 @@ def make_template_params(cc):
     # TODO: template_paarams["DATA_DIR"] = database_dir
         
     template_params["REPLICATION_SIZE"] = cc.replication_size
+
+    template_params["LOG_DIR"] = log_dir
+    template_params["DATABASE_DIR"] = database_dir
+    template_params["TMP_DIR"] = tmp_dir
         
     # Template params for ZooKeepers
     zknames = []
