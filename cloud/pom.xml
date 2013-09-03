@@ -30,6 +30,7 @@
 		<module>cloud-worker</module>
 		<module>cloud-health-monitoring</module>
 		<module>cloud-properties-batch</module>
+		<module>cloud-configuration-template</module>
 	</modules>
 	<dependencies>
 		<dependency>
