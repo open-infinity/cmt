@@ -18,13 +18,11 @@ package org.openinfinity.cloud.service.configurationtemplate;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.openinfinity.cloud.domain.configurationtemplate.Template;
-import org.openinfinity.cloud.domain.repository.configurationtemplate.TemplateRepository;
+import org.openinfinity.cloud.domain.configurationtemplate.ParameterKey;
+import org.openinfinity.cloud.domain.repository.configurationtemplate.ParameterKeyRepository;
 import org.openinfinity.core.annotation.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-
 
 /**
  * @author Vedran Bartonicek
@@ -32,16 +30,16 @@ import org.springframework.stereotype.Service;
  * @since 1.3.0
  */
 
-@Service("configurationTemplateService")
-public class TemplateServiceImpl implements TemplateService {
-	private static final Logger LOGGER = Logger.getLogger(TemplateServiceImpl.class.getName());
+@Service("configurationElementParameterKeyService")
+public class ParameterKeyServiceImpl implements ParameterKeyService {
+	private static final Logger LOGGER = Logger.getLogger(ParameterKeyServiceImpl.class.getName());
 
 	@Autowired
-	private TemplateRepository templateRepository;
+	private ParameterKeyRepository parameterKeyRepository;
 	
-	@Log 
-    public List<Template> getAll() {
-        return templateRepository.getAll();
+	@Log
+    public List<ParameterKey> getAll() {
+        return parameterKeyRepository.getAll();
     }
 	
 }

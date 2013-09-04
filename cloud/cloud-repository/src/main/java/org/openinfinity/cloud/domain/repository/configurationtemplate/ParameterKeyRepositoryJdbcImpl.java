@@ -19,7 +19,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.openinfinity.cloud.domain.configurationtemplate.Element;
+import org.openinfinity.cloud.domain.configurationtemplate.ParameterKey;
 import org.openinfinity.core.annotation.AuditTrail;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -34,7 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @since 1.3.0
  */
 @Repository
-public class ElementRepositoryJdbcImpl implements ElementRepository {
+public class ParameterKeyRepositoryJdbcImpl implements ParameterKeyRepository {
 
 	private JdbcTemplate jdbcTemplate;
 	private static final String GET_ALL_SQL = 
@@ -42,24 +42,16 @@ public class ElementRepositoryJdbcImpl implements ElementRepository {
 
     @AuditTrail
     @Transactional
-    public List<Element> getAll() {
+    public List<ParameterKey> getAll() {
         // TODO Auto-generated method stub
         return null;
     }
-   
-	private class ElementRowMapper implements RowMapper<Element> {
+  
+	private class ParameterKeyMapper implements RowMapper<ParameterKey> {
 		
-		public Element mapRow(ResultSet resultSet, int rowNum) throws SQLException {    
-		    return new Element(resultSet.getInt("id"),
-		                       resultSet.getInt("type"),
-		                       resultSet.getString("name"),
-		                       resultSet.getInt("version"),
-		                       resultSet.getString("description"),
-		                       resultSet.getInt("parameterKey"),
-		                       resultSet.getInt("minMachines"),
-		                       resultSet.getInt("maxMachines"),
-		                       resultSet.getInt("minReplicationMachines"),
-		                       resultSet.getInt("maxReplicationMachines"));
+		public ParameterKey mapRow(ResultSet resultSet, int rowNum) throws SQLException {    
+		    return new ParameterKey(resultSet.getInt("id"),
+		                            resultSet.getString("name"));
 		}
 	}
 

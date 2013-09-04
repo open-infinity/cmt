@@ -13,19 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.openinfinity.cloud.domain.repository.configurationtemplate;
+package org.openinfinity.cloud.service.configurationtemplate;
 
-import org.openinfinity.cloud.domain.ConfigurationTemplate;
+import java.util.List;
+
+import org.openinfinity.cloud.domain.configurationtemplate.ParameterKey;
+
 
 /**
- * CRUD interface for storing <code>org.openinfinity.core.cloud.domain.template</code> objects.
+ * Template interface for management of cloud configuration tempaltes.
  * 
  * @author Vedran Bartonicek
  * @version 1.3.0
  * @since 1.3.0
  */
-public interface ConfigurationTemplateRepository {
+public interface ParameterKeyService {
 	
-    ConfigurationTemplate getByOrganization(int id);
-
+    List<ParameterKey> getAll();
+	
 }

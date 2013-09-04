@@ -15,17 +15,33 @@
  */
 package org.openinfinity.cloud.service.configurationtemplate;
 
-import org.openinfinity.cloud.domain.ConfigurationTemplate;
+import java.util.List;
+
+import org.apache.log4j.Logger;
+import org.openinfinity.cloud.domain.configurationtemplate.Element;
+import org.openinfinity.cloud.domain.repository.configurationtemplate.ElementRepository;
+import org.openinfinity.core.annotation.Log;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+
 
 /**
- * Template interface for management of cloud configuration tempaltes.
- * 
  * @author Vedran Bartonicek
  * @version 1.3.0
  * @since 1.3.0
  */
-public interface ConfigurationTemplateService {
+
+@Service("configurationElementService")
+public class ElementServiceImpl implements ElementService {
+	private static final Logger LOGGER = Logger.getLogger(ElementServiceImpl.class.getName());
+
+	@Autowired
+	private ElementRepository elementRepository;
 	
-    ConfigurationTemplate getByOrganization(int id);
+	@Log
+    public List<Element> getAll() {
+        return elementRepository.getAll();
+    }
 	
 }
