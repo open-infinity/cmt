@@ -26,9 +26,37 @@
 # @since 1.0.0
 #
 
-echo "Creating local directories"
 export DATADIR=[[DATABASE_DIR]]
 
+echo "Creating log directories"
+groupmems -g hadoop -a hbase
+mkdir -p [[LOG_DIR]]
+chown hdfs [[LOG_DIR]]
+chown hdfs [[LOG_DIR]]
+chmod g+rwx [[LOG_DIR]]
+
+mkdir [[LOG_DIR]]/hbase
+chown hdfs [[LOG_DIR]]/hbase
+chgrp hadoop [[LOG_DIR]]/hbase
+chmod 0775 [[LOG_DIR]]/hbase
+rm -fR /var/log/hbase
+ln -s [[LOG_DIR]]/hbase /var/log/hbase
+
+mkdir [[LOG_DIR]]/hadoop-0.20-mapreduce
+chown mapred [[LOG_DIR]]/hadoop-0.20-mapreduce
+chgrp hadoop [[LOG_DIR]]/hadoop-0.20-mapreduce
+chmod 0775 [[LOG_DIR]]/hadoop-0.20-mapreduce
+rm -fR /var/log/hadoop-0.20-mapreduce
+ln -s [[LOG_DIR]]/hadoop-0.20-mapreduce /var/log/hadoop-0.20-mapreduce
+
+mkdir [[LOG_DIR]]/hadoop-hdfs
+chown hdfs [[LOG_DIR]]/hadoop-hdfs
+chgrp hadoop [[LOG_DIR]]/hadoop-hdfs
+chmod 0775 [[LOG_DIR]]/hadoop-hdfs
+rm -fR /var/log/hadoop-hdfs
+ln -s [[LOG_DIR]]/hadoop-hdfs /var/log/hadoop-hdfs
+
+echo "Creating data directories"
 mkdir -p $DATADIR/1/dfs/dn $DATADIR/2/dfs/dn $DATADIR/3/dfs/dn ; mkdir -p $DATADIR/1/dfs/dn $DATADIR/2/dfs/dn $DATADIR/3/dfs/dn 
 chown -R hdfs:hadoop $DATADIR/1/dfs/dn $DATADIR/2/dfs/dn $DATADIR/3/dfs/dn
 
