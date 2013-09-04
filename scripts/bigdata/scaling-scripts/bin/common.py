@@ -314,17 +314,28 @@ class Node(object):
                 rssh = SSHConnection(node.ip_address, out)
                 try:
                     rssh.connect()
-                    
+
+                    # Read the file                    
                     etc_hosts = rssh.receive_file_from("/etc/hosts", "")
                     etc_hosts_splitted = etc_hosts.split('\n')
+
+                    # Remove node's IP address line(s)
+                    for line in etc_hosts_splitted:
+                        if node.ip_address in line.split(' '):
+                            etc_hosts_splitted.remove(line)
+                            break
+
+                    # Generate dedicated block in the file                    
                     if (BIGDATA_BEGIN_LINE in etc_hosts_splitted) and (BIGDATA_END_LINE in etc_hosts_splitted):
                         a = etc_hosts_splitted.index(BIGDATA_BEGIN_LINE)
                         b = etc_hosts_splitted.index(BIGDATA_END_LINE)
                         c = etc_hosts_splitted[:(a + 1)] + [gen_content] + etc_hosts_splitted[b:]
                         etc_hosts = '\n'.join(c)
                     else:
-                        etc_hosts += '\n' + BIGDATA_BEGIN_LINE + '\n' + gen_content + BIGDATA_END_LINE + '\n'
+                        c = etc_hosts_splitted
+                        etc_hosts = '\n'.join(c) + '\n' + BIGDATA_BEGIN_LINE + '\n' + gen_content + BIGDATA_END_LINE + '\n'
 
+                    # Write file
                     out.debug(etc_hosts)                
                     rssh.send_file_to(etc_hosts, "/etc/hosts", 0o0644)
                 finally:
