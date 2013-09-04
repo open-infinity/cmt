@@ -10,19 +10,9 @@
 	   	<relativePath>..</relativePath>    	
 	</parent>
 
-    <groupId>org.openinfinity</groupId>
     <artifactId>cloud-properties</artifactId>
     <name>cloud-properties</name>
     <packaging>war</packaging>
-
-    <properties>
-        <liferay.version>6.0.6</liferay.version>
-        <springframework.version>3.1.1.RELEASE</springframework.version>
-        <slf4j.version>1.6.4</slf4j.version>
-
-        <project.build.jdk.version>1.6</project.build.jdk.version>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
 
     <prerequisites>
         <maven>3.0.4</maven>

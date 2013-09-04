@@ -13,21 +13,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.openinfinity.cloud.domain.repository.configurationtemplate;
+package org.openinfinity.cloud.service.configurationtemplate;
 
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.openinfinity.cloud.domain.configurationtemplate.Template;
+import org.openinfinity.cloud.domain.repository.configurationtemplate.TemplateRepository;
+import org.openinfinity.core.annotation.AuditTrail;
+import org.openinfinity.core.annotation.Log;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+
 
 /**
- * CRUD interface for storing <code>org.openinfinity.core.cloud.domain.template</code> objects.
- * 
  * @author Vedran Bartonicek
  * @version 1.3.0
  * @since 1.3.0
  */
-public interface TemplateRepository {
-	
-    List<Template> getAll();
 
+@Service("configurationTemplateService")
+public class TemplateServiceImpl implements TemplateService {
+	private static final Logger LOGGER = Logger.getLogger(TemplateServiceImpl.class.getName());
+
+	@Autowired
+	private TemplateRepository templateRepository;
+	
+	@Log
+    @AuditTrail 
+    public List<Template> getAll() {
+        return templateRepository.getAll();
+    }
+	
 }

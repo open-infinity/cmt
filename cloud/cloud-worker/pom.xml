@@ -6,12 +6,8 @@
 	<version>${project.global.version}</version>
    	<relativePath>..</relativePath>    	
   </parent> 
-  <groupId>org.openinfinity</groupId>
   <artifactId>cloud-worker</artifactId>
   <packaging>jar</packaging>
-<!--   <properties> -->
-<!--   	<springframework.version>3.1.1.RELEASE</springframework.version> -->
-<!--   </properties> -->
   
   <build>
   	<resources>
@@ -85,11 +81,6 @@
                                         <artifactId>jolokia-core</artifactId>
                                 </exclusion>
                 </exclusions>
-	</dependency>
-	<dependency>
-		<groupId>org.apache.httpcomponents</groupId>
-		<artifactId>httpclient</artifactId>
-		<version>4.2</version>
 	</dependency>
 	<dependency>
 		<groupId>org.apache.httpcomponents</groupId>

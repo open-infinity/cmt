@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 the original author or authors.
+ * Copyright (c) 2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,16 @@ package org.openinfinity.cloud.domain.repository.configurationtemplate;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 
+import lombok.NonNull;
+
+import org.openinfinity.cloud.domain.Cluster;
+import org.openinfinity.cloud.domain.configurationtemplate.Element;
 import org.openinfinity.cloud.domain.configurationtemplate.Template;
 import org.openinfinity.core.annotation.AuditTrail;
+import org.openinfinity.core.annotation.NotScript;
+import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
@@ -28,36 +35,60 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * JDBC Repository implementation of the <code>org.openinfinity.core.cloud.deployer.repository.DeploymentRepository</code> interface.
  * 
- * @author Ilkka Leinonen
- * @author Tommi Siitonen
- * @version 1.1.0
- * @since 1.0.0
+ * @author Vedran Bartonicek
+ * @version 1.3.0
+ * @since 1.3.0
  */
 @Repository
 public class ElementRepositoryJdbcImpl implements
-TemplateRepository {
+ElementRepository {
 
 	private JdbcTemplate jdbcTemplate;
-	private static final String GET_BY_ORGANIZATION_SQL = 
-	        "SELECT * FROM CONFIGURATION_TEMPLATE_TABLE WHERE ORGANIZATION_ID = ?";
-	
-    
+	private static final String GET_ALL_SQL = 
+	        "SELECT * FROM CONFIGURATION_ELEMENT_TABLE";
+
     @AuditTrail
     @Transactional
-    public Template getByOrganization(int id) {
-        return jdbcTemplate.queryForObject(GET_BY_ORGANIZATION_SQL,
-                                           new Object[]{id},
-                                           new ConfigurationTemplateRowMapper());
+    public List<Element> getAll() {
+        // TODO Auto-generated method stub
+        return null;
     }
+    
 
-	private class ConfigurationTemplateRowMapper implements RowMapper<Template> {
+    
+    @NonNull
+    @NotScript
+    private int parameter; 
+    
+    @NonNull
+    @NotScript
+    private int minMachines;
+    
+    @NonNull
+    @NotScript
+    private int maxMachines;
+    
+    @NonNull
+    @NotScript
+    private int minReplicationMachines;
+    
+    @NonNull
+    @NotScript
+    private int maxReplicationMachines;
+	private class ElementRowMapper implements RowMapper<Element> {
 		
-		public Template mapRow(ResultSet resultSet, int rowNum) throws SQLException {    
-		    return new Template(resultSet.getInt("id"),
-		                                     resultSet.getString("name"),
-		                                     resultSet.getString("description"));
+		public Element mapRow(ResultSet resultSet, int rowNum) throws SQLException {    
+		    return new Element(resultSet.getInt("id"),
+		                       resultSet.getInt("type"),
+		                       resultSet.getString("name"),
+		                       resultSet.getInt("version"),
+		                       resultSet.getString("description"),
+		                       resultSet.getInt("parameterKey"),
+		                       resultSet.getInt("minMachines"),
+		                       resultSet.getInt("maxMachines"),
+		                       resultSet.getInt("minReplicationMachines"),
+		                       resultSet.getInt("maxReplicationMachines"));
 		}
-	
 	}
-	
+
 }

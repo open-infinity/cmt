@@ -15,8 +15,6 @@
  */
 package org.openinfinity.cloud.domain.repository.configurationtemplate;
 
-import java.util.List;
-
 import org.openinfinity.cloud.domain.configurationtemplate.Template;
 
 /**
@@ -26,8 +24,8 @@ import org.openinfinity.cloud.domain.configurationtemplate.Template;
  * @version 1.3.0
  * @since 1.3.0
  */
-public interface TemplateRepository {
+public interface OrganizationRepository {
 	
-    List<Template> getAll();
+    Template getByOrganization(int id);
 
 }
