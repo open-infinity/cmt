@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+    <context:property-placeholder location=
+        "classpath*:/META-INF/properties/repository.properties, 
+         classpath*:/META-INF/spring/EucaCredentials.properties,
+         classpath*:/META-INF/spring/infrastructure.properties" />
+    <context:property-override location="classpath:override.properties"/>
+    
+    <context:component-scan base-package="org.openinfinity">
+        <context:exclude-filter type="regex" expression="org.openinfinity.cloud.service.healthmonitoring.*.*" />
+        <context:exclude-filter type="regex" expression="org.openinfinity.cloud.domain.repository.deployer.*.*" />
+        <context:exclude-filter type="regex" expression="org.openinfinity.cloud.service.deployer.*.*" />    
+    </context:component-scan>
+    
+    
+    <bean id="txManager"
+          class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="cloudDataSource"/>
+    </bean>
+
+    <jdbc:initialize-database data-source="cloudDataSource">
+        <jdbc:script location="file:${sql.script.path}/H2/create_tables.sql"/>
+        <jdbc:script location="sql/H2/populate_tables.sql"/>
+    </jdbc:initialize-database>
+
+    <bean id="testJdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <property name="dataSource" ref="cloudDataSource"/>
+    </bean>
+    
+    <bean id="cloudDataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+        destroy-method="close">
+        <property name="driverClass">
+            <value>${jdbc.driverClassName}</value>
+        </property>
+        <property name="jdbcUrl">
+            <value>${jdbc.url}</value>
+        </property>
+        <property name="user">
+            <value>${jdbc.username}</value>
+        </property>
+        <property name="password">
+            <value>${jdbc.password}</value>
+        </property>
+        <property name="maxPoolSize">
+            <value>30</value>
+        </property>
+        <property name="minPoolSize">
+            <value>2</value>
+        </property>
+        <property name="numHelperThreads">
+            <value>2</value>
+        </property>
+        <property name="testConnectionOnCheckout">
+            <value>true</value>
+        </property>
+    </bean>
+
+</beans>
