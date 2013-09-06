@@ -79,9 +79,12 @@ if [ $? -eq 1 ] ; then
     echo "Hadoop name node didn't start: `service hadoop-hdfs-namenode status`" &>/dev/stderr
     exit 1
 fi
-su - hdfs -s /bin/bash -c 'hadoop fs -mkdir /hbase' 
-su - hdfs -s /bin/bash -c 'hadoop fs -chmod -R 775 /hbase' || exit 1
-su - hdfs -s /bin/bash -c 'hadoop fs -chown -R hbase /hbase' || exit 1
+
+if [ "[[CLUSTER_TYPE]]" -eq "hbase" ] ; then
+    su - hdfs -s /bin/bash -c 'hadoop fs -mkdir /hbase' 
+    su - hdfs -s /bin/bash -c 'hadoop fs -chmod -R 775 /hbase' || exit 1
+    su - hdfs -s /bin/bash -c 'hadoop fs -chown -R hbase /hbase' || exit 1
+fi
 
 su - hdfs -s /bin/bash -c 'hadoop fs -mkdir -p /app/hadoop/tmp'
 su - hdfs -s /bin/bash -c 'hadoop fs -chmod -R 775 /app' || exit 1
@@ -91,9 +94,11 @@ su - hdfs -s /bin/bash -c 'hadoop fs -mkdir -p /mapred/system'
 su - hdfs -s /bin/bash -c 'hadoop fs -chmod -R 775 /mapred/system' || exit 1
 su - hdfs -s /bin/bash -c 'hadoop fs -chown -R mapred /mapred/system' || exit 1
 
-su - hdfs -s /bin/bash -c 'hadoop fs -mkdir -p /user/hbase'
-su - hdfs -s /bin/bash -c 'hadoop fs -chmod -R 775 /user/hbase' || exit 1
-su - hdfs -s /bin/bash -c 'hadoop fs -chown -R hbase /user/hbase' || exit 1
+if [ "[[CLUSTER_TYPE]]" -eq "hbase" ] ; then
+    su - hdfs -s /bin/bash -c 'hadoop fs -mkdir -p /user/hbase'
+    su - hdfs -s /bin/bash -c 'hadoop fs -chmod -R 775 /user/hbase' || exit 1
+    su - hdfs -s /bin/bash -c 'hadoop fs -chown -R hbase /user/hbase' || exit 1
+fi
 
 su - hdfs -s /bin/bash -c 'hadoop fs -mkdir -p [[TMP_DIR]]'
 su - hdfs -s /bin/bash -c 'hadoop fs -chmod -R 777 [[TMP_DIR]]' || exit 1
@@ -114,12 +119,14 @@ fi
 
 echo "Creating SSH keys for hbase and hdfs users"
 
-HBASE_HOMEDIR=`egrep "^hbase:" /etc/passwd | cut -d':' -f6`
-mkdir $HBASE_HOMEDIR/.ssh
-chown hbase $HBASE_HOMEDIR/.ssh 
-chmod 0700 $HBASE_HOMEDIR/.ssh
-rm -f $HBASE_HOMEDIR/.ssh/id_rsa*
-su - hbase -s /bin/bash -c "ssh-keygen -q -t rsa -f /var/run/hbase/.ssh/id_rsa -N \"\""
+if [ "[[CLUSTER_TYPE]]" -eq "hbase" ] ; then
+    HBASE_HOMEDIR=`egrep "^hbase:" /etc/passwd | cut -d':' -f6`
+    mkdir $HBASE_HOMEDIR/.ssh
+    chown hbase $HBASE_HOMEDIR/.ssh 
+    chmod 0700 $HBASE_HOMEDIR/.ssh
+    rm -f $HBASE_HOMEDIR/.ssh/id_rsa*
+    su - hbase -s /bin/bash -c "ssh-keygen -q -t rsa -f /var/run/hbase/.ssh/id_rsa -N \"\""
+fi
 
 HDFS_HOMEDIR=`egrep "^hdfs:" /etc/passwd | cut -d':' -f6`
 mkdir $HDFS_HOMEDIR/.ssh

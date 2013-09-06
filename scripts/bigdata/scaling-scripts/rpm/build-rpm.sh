@@ -60,8 +60,8 @@ cp -pR ../bin $TMPDIR/ROOT/
 
 # Build RPM package
 fpm -s dir -t rpm -C $TMPDIR -p $TARGETDIR -a noarch \
-	-n toas-bigdata-mgmt --version 1.1 --iteration 11 \
-	--description "HBase and MongoDB cluster up and down scaling scipts" \
+	-n toas-bigdata-mgmt --version 1.1 --iteration 16 \
+	--description "Hadoop, HBase and MongoDB cluster up and down scaling scipts" \
 	-d "python python-paramiko" \
 	--prefix /opt/bigdata \
 	-C $TMPDIR/ROOT --after-install $SCRIPTDIR/fpm-post-install.sh \

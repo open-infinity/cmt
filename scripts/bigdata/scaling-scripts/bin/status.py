@@ -56,11 +56,6 @@ parser.add_option("--xml", dest="xml",
 out = OutputWriter(options)
 
 try:
-    ## Chec that HBase big data is initialized
-    #if not hbase.is_initialized():
-    #    out.error("Big data storage not initialized in thise")
-    #    sys.exit(1)
-
     # Get access objects of the nodes
     cc = bigdata.create_config_context(options)
 
@@ -72,7 +67,7 @@ try:
             if node.role != last_role:
                 out.info("%s" % (node.role))
                 last_role = node.role
-            if node.type == "hbase":
+            if node.type == "hbase" or node.type == 'hadoop':
                 out.extra_xml += "    <NodeStatus hostname=\"%s\" ip-address=\"%s\" role=\"%s\" num=\"%s\" state=\"%s\" description=\"%s\" />\n" % \
                     (node.hostname, node.ip_address, node.role, node.num, node.config_state, node.config_description)
                 out.info("  #%s %s (%s) %s" % (node.num, node.hostname, node.ip_address, node.config_state))

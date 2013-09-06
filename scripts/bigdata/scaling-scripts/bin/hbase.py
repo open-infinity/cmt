@@ -53,8 +53,12 @@ class HBaseConfigContext(object):
     replication_size = 3
 
     # Constructor
-    def __init__(self):
-        bconf = read_hashmap(join(storage_dir, 'hbase', 'cluster-config'))
+    def __init__(self, hbase=True):
+        if hbase:
+            self.type = "hbase"
+        else:
+            self.type = "hadoop"
+        bconf = read_hashmap(join(storage_dir, self.type, 'cluster-config'))
         replication_size = bconf['replication-size']
         if 'replication-size' in bconf:
             replication_size = int(bconf['replication-size'])
@@ -66,9 +70,23 @@ class HBaseConfigContext(object):
             return None
     hmaster = property(get_hmaster)
 
+    def is_hbase_cluster(self): return self.type == 'hbase'
+
     def get_everything(self):
         return self.hmasters + self.zookeepers + self.hives + self.slaves
     everything = property(get_everything)
+
+    # Print presentation
+    def __repr__(self):
+        s = "Config context (%s)\n" % self.type
+        for node in self.get_everything():
+            s +="  %s\n" % node
+        return s
+        
+    # String presentation
+    def __str__(self):
+        return self.__repr__()
+
 
 # Generates all node roles from 1 to num
 def generate_role_list(cc, num):
@@ -78,7 +96,7 @@ def generate_role_list(cc, num):
     scount = 0
     hive_count = 0
     for i in range(1, num + 1):
-        if i < 3 or zcount < scount // 100 or zcount % 2 == 0:
+        if cc.type == 'hbase' and (i < 3 or zcount < scount // 100 or zcount % 2 == 0):
             r.append('zookeeper')
             zcount += 1
         elif hmcount == 0 and scount >= 3: # Notice: this should be in sync with dfs.replication parameter in hmaster_hdfs-site.xml
@@ -107,15 +125,22 @@ def count_config_states(cclist, state):
 
 # Node-related values read from file
 class HBaseNode(Node):
-    def __init__(self, role, num = None):
-        self.type = "hbase"
+    def __init__(self, role, cluster_type, num = None):
+        if not role in ['hmaster', 'zookeeker', 'slave', 'hive']:
+            raise MgmtException("Uknown role %s" % role)
+        if not cluster_type in ['hbase', 'hadoop']:
+            raise MgmtException("Uknown cluster type %s" % cluster_type)
+        if num != None and type(num) != type(1):
+            raise MgmtException("Node number is not of numeric type: %s" % num)
+            
+        self.type = cluster_type
         self.role = role
         if num != None:
             self.num  = num
         else:
             # Find the next number
             max_num = 0
-            for item in listdir(join(storage_dir, "hbase", role)):
+            for item in listdir(join(storage_dir, self.type, role)):
                 try:
                     max_num = max(int(item), max_num)
                 except ValueError:
@@ -124,6 +149,8 @@ class HBaseNode(Node):
 
             self.put_config_state("blank")
             self.put_node_status("created")
+
+    def is_hadoop_only(self): return (self.type == 'hadoop')
         
     def get_hbase_public_ssh_key(self): self.read(self.role, self.num, "hbase-public-ssh-key", 1)
     def set_hbase_public_ssh_key(self, value): self.write(self.role, self.num, "hbase-public-ssh-key", str(value), 1)
@@ -201,15 +228,23 @@ class HBaseNode(Node):
             
                 if self.role == "hmaster":
                     out.info("Installing HMaster RPM files")
-                    rpms = [
-                            'zookeeper',
-                            'hadoop-0.20-mapreduce-jobtracker',
-                            'hadoop-hdfs-secondarynamenode',
-                            'hadoop-hdfs-namenode',
-                            'hbase',
-                            'hbase-master',
-                            'hadoop-hdfs',
-                    ]
+                    if self.type == 'hbase':
+                        rpms = [
+                                'zookeeper',
+                                'hadoop-0.20-mapreduce-jobtracker',
+                                'hadoop-hdfs-secondarynamenode',
+                                'hadoop-hdfs-namenode',
+                                'hbase',
+                                'hbase-master',
+                                'hadoop-hdfs',
+                        ]
+                    else:
+                        rpms = [
+                                'hadoop-0.20-mapreduce-jobtracker',
+                                'hadoop-hdfs-secondarynamenode',
+                                'hadoop-hdfs-namenode',
+                                'hadoop-hdfs',
+                        ]
                     ssh.install(rpms)
                     rpms_list.push(rpms)
                 elif self.role == "zookeeper":
@@ -223,14 +258,21 @@ class HBaseNode(Node):
                     rpms_list.push(rpms)
                 elif self.role == "slave":
                     # Install RPM packages
-                    rpms = [
-                                'zookeeper',
-                                'hadoop-hdfs',
-                                'hadoop-hdfs-datanode',
-                                'hadoop-0.20-mapreduce-tasktracker',
-                                'hbase',
-                                'hbase-regionserver',
-                    ]
+                    if self.type == 'hbase':
+                        rpms = [
+                                    'zookeeper',
+                                    'hadoop-hdfs',
+                                    'hadoop-hdfs-datanode',
+                                    'hadoop-0.20-mapreduce-tasktracker',
+                                    'hbase',
+                                    'hbase-regionserver',
+                        ]
+                    else:
+                        rpms = [
+                                    'hadoop-hdfs',
+                                    'hadoop-hdfs-datanode',
+                                    'hadoop-0.20-mapreduce-tasktracker',
+                        ]
                     ssh.install(rpms)
                     rpms_list.push(rpms)
                 elif self.role == "hive":
@@ -238,9 +280,10 @@ class HBaseNode(Node):
                 else:
                     raise "Unknown role: %s" % (self.role)
 
+            # FIXME: earlier these all refered to 'hbase' user, but changed to the correct ones. Does this work?
             hbase_homedir = ssh.get_homedir_of('hbase')
-            hdfs_homedir = ssh.get_homedir_of('hbase')
-            zookeeper_homedir = ssh.get_homedir_of('hbase')
+            hdfs_homedir = ssh.get_homedir_of('hdfs')
+            zookeeper_homedir = ssh.get_homedir_of('zookeeper')
 
             # Ensure that update-alternatives configuration is correct
             if self.role in ['hmaster', 'slave']:
@@ -255,10 +298,11 @@ class HBaseNode(Node):
                 self.config_description = 'waiting for other nodes'
                 bigdata.release('node-%s' % self.hostname)
                 if self.role == 'hmaster':
-                    self.config_description = 'waiting for zookeepers'
-                    while count_config_states(cc.zookeepers, 'attached') < 3:
-                        cc = self.recreate_config_context(cc.options)
-                        sleep(2.0)
+                    if len(cc.zookeepers) > 0:
+                        self.config_description = 'waiting for zookeepers'
+                        while count_config_states(cc.zookeepers, 'attached') < 3:
+                            cc = self.recreate_config_context(cc.options)
+                            sleep(2.0)
                     self.config_description = 'waiting for initial slaves'
                     while count_config_states(cc.slaves, 'attached') < 3:
                         cc = self.recreate_config_context(cc.options)
@@ -266,10 +310,11 @@ class HBaseNode(Node):
                 elif self.role == 'zookeeper':
                     pass
                 elif self.role == 'slave':
-                    self.config_description = 'waiting for zookeepers'
-                    while count_config_states(cc.zookeepers, 'attached') < 3:
-                        cc = self.recreate_config_context(cc.options)
-                        sleep(2.0)
+                    if len(cc.zookeepers) > 0:
+                        self.config_description = 'waiting for zookeepers'
+                        while count_config_states(cc.zookeepers, 'attached') < 3:
+                            cc = self.recreate_config_context(cc.options)
+                            sleep(2.0)
                 elif self.role == 'hive':
                     self.config_description = 'waiting for hmaster'
                     while count_config_states(cc.hmasters, 'attached') < 1:
@@ -313,7 +358,8 @@ class HBaseNode(Node):
                         # (Re)start the services                            
                         rssh.execute("service hadoop-hdfs-datanode restart");                    
                         rssh.execute("service hadoop-0.20-mapreduce-tasktracker restart");
-                        rssh.execute("service hbase-regionserver restart");
+                        if self.type == 'hbase':
+                            rssh.execute("service hbase-regionserver restart");
                     finally:
                         bigdata.release('node-%s' % snode.hostname)
                         rssh.disconnect()
@@ -328,22 +374,36 @@ class HBaseNode(Node):
             if self.role == "hmaster":
                 # Copy SSH keys of hdfs and hbase to the bigdata storage
                 self.config_description = 'sending ssh keys'
-                out.info("Save public SSH keys of hbase and hdfs")
-                self.hdfs_public_ssh_key  = ssh.receive_file_from("%s/.ssh/id_rsa.pub" % hdfs_homedir)
-                self.hbase_public_ssh_key = ssh.receive_file_from("%s/.ssh/id_rsa.pub" % hbase_homedir)
+                if self.type == 'hbase':
+                    out.info("Save public SSH keys of hbase and hdfs")
+                    self.hdfs_public_ssh_key  = ssh.receive_file_from("%s/.ssh/id_rsa.pub" % hdfs_homedir)
+                    self.hbase_public_ssh_key = ssh.receive_file_from("%s/.ssh/id_rsa.pub" % hbase_homedir)
+                else:
+                    out.info("Save public SSH keys of hdfs")
+                    self.hdfs_public_ssh_key  = ssh.receive_file_from("%s/.ssh/id_rsa.pub" % hdfs_homedir)
 
                 # Start the services
                 self.config_description = 'starting services'
-                out.info("Starting services in HMaster")
-                ssh.execute("service hbase-master stop", raise_on_non_zero=False)
-                ssh.execute("/etc/init.d/hadoop-0.20-mapreduce-jobtracker stop", raise_on_non_zero=False)
-                ssh.execute("service hadoop-hdfs-secondarynamenode stop", raise_on_non_zero=False)
-                ssh.execute("service hadoop-hdfs-namenode stop", raise_on_non_zero=False)
-                
-                ssh.execute("service hadoop-hdfs-namenode start")
-                ssh.execute("service hadoop-hdfs-secondarynamenode start")
-                ssh.execute("/etc/init.d/hadoop-0.20-mapreduce-jobtracker restart")
-                ssh.execute("service hbase-master start")
+                if self.type == 'hbase':
+                    out.info("Starting services in HMaster")
+                    ssh.execute("service hbase-master stop", raise_on_non_zero=False)
+                    ssh.execute("/etc/init.d/hadoop-0.20-mapreduce-jobtracker stop", raise_on_non_zero=False)
+                    ssh.execute("service hadoop-hdfs-secondarynamenode stop", raise_on_non_zero=False)
+                    ssh.execute("service hadoop-hdfs-namenode stop", raise_on_non_zero=False)
+                    
+                    ssh.execute("service hadoop-hdfs-namenode start")
+                    ssh.execute("service hadoop-hdfs-secondarynamenode start")
+                    ssh.execute("/etc/init.d/hadoop-0.20-mapreduce-jobtracker restart")
+                    ssh.execute("service hbase-master start")
+                else:
+                    out.info("Starting services in Hadoop Master")
+                    ssh.execute("/etc/init.d/hadoop-0.20-mapreduce-jobtracker stop", raise_on_non_zero=False)
+                    ssh.execute("service hadoop-hdfs-secondarynamenode stop", raise_on_non_zero=False)
+                    ssh.execute("service hadoop-hdfs-namenode stop", raise_on_non_zero=False)
+                    
+                    ssh.execute("service hadoop-hdfs-namenode start")
+                    ssh.execute("service hadoop-hdfs-secondarynamenode start")
+                    ssh.execute("/etc/init.d/hadoop-0.20-mapreduce-jobtracker restart")
             elif self.role == "zookeeper":
                 # Initialize the service
                 self.config_description = 'starting services'
@@ -358,20 +418,31 @@ class HBaseNode(Node):
                 ssh.execute("service zookeeper-server restart");
             elif self.role == "slave":
                 # Copy SSH public keys
-                out.info("Copying the public SSH keys of hbase and hdfs from master to the node")
-                ssh.send_file_to(self.hbase_public_ssh_key, "/tmp/id_rsa.pub")
-                ssh.execute("cat /tmp/id_rsa.pub >> %s/.ssh/authorized_keys && rm /tmp/id_rsa.pub" % hbase_homedir)
-                ssh.execute("mkdir %s/.ssh && chmod 0700 %s/.ssh" % (hdfs_homedir, hdfs_homedir), raise_on_non_zero=False)
-                ssh.send_file_to(self.hdfs_public_ssh_key, "/tmp/id_rsa.pub")
-                ssh.execute("cat /tmp/id_rsa.pub >> %s/.ssh/authorized_keys && rm /tmp/id_rsa.pub" % hdfs_homedir)
+                if self.type == 'hbase':
+                    out.info("Copying the public SSH keys of hbase and hdfs from master to the node")
+                    ssh.send_file_to(self.hbase_public_ssh_key, "/tmp/id_rsa.pub")
+                    ssh.execute("cat /tmp/id_rsa.pub >> %s/.ssh/authorized_keys && rm /tmp/id_rsa.pub" % hbase_homedir)
+                    ssh.execute("mkdir %s/.ssh && chmod 0700 %s/.ssh" % (hdfs_homedir, hdfs_homedir), raise_on_non_zero=False)
+                    ssh.send_file_to(self.hdfs_public_ssh_key, "/tmp/id_rsa.pub")
+                    ssh.execute("cat /tmp/id_rsa.pub >> %s/.ssh/authorized_keys && rm /tmp/id_rsa.pub" % hdfs_homedir)
+                else:
+                    out.info("Copying the public SSH keys of hdfs from master to the node")
+                    ssh.execute("mkdir %s/.ssh && chmod 0700 %s/.ssh" % (hdfs_homedir, hdfs_homedir), raise_on_non_zero=False)
+                    ssh.send_file_to(self.hdfs_public_ssh_key, "/tmp/id_rsa.pub")
+                    ssh.execute("cat /tmp/id_rsa.pub >> %s/.ssh/authorized_keys && rm /tmp/id_rsa.pub" % hdfs_homedir)
             
                 # Start the services
                 if len(cc.slaves) > 3:
                     self.config_description = 'starting services'
-                    out.info("Starting services in HBase slave")
-                    ssh.execute("service hadoop-hdfs-datanode restart");                    
-                    ssh.execute("/etc/init.d/hadoop-0.20-mapreduce-tasktracker restart");
-                    ssh.execute("service hbase-regionserver restart");
+                    if self.type == 'hbase':
+                        out.info("Starting services in HBase slave")
+                        ssh.execute("service hadoop-hdfs-datanode restart");                    
+                        ssh.execute("/etc/init.d/hadoop-0.20-mapreduce-tasktracker restart");
+                        ssh.execute("service hbase-regionserver restart");
+                    else:
+                        out.info("Starting services in Hadoop slave")
+                        ssh.execute("service hadoop-hdfs-datanode restart");                    
+                        ssh.execute("/etc/init.d/hadoop-0.20-mapreduce-tasktracker restart");
                 else:
                     out.info("Not starting slave services before HMaster")
             elif self.role == "hive":
@@ -594,8 +665,9 @@ class HBaseNode(Node):
             out.info("Stopping services")
             ronz = not cc.options.force
             if self.role == "hmaster":
-                out.info("  hmaster...")
-                ssh.execute("service hbase-master stop", raise_on_non_zero=ronz)
+                if self.type == 'hbase':
+                    out.info("  hmaster...")
+                    ssh.execute("service hbase-master stop", raise_on_non_zero=ronz)
                 out.info("  jobtracker...")
                 ssh.execute("service hadoop-0.20-mapreduce-jobtracker stop", raise_on_non_zero=ronz)
                 out.info("  namenode...")
@@ -606,8 +678,9 @@ class HBaseNode(Node):
                 out.info("  zookeeper...")
                 ssh.execute("service zookeeper-server stop", raise_on_non_zero=ronz);      
             elif self.role == "slave":
-                out.info("  regionserver...")
-                ssh.execute("service hbase-regionserver stop", raise_on_non_zero=ronz);
+                if self.type == 'hbase':
+                    out.info("  regionserver...")
+                    ssh.execute("service hbase-regionserver stop", raise_on_non_zero=ronz);
                 out.info("  taskcracker...")
                 ssh.execute("service hadoop-0.20-mapreduce-tasktracker stop", raise_on_non_zero=ronz);
                 out.info("  datanode...")
@@ -804,7 +877,7 @@ class RpmList(object):
 
     # List of RPM lists to a file
     def write(self):
-        filename = join(storage_dir, "hbase", self.node.role, str(self.node.num), "rpms")
+        filename = join(storage_dir, get_cluster_basename(), self.node.role, str(self.node.num), "rpms")
         f = open(filename, "w")
         for rl in self.__rpms_list:
             line = ' '.join(rl)
@@ -814,7 +887,7 @@ class RpmList(object):
 
     # Read RPM lists related to this node from a file
     def read(self):
-        filename = join(storage_dir, "hbase", self.node.role, str(self.node.num), "rpms")
+        filename = join(storage_dir, get_cluster_basename(), self.node.role, str(self.node.num), "rpms")
         self.__rpms_list = []
         try:
             f = open(filename, "r")
@@ -838,6 +911,8 @@ def make_template_params(cc):
         template_params["HMASTER_HOST"] = hm.hostname
         
     # TODO: template_paarams["DATA_DIR"] = database_dir
+
+    template_params["CLUSTER_TYPE"] = cc.type
         
     template_params["REPLICATION_SIZE"] = cc.replication_size
 
@@ -874,22 +949,29 @@ def make_template_params(cc):
 # ------------------------------------------------------------------------------
 
 # Create the directories. Returns False, if the directories exist already,
-# and True on success.
-def initialize_directories(out, options):
+# and True on success. If parameter hbase = False, then only Hadoop will 
+# be installed
+def initialize_directories(out, options, hbase = True):
     bigdata_id_filename = join(storage_dir, "bigdata-id")
     if exists(bigdata_id_filename):
         out.error("Bigdata is already initialized.")
         return False
 
-    _mkdirs(join(storage_dir, "hbase", "hmaster"))
-    _mkdirs(join(storage_dir, "hbase", "hive"))
-    _mkdirs(join(storage_dir, "hbase", "zookeeper"))
-    _mkdirs(join(storage_dir, "hbase", "slave"))
+    if hbase:
+        basename = "hbase"
+    else:
+        basename = "hadoop"
+
+    _mkdirs(join(storage_dir, basename, "hmaster"))
+    _mkdirs(join(storage_dir, basename, "hive"))
+    if hbase:
+        _mkdirs(join(storage_dir, basename, "zookeeper"))
+    _mkdirs(join(storage_dir, basename, "slave"))
     _mkdirs(join(storage_dir, "lock"))
     _mkdirs(ssh_log_logpath)
 
     # Save big data cluster options
-    f = open(join(storage_dir, "hbase", 'cluster-config'), 'w')
+    f = open(join(storage_dir, basename, 'cluster-config'), 'w')
     f.write("replication-size: %s\n" % options.replsize)
     f.close()
 
@@ -904,13 +986,23 @@ def initialize_directories(out, options):
 
 # ------------------------------------------------------------------------------
 
+# Returns either "hadoop" or "hbase", depending on cluster type.
+# If neither is found, raises an exception.
+def get_cluster_basename():
+    if exists(join(storage_dir, "hbase")):
+        return 'hbase'
+    if exists(join(storage_dir, "hadoop")):
+        return 'hadoop'
+    raise MgmtException("Unable to recognize cluster type, based on directory %s" % storage_dir)
+
 # Returns list of HMaster nodes (usually only one)
 def get_hbase_masters():
     nodes = []
-    for item in listdir(join(storage_dir, "hbase", "hmaster")):
+    cluster_type = get_cluster_basename()
+    for item in listdir(join(storage_dir, cluster_type, "hmaster")):
         if item[0] != ".":
             try:
-                nodes.append(HBaseNode("hmaster", int(item)))
+                nodes.append(HBaseNode("hmaster", cluster_type, int(item)))
             except ValueError:
                 pass
     nodes.sort()
@@ -919,22 +1011,26 @@ def get_hbase_masters():
 # Returns list of Zookeepers
 def get_zookeepers():
     nodes = []
-    for item in listdir(join(storage_dir, "hbase", "zookeeper")):
-        if item[0] != ".":
-            try:
-                nodes.append(HBaseNode("zookeeper", int(item)))
-            except ValueError:
-                pass
-    nodes.sort()
+    cluster_type = get_cluster_basename()
+    path = join(storage_dir, cluster_type, "zookeeper")
+    if exists(path):
+        for item in listdir(path):
+            if item[0] != ".":
+                try:
+                    nodes.append(HBaseNode("zookeeper", cluster_type, int(item)))
+                except ValueError:
+                    pass
+        nodes.sort()
     return nodes
 
 # Returns list of HBase slaves
 def get_hbase_slaves():
     nodes = []
-    for item in listdir(join(storage_dir, "hbase", "slave")):
+    cluster_type = get_cluster_basename()
+    for item in listdir(join(storage_dir, cluster_type, "slave")):
         if item[0] != ".":
             try:
-                nodes.append(HBaseNode("slave", int(item)))
+                nodes.append(HBaseNode("slave", cluster_type, int(item)))
             except ValueError:
                 pass
     nodes.sort()
@@ -943,13 +1039,16 @@ def get_hbase_slaves():
 # Returns list of HMaster nodes (usually only one)
 def get_hbase_hives():
     nodes = []
-    for item in listdir(join(storage_dir, "hbase", "hive")):
-        if item[0] != ".":
-            try:
-                nodes.append(HBaseNode("hive", int(item)))
-            except ValueError:
-                pass
-    nodes.sort()
+    cluster_type = get_cluster_basename()
+    path = join(storage_dir, cluster_type, "hive")
+    if exists(path):
+        for item in listdir(path):
+            if item[0] != ".":
+                try:
+                    nodes.append(HBaseNode("hive", cluster_type, int(item)))
+                except ValueError:
+                    pass
+        nodes.sort()
     return nodes
 
 # ------------------------------------------------------------------------------

@@ -121,7 +121,7 @@ try:
 
     # Decide the role of the new node
     role = 'unknown'
-    if cc.type == "hbase":
+    if cc.type == "hbase" or cc.type == "hadoop":
         # Decide role
         role  = 'unknown'
         if options.role != None:
@@ -148,7 +148,7 @@ try:
         # Configure
         out.role = role
         if not cc.options.roleonly:
-            node = hbase.HBaseNode(role)
+            node = hbase.HBaseNode(role, cc.type)
             node.hostname = hostname
             node.ip_address = ip_address
             cclist.append(node)

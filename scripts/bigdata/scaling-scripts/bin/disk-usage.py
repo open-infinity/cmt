@@ -162,7 +162,7 @@ class DiskSpaceAnalyzer(object):
 
                 # Get role list
                 roles = []
-                if cc.type == "hbase":
+                if cc.type == "hbase" or cc.type == 'hadoop':
                     (roles, counts) = hbase.generate_role_list(cc, current_cluster_size)
                 elif cc.type == "mongodb":
                     (roles, counts) = mongodb.generate_role_list(cc, current_cluster_size)
@@ -241,10 +241,13 @@ try:
 
     # Get access objects of the nodes
     cc = bigdata.create_config_context(options)
-    if cc.type == "hbase":
+    if cc.type == 'hbase':
         a = DiskSpaceAnalyzer(cc, ['slave', 'zookeeper', 'hmaster'])
         a.run()
-    elif cc.type == "mongodb":
+    elif cc.type == 'hadoop':
+        a = DiskSpaceAnalyzer(cc, ['slave', 'hmaster'])
+        a.run()
+    elif cc.type == 'mongodb':
         a = DiskSpaceAnalyzer(cc, ['shard', 'config'])
         a.run()
 

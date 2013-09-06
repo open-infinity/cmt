@@ -29,18 +29,22 @@
 export DATADIR=[[DATABASE_DIR]]
 
 echo "Creating log directories"
-groupmems -g hadoop -a hbase
+if [ "[[CLUSTER_TYPE]]" -eq "hbase" ] ; then
+    groupmems -g hadoop -a hbase
+fi
 mkdir -p [[LOG_DIR]]
 chown hdfs [[LOG_DIR]]
 chown hdfs [[LOG_DIR]]
 chmod g+rwx [[LOG_DIR]]
 
-mkdir [[LOG_DIR]]/hbase
-chown hdfs [[LOG_DIR]]/hbase
-chgrp hadoop [[LOG_DIR]]/hbase
-chmod 0775 [[LOG_DIR]]/hbase
-rm -fR /var/log/hbase
-ln -s [[LOG_DIR]]/hbase /var/log/hbase
+if [ "[[CLUSTER_TYPE]]" -eq "hbase" ] ; then
+    mkdir [[LOG_DIR]]/hbase
+    chown hdfs [[LOG_DIR]]/hbase
+    chgrp hadoop [[LOG_DIR]]/hbase
+    chmod 0775 [[LOG_DIR]]/hbase
+    rm -fR /var/log/hbase
+    ln -s [[LOG_DIR]]/hbase /var/log/hbase
+fi
 
 mkdir [[LOG_DIR]]/hadoop-0.20-mapreduce
 chown mapred [[LOG_DIR]]/hadoop-0.20-mapreduce
@@ -68,12 +72,14 @@ chown -R mapred:hadoop $DATADIR/1/mapred/local $DATADIR/2/mapred/local $DATADIR/
 
 echo "Creating SSH keys for hbase and hdfs users"
 
-HBASE_HOMEDIR=`egrep "^hbase:" /etc/passwd | cut -d':' -f6`
-mkdir $HBASE_HOMEDIR/.ssh
-chown hbase $HBASE_HOMEDIR/.ssh 
-chmod 0700 $HBASE_HOMEDIR/.ssh
-rm -f $HBASE_HOMEDIR/.ssh/id_rsa*
-su - hbase -s /bin/bash -c "ssh-keygen -q -t rsa -f /var/run/hbase/.ssh/id_rsa -N \"\""
+if [ "[[CLUSTER_TYPE]]" -eq "hbase" ] ; then
+    HBASE_HOMEDIR=`egrep "^hbase:" /etc/passwd | cut -d':' -f6`
+    mkdir $HBASE_HOMEDIR/.ssh
+    chown hbase $HBASE_HOMEDIR/.ssh 
+    chmod 0700 $HBASE_HOMEDIR/.ssh
+    rm -f $HBASE_HOMEDIR/.ssh/id_rsa*
+    su - hbase -s /bin/bash -c "ssh-keygen -q -t rsa -f /var/run/hbase/.ssh/id_rsa -N \"\""
+fi
 
 HDFS_HOMEDIR=`egrep "^hdfs:" /etc/passwd | cut -d':' -f6`
 mkdir $HDFS_HOMEDIR/.ssh
