@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.openinfinity.cloud.domain;
+package org.openinfinity.cloud.domain.configurationtemplate;
 
 import org.openinfinity.core.annotation.NotScript;
 
@@ -30,7 +30,7 @@ import lombok.RequiredArgsConstructor;
 @Data
 @NoArgsConstructor
 @RequiredArgsConstructor
-public class ConfigurationTemplateOrganization {
+public class Organization {
     
     @NonNull
     @NotScript
@@ -38,5 +38,5 @@ public class ConfigurationTemplateOrganization {
     
     @NonNull
     @NotScript
-    private int configurationTemplateId; 
+    private int templateId; 
 }

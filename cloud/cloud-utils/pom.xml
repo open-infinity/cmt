@@ -10,7 +10,6 @@
 	   	<relativePath>..</relativePath>    	
 	</parent>
 	
-	<groupId>org.openinfinity</groupId>
 	<artifactId>cloud-utils</artifactId>
 
 	 <build>

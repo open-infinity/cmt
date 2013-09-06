@@ -15,7 +15,9 @@
  */
 package org.openinfinity.cloud.domain.repository.configurationtemplate;
 
-import org.openinfinity.cloud.domain.ConfigurationTemplate;
+import java.util.List;
+
+import org.openinfinity.cloud.domain.configurationtemplate.Template;
 
 /**
  * CRUD interface for storing <code>org.openinfinity.core.cloud.domain.template</code> objects.
@@ -24,8 +26,8 @@ import org.openinfinity.cloud.domain.ConfigurationTemplate;
  * @version 1.3.0
  * @since 1.3.0
  */
-public interface ConfigurationTemplateRepository {
+public interface TemplateRepository {
 	
-    ConfigurationTemplate getByOrganization(int id);
+    List<Template> getAll();
 
 }

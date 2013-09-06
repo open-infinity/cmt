@@ -15,10 +15,11 @@
  */
 package org.openinfinity.cloud.service.configurationtemplate;
 
+import java.util.List;
+
 import org.apache.log4j.Logger;
-import org.openinfinity.cloud.domain.ConfigurationTemplate;
-import org.openinfinity.cloud.domain.repository.configurationtemplate.ConfigurationTemplateRepository;
-import org.openinfinity.core.annotation.AuditTrail;
+import org.openinfinity.cloud.domain.configurationtemplate.ParameterValue;
+import org.openinfinity.cloud.domain.repository.configurationtemplate.ParameterValueRepository;
 import org.openinfinity.core.annotation.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,17 +32,16 @@ import org.springframework.stereotype.Service;
  * @since 1.3.0
  */
 
-@Service("configurationTemplateService")
-public class ConfigurationTemplateServiceImpl implements ConfigurationTemplateService {
-	private static final Logger LOGGER = Logger.getLogger(ConfigurationTemplateServiceImpl.class.getName());
+@Service("configurationElementParameterValueService")
+public class ParameterValueServiceImpl implements ParameterValueService {
+	private static final Logger LOGGER = Logger.getLogger(ParameterValueServiceImpl.class.getName());
 
 	@Autowired
-	private ConfigurationTemplateRepository configurationTemplateRepository;
+	private ParameterValueRepository parameterValueRepository;
 	
 	@Log
-    @AuditTrail 
-    public ConfigurationTemplate getByOrganization(int organization_id) {
-        return configurationTemplateRepository.getByOrganization(organization_id);
+    public List<ParameterValue> getAll() {
+        return parameterValueRepository.getAll();
     }
 	
 }

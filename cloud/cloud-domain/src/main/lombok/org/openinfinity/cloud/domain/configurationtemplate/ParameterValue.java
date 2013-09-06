@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.openinfinity.cloud.domain;
+package org.openinfinity.cloud.domain.configurationtemplate;
 
 import org.openinfinity.core.annotation.NotScript;
 
@@ -30,7 +30,7 @@ import lombok.RequiredArgsConstructor;
 @Data
 @NoArgsConstructor
 @RequiredArgsConstructor
-public class ConfigurationElementKey {
+public class ParameterValue {
     
     @NonNull
     @NotScript
@@ -38,6 +38,14 @@ public class ConfigurationElementKey {
     
     @NonNull
     @NotScript
-    private String name;
- 
+    private int parameterKeyId;
+    
+    @NonNull
+    @NotScript
+    private int type;
+    
+    @NonNull
+    @NotScript
+    private String value;
+    
 }

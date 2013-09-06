@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011 the original author or authors.
+ * Copyright (c) 2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,10 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.openinfinity.cloud.service.configurationtemplate;
 
-package org.openinfinity.cloud.util;
+import java.util.List;
 
-public class AdminGeneral {
-	public static final String HTTP_ERROR_CODE_USER_NOT_LOGGED_IN = "401";
-	public static final String HTTP_ERROR_CODE_SERVER_ERROR = "500";
+import org.openinfinity.cloud.domain.configurationtemplate.Organization;
+
+
+/**
+ * Interface for management of cloud configuration template organizations.
+ * 
+ * @author Vedran Bartonicek
+ * @version 1.3.0
+ * @since 1.3.0
+ */
+public interface OrganizationService {
+	
+    List<Organization> getAll();
+	
 }

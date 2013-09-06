@@ -1,0 +1,19 @@
+#Example values
+awsaccesskeyid=${euca.accessKey}
+awssecretkey=${euca.secretKey}
+
+eucaaccesskeyid=${aws.accessKey}
+eucasecretkey=${aws.secretKey}
+
+jdbc.driverClassName=com.mysql.jdbc.Driver
+#jdbc.url=jdbc:mysql://localhost/openinfinity?useUnicode=true&amp;autoReconnect=true&amp;
+jdbc.url=${cmt-admin.jdbc.url}
+jdbc.username=${cmt-admin.jdbc.username}
+jdbc.password=${cmt-admin.jdbc.password}
+
+batch.jdbc.driver=org.hsqldb.jdbcDriver
+batch.jdbc.url=jdbc:hsqldb:mem:testdb;sql.enforce_strict_size=true
+batch.jdbc.username=sa
+batch.jdbc.password=
+batch.schema=
+batch.schema.script=classpath:/org/springframework/batch/core/schema-hsqldb.sql

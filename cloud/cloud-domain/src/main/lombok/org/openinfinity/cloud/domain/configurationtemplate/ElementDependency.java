@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.openinfinity.cloud.domain;
+package org.openinfinity.cloud.domain.configurationtemplate;
 
 import org.openinfinity.core.annotation.NotScript;
 
@@ -30,7 +30,7 @@ import lombok.RequiredArgsConstructor;
 @Data
 @NoArgsConstructor
 @RequiredArgsConstructor
-public class ConfigurationElement {
+public class ElementDependency {
     
     @NonNull
     @NotScript
@@ -38,38 +38,9 @@ public class ConfigurationElement {
     
     @NonNull
     @NotScript
-    private int type;
+    private int elementFrom;
     
     @NonNull
     @NotScript
-    private String name;
-    
-    @NonNull
-    @NotScript
-    private int version;
-    
-    @NonNull
-    @NotScript
-    private int description;
-    
-    @NonNull
-    @NotScript
-    private String key; 
-    
-    @NonNull
-    @NotScript
-    private int minMachines;
-    
-    @NonNull
-    @NotScript
-    private int maxMachines;
-    
-    @NonNull
-    @NotScript
-    private int minReplicationMachines;
-    
-    @NonNull
-    @NotScript
-    private int maxReplicationMachines;
-    
+    private int elementTo;
 }

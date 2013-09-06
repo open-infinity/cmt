@@ -24,8 +24,8 @@ import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 import javax.portlet.ResourceResponse;
 
-import org.openinfinity.cloud.domain.ConfigurationTemplate;
-import org.openinfinity.cloud.service.configurationtemplate.ConfigurationTemplateService;
+import org.openinfinity.cloud.domain.configurationtemplate.Template;
+import org.openinfinity.cloud.service.configurationtemplate.TemplateService;
 import org.openinfinity.cloud.util.serialization.SerializerUtil;
 import org.openinfinity.core.annotation.AuditTrail;
 import org.openinfinity.core.annotation.Log;
@@ -50,15 +50,15 @@ import org.springframework.web.portlet.bind.annotation.ResourceMapping;
  * @version 1.3.0
  * @since 1.3.0
  */
-@Qualifier("template")
-@Controller(value="ConfigurationParameterController")
+@Qualifier("configurationElement")
+@Controller(value="configurationTemplateController")
 @RequestMapping("VIEW")
-public class ConfigurationParameterController {
+public class ElementController {
 	
 	private static final String PATH_GET_TEMPLATES_BY_ORGANIZATION = "getTemplatesByOrganization";
 	
 	@Autowired
-	private ConfigurationTemplateService configurationTemplateService;
+	private TemplateService configurationTemplateService;
 	
 	@ExceptionHandler({ApplicationException.class, BusinessViolationException.class,
 	                   SystemException.class})
@@ -95,9 +95,9 @@ public class ConfigurationParameterController {
         
         // TODO
         @SuppressWarnings("unchecked")
-        Collection<ConfigurationTemplate> templatesList = 
-            (Collection<ConfigurationTemplate>) 
-            configurationTemplateService.getByOrganization(organizationId);
+        Collection<Template> templatesList = 
+            (Collection<Template>) 
+            configurationTemplateService.getAll();
         
         if(templatesList !=  null) 
             SerializerUtil.jsonSerialize(response.getWriter(), templatesList);

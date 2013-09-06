@@ -9,7 +9,6 @@
 		<version>${project.global.version}</version>
 	   	<relativePath>..</relativePath>    	
 	</parent>
-	<groupId>org.openinfinity</groupId>
 	<artifactId>cloud-deployer-batch</artifactId>
 	<name>cloud-deployer-batch</name>
 	<description>
@@ -19,8 +18,6 @@
 	</description>
 	<properties>
 		<maven.test.failure.ignore>true</maven.test.failure.ignore>
-		<spring.framework.version>3.1.1.RELEASE</spring.framework.version>
-		<spring.batch.version>2.1.8.RELEASE</spring.batch.version>
 	</properties>
 	<profiles>
 		<profile>
@@ -72,7 +69,7 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-test</artifactId>
-			<version>${spring.framework.version}</version>
+			<version>${springframework.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -83,17 +80,17 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-jdbc</artifactId>
-			<version>${spring.framework.version}</version>
+			<version>${springframework.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-tx</artifactId>
-			<version>${spring.framework.version}</version>
+			<version>${springframework.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context</artifactId>
-			<version>${spring.framework.version}</version>
+			<version>${springframework.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>cglib</groupId>
@@ -103,7 +100,7 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-aop</artifactId>
-			<version>${spring.framework.version}</version>
+			<version>${springframework.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.batch</groupId>
@@ -144,34 +141,19 @@
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
 			<version>1.2.14</version>
-		</dependency>
-		
+		</dependency>	
 		<!-- For jsvc execution -->
 		<dependency>
 			<groupId>commons-daemon</groupId>
 			<artifactId>commons-daemon</artifactId>
 			<version>1.0.10</version>
 		</dependency>		
-		
-		
-<!-- 		<dependency> -->
-<!-- 			<groupId>commons-httpclient</groupId> -->
-<!-- 			<artifactId>commons-httpclient</artifactId> -->
-<!-- 			<version>3.1</version> -->
-<!-- 		</dependency> -->
-
-		<!-- <dependency> -->
-		<!-- <groupId>com.atomikos</groupId> -->
-		<!-- <artifactId>transactions-essentials-all</artifactId> -->
-		<!-- <version>3.6.4</version> -->
-		<!-- </dependency> -->
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-all</artifactId>
 			<version>1.9.0</version>
 			<scope>test</scope>
 		</dependency>
-
 		<dependency>
 			<groupId>org.dbunit</groupId>
 			<artifactId>dbunit</artifactId>
@@ -189,11 +171,6 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		<!--dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpclient</artifactId>
-			<version>4.2.1</version>
-		</dependency-->
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-test</artifactId>
