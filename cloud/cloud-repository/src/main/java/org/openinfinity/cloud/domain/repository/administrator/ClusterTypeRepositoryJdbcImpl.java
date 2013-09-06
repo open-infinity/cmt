@@ -32,7 +32,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.util.Assert;
 
 /**
- * Cluster repository interface
+ * Cluster repository interfacefinsert
  * 
  * @author Vedran Bartonicek
  * @version 1.0.0 Initial version

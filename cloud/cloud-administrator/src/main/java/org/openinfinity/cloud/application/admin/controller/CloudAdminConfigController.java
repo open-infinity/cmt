@@ -20,7 +20,7 @@ import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 
 import org.apache.log4j.Logger;
-import org.openinfinity.cloud.util.LiferayService;
+import org.openinfinity.cloud.service.liferay.LiferayService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
@@ -34,6 +34,7 @@ import com.liferay.portal.model.User;
  * Controller for edit requests
  * @author Juha-Matti Sironen
  * @author Ossi Hämäläinen
+ * @author Vedran Bartonicek
  * @version 1.0.0 Initial version
  * @since 1.0.0
  */
@@ -56,7 +57,6 @@ public class CloudAdminConfigController {
 		}
 		return "edit";
 	}
-	
 	
 	protected ModelAndView handleRenderRequestInternal(RenderRequest request, RenderResponse response) throws Exception {
 		LOG.debug("CloudAdminConfigController.handleRenderRequestInternal()");

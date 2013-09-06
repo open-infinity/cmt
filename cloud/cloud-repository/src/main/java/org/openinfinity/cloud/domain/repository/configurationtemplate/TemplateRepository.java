@@ -28,6 +28,6 @@ import org.openinfinity.cloud.domain.configurationtemplate.Template;
  */
 public interface TemplateRepository {
 	
-    List<Template> getAll();
+    List<Template> getTemplates(Long oid);
 
 }

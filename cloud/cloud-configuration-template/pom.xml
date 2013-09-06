@@ -6,6 +6,9 @@
 	<version>${project.global.version}</version>
    	<relativePath>..</relativePath>    	
   </parent>
+  <properties>
+      <sql.script.path>${project.parent.basedir}/cloud-repository/src/test/resources/sql</sql.script.path>
+  </properties>
   <artifactId>cloud-configuration-template</artifactId>
 	<packaging>war</packaging>
 	<build>
@@ -47,7 +50,7 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>2.5</version>
 				<configuration>
-					<skip>false</skip>
+					<skip>true</skip>
 					<trimStackTrace>false</trimStackTrace>
 				</configuration>
 				<executions>
@@ -173,6 +176,8 @@
 				<directory>src/main/resources</directory>
 				<filtering>true</filtering>
 			</resource>
+			
+			
 			<resource>
 				<directory>src/main/webapp</directory>
 				<filtering>true</filtering>
@@ -196,6 +201,12 @@
 				</includes>
 			</resource>
 		</resources>
+		<testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+                <filtering>true</filtering>
+            </testResource>
+        </testResources>
 	</build>
 	<dependencies>
 		<dependency>
@@ -258,10 +269,10 @@
 			<!-- <scope>provided</scope> -->
 		</dependency>
 		<dependency>
-			<groupId>org.hsqldb</groupId>
-			<artifactId>hsqldb-j5</artifactId>
-			<version>2.2.4</version>
-		</dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>1.3.170</version>
+        </dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-test</artifactId>
@@ -367,11 +378,5 @@
 			</build>
 		</profile>
 	</profiles>
-	<properties>
-		<liferay.version>6.0.6</liferay.version>
-		<springframework.version>3.1.1.RELEASE</springframework.version>
-		<project.build.sourceEncoding>Cp1252</project.build.sourceEncoding>
-		<slf4j.version>1.6.4</slf4j.version>
-		<maven.build.timestamp.format>yyyyMMdd-HHmm</maven.build.timestamp.format>
-	</properties>
+	
 </project>

@@ -16,32 +16,36 @@
 
 package org.openinfinity.cloud.application.template.controller;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
+import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.util.Assert;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.portlet.ModelAndView;
+import org.springframework.web.portlet.bind.annotation.ResourceMapping;
+
+import com.liferay.portal.model.User;
 
 import org.openinfinity.cloud.domain.configurationtemplate.Template;
 import org.openinfinity.cloud.service.configurationtemplate.TemplateService;
+import org.openinfinity.cloud.service.liferay.LiferayService;
 import org.openinfinity.cloud.util.serialization.SerializerUtil;
-import org.openinfinity.core.annotation.AuditTrail;
-import org.openinfinity.core.annotation.Log;
 import org.openinfinity.core.exception.AbstractCoreException;
 import org.openinfinity.core.exception.ApplicationException;
 import org.openinfinity.core.exception.BusinessViolationException;
 import org.openinfinity.core.exception.SystemException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Controller;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.portlet.ModelAndView;
-import org.springframework.web.portlet.bind.annotation.ResourceMapping;
+import org.openinfinity.core.util.ExceptionUtil;
 
 /**
  * Spring portlet controller for handling templates.
@@ -50,59 +54,59 @@ import org.springframework.web.portlet.bind.annotation.ResourceMapping;
  * @version 1.3.0
  * @since 1.3.0
  */
-@Qualifier("configurationTemplate")
+
 @Controller(value="configurationTemplateController")
+
 @RequestMapping("VIEW")
 public class TemplateController {
 	
-	private static final String PATH_GET_TEMPLATES_BY_ORGANIZATION = "getTemplatesByOrganization";
+	private static final String PATH_GET_TEMPLATES_FOR_USER = "getTemplatesForUser";
+    private static final String PATH_GET_TEMPLATES_FOR_ORGANIZATION = "getTemplatesForOrganization";
+    private static final String PATH_EDIT_TEMPLATE = "editTemplate";
+    private static final String PATH_ADD_TEMPLATE = "addTemplate";
+    private static final String PATH_DELETE_TEMPLATE = "deleteTemplate";
+    private static final String PATH_USE_TEMPLATE = "useTemplate";
+
+	@Autowired
+	@Qualifier("configurationTemplateService")
+	private TemplateService templateService;
 	
 	@Autowired
-	private TemplateService configurationTemplateService;
+	LiferayService liferayService;
 	
-	@ExceptionHandler({ApplicationException.class, BusinessViolationException.class,
-	                   SystemException.class})
-    public ModelAndView handleException(RenderRequest renderRequest, RenderResponse renderResponse,
-                                        AbstractCoreException abstractCoreException) {
+	// TODO -> to some util class? :vbartoni
+	@ExceptionHandler({ApplicationException.class, BusinessViolationException.class, SystemException.class})
+    public ModelAndView handleException(RenderRequest renderRequest, RenderResponse renderResponse, AbstractCoreException abstractCoreException) {
 		ModelAndView modelAndView = new ModelAndView("error");
 		if (abstractCoreException.isErrorLevelExceptionMessagesIncluded()) 
-			modelAndView.addObject("errorLevelExceptions", 
-			                        abstractCoreException.getErrorLevelExceptionIds());
+			modelAndView.addObject("errorLevelExceptions", abstractCoreException.getErrorLevelExceptionIds());
 		if (abstractCoreException.isWarningLevelExceptionMessagesIncluded()) 
-			modelAndView.addObject("warningLevelExceptions", 
-			                        abstractCoreException.getWarningLevelExceptionIds());
+			modelAndView.addObject("warningLevelExceptions", abstractCoreException.getWarningLevelExceptionIds());
 		if (abstractCoreException.isInformativeLevelExceptionMessagesIncluded()) 
-			modelAndView.addObject("informativeLevelExceptions", 
-			                        abstractCoreException.getInformativeLevelExceptionIds());
+			modelAndView.addObject("informativeLevelExceptions", abstractCoreException.getInformativeLevelExceptionIds());
 		
-		// TODO
+		// TODO, what's this stuff? :vbartoni
 		@SuppressWarnings("unchecked")
-        Map<String, Object> userInfo = (Map<String, Object>) 
-		                                renderRequest.getAttribute(ActionRequest.USER_INFO);
-		if (userInfo == null) return new ModelAndView("home");
+        Map<String, Object> userInfo = 
+            (Map<String, Object>) renderRequest.getAttribute(ActionRequest.USER_INFO);
+		if (userInfo == null) 
+		    return new ModelAndView("home");
 
 		return modelAndView;
     }
 	
-	
-    @Log
-    @AuditTrail
-    @Transactional
-    @ResourceMapping(PATH_GET_TEMPLATES_BY_ORGANIZATION)
-    public void getTemplatesByOrganization(ResourceResponse response, 
-                             @RequestParam("organizationId") int organizationId)
-                             throws Exception {    
-        
-        // TODO
-        @SuppressWarnings("unchecked")
-        Collection<Template> templatesList = 
-            (Collection<Template>) 
-            configurationTemplateService.getAll();
-        
-        if(templatesList !=  null) 
-            SerializerUtil.jsonSerialize(response.getWriter(), templatesList);
-        
-        else return;   
+    @ResourceMapping(PATH_GET_TEMPLATES_FOR_USER)
+    public void getTemplatesForUser(ResourceRequest request, ResourceResponse response) throws Exception {
+        try{
+            User user = liferayService.getUser(request, response);           
+            List<Long> organizationIds = liferayService.getOrganizationIds(user);     
+            Set<Template> templates = templateService.getTemplates(organizationIds);          
+            Assert.notNull(templates);
+            SerializerUtil.jsonSerialize(response.getWriter(), templates); 
+    
+        } catch (Exception e){
+            ExceptionUtil.throwSystemException(e);  
+        }
     } 
-		
+    
 }

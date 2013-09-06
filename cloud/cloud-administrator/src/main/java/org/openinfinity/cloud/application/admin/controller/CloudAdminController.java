@@ -38,12 +38,11 @@ import org.openinfinity.cloud.domain.ClusterType;
 import org.openinfinity.cloud.domain.Instance;
 import org.openinfinity.cloud.domain.Job;
 import org.openinfinity.cloud.domain.Key;
-import org.openinfinity.cloud.service.administrator.JobService;
 import org.openinfinity.cloud.service.administrator.*;
+import org.openinfinity.cloud.service.liferay.LiferayService;
 import org.openinfinity.cloud.util.AdminException;
-import org.openinfinity.cloud.util.AdminGeneral;
-import org.openinfinity.cloud.util.LiferayService;
 import org.openinfinity.cloud.util.collection.ListUtil;
+import org.openinfinity.cloud.util.http.HttpCodes;
 import org.openinfinity.cloud.util.serialization.JsonDataWrapper;
 import org.openinfinity.cloud.util.serialization.SerializerUtil;
 import org.openinfinity.core.util.ExceptionUtil;
@@ -85,7 +84,6 @@ public class CloudAdminController {
     @Qualifier("liferayService")
     private LiferayService liferayService;
 
-	
 	@Autowired
 	@Qualifier("instanceService")
 	private InstanceService instanceService;
@@ -122,7 +120,7 @@ public class CloudAdminController {
 	public String showView(RenderRequest request, RenderResponse response) {
 		User user = liferayService.getUser(request);
 		if(user == null) {
-			response.setProperty(ResourceResponse.HTTP_STATUS_CODE, AdminGeneral.HTTP_ERROR_CODE_USER_NOT_LOGGED_IN);
+			response.setProperty(ResourceResponse.HTTP_STATUS_CODE, HttpCodes.HTTP_ERROR_CODE_USER_NOT_LOGGED_IN);
 			return "notlogged";
 		}	
 		return "mainview";

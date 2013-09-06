@@ -34,7 +34,7 @@ public class Organization {
     
     @NonNull
     @NotScript
-    private int id;
+    private long organizationId;
     
     @NonNull
     @NotScript

@@ -19,12 +19,18 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.openinfinity.cloud.domain.configurationtemplate.Template;
-import org.openinfinity.core.annotation.AuditTrail;
+import javax.sql.DataSource;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
+
+import org.openinfinity.cloud.domain.configurationtemplate.Template;
+import org.openinfinity.core.annotation.AuditTrail;
 
 /**
  * JDBC Repository implementation of the <code>org.openinfinity.core.cloud.deployer.repository.DeploymentRepository</code> interface.
@@ -38,26 +44,33 @@ public class TemplateRepositoryJdbcImpl implements TemplateRepository {
 
 	private JdbcTemplate jdbcTemplate;
 	
-	// TODO
-	private static final String GET_ALL_SQL = "SELECT * FROM CONFIGURATION_TEMPLATE_TABLE";
-	
-	@SuppressWarnings("unchecked")
+    private static final String GET_ALL_FOR_ORGANIZATION_SQL = 
+        "select configuration_template_tbl.id, configuration_template_tbl.name, " + 
+        "configuration_template_tbl.description from configuration_template_tbl " +
+        "inner join configuration_template_organization_tbl on " +
+        "configuration_template_tbl.id = configuration_template_organization_tbl.template_id " +
+        "where organization_id = ?";
+    
+    @Autowired
+    public TemplateRepositoryJdbcImpl(@Qualifier("cloudDataSource") DataSource dataSource) {
+        Assert.notNull(dataSource, "Please define datasource for scaling rule repository.");
+        this.jdbcTemplate = new JdbcTemplate(dataSource);
+    }
+    
     @AuditTrail
     @Transactional
-    public List<Template> getAll() {
-        return (List<Template>) jdbcTemplate.queryForObject(GET_ALL_SQL, new TemplateRowMapper());
+    public List<Template> getTemplates(Long oid) {
+        return jdbcTemplate.query(GET_ALL_FOR_ORGANIZATION_SQL,
+                                  new Object[] {oid},
+                                  new TemplateRowMapper());
     }
 
 	private class TemplateRowMapper implements RowMapper<Template> {
-		
 		public Template mapRow(ResultSet resultSet, int rowNum) throws SQLException {    
 		    return new Template(resultSet.getInt("id"),
-                                resultSet.getString("name"),
-                                resultSet.getString("description"));
+		                        resultSet.getString("name"),
+		                        resultSet.getString("description"));
 		}
-	
 	}
-
-   
 	
 }

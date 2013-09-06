@@ -35,16 +35,15 @@ import org.openinfinity.cloud.domain.Instance;
 import org.openinfinity.cloud.domain.Job;
 import org.openinfinity.cloud.domain.Machine;
 import org.openinfinity.cloud.domain.ScalingRule;
-
 import org.openinfinity.cloud.service.administrator.AuthorizationRoutingService;
 import org.openinfinity.cloud.service.administrator.ClusterService;
 import org.openinfinity.cloud.service.administrator.EC2Wrapper;
 import org.openinfinity.cloud.service.administrator.InstanceService;
 import org.openinfinity.cloud.service.administrator.JobService;
 import org.openinfinity.cloud.service.administrator.MachineService;
+import org.openinfinity.cloud.service.liferay.LiferayService;
 import org.openinfinity.cloud.service.scaling.ScalingRuleService;
-import org.openinfinity.cloud.util.AdminGeneral;
-import org.openinfinity.cloud.util.LiferayService;
+import org.openinfinity.cloud.util.http.HttpCodes;
 import org.openinfinity.cloud.util.serialization.JsonDataWrapper;
 import org.openinfinity.cloud.util.serialization.SerializerUtil;
 import org.openinfinity.core.util.ExceptionUtil;
@@ -128,7 +127,7 @@ public class ClusterController {
 		if (liferayService.getUser(request, response) == null) return;
 		Machine lb = clusterService.getClustersLoadBalancer(clusterId);
 		if(lb == null) 
-			response.setProperty(ResourceResponse.HTTP_STATUS_CODE, AdminGeneral.HTTP_ERROR_CODE_SERVER_ERROR);
+			response.setProperty(ResourceResponse.HTTP_STATUS_CODE, HttpCodes.HTTP_ERROR_CODE_SERVER_ERROR);
 		else{
 			try{
 				SerializerUtil.jsonSerialize(response.getWriter(), arService.getClustersElasticIP(clusterId));		
@@ -169,7 +168,7 @@ public class ClusterController {
 			arService.updateElasticIP(ip);
 		} catch (Exception e) {
 			ExceptionUtil.throwSystemException(e);
-			response.setProperty(ResourceResponse.HTTP_STATUS_CODE, AdminGeneral.HTTP_ERROR_CODE_SERVER_ERROR);	
+			response.setProperty(ResourceResponse.HTTP_STATUS_CODE, HttpCodes.HTTP_ERROR_CODE_SERVER_ERROR);	
 		}
 	}
 	
@@ -193,7 +192,7 @@ public class ClusterController {
 			arService.freeElasticIP(eip);
 		} catch(Exception e){
 			e.printStackTrace();
-			response.setProperty(ResourceResponse.HTTP_STATUS_CODE, AdminGeneral.HTTP_ERROR_CODE_SERVER_ERROR);	
+			response.setProperty(ResourceResponse.HTTP_STATUS_CODE, HttpCodes.HTTP_ERROR_CODE_SERVER_ERROR);	
 		}
 	}
 	
@@ -234,7 +233,7 @@ public class ClusterController {
 			arService.deleteUserAuthorizedIP(ipId);
 		} catch(Exception e){
 			e.printStackTrace();
-			response.setProperty(ResourceResponse.HTTP_STATUS_CODE, AdminGeneral.HTTP_ERROR_CODE_SERVER_ERROR);		
+			response.setProperty(ResourceResponse.HTTP_STATUS_CODE, HttpCodes.HTTP_ERROR_CODE_SERVER_ERROR);		
 		}	
 	}
 		 
@@ -268,7 +267,7 @@ public class ClusterController {
 			SerializerUtil.jsonSerialize(response.getWriter(), ipId);	
 		} catch(Exception e){
 			e.printStackTrace();
-			response.setProperty(ResourceResponse.HTTP_STATUS_CODE, AdminGeneral.HTTP_ERROR_CODE_SERVER_ERROR);		
+			response.setProperty(ResourceResponse.HTTP_STATUS_CODE, HttpCodes.HTTP_ERROR_CODE_SERVER_ERROR);		
 		}	
 	}
 	
@@ -338,7 +337,7 @@ public class ClusterController {
 	        
 		} catch (Exception e) {
 			LOG.error("Error setting up the service: "+e.getMessage());
-			response.setProperty(ResourceResponse.HTTP_STATUS_CODE, AdminGeneral.HTTP_ERROR_CODE_SERVER_ERROR);
+			response.setProperty(ResourceResponse.HTTP_STATUS_CODE, HttpCodes.HTTP_ERROR_CODE_SERVER_ERROR);
 			try {
 				response.getWriter().write(e.getMessage());
 			} catch (IOException ioe) {

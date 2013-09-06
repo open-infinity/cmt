@@ -16,6 +16,8 @@
 package org.openinfinity.cloud.service.configurationtemplate;
 
 import java.util.List;
+import java.util.Set;
+
 import org.openinfinity.cloud.domain.configurationtemplate.Template;
 
 
@@ -28,6 +30,6 @@ import org.openinfinity.cloud.domain.configurationtemplate.Template;
  */
 public interface TemplateService {
 	
-    List<Template> getAll();
+    Set<Template> getTemplates(List<Long> organizationIds);
 	
 }

@@ -70,3 +70,11 @@ insert into acl_cluster_type_tbl select 'Tieto Finland', id from cluster_type_tb
 insert into acl_machine_type_tbl select 'OPPYATOAS', id from machine_type_tbl;
 insert into acl_machine_type_tbl select 'TOAS', id from machine_type_tbl;
 insert into acl_machine_type_tbl select 'Tieto Finland', id from machine_type_tbl;
+
+insert into configuration_template_tbl values (1, 'TEMPLATE_WEB_SIMPLE', 'Platforms suitable for simple web services');
+insert into configuration_template_tbl values (2, 'TEMPLATE_WEB_IG', 'Platforms suitable for web services with authentication support');
+
+insert into configuration_template_organization_tbl values (1, 1);
+insert into configuration_template_organization_tbl values (2, 1);
+insert into configuration_template_organization_tbl values (3, 2);
+insert into configuration_template_organization_tbl values (4, 2);

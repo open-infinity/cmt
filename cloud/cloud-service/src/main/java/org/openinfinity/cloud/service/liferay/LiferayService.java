@@ -1,8 +1,10 @@
 package org.openinfinity.cloud.service.liferay;
 
-import java.util.Collection;
+import java.util.List;
+
 import javax.portlet.PortletRequest;
 import javax.portlet.ResourceResponse;
+
 import com.liferay.portal.model.User;
 
 public interface LiferayService {
@@ -10,7 +12,7 @@ public interface LiferayService {
 
     User getUser(PortletRequest request, ResourceResponse response);
 
-    Collection<String> getOrganizationNames(User user);
+    List<String> getOrganizationNames(User user);
     
-    Collection<Long> getOrganizationIds(User user);
+    List<Long> getOrganizationIds(User user);
 }

@@ -50,7 +50,7 @@ public class OrganizationRepositoryJdbcImpl implements OrganizationRepository {
 	private class OrganizationRowMapper implements RowMapper<Organization> {
 		
 		public Organization mapRow(ResultSet resultSet, int rowNum) throws SQLException {    
-		    return new Organization(resultSet.getInt("id"), resultSet.getInt("template_id"));
+		    return new Organization(resultSet.getLong("organization_id"), resultSet.getInt("template_id"));
 		}
 	}
 

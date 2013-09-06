@@ -4,6 +4,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.openinfinity.cloud.application.admin.controller.CloudAdminController;
 import org.openinfinity.cloud.domain.*;
 import org.openinfinity.cloud.domain.repository.administrator.InstanceRepository;
 import org.openinfinity.cloud.domain.repository.administrator.JobRepository;

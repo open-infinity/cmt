@@ -9,11 +9,11 @@ import javax.portlet.PortletRequest;
 import javax.portlet.ResourceResponse;
 
 import org.apache.log4j.Logger;
-
 import org.springframework.stereotype.Service;
-
 import org.openinfinity.cloud.util.http.HttpCodes;
 import org.openinfinity.cloud.service.liferay.LiferayServiceImpl;
+import org.openinfinity.core.util.ExceptionUtil;
+
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.model.Organization;
@@ -48,7 +48,7 @@ private static final Logger LOG = Logger.getLogger(LiferayServiceImpl.class.getN
         return user;    
     }
 
-    public Collection<String> getOrganizationNames(User user) {
+    public List<String> getOrganizationNames(User user) {
         List<Organization> userOrganizations = null;
         List<Organization> subOrganizations = null;
         try {
@@ -66,30 +66,22 @@ private static final Logger LOG = Logger.getLogger(LiferayServiceImpl.class.getN
         return orgNames;
     }
     
-    public Collection<Long> getOrganizationIds(User user){
+    public List<Long> getOrganizationIds(User user){
         List<Organization> organizationList = null;
         List<Organization> subOrganizationList = null;
+        List<Long> orgIdList = new ArrayList<Long>();
         try {
             organizationList = user.getOrganizations();
             subOrganizationList = OrganizationLocalServiceUtil.getSuborganizations(organizationList);
-        } catch (PortalException e) {
-            LOG.error("Could not get organizations for user "+user.getFullName()+": "+e.getLocalizedMessage());
-        } catch (SystemException e) {
-            LOG.error("Something is wrong: "+e.getLocalizedMessage());
-        }
-        Collection<Long> orgIdList = new ArrayList<Long>();
-        if (organizationList != null) {
             for (Organization organization : organizationList) {
-                LOG.info("Adding organization " + organization.getName() + " to user " + user.getScreenName());
                 orgIdList.add(organization.getOrganizationId());
             }
-        }
-        if (subOrganizationList != null) {
             for (Organization organization : subOrganizationList) {
-                LOG.info("Adding organization " + organization.getName() + " to user " + user.getScreenName());
                 orgIdList.add(organization.getOrganizationId());
             }
-        }
+        } catch (Exception e) {
+            ExceptionUtil.throwSystemException("Error getting organizations for user " + user.getFullName());
+        } 
         return orgIdList;
     }
     

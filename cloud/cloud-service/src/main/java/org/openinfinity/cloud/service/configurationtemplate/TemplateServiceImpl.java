@@ -15,16 +15,16 @@
  */
 package org.openinfinity.cloud.service.configurationtemplate;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
-import org.apache.log4j.Logger;
-import org.openinfinity.cloud.domain.configurationtemplate.Template;
-import org.openinfinity.cloud.domain.repository.configurationtemplate.TemplateRepository;
-import org.openinfinity.core.annotation.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-
+import org.openinfinity.core.annotation.Log;
+import org.openinfinity.cloud.domain.configurationtemplate.Template;
+import org.openinfinity.cloud.domain.repository.configurationtemplate.TemplateRepository;
 
 /**
  * @author Vedran Bartonicek
@@ -34,14 +34,16 @@ import org.springframework.stereotype.Service;
 
 @Service("configurationTemplateService")
 public class TemplateServiceImpl implements TemplateService {
-	private static final Logger LOGGER = Logger.getLogger(TemplateServiceImpl.class.getName());
-
 	@Autowired
 	private TemplateRepository templateRepository;
 	
 	@Log 
-    public List<Template> getAll() {
-        return templateRepository.getAll();
+    public Set<Template> getTemplates(List<Long> organizationIds) {
+	    Set<Template> templates = new HashSet<Template>();
+	    for(Long oid: organizationIds){
+	        templates.addAll(templateRepository.getTemplates(oid));
+	    }
+        return templates;
     }
 	
 }

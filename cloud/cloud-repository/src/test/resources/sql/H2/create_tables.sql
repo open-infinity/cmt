@@ -279,3 +279,24 @@ CREATE TABLE `deployment_state_tbl` (
   `cur_timestamp` timestamp NOT NULL,
   PRIMARY KEY (`id`)
 );
+
+DROP TABLE IF EXISTS `configuration_template_tbl`;
+
+CREATE TABLE `configuration_template_tbl` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(30) NOT NULL,
+  `description` varchar(256),
+  PRIMARY KEY (`id`)
+);
+
+DROP TABLE IF EXISTS `configuration_template_organization_tbl`;
+
+CREATE TABLE `configuration_template_organization_tbl` (
+  `organization_id`bigint(20) NOT NULL,
+  `template_id` int(11) NOT NULL,
+  PRIMARY KEY (`organization_id`),
+  CONSTRAINT fk_configuration_template FOREIGN KEY (template_id) REFERENCES configuration_template_tbl(id)
+);
+
+
+

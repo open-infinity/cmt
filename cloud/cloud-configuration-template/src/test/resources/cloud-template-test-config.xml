@@ -13,13 +13,25 @@
          classpath*:/META-INF/spring/infrastructure.properties" />
     <context:property-override location="classpath:override.properties"/>
     
+    <!-- bean id="configurationTemplateController" 
+          class="org.openinfinity.cloud.application.template.controller.TemplateController" /-->
+       
+    <!--    
+    <bean id="mockUser" class="org.mockito.Mockito" factory-method="mock">
+        <constructor-arg value="com.liferay.portal.model.User" />
+    </bean>
+        
+    <bean id="mockLiferayService" class="org.mockito.Mockito" factory-method="mock">
+        <constructor-arg value="org.openinfinity.cloud.service.liferay.LiferayService" />
+    </bean>
+    -->
     <context:component-scan base-package="org.openinfinity">
+        <!-- context:exclude-filter type="regex" expression="org.openinfinity.cloud.application.template.controller.TemplateController" /-->
         <context:exclude-filter type="regex" expression="org.openinfinity.cloud.service.healthmonitoring.*.*" />
         <context:exclude-filter type="regex" expression="org.openinfinity.cloud.domain.repository.deployer.*.*" />
         <context:exclude-filter type="regex" expression="org.openinfinity.cloud.service.deployer.*.*" />    
     </context:component-scan>
-    
-    
+        
     <bean id="txManager"
           class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
         <property name="dataSource" ref="cloudDataSource"/>
@@ -27,7 +39,7 @@
 
     <jdbc:initialize-database data-source="cloudDataSource">
         <jdbc:script location="file:${sql.script.path}/H2/create_tables.sql"/>
-        <jdbc:script location="sql/H2/populate_tables.sql"/>
+        <jdbc:script location="file:${sql.script.path}/H2/populate_tables.sql"/>
     </jdbc:initialize-database>
 
     <bean id="testJdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
