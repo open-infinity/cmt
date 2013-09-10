@@ -1,0 +1,120 @@
+#!/usr/local/bin/python
+
+import sys
+import time
+from toasdomain import *
+from common import *
+
+def checkParameters():
+	if(len(sys.argv) < 2):
+		print "Usage: "+sys.argv[0]+" <clusterId>"
+		sys.exit(0)
+
+def checkIsLbNeeded(cluster):
+	if (cluster.type in [0, 1, 5, 8]):
+		return True
+	else:
+		return False
+
+def createNewLb(cluster):
+	key = getInstanceKey(cluster.instanceId)
+	if(key == None):
+		return None
+	print "Creating new machine instance for the loadbalancer"	
+	instance = runInstance(key.name, eucaInstanceStoreImage, cluster.groupName, "m1.small")
+	if(instance == None):
+		return None
+	wait = eucaMaxWait
+	print "Waiting for the instance to startup..."
+	while(instance.state != 'running' and wait > 0):
+		time.sleep(3)
+		instance = getEucaInstance(instance.id)
+		wait -= 1
+	if(wait <= 0):
+		print "Instance failed to start in time, aborting"
+		print "Please check that instance %s is terminated, or terminate it if necessary" % (instance.id)
+
+	print "Instance %s status %s" % (instance.id, instance.state)
+	print "Inserting new loadbalancer machine to database to be configured by worker"
+	if(insertMachine(instance.id, cluster.name, instance.public_dns_name, "root", instance.state, cluster.id, instance.private_dns_name, "loadbalancer", 0, 1, "null", "null", 0)):
+		print "Machine added to database"
+	else:
+		print "Problems adding machine to database"
+		sys.exit(-1)
+	
+	if(updateClusterLbInfo(cluster.id, instance.public_dns_name, instance.id)):
+		print "Cluster loadbalancer info updated"
+	else:
+		print "Failed to update cluster loadbalancer info. Please check cluster status"
+		sys.exit(-1)
+		
+
+def createNewClusterMember(cluster):
+	key = getInstanceKey(cluster.instanceId)
+	if(key == None):
+		return None
+	print "Creating new machine instance for the clustermember"
+	mtype = getMachineType(cluster.machineType)
+	image = eucaInstanceStoreImage
+	volume = None
+	if(cluster.ebsImageUsed == 1):
+		image = eucaEbsImage
+	if(cluster.ebsVolumeUsed > 0):
+		volume = createVolume(cluster.ebsVolumeUsed)
+		if(volume == None):
+			sys.exit(-1)
+		else:
+			print "Volume %s created" % (volume)
+	instance = runInstance(key.name, image, cluster.groupName, mtype)
+	wait = eucaMaxWait
+	print "Waiting for the instance to start...."
+	while(instance.state != running and wait > 0):
+		time.sleep(3)
+		instance = getEucaInstance(instance.id)
+		wait -= 1
+	if(wait <= 0):
+		print "Instance failed to start in time, aborting"
+		print "Please check that instance %s is terminated, or terminate it if necessary" % (instance.id)
+	print "Instance %s status %s" % (instance.id, instance.state)
+	device = None
+	if(cluster.ebsVolumeUsed > 0):
+		print "Attaching EBS volume %s to instance %s" % (volume, instance.id)
+		device = "vdb"
+		if(cluster.ebsImageUsed == 1):
+			device = "vdc"
+		retval = ec2.attach_volume(volume, instance.id, device)
+		if(retval == False):
+			print "Could not attach volume to the instance, aborting"
+			print "Please check the status of instance %s and volume %s manually, nothing inserted to the TOAS database yet" % (instance.id, volume)
+			sys.exit(-1)
+	
+	print "Inserting new machine to database to be configured by worker"
+	if(insertMachine(instance.id, cluster.name, instance.public_dns_name, "root", instance.state, cluster.id, instance.private_dns_name, "clustermember", 0, 1, volume, device, cluster.ebsVolumeUsed)):
+		print "Machine added to database"
+	else:
+		print "Problems adding machine to database"
+		print "Please check and terminate all created instances and volumes if needed"
+		sys.exit(-1)
+
+
+
+def main():
+	checkParameters()
+	clusterId = sys.argv[1]
+	try:
+		cluster = getCluster(clusterId);
+		if(cluster == None):
+			print "Cluster not found"
+			sys.exit(0)
+		
+	except mdb.Error, e:
+		print "Error %d: %s" % (e.args[0], e.args[1])
+		sys.exit(1)
+
+	finally:
+		if con:
+			con.close()
+
+
+if __name__ == '__main__':
+	main()
