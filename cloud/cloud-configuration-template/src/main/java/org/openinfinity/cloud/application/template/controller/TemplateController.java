@@ -33,13 +33,17 @@ import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.portlet.ModelAndView;
+import org.springframework.web.portlet.bind.annotation.RenderMapping;
 import org.springframework.web.portlet.bind.annotation.ResourceMapping;
+
+import org.apache.log4j.Logger;
 
 import com.liferay.portal.model.User;
 
 import org.openinfinity.cloud.domain.configurationtemplate.Template;
 import org.openinfinity.cloud.service.configurationtemplate.TemplateService;
 import org.openinfinity.cloud.service.liferay.LiferayService;
+import org.openinfinity.cloud.util.http.HttpCodes;
 import org.openinfinity.cloud.util.serialization.SerializerUtil;
 import org.openinfinity.core.exception.AbstractCoreException;
 import org.openinfinity.core.exception.ApplicationException;
@@ -67,12 +71,25 @@ public class TemplateController {
     private static final String PATH_DELETE_TEMPLATE = "deleteTemplate";
     private static final String PATH_USE_TEMPLATE = "useTemplate";
 
+    private static final Logger LOG = Logger.getLogger(TemplateController.class.getName());
+
 	@Autowired
 	@Qualifier("configurationTemplateService")
 	private TemplateService templateService;
 	
 	@Autowired
 	LiferayService liferayService;
+	
+	@RenderMapping
+    public String showView(RenderRequest request, RenderResponse response) {
+        User user = liferayService.getUser(request);
+        if(user == null) {
+            LOG.debug("User = null");
+            response.setProperty(ResourceResponse.HTTP_STATUS_CODE, HttpCodes.HTTP_ERROR_CODE_USER_NOT_LOGGED_IN);
+            return "notlogged";
+        }   
+        return "main";
+    }
 	
 	// TODO -> to some util class? :vbartoni
 	@ExceptionHandler({ApplicationException.class, BusinessViolationException.class, SystemException.class})
@@ -100,10 +117,16 @@ public class TemplateController {
         try{
             User user = liferayService.getUser(request, response);           
             List<Long> organizationIds = liferayService.getOrganizationIds(user);     
-            Set<Template> templates = templateService.getTemplates(organizationIds);          
+            LOG.debug("organizationIds");
+            LOG.debug(organizationIds);
+            Set<Template> templates = templateService.getTemplates(organizationIds);   
+            LOG.debug("templates received");
             Assert.notNull(templates);
+            LOG.debug("Jsonization start");
+
             SerializerUtil.jsonSerialize(response.getWriter(), templates); 
-    
+            LOG.debug("Jsonization end");
+
         } catch (Exception e){
             ExceptionUtil.throwSystemException(e);  
         }

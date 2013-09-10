@@ -29,19 +29,19 @@
 	</appender>
 	<!-- Core logger -->
 	<logger name="org.openinfinity.core.aspect.AuditTrailAspect">
-		<level value="info" />
+		<level value="error" />
 		<appender-ref ref="audittrail" />
 	</logger>
 	<logger name="org.openinfinity.core.aspect.ArgumentBuilder">
-		<level value="warn" />
+		<level value="error" />
 		<appender-ref ref="exception" />
 	</logger>
 	<logger name="org.openinfinity.core.aspect.LogAspect">
-		<level value="debug" />
+		<level value="error" />
 		<appender-ref ref="log" />
 	</logger>
 	<logger name="org.openinfinity.cloud">
-		<level value="debug" />
+		<level value="error" />
 		<appender-ref ref="log" />
 	</logger>
 	<!-- 3rdparty Loggers -->
@@ -54,21 +54,25 @@
 		<appender-ref ref="console" />
 	</logger>
 	<logger name="org.springframework.transaction">
-		<level value="warn" />
+		<level value="error" />
 		<appender-ref ref="console" />
 	</logger>
 	<logger name="org.springframework.orm">
-		<level value="warn" />
+		<level value="error" />
 		<appender-ref ref="console" />
 	</logger>
 	<logger name="org.springframework.web">
-		<level value="debug" />
+		<level value="error" />
 		<appender-ref ref="console" />
 	</logger>
 	<logger name="org.springframework.webflow">
-		<level value="debug" />
+		<level value="error" />
 		<appender-ref ref="console" />
 	</logger>
+	<logger name=" com.mchange.v2.c3p0.impl">
+        <level value="error" />
+        <appender-ref ref="console" />
+    </logger>
 	<!-- Application logger -->
 	<!-- <logger name="org.openinfinity.core.aspect"> -->
 	<!-- <level value="warn" /> -->

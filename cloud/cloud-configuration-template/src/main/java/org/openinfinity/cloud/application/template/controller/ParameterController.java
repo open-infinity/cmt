@@ -40,6 +40,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -81,7 +82,8 @@ public class ParameterController {
 		@SuppressWarnings("unchecked")
         Map<String, Object> userInfo = (Map<String, Object>) 
 		                                renderRequest.getAttribute(ActionRequest.USER_INFO);
-		if (userInfo == null) return new ModelAndView("home");
+		if (userInfo == null) 
+		    return new ModelAndView("home");
 
 		return modelAndView;
     }
@@ -95,14 +97,9 @@ public class ParameterController {
                              @RequestParam("organizationId") int organizationId)
                              throws Exception {    
         
-        // TODO
-        @SuppressWarnings("unchecked")
         List<ParameterKey> templatesList = parameterKeyService.getAll();
-        
-        if(templatesList !=  null) 
-            SerializerUtil.jsonSerialize(response.getWriter(), templatesList);
-        
-        else return;   
-    } 
-		
+        Assert.notNull(templatesList);
+        SerializerUtil.jsonSerialize(response.getWriter(), templatesList);    
+    } 		
+    
 }

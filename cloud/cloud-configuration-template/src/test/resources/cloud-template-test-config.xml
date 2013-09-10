@@ -9,24 +9,13 @@
 
     <context:property-placeholder location=
         "classpath*:/META-INF/properties/repository.properties, 
-         classpath*:/META-INF/spring/EucaCredentials.properties,
-         classpath*:/META-INF/spring/infrastructure.properties" />
-    <context:property-override location="classpath:override.properties"/>
+         classpath*:/META-INF/properties/EucaCredentials.properties,
+         classpath*:/META-INF/properties/infrastructure.properties,
+         classpath*:/META-INF/properties/system.properties" />
     
-    <!-- bean id="configurationTemplateController" 
-          class="org.openinfinity.cloud.application.template.controller.TemplateController" /-->
-       
-    <!--    
-    <bean id="mockUser" class="org.mockito.Mockito" factory-method="mock">
-        <constructor-arg value="com.liferay.portal.model.User" />
-    </bean>
-        
-    <bean id="mockLiferayService" class="org.mockito.Mockito" factory-method="mock">
-        <constructor-arg value="org.openinfinity.cloud.service.liferay.LiferayService" />
-    </bean>
-    -->
+    <context:property-override location="classpath:override.properties"/>
+
     <context:component-scan base-package="org.openinfinity">
-        <!-- context:exclude-filter type="regex" expression="org.openinfinity.cloud.application.template.controller.TemplateController" /-->
         <context:exclude-filter type="regex" expression="org.openinfinity.cloud.service.healthmonitoring.*.*" />
         <context:exclude-filter type="regex" expression="org.openinfinity.cloud.domain.repository.deployer.*.*" />
         <context:exclude-filter type="regex" expression="org.openinfinity.cloud.service.deployer.*.*" />    

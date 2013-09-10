@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+<!DOCTYPE liferay-portlet-app PUBLIC "-//Liferay//DTD Portlet Application 6.0.0//EN" "http://www.liferay.com/dtd/liferay-portlet-app_6_0_0.dtd">
+
+<liferay-portlet-app>
+	<portlet>
+		<portlet-name>cloudtemplate</portlet-name>
+		<icon>/icon.png</icon>
+		<instanceable>true</instanceable>
+		<!-- 
+		<header-portlet-css>/css/cloudadmin.css</header-portlet-css
+		<header-portlet-css>/css/plugins/ui.jqgrid.css</header-portlet-css>
+		-->
+		<header-portlet-javascript>/js/plugins/jquery.metadata.js</header-portlet-javascript>
+		<header-portlet-javascript>/js/plugins/i18n/grid.locale-en.js</header-portlet-javascript>
+		<header-portlet-javascript>/js/plugins/jquery.jqGrid.min.js</header-portlet-javascript>
+		<!--
+		<header-portlet-javascript>/js/plugins/jquery.mb.slider.js</header-portlet-javascript>
+		-->		
+		
+		<!-- import modules -->
+		<!--
+		<header-portlet-javascript>/js/cloudtemplate/main.js</header-portlet-javascript>
+		<header-portlet-javascript>/js/cloudtemplate/widgets/platformselect.js</header-portlet-javascript>
+		<header-portlet-javascript>/js/cloudtemplate/resource/resource.js</header-portlet-javascript>
+		
+		-->
+		<header-portlet-javascript>/js/cloudtemplate/main.js</header-portlet-javascript>
+		<header-portlet-javascript>/js/cloudtemplate/template.js</header-portlet-javascript>
+		
+		<!--
+		<header-portlet-javascript>/js/cloudtemplate/util/util.js</header-portlet-javascript>
+		<header-portlet-javascript>/js/cloudadmin/poller/datapoller.js</header-portlet-javascript>
+		-->
+
+		<!-- dialogs -->
+		<!--
+		<footer-portlet-javascript>/js/cloudadmin/dialog/dialog.instance.js</footer-portlet-javascript>
+		<footer-portlet-javascript>/js/cloudadmin/dialog/dialog.cluster.js</footer-portlet-javascript>
+		<footer-portlet-javascript>/js/cloudadmin/dialog/dialog.machine.js</footer-portlet-javascript>				
+		<footer-portlet-javascript>/js/cloudadmin/dialog/dialog.service.js</footer-portlet-javascript>
+        -->
+        
+		<!-- main app -->
+		<footer-portlet-javascript>/js/cloudtemplate/main.js</footer-portlet-javascript>
+	</portlet>
+	<role-mapper>
+		<role-name>administrator</role-name>
+		<role-link>Administrator</role-link>
+	</role-mapper>
+	<role-mapper>
+		<role-name>guest</role-name>
+		<role-link>Guest</role-link>
+	</role-mapper>
+	<role-mapper>
+		<role-name>power-user</role-name>
+		<role-link>Power User</role-link>
+	</role-mapper>
+	<role-mapper>
+		<role-name>user</role-name>
+		<role-link>User</role-link>
+	</role-mapper>
+</liferay-portlet-app>
