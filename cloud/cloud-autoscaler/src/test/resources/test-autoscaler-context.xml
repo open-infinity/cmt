@@ -27,17 +27,17 @@
 	    classpath:infrastructure.properties,
 	    classpath:healthmonitoring.properties,
 	    classpath:autoscaler.properties" />
-	    
+   
 	<import resource="classpath*:/META-INF/spring/cloud-context-util.xml" />
 	<import resource="classpath*:/META-INF/spring/cloud-context-core.xml" />
 	<import resource="classpath*:/META-INF/spring/cloud-context-repository.xml" />
 	<import resource="classpath*:/META-INF/spring/cloud-context-service.xml" />
-	
-    <context:component-scan base-package="org.openinfinity.cloud.autoscaler.periodicscaler"/>
-	<context:component-scan base-package="org.openinfinity.cloud.autoscaler.scheduledscaler"/>
+	<import resource="classpath*:/META-INF/spring/periodic-scaler-context.xml" />
+	<import resource="classpath*:/META-INF/spring/scheduled-scaler-context.xml" />
 			
 	<jdbc:embedded-database id="cloudDataSource">
         <jdbc:script location="classpath*:*openinfinity-schema.sql"/>
+        <jdbc:script location="classpath:/org/springframework/batch/core/schema-drop-hsqldb.sql"/>
         <jdbc:script location="classpath:/org/springframework/batch/core/schema-hsqldb.sql"/>
     </jdbc:embedded-database>
      
