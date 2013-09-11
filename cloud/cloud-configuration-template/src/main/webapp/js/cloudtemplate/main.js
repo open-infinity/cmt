@@ -20,11 +20,20 @@
 
 jQuery(function($){
 	var portlet = window.portlet || {};
-		
+	
+	var tabTitle = $("#tab_title" ),
+    tabContent = $( "#tab_content" ),
+    tabTemplate = "<li><a href='#{href}'>#{label}</a> " +
+    		          "<span class='ui-icon ui-icon-close' role='presentation'>Remove Tab</span>" +
+    		      "</li>",
+    tabCounter = 2;
+	var tabs = $( "#tabs" ).tabs();
+	
 	portlet = {
 		init: function(){
 			$.ajaxSetup({cache: false});
 		},
+		
 		setupTemplatesTable: function(){
 			$("#templates-grid").jqGrid({
 				url: portletURL.url.template.getTemplatesForUserURL,
@@ -39,30 +48,93 @@ jQuery(function($){
 					},
 				colNames:['Id', 'Name', 'Description'],
 				colModel:[
-				          {name:'id', index:'id', width:100, align:"center"},
-				          {name:'name', index:'name', width:217, align:"center"},
-				          {name:'description', index:'description', width:100, align:"center"}
+				          {name:'id', index:'id', width:50, align:"center"},
+				          {name:'name', index:'name', width:150, align:"left"},
+				          // 545
+				          {name:'description', index:'description', width:535, align:"left"}
 				          ],
-				rowNum:10,
-				width: 100,
-				height: 100,
+				rowNum: 10,
+				width: 750,
+				height: 300,
 				pager: '#template-grid-pager',
 				sortname: 'id',
 				viewrecords: true,
-				shrinkToFit:false,
+				shrinkToFit: false,
 				sortorder: 'id'
 			})
-		}
+		},
+		
+		setupTabs: function(){
+			$( "#tabs" ).tabs();
+		},
+		
+		bindEventHandlers: function(){
+		    $("#edit-template").bind( "click", portlet.editTemplate);   
+		    $("#new-template").bind( "click", portlet.createNewTemplate);
+		    $("#assign-template").bind( "click", portlet.assignTemplate);
+		    $("#delete-template").bind( "click", portlet.deleteTemplate);
+
+		},
+		
+		createNewTemplate: function(){
+			alert( "User clicked on 'New '" );
+			var label = tabTitle.val() || "Tab " + tabCounter,
+				id = "tabs-" + tabCounter,
+				li = $(tabTemplate.replace( /#\{href\}/g, "#" + id ).replace( /#\{label\}/g, label ) ),
+				tabContentHtml = tabContent.val() || "Tab " + tabCounter + " content.";
+	 
+			tabs.find( ".ui-tabs-nav" ).append( li );
+			tabs.append( "<div id='" + id + "'><p>" + tabContentHtml + "</p></div>" );
+			tabs.tabs( "refresh" );
+			tabCounter++;
+		},
+		
+		deleteTemplate: function(){
+			alert( "User clicked on 'Delete '" );
+		},
+		
+		editTemplate: function(){
+			alert( "User clicked on 'Edit '" );
+			
+		},
+		
+		assignTemplate: function(){
+			alert( "User clicked on 'Assign '" );
+		},
+		
+		addTab: function(){
+		      var label = tabTitle.val() || "Tab " + tabCounter,
+		        id = "tabs-" + tabCounter,
+		        li = $( tabTemplate.replace( /#\{href\}/g, "#" + id ).replace( /#\{label\}/g, label ) ),
+		        tabContentHtml = tabContent.val() || "Tab " + tabCounter + " content.";
+		 
+		      tabs.find( ".ui-tabs-nav" ).append( li );
+		      tabs.append( "<div id='" + id + "'><p>" + tabContentHtml + "</p></div>" );
+		      tabs.tabs( "refresh" );
+		      tabCounter++;
+		    }
+	
 	};
 	
-    console.log("portletURL.url.template.getTemplatesForUserURL ");
-	console.log("portletURL.url.template.getTemplatesForUserURL " + portletURL.url.template.getTemplatesForUserURL);
-	$.get(portletURL.url.template.getTemplatesForUserURL, function(data) {
-		  console.log(data);
-		});
+	function addOneTab() {
+	      var label = tabTitle.val() || "Tab " + tabCounter,
+	        id = "tabs-" + tabCounter,
+	        li = $( tabTemplate.replace( /#\{href\}/g, "#" + id ).replace( /#\{label\}/g, label ) ),
+	        tabContentHtml = tabContent.val() || "Tab " + tabCounter + " content.";
+	 
+	      tabs.find( ".ui-tabs-nav" ).append( li );
+	      tabs.append( "<div id='" + id + "'><p>" + tabContentHtml + "</p></div>" );
+	      tabs.tabs( "refresh" );
+	      tabCounter++;
+	    }
+	
+
+	
 	
 	portlet.init();
 	portlet.setupTemplatesTable();
+	portlet.setupTabs();
+	portlet.bindEventHandlers();
 			
 });
 		

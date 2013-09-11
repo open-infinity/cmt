@@ -10,6 +10,10 @@
 		<header-portlet-css>/css/cloudadmin.css</header-portlet-css
 		<header-portlet-css>/css/plugins/ui.jqgrid.css</header-portlet-css>
 		-->
+		
+		<header-portlet-css>/css/cloudtemplate.css</header-portlet-css>
+        <header-portlet-css>/css/plugins/ui.jqgrid.css</header-portlet-css>
+        
 		<header-portlet-javascript>/js/plugins/jquery.metadata.js</header-portlet-javascript>
 		<header-portlet-javascript>/js/plugins/i18n/grid.locale-en.js</header-portlet-javascript>
 		<header-portlet-javascript>/js/plugins/jquery.jqGrid.min.js</header-portlet-javascript>
