@@ -41,7 +41,7 @@
 		<appender-ref ref="log" />
 	</logger>
 	<logger name="org.openinfinity.cloud">
-		<level value="error" />
+		<level value="debug" />
 		<appender-ref ref="log" />
 	</logger>
 	<!-- 3rdparty Loggers -->
@@ -69,15 +69,27 @@
 		<level value="error" />
 		<appender-ref ref="console" />
 	</logger>
-	<logger name=" com.mchange.v2.c3p0.impl">
+	<logger name="com.mchange.v2.c3p0.impl.C3P0PooledConnectionPool">
         <level value="error" />
         <appender-ref ref="console" />
     </logger>
-	<!-- Application logger -->
-	<!-- <logger name="org.openinfinity.core.aspect"> -->
-	<!-- <level value="warn" /> -->
-	<!-- <appender-ref ref="console" /> -->
-	<!-- </logger> -->
+    <logger name="com.mchange.v2.c3p0.impl">
+        <level value="error" />
+        <appender-ref ref="console" />
+    </logger>
+    <logger name="com.mchange.v2.c3p0">
+        <level value="error" />
+        <appender-ref ref="console" />
+    </logger>
+    <logger name="com.mchange.v2">
+        <level value="error" />
+        <appender-ref ref="console" />
+    </logger>
+    <logger name="com.mchange">
+        <level value="error" />
+        <appender-ref ref="console" />
+    </logger>
+	
 	<!-- Root Logger -->
 	<root>
 		<priority value="debug" />

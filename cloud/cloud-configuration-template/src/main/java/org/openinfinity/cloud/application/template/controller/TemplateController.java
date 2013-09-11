@@ -17,6 +17,7 @@
 package org.openinfinity.cloud.application.template.controller;
 
 import java.util.List;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
@@ -32,18 +33,21 @@ import org.springframework.stereotype.Controller;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.portlet.ModelAndView;
 import org.springframework.web.portlet.bind.annotation.RenderMapping;
 import org.springframework.web.portlet.bind.annotation.ResourceMapping;
-
 import org.apache.log4j.Logger;
 
 import com.liferay.portal.model.User;
 
+import org.openinfinity.cloud.domain.Instance;
 import org.openinfinity.cloud.domain.configurationtemplate.Template;
 import org.openinfinity.cloud.service.configurationtemplate.TemplateService;
 import org.openinfinity.cloud.service.liferay.LiferayService;
+import org.openinfinity.cloud.util.collection.ListUtil;
 import org.openinfinity.cloud.util.http.HttpCodes;
+import org.openinfinity.cloud.util.serialization.JsonDataWrapper;
 import org.openinfinity.cloud.util.serialization.SerializerUtil;
 import org.openinfinity.core.exception.AbstractCoreException;
 import org.openinfinity.core.exception.ApplicationException;
@@ -113,7 +117,9 @@ public class TemplateController {
     }
 	
     @ResourceMapping(PATH_GET_TEMPLATES_FOR_USER)
-    public void getTemplatesForUser(ResourceRequest request, ResourceResponse response) throws Exception {
+    public void getTemplatesForUser(ResourceRequest request, ResourceResponse response,
+                                    @RequestParam("page") int page, @RequestParam("rows") int rows) 
+                                    throws Exception {
         try{
             User user = liferayService.getUser(request, response);           
             List<Long> organizationIds = liferayService.getOrganizationIds(user);     
@@ -124,7 +130,18 @@ public class TemplateController {
             Assert.notNull(templates);
             LOG.debug("Jsonization start");
 
-            SerializerUtil.jsonSerialize(response.getWriter(), templates); 
+            int records = templates.size();
+            int mod = records % rows;
+            int totalPages = records/rows;
+            if(mod > 0) totalPages++;
+
+            // Slice a subset from all deployments, the result fits into one jqGgrid page
+            List<Template> temp = new LinkedList<Template>();
+            temp.addAll(templates);
+            List<Template> onePage = ListUtil.sliceList(page, rows, temp);
+            
+            SerializerUtil.jsonSerialize(response.getWriter(), 
+                                         new JsonDataWrapper(page, totalPages, records, onePage));
             LOG.debug("Jsonization end");
 
         } catch (Exception e){
