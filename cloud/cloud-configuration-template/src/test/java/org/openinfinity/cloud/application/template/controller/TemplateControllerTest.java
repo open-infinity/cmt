@@ -1,10 +1,7 @@
 package org.openinfinity.cloud.application.template.controller;
 
-import static junit.framework.Assert.assertEquals;
-
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -15,22 +12,31 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.liferay.portal.model.User;
 
+import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.type.TypeReference;
-
-import org.openinfinity.cloud.domain.configurationtemplate.Template;
-import org.openinfinity.cloud.service.liferay.LiferayService;
-import org.openinfinity.cloud.application.template.controller.TemplateController;
-import org.openinfinity.core.util.ExceptionUtil;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import static junit.framework.Assert.assertEquals;
+
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+
 import static org.mockito.Mockito.*;
+
+import org.openinfinity.cloud.service.liferay.LiferayService;
+import org.openinfinity.cloud.application.template.controller.TemplateController;
+import org.openinfinity.core.util.ExceptionUtil;
+
+/**
+ * Tests for TemplateController
+ * 
+ * @author Vedran Bartonicek
+ * @version 1.3.0
+ * @since 1.3.0
+ */
 
 @ContextConfiguration(locations={"/cloud-template-test-config.xml"})
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -68,11 +74,16 @@ public class TemplateControllerTest {
         when(mockLiferayService.getOrganizationIds(mockUser)).thenReturn(organizationIds);  
             
         try{
-            templateController.getTemplatesForUser(request, response);
-            System.out.println(response.getContentAsString());
-            Set<Template> templates = objectMapper.readValue(
-                   response.getContentAsString(),new TypeReference<Set<Template>>(){});
-            assertEquals(1, templates.size()); 
+            templateController.getTemplatesForUser(request, response, 1, 1);
+            JsonNode rootNode = objectMapper.readValue(response.getContentAsString(), 
+                                             JsonNode.class);
+            
+            int templatesExpected = 1;
+            int rowsFound = 0;        
+            for (@SuppressWarnings("unused") JsonNode node : rootNode.path("rows")) {
+                ++rowsFound;
+            }
+            assertEquals(templatesExpected, rowsFound); 
         }
         catch (Exception e){
             ExceptionUtil.throwSystemException(e);   

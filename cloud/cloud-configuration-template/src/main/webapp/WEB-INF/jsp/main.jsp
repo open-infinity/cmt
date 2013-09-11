@@ -39,7 +39,7 @@
     <title>Cloud Template</title>
 </head>
 <body>	
-	<h1> Cloud Template </h1>	
+	<h1> How could a page be so fckd up?</h1>	
 	<table id="templates-grid"> </table>
 	<div id="template-grid-pager"> </div>
 	<div>add</div>
