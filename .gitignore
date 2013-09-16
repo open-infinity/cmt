@@ -13,3 +13,6 @@ target/
 
 # ignore generated logs
 *.log
+
+# ignore Apple metadata
+.DS_Store
