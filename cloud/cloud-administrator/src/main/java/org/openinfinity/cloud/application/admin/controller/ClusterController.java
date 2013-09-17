@@ -26,6 +26,7 @@ import java.util.HashMap;
 
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
+import javax.validation.Valid;
 
 import lombok.NonNull;
 
@@ -375,7 +376,11 @@ public class ClusterController {
 	 */
 		
 	@ResourceMapping("scaleCluster")
-	public void scaleService(ResourceRequest request, ResourceResponse response, @RequestBody ScalingRequest scalingRequest){	
+	public void scaleService(
+			ResourceRequest request,
+			ResourceResponse response,
+			@RequestBody ScalingRequest scalingRequest){
+		
 		Assert.notNull(liferayService.getUser(request, response));
 		ScalingRule scalingRule = (ScalingRule)scalingRequest;
 		int clusterSize = clusterService.getCluster(scalingRule.getClusterId()).getNumberOfMachines();
@@ -474,7 +479,7 @@ public class ClusterController {
 			scalingRuleData.put("scheduledSize", scalingRule.getClusterSizeNew());
 		}
 		catch(Exception e){
-		//	TODO, catch loadByClusterId exceptions, ignore put exceptions
+		//TODO: catch loadByClusterId exceptions, ignore put exceptions
 			e.printStackTrace();
 			scalingRuleData.put("ruleDefined", false);
 		}	

@@ -89,8 +89,6 @@
 		height: 510,
 		buttons: {
 			"Scale cluster": function() {
-				var outData = {};
-				var outJson = {};
 				var clusterId = this.getAttribute("data-cluster");				 
 				var dateFormat = "%e-%b-%Y-%H:%i";
 				var defaultConv = new AnyTime.Converter({format:dateFormat});
@@ -121,7 +119,6 @@
 						'machineCount':				     $("#mb_manual_scale_slider").mbgetVal()
 					};
 					
-					outJson = JSON.stringify(outData);
 					/*
 					outData['cluster'] 						 = clusterId;
 					outData['periodicScalingOn'] 			 = getCheckboxValue($("#automatic_provisioning_checkbox:checked"));
@@ -145,13 +142,18 @@
 				catch(e){
 					console.log("Exception thrown: " + err.message);
 				}
+				console.log("OutData: " + outData);
+				$.postJSON(portletURL.url.cluster.scaleClusterURL, outData);
+			    	
+				
+				/*
 				$.ajax({
 					  type: "POST",
 					  url: portletURL.url.cluster.scaleClusterURL,
 					  data: outJson,
 					  dataType: 'json'
 					});
-				
+				*/
 				//$.post(portletURL.url.cluster.scaleClusterURL, outJson);
 				this.removeAttribute("data-cluster");
 				$(this).dialog("close");
@@ -242,3 +244,20 @@
 	
 	
 })(jQuery);
+
+(function ($) {
+	$.postJSON = function (url, data) {
+		var o = {
+				url: url,
+				type: "POST",
+				dataType: "json",
+				contentType: 'application/json; charset=utf-8'
+		};
+
+		if (data !== undefined) {
+			o.data = JSON.stringify(data);
+		}
+
+		return $.ajax(o);
+	};
+} (jQuery));
