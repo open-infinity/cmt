@@ -11,6 +11,6 @@
         http://www.springframework.org/schema/task
         http://www.springframework.org/schema/task/spring-task-3.0.xsd">
 
-	<context:component-scan base-package="org.openinfinity.cloud.autoscaler.periodicscaler" />
+	<context:component-scan base-package="org.openinfinity.cloud.autoscaler" />
 
 </beans>

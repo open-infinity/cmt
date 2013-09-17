@@ -124,6 +124,10 @@ public class ScalingRuleServiceImpl implements ScalingRuleService {
 	}
 
 	public ScalingRule getRule(int clusterId){
+		ScalingRule r = scalingRuleRepository.getRule(clusterId);
+		LOG.debug("-------------------------------------------");
+		LOG.debug(Integer.toString(r.getClusterSizeOriginal()));
+
         return scalingRuleRepository.getRule(clusterId);
 	}
     

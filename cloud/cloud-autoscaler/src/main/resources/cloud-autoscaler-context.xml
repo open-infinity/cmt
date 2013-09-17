@@ -20,15 +20,15 @@
         classpath:/infrastructure.properties,
         classpath:/EucaCredentials.properties,
         classpath:/healthmonitoring.properties,
-        classpath:autoscaler.properties"/>  
+        classpath:cloud-autoscaler.properties"/>  
         		    
 	<import resource="classpath*:/META-INF/spring/cloud-context-util.xml" />
 	<import resource="classpath*:/META-INF/spring/cloud-context-core.xml" />
 	<import resource="classpath*:/META-INF/spring/cloud-context-repository.xml" />
 	<import resource="classpath*:/META-INF/spring/cloud-context-service.xml" />
-	<import resource="classpath*:/META-INF/spring/periodic-scaler-context.xml" />
-	<import resource="classpath*:/META-INF/spring/scheduled-scaler-context.xml" />
-    	
+	    
+    <context:component-scan base-package="org.openinfinity.cloud.autoscaler" />
+    
 	<bean id="txManager" 
 	    class="org.springframework.jdbc.datasource.DataSourceTransactionManager"
 		p:dataSource-ref="cloudDataSource" /> 	

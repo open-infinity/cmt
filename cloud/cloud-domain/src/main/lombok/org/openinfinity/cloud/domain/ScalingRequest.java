@@ -16,13 +16,8 @@
 
 package org.openinfinity.cloud.domain;
 
-import java.io.Serializable;
-import java.sql.Timestamp;
-
 import lombok.Data;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import lombok.NoArgsConstructor;
 
 import org.openinfinity.core.annotation.NotScript;
 
@@ -36,60 +31,24 @@ import org.openinfinity.core.annotation.NotScript;
  */
 
 @Data
-@NoArgsConstructor
-@RequiredArgsConstructor
-public class ScalingRule implements Serializable {
-	
+public class ScalingRequest extends ScalingRule{
+
 	@NonNull 
 	@NotScript
-	protected int clusterId;
+	private boolean manualScaling;
 		
 	@NonNull 
 	@NotScript
-	protected boolean periodicScalingOn;	
+	private int newSizeManual;	
 	
-	@NonNull
-	@NotScript
-	protected boolean scheduledScalingOn;
-	
-	@NonNull
-	@NotScript
-	protected int scheduledScalingState;
-	
-	@NonNull 
-	@NotScript
-	protected int maxNumberOfMachinesPerCluster;
-	
-	@NonNull 
-	@NotScript
-	protected int minNumberOfMachinesPerCluster;
-	
-	@NonNull 
-	@NotScript
-	protected float maxLoad;
-	
-	@NonNull 
-	@NotScript
-	protected float minLoad;
-		
-	@NonNull
-	@NotScript
-	protected Timestamp periodFrom;
-	
-	@NonNull
-	@NotScript
-	protected Timestamp periodTo;
-	
-	@NonNull
-	@NotScript
-	private int clusterSizeNew; 
-
-	@NonNull
-	@NotScript
-	protected int clusterSizeOriginal; 
-	
-	@NonNull 
-	@NotScript
-	protected int jobId;
-
+	public int putNewSizeInRange(){  
+	    if (newSizeManual < minNumberOfMachinesPerCluster){
+	    	return minNumberOfMachinesPerCluster;
+	    }
+	    else if (newSizeManual > maxNumberOfMachinesPerCluster){
+	    	return maxNumberOfMachinesPerCluster;
+	    }
+	    else return newSizeManual;
+	}
 }
+

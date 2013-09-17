@@ -9,7 +9,6 @@
 		<version>${project.global.version}</version>
 	   	<relativePath>..</relativePath>    	
 	</parent>
-	<groupId>org.openinfinity</groupId>
 	<artifactId>cloud-autoscaler</artifactId>
 	<packaging>jar</packaging>
 	<name>cloud-autoscaler</name>
@@ -18,16 +17,7 @@
       This project project provides analyzes for automated provisioning capabilities for Open Infinity based cloud projects. 
     ]]>
 	</description>
-	<properties>
-		<maven.test.failure.ignore>false</maven.test.failure.ignore>
-	</properties>
 	<profiles>
-		<profile>
-			<id>strict</id>
-			<properties>
-				<maven.test.failure.ignore>false</maven.test.failure.ignore>
-			</properties>
-		</profile>
 		<profile>
 			<id>compiler</id>
 			<activation>

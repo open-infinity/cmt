@@ -17,7 +17,7 @@ public class Autoscaler implements Daemon {
 
     @Override
     public void init(DaemonContext arg0) throws DaemonInitException, Exception {
-        this.spring = new ClassPathXmlApplicationContext("/autoscaler-context.xml");   
+        this.spring = new ClassPathXmlApplicationContext("/META-INF/spring/autoscaler-context.xml");   
     }
 
     @Override

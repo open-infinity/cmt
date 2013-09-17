@@ -90,6 +90,7 @@
 		buttons: {
 			"Scale cluster": function() {
 				var outData = {};
+				var outJson = {};
 				var clusterId = this.getAttribute("data-cluster");				 
 				var dateFormat = "%e-%b-%Y-%H:%i";
 				var defaultConv = new AnyTime.Converter({format:dateFormat});
@@ -98,25 +99,60 @@
 					if(element.val().length > 0) return defaultConv.parse(element.val()).getTime();
 					else return 0;
 				}
-				try {			
-					outData['cluster'] 					= clusterId;
-					outData['machineCount'] 			= $("#mb_manual_scale_slider").mbgetVal();
-					outData['minSize'] 					= $("#jq_cluster_size_range_slider").slider("values", 0);
-					outData['maxSize'] 					= $("#jq_cluster_size_range_slider").slider("values", 1);
-					outData['downscaleThreshold'] 	    = $("#jq_load_thresholds_slider").slider("values", 0);
-					outData['upscaleThreshold'] 		= $("#jq_load_thresholds_slider").slider("values", 1);
-					outData['scalePeriodFrom'] 			= getDateTimePickerValue($("#scale_scheduler_datetime_picker_from"));
-					outData['scalePeriodTo'] 			= getDateTimePickerValue($("#scale_scheduler_datetime_picker_to"));
-					outData['scheduledClusterSize'] 	= $("#mb_scheduled_size_slider").mbgetVal();
-					outData['manualScaling'] 			= getCheckboxValue($("#manual_provisioning_checkbox:checked"));
-					outData['automaticScaling'] 		= getCheckboxValue($("#automatic_provisioning_checkbox:checked"));
-					outData['scheduledScaling'] 		= getCheckboxValue($("#scehduled_scale_checkbox:checked"));
+				try {
+					//JSON.stringify({ "userName": userName, "password" : password })
+					
+					
+					outData = {
+						'cluster':						 clusterId,
+						'periodicScalingOn':			 getCheckboxValue($("#automatic_provisioning_checkbox:checked")),
+						'scheduledScalingOn':			 getCheckboxValue($("#scehduled_scale_checkbox:checked")),
+						'scheduledScalingState':		 1,
+						'maxNumberOfMachinesPerCluster': $("#jq_cluster_size_range_slider").slider("values", 1),
+						'minNumberOfMachinesPerCluster': $("#jq_cluster_size_range_slider").slider("values", 0),
+						'maxLoad':			 			 $("#jq_load_thresholds_slider").slider("values", 1),
+						'minLoad':	    	 			 $("#jq_load_thresholds_slider").slider("values", 0),
+						'periodFrom':				     getDateTimePickerValue($("#scale_scheduler_datetime_picker_from")),
+						'periodTo':				         getDateTimePickerValue($("#scale_scheduler_datetime_picker_to")),
+						'scheduledClusterSize':		     $("#mb_scheduled_size_slider").mbgetVal(),
+						'clusterSizeOriginal':			 -1,
+						'jobId':						 -1,
+						'manualScaling':				 getCheckboxValue($("#manual_provisioning_checkbox:checked")),
+						'machineCount':				     $("#mb_manual_scale_slider").mbgetVal()
+					};
+					
+					outJson = JSON.stringify(outData);
+					/*
+					outData['cluster'] 						 = clusterId;
+					outData['periodicScalingOn'] 			 = getCheckboxValue($("#automatic_provisioning_checkbox:checked"));
+					outData['scheduledScalingOn'] 			 = getCheckboxValue($("#scehduled_scale_checkbox:checked"));
+					outData['scheduledScalingState'] 		 = 1;
+					outData['maxNumberOfMachinesPerCluster'] = $("#jq_cluster_size_range_slider").slider("values", 1);
+					outData['minNumberOfMachinesPerCluster'] = $("#jq_cluster_size_range_slider").slider("values", 0);
+					outData['maxLoad'] 			 			 = $("#jq_load_thresholds_slider").slider("values", 1);
+					outData['minLoad'] 	    	 			 = $("#jq_load_thresholds_slider").slider("values", 0);
+					outData['periodFrom'] 				     = getDateTimePickerValue($("#scale_scheduler_datetime_picker_from"));
+					outData['periodTo'] 				     = getDateTimePickerValue($("#scale_scheduler_datetime_picker_to"));
+					outData['scheduledClusterSize'] 		 = $("#mb_scheduled_size_slider").mbgetVal();
+					outData['clusterSizeOriginal'] 			 = -1;
+					outData['jobId'] 						 = -1;
+
+					outData['manualScaling'] 				 = getCheckboxValue($("#manual_provisioning_checkbox:checked"));
+					outData['machineCount'] 				 = $("#mb_manual_scale_slider").mbgetVal();
+					*/
+
 				}
 				catch(e){
 					console.log("Exception thrown: " + err.message);
 				}
+				$.ajax({
+					  type: "POST",
+					  url: portletURL.url.cluster.scaleClusterURL,
+					  data: outJson,
+					  dataType: 'json'
+					});
 				
-				$.post(portletURL.url.cluster.scaleClusterURL, outData);
+				//$.post(portletURL.url.cluster.scaleClusterURL, outJson);
 				this.removeAttribute("data-cluster");
 				$(this).dialog("close");
 			},
