@@ -92,38 +92,16 @@
 				var clusterId = this.getAttribute("data-cluster");				 
 				var dateFormat = "%e-%b-%Y-%H:%i";
 				var defaultConv = new AnyTime.Converter({format:dateFormat});
+				var outData = {};
 				
 				function getDateTimePickerValue (element) {
 					if(element.val().length > 0) return defaultConv.parse(element.val()).getTime();
 					else return 0;
 				}
 				try {
-					//JSON.stringify({ "userName": userName, "password" : password })
-					
-					
-					outData = {
-						'cluster':						 clusterId,
-						'periodicScalingOn':			 getCheckboxValue($("#automatic_provisioning_checkbox:checked")),
-						'scheduledScalingOn':			 getCheckboxValue($("#scehduled_scale_checkbox:checked")),
-						'scheduledScalingState':		 1,
-						'maxNumberOfMachinesPerCluster': $("#jq_cluster_size_range_slider").slider("values", 1),
-						'minNumberOfMachinesPerCluster': $("#jq_cluster_size_range_slider").slider("values", 0),
-						'maxLoad':			 			 $("#jq_load_thresholds_slider").slider("values", 1),
-						'minLoad':	    	 			 $("#jq_load_thresholds_slider").slider("values", 0),
-						'periodFrom':				     getDateTimePickerValue($("#scale_scheduler_datetime_picker_from")),
-						'periodTo':				         getDateTimePickerValue($("#scale_scheduler_datetime_picker_to")),
-						'scheduledClusterSize':		     $("#mb_scheduled_size_slider").mbgetVal(),
-						'clusterSizeOriginal':			 -1,
-						'jobId':						 -1,
-						'manualScaling':				 getCheckboxValue($("#manual_provisioning_checkbox:checked")),
-						'machineCount':				     $("#mb_manual_scale_slider").mbgetVal()
-					};
-					
-					/*
 					outData['cluster'] 						 = clusterId;
 					outData['periodicScalingOn'] 			 = getCheckboxValue($("#automatic_provisioning_checkbox:checked"));
 					outData['scheduledScalingOn'] 			 = getCheckboxValue($("#scehduled_scale_checkbox:checked"));
-					outData['scheduledScalingState'] 		 = 1;
 					outData['maxNumberOfMachinesPerCluster'] = $("#jq_cluster_size_range_slider").slider("values", 1);
 					outData['minNumberOfMachinesPerCluster'] = $("#jq_cluster_size_range_slider").slider("values", 0);
 					outData['maxLoad'] 			 			 = $("#jq_load_thresholds_slider").slider("values", 1);
@@ -131,30 +109,13 @@
 					outData['periodFrom'] 				     = getDateTimePickerValue($("#scale_scheduler_datetime_picker_from"));
 					outData['periodTo'] 				     = getDateTimePickerValue($("#scale_scheduler_datetime_picker_to"));
 					outData['scheduledClusterSize'] 		 = $("#mb_scheduled_size_slider").mbgetVal();
-					outData['clusterSizeOriginal'] 			 = -1;
-					outData['jobId'] 						 = -1;
-
 					outData['manualScaling'] 				 = getCheckboxValue($("#manual_provisioning_checkbox:checked"));
-					outData['machineCount'] 				 = $("#mb_manual_scale_slider").mbgetVal();
-					*/
-
+					outData['manualScalingNewSize'] 		 = $("#mb_manual_scale_slider").mbgetVal();
 				}
-				catch(e){
+				catch(err){
 					console.log("Exception thrown: " + err.message);
 				}
-				console.log("OutData: " + outData);
-				$.postJSON(portletURL.url.cluster.scaleClusterURL, outData);
-			    	
-				
-				/*
-				$.ajax({
-					  type: "POST",
-					  url: portletURL.url.cluster.scaleClusterURL,
-					  data: outJson,
-					  dataType: 'json'
-					});
-				*/
-				//$.post(portletURL.url.cluster.scaleClusterURL, outJson);
+				$.post(portletURL.url.cluster.scaleClusterURL, outData);
 				this.removeAttribute("data-cluster");
 				$(this).dialog("close");
 			},
@@ -244,20 +205,3 @@
 	
 	
 })(jQuery);
-
-(function ($) {
-	$.postJSON = function (url, data) {
-		var o = {
-				url: url,
-				type: "POST",
-				dataType: "json",
-				contentType: 'application/json; charset=utf-8'
-		};
-
-		if (data !== undefined) {
-			o.data = JSON.stringify(data);
-		}
-
-		return $.ajax(o);
-	};
-} (jQuery));

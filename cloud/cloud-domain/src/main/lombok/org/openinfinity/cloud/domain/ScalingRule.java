@@ -42,43 +42,43 @@ public class ScalingRule implements Serializable {
 	
 	@NonNull 
 	@NotScript
-	protected int clusterId;
+	private int clusterId;
 		
 	@NonNull 
 	@NotScript
-	protected boolean periodicScalingOn;	
+	private boolean periodicScalingOn;	
 	
 	@NonNull
 	@NotScript
-	protected boolean scheduledScalingOn;
+	private boolean scheduledScalingOn;
 	
 	@NonNull
 	@NotScript
-	protected int scheduledScalingState;
+	private int scheduledScalingState;
 	
 	@NonNull 
 	@NotScript
-	protected int maxNumberOfMachinesPerCluster;
+	private int maxNumberOfMachinesPerCluster;
 	
 	@NonNull 
 	@NotScript
-	protected int minNumberOfMachinesPerCluster;
+	private int minNumberOfMachinesPerCluster;
 	
 	@NonNull 
 	@NotScript
-	protected float maxLoad;
+	private float maxLoad;
 	
 	@NonNull 
 	@NotScript
-	protected float minLoad;
+	private float minLoad;
 		
 	@NonNull
 	@NotScript
-	protected Timestamp periodFrom;
+	private Timestamp periodFrom;
 	
 	@NonNull
 	@NotScript
-	protected Timestamp periodTo;
+	private Timestamp periodTo;
 	
 	@NonNull
 	@NotScript
@@ -86,10 +86,9 @@ public class ScalingRule implements Serializable {
 
 	@NonNull
 	@NotScript
-	protected int clusterSizeOriginal; 
+	private int clusterSizeOriginal; 
 	
 	@NonNull 
 	@NotScript
-	protected int jobId;
-
+	private int jobId;
 }

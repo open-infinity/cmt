@@ -339,7 +339,7 @@ var instanceManager = {
 		
 		
 		updateInstanceClusters: function (instanceId) {
-			var url = portletURL.url.cluster.availableClustersURL + "&instanceId="+instanceId+"&rnd="+Math.random();
+			var url = portletURL.url.cluster.availableClustersURL + "&instanceId="+instanceId;
 			
 			$.getJSON(url, function(data) {
 				$.each(data, function(key,val) {
@@ -639,9 +639,9 @@ var instanceManager = {
 			});							
 			o.jqClusterSizeRangeSlider.slider({
 				range: true,
-				min: 0,
-				max: 20,
-				values: [ 15, 60 ],
+				min: clusterData.clusterMinSize,
+				max: clusterData.clusterMaxSize,
+				values: [ clusterData.clusterMinSize +1 , clusterData.clusterMinSize -1],
 				slide: function( event, ui) {
 					o.clusterSizeRange.text(setRangeText(ui));
 				}
