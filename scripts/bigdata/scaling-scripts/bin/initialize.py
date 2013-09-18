@@ -64,7 +64,8 @@ out = OutputWriter(options)
 
 # Initialize HBase
 if cluster_type == "hbase":
-    hbase.initialize_directories(out, options)
+    hbase.initialize_directories(out, options, hbase=False) # TODO: pois
+    #TODO: hbase.initialize_directories(out, options)
 elif cluster_type == "hadoop":
     hbase.initialize_directories(out, options, hbase=False)
 elif cluster_type == "mongodb":

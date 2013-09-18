@@ -336,7 +336,6 @@ class Node(object):
                         etc_hosts = '\n'.join(c) + '\n' + BIGDATA_BEGIN_LINE + '\n' + gen_content + BIGDATA_END_LINE + '\n'
 
                     # Write file
-                    out.debug(etc_hosts)                
                     rssh.send_file_to(etc_hosts, "/etc/hosts", 0o0644)
                 finally:
                     rssh.disconnect()

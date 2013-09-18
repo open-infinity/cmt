@@ -276,7 +276,28 @@ class HBaseNode(Node):
                     ssh.install(rpms)
                     rpms_list.push(rpms)
                 elif self.role == "hive":
-                    pass # TODO
+                    # Install RPM packages
+                    if self.type == 'hbase':
+                        rpms = [
+                                    'hive',
+                                    'hive-hbase',
+                                    'hive-metastore',
+                                    'hive-server2',
+                                    'MariaDB-server',
+                                    'MariaDB-client',
+                                    'mysql-connector-java',
+                        ]
+                    else:
+                        rpms = [
+                                    'hive',
+                                    'hive-metastore',
+                                    'hive-server2',
+                                    'MariaDB-server',
+                                    'MariaDB-client',
+                                    'mysql-connector-java',
+                        ]
+                    ssh.install(rpms)
+                    rpms_list.push(rpms)
                 else:
                     raise "Unknown role: %s" % (self.role)
 
@@ -284,6 +305,7 @@ class HBaseNode(Node):
             hbase_homedir = ssh.get_homedir_of('hbase')
             hdfs_homedir = ssh.get_homedir_of('hdfs')
             zookeeper_homedir = ssh.get_homedir_of('zookeeper')
+            hive_homedir = ssh.get_homedir_of('hive')
 
             # Ensure that update-alternatives configuration is correct
             if self.role in ['hmaster', 'slave']:
@@ -446,7 +468,14 @@ class HBaseNode(Node):
                 else:
                     out.info("Not starting slave services before HMaster")
             elif self.role == "hive":
-                pass # TODO
+                # Initialize the service
+                self.config_description = 'starting services'
+                
+                # Start the service
+                out.info("Starting services in Hive")
+                ssh.execute("service mysql restart");
+                ssh.execute("service hive-metastore restart");
+                ssh.execute("service hive-server2 restart");
             else:
                 raise "Unknown role: %s" % (self.role)
 
@@ -686,7 +715,12 @@ class HBaseNode(Node):
                 out.info("  datanode...")
                 ssh.execute("service hadoop-hdfs-datanode stop", raise_on_non_zero=ronz);                    
             elif self.role == "hive":
-                out.warn("  hive stop not implemented")
+                out.info("  HiveServer2...")
+                ssh.execute("service hive-server2 stop");
+                out.info("  Hive Metastore...")
+                ssh.execute("service hive-metastore stop");
+                out.info("  MariaDB...")
+                ssh.execute("service mysql stop");
             
             # Read list of RPMs installed
             rpm_list = RpmList(self)
@@ -928,7 +962,6 @@ def make_template_params(cc):
         zkcfg += "server.%d=%s:2888:3888\n" % (i, zk.hostname)
     template_params["ZOOKEEPER_HOSTNAMES_COMMA_SEPERATED"] = ','.join(zknames)
     template_params["ZOOKEEPER_CFG"] = zkcfg
-    
 
     # Template params for Slaves
     slavenames = []
@@ -943,6 +976,13 @@ def make_template_params(cc):
         slavenames.append(sl.hostname)
     #template_params["REGIONSERVER_HOSTNAMES_COMMA_SEPERATED"] = ','.join(slavenames)
     template_params["REGIONSERVERS_HOSTNAMES_BY_LINE"] = '\n'.join(slavenames) + '\n'
+
+    # Templave params for Hive
+    template_params["HIVE_DATABASE_ROOT_PASSWORD"] = hive_database_root_password
+    template_params["HIVE_DATABASE_USER"]          = hive_database_user
+    template_params["HIVE_DATABASE_USER_PASSWORD"] = hive_database_user_password
+    for hive in cc.hives:
+        template_params["METASTORE_HOSTNAME"]      = hive.hostname # TODO: this doesn't work, if there are many hives
 
     return template_params
 

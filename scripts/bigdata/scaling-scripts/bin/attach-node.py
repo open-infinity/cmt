@@ -64,7 +64,7 @@ parser.add_option("--dns", dest="dns",
                   action="store_true", default=False,
                   help="don't modify /etc/host files but trust in DNS", metavar="DNS")
 parser.add_option("--role", dest="role", 
-                  help="manually assign the given role to the node", metavar="DNS")
+                  help="manually assign the given role to the node", metavar="ROLE")
 parser.add_option("--no-rpms", dest="rpms",
                   action="store_false", default=True,
                   help="don't install RPM packages", metavar="RPMS")
