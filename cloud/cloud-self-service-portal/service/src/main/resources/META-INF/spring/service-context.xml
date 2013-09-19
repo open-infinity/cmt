@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/mvc"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
+
+	<beans:import resource="classpath*:META-INF/spring/mongo-repository-context.xml"/> 
+
+	<beans:bean
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<beans:property name="locations">
+			<beans:list>
+				<beans:value>
+					classpath*:/META-INF/properties/logging.properties
+				</beans:value>
+				<beans:value>
+					classpath*:/META-INF/properties/repository.properties
+				</beans:value>
+			</beans:list>
+		</beans:property>
+		<beans:property name="ignoreUnresolvablePlaceholders"
+			value="true" />
+	</beans:bean>
+
+	<aop:aspectj-autoproxy>
+		<aop:include name="logAspect" />
+		<aop:include name="auditTrailAspect" />
+		<aop:include name="exceptionTranslatorAspect" />
+	</aop:aspectj-autoproxy>
+
+	<beans:bean id="exceptionTranslatorAspect"
+		class="ssp.core.aspect.ExceptionTranslatorAspect" />
+
+	<beans:bean id="auditTrailAspect"
+		class="ssp.core.aspect.AuditTrailAspect" />
+
+	<beans:bean id="logAspect" class="ssp.core.aspect.LogAspect">
+		<beans:property name="defaultLogLevel" value="${logging.level}" />
+	</beans:bean>
+
+	<beans:bean id="log4jInitialization"
+		class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+		<beans:property name="targetClass" value="org.springframework.util.Log4jConfigurer" />
+		<beans:property name="targetMethod" value="initLogging" />
+		<beans:property name="arguments">
+			<beans:list>
+				<beans:value>classpath:log4j.xml</beans:value>
+			</beans:list>
+		</beans:property>
+	</beans:bean>
+	
+	<beans:bean id="validator"
+		class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean">
+		<beans:property name="validationMessageSource" ref="messageSource" />
+	</beans:bean>
+
+</beans:beans>
