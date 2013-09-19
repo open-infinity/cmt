@@ -1,8 +1,8 @@
-class oibas::service {
+class oi3-bas::service {
 	service {"oi-tomcat":
 		ensure => running,
 		hasrestart => true,
 		enable => true,
-		require => Class["oibas::config"],
+		require => Class["oi3-bas::config"],
 	}
 }

@@ -1,7 +1,7 @@
-class oilttwatch::install {
-    package { ["oi-ltt-watch"]:
+class oi3-lttwatch::install {
+    package { ["oi3-lttwatch"]:
         ensure => installed,
-        require => Class["oilttwatch::preconfig"],
+        require => Class["oi3-lttwatch::preconfig"],
     }
 }
 

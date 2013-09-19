@@ -1,53 +1,53 @@
-class oibas::config {
+class oi3-bas::config {
 	exec {"set-privileges":
                 command => "/bin/chown -R oiuser:oiuser /opt/openinfinity/3.0.0",
-                require => Class["oibas::install"],
+                require => Class["oi3-bas::install"],
         }
 
-	file {"/opt/openinfinity/2.0.0/tomcat/bin/setenv.sh":
+	file {"/opt/openinfinity/3.0.0/tomcat/bin/setenv.sh":
                 ensure => present,
                 owner => 'oiuser',
                 group => 'oiuser',
                 mode => 0755,
-                source => "puppet:///modules/oibas/setenv.sh",
+                source => "puppet:///modules/oi3-bas/setenv.sh",
                 require => Class["oibas::install"],
         }
 
-	file {"/opt/openinfinity/2.0.0/tomcat/conf/catalina.properties":
+	file {"/opt/openinfinity/3.0.0/tomcat/conf/catalina.properties":
 		ensure => present,
 		owner => 'oiuser',
 		group => 'oiuser',
 		mode => 0600,
-		source => "puppet:///modules/oibas/catalina.properties",
-		require => Class["oibas::install"],
+		source => "puppet:///modules/oi3-bas/catalina.properties",
+		require => Class["oi3-bas::install"],
 		notify => Service["oi-tomcat"],
 	}
 
-	file {"/opt/openinfinity/2.0.0/tomcat/conf/server.xml":
+	file {"/opt/openinfinity/3.0.0/tomcat/conf/server.xml":
 		ensure => present,
 		owner => 'oiuser',
 		group => 'oiuser',
 		mode => 0600,
-		source => "puppet:///modules/oibas/server_7.0.27.xml",
-		require => Class["oibas::install"],
+		source => "puppet:///modules/oi3-bas/server.xml",
+		require => Class["oi3-bas::install"],
 	}
 
-	file {"/opt/openinfinity/2.0.0/tomcat/conf/context.xml":
+	file {"/opt/openinfinity/3.0.0/tomcat/conf/context.xml":
 		ensure => present,
 		owner => 'oiuser',
 		group => 'oiuser',
 		mode => 0600,
-		source => "puppet:///modules/oibas/context.xml",
-		require => Class["oibas::install"],
+		source => "puppet:///modules/oi3-bas/context.xml",
+		require => Class["oi3-bas::install"],
 	}
 
-	file {"/opt/openinfinity/2.0.0/tomcat/conf/hazelcast.xml":
+	file {"/opt/openinfinity/3.0.0/tomcat/conf/hazelcast.xml":
 		ensure => present,
 		owner => 'oiuser',
 		group => 'oiuser',
 		mode => 0600,
-		content => template("oibas/hazelcast.xml.erb"),
-		require => Class["oibas::install"],
+		content => template("oi3-bas/hazelcast.xml.erb"),
+		require => Class["oi3-bas::install"],
 	}
 
 	file {"/etc/init.d/oi-tomcat":
@@ -55,8 +55,8 @@ class oibas::config {
                 owner => 'root',
                 group => 'root',
                 mode => 0755,
-                source => "puppet:///modules/oibas/oi-tomcat",
-                require => Class["oibas::install"],
+                source => "puppet:///modules/oi3-bas/oi-tomcat",
+                require => Class["oi3-bas::install"],
     }
 
     # Try ensure, that the supported Java is chosen
