@@ -42,5 +42,5 @@ if [ $? -eq 0 ] ; then
 fi
 
 rm -fR [[MONGO_DBPATH]]/*
-rm -fR /var/log/mongo/*
+#rm -fR [[MONGO_LOGPATH]]/mongo*
 

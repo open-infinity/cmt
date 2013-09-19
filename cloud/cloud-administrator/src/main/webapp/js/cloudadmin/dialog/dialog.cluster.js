@@ -89,33 +89,32 @@
 		height: 510,
 		buttons: {
 			"Scale cluster": function() {
-				var outData = {};
 				var clusterId = this.getAttribute("data-cluster");				 
 				var dateFormat = "%e-%b-%Y-%H:%i";
 				var defaultConv = new AnyTime.Converter({format:dateFormat});
+				var outData = {};
 				
 				function getDateTimePickerValue (element) {
 					if(element.val().length > 0) return defaultConv.parse(element.val()).getTime();
 					else return 0;
 				}
-				try {			
-					outData['cluster'] 					= clusterId;
-					outData['machineCount'] 			= $("#mb_manual_scale_slider").mbgetVal();
-					outData['minSize'] 					= $("#jq_cluster_size_range_slider").slider("values", 0);
-					outData['maxSize'] 					= $("#jq_cluster_size_range_slider").slider("values", 1);
-					outData['downscaleThreshold'] 	    = $("#jq_load_thresholds_slider").slider("values", 0);
-					outData['upscaleThreshold'] 		= $("#jq_load_thresholds_slider").slider("values", 1);
-					outData['scalePeriodFrom'] 			= getDateTimePickerValue($("#scale_scheduler_datetime_picker_from"));
-					outData['scalePeriodTo'] 			= getDateTimePickerValue($("#scale_scheduler_datetime_picker_to"));
-					outData['scheduledClusterSize'] 	= $("#mb_scheduled_size_slider").mbgetVal();
-					outData['manualScaling'] 			= getCheckboxValue($("#manual_provisioning_checkbox:checked"));
-					outData['automaticScaling'] 		= getCheckboxValue($("#automatic_provisioning_checkbox:checked"));
-					outData['scheduledScaling'] 		= getCheckboxValue($("#scehduled_scale_checkbox:checked"));
+				try {
+					outData['cluster'] 						 = clusterId;
+					outData['periodicScalingOn'] 			 = getCheckboxValue($("#automatic_provisioning_checkbox:checked"));
+					outData['scheduledScalingOn'] 			 = getCheckboxValue($("#scehduled_scale_checkbox:checked"));
+					outData['maxNumberOfMachinesPerCluster'] = $("#jq_cluster_size_range_slider").slider("values", 1);
+					outData['minNumberOfMachinesPerCluster'] = $("#jq_cluster_size_range_slider").slider("values", 0);
+					outData['maxLoad'] 			 			 = $("#jq_load_thresholds_slider").slider("values", 1);
+					outData['minLoad'] 	    	 			 = $("#jq_load_thresholds_slider").slider("values", 0);
+					outData['periodFrom'] 				     = getDateTimePickerValue($("#scale_scheduler_datetime_picker_from"));
+					outData['periodTo'] 				     = getDateTimePickerValue($("#scale_scheduler_datetime_picker_to"));
+					outData['scheduledClusterSize'] 		 = $("#mb_scheduled_size_slider").mbgetVal();
+					outData['manualScaling'] 				 = getCheckboxValue($("#manual_provisioning_checkbox:checked"));
+					outData['manualScalingNewSize'] 		 = $("#mb_manual_scale_slider").mbgetVal();
 				}
-				catch(e){
+				catch(err){
 					console.log("Exception thrown: " + err.message);
 				}
-				
 				$.post(portletURL.url.cluster.scaleClusterURL, outData);
 				this.removeAttribute("data-cluster");
 				$(this).dialog("close");

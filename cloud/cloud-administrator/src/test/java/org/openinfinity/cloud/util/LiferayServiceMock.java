@@ -4,7 +4,11 @@ import com.liferay.portal.model.User;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.ResourceResponse;
+
+import org.openinfinity.cloud.service.liferay.LiferayService;
+
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -44,6 +48,12 @@ public class LiferayServiceMock implements LiferayService {
     @Override
     public List<String> getOrganizationNames(User user) {
         return userOrgs;
+    }
+
+    @Override
+    public List<Long> getOrganizationIds(User user) {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 

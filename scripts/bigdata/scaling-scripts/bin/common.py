@@ -269,24 +269,6 @@ class Node(object):
         else:
             out.warn("Warning: couldn't check validity of the hostname")
 
-    # Regenerate host files of all the managed nodes
-    def regenerate_etc_hosts_files(self, cc, out):
-        if not cc.options.dns:
-            out.info("Regenerating /etc/hosts files of all nodes")
-            etc_hosts = "127.0.0.1\tlocalhost localhost.localdomain\n\n"
-            etc_hosts += "\n"
-            etc_hosts += generate_etc_hosts_content(cc)
-            etc_hosts += "\n"
-            for node in cc.get_everything():
-                out.debug("  %s" % node.hostname)
-                rssh = SSHConnection(node.ip_address, out)
-                try:
-                    rssh.connect()
-                    rssh.send_file_to(etc_hosts, "/etc/hosts", 0o0644)
-                finally:
-                    rssh.disconnect()
-                    rssh = None
-
     # Check if there is an installation in the node already
     def check_possible_big_data_installation(self, cc, out, ssh):
         try:
@@ -318,6 +300,63 @@ class Node(object):
             ssh.send_file_to(sio.getvalue(), "/etc/bigdata")
         finally:
             pass
+
+    # Regenerate host files of all the managed nodes
+    def regenerate_etc_hosts_files(self, cc, out):
+        if not cc.options.dns:
+            BIGDATA_BEGIN_LINE = "# Bigdata begin -----------------------------------------------"
+            BIGDATA_END_LINE   = "# Bigdata end -------------------------------------------------"
+            
+            out.info("Regenerating /etc/hosts files of all nodes")
+            gen_content = generate_etc_hosts_content(cc)
+            for node in cc.get_everything():
+                out.debug("  %s" % node.hostname)
+                rssh = SSHConnection(node.ip_address, out)
+                try:
+                    rssh.connect()
+
+                    # Read the file                    
+                    etc_hosts = rssh.receive_file_from("/etc/hosts", "")
+                    etc_hosts_splitted = etc_hosts.split('\n')
+
+                    # Remove node's IP address line(s)
+                    for line in etc_hosts_splitted:
+                        if node.ip_address in line.split(' '):
+                            etc_hosts_splitted.remove(line)
+                            break
+
+                    # Generate dedicated block in the file                    
+                    if (BIGDATA_BEGIN_LINE in etc_hosts_splitted) and (BIGDATA_END_LINE in etc_hosts_splitted):
+                        a = etc_hosts_splitted.index(BIGDATA_BEGIN_LINE)
+                        b = etc_hosts_splitted.index(BIGDATA_END_LINE)
+                        c = etc_hosts_splitted[:(a + 1)] + [gen_content] + etc_hosts_splitted[b:]
+                        etc_hosts = '\n'.join(c)
+                    else:
+                        c = etc_hosts_splitted
+                        etc_hosts = '\n'.join(c) + '\n' + BIGDATA_BEGIN_LINE + '\n' + gen_content + BIGDATA_END_LINE + '\n'
+
+                    # Write file
+                    rssh.send_file_to(etc_hosts, "/etc/hosts", 0o0644)
+                finally:
+                    rssh.disconnect()
+                    rssh = None
+            
+
+#            # ---- OLD ----            
+#            etc_hosts = "127.0.0.1\tlocalhost localhost.localdomain\n\n"
+#            etc_hosts += "\n"
+#            etc_hosts += generate_etc_hosts_content(cc)
+#            etc_hosts += "\n"
+#            for node in cc.get_everything():
+#                out.debug("  %s" % node.hostname)
+#                rssh = SSHConnection(node.ip_address, out)
+#                try:
+#                    rssh.connect()
+#                    rssh.send_file_to(etc_hosts, "/etc/hosts", 0o0644)
+#                finally:
+#                    rssh.disconnect()
+#                    rssh = None
+
 
 # Returns content to be added to /etc/hosts files (both local and remote)
 def generate_etc_hosts_content(cc, new_hostname = None, new_ip_address = None):

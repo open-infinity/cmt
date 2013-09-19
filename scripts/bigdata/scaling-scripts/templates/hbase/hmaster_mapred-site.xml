@@ -13,6 +13,6 @@
     </property>
     <property>
         <name>mapred.local.dir</name>
-        <value>/data/1/mapred/local,/data/2/mapred/local,/data/3/mapred/local</value>
+        <value>[[DATABASE_DIR]]/1/mapred/local,[[DATABASE_DIR]]/2/mapred/local,[[DATABASE_DIR]]/3/mapred/local</value>
     </property>
 </configuration>

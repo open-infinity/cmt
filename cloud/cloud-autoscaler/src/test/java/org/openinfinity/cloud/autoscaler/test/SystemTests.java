@@ -20,8 +20,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.net.URL;
 import java.sql.Timestamp;
+
 import javax.sql.DataSource;
+
 import junit.framework.Assert;
+
+import org.apache.log4j.Logger;
 import org.dbunit.database.DatabaseDataSourceConnection;
 import org.dbunit.database.IDatabaseConnection;
 import org.dbunit.dataset.IDataSet;
@@ -41,6 +45,7 @@ import org.openinfinity.cloud.domain.ScalingRule;
 import org.openinfinity.cloud.service.administrator.ClusterService;
 import org.openinfinity.cloud.service.administrator.JobService;
 import org.openinfinity.cloud.service.scaling.ScalingRuleService;
+import org.openinfinity.cloud.service.scaling.ScalingRuleServiceImpl;
 
 /**
  * Batch configuration integration tests.
@@ -50,9 +55,11 @@ import org.openinfinity.cloud.service.scaling.ScalingRuleService;
  * @since 1.0.0
  */
 
-@ContextConfiguration(locations={"classpath*:test-autoscaler-context.xml"})
+@ContextConfiguration(locations={"classpath*:META-INF/spring/cloud-autoscaler-test-context.xml"})
 @RunWith(SpringJUnit4ClassRunner.class)
 public class SystemTests {
+	private static final Logger LOG = Logger.getLogger(SystemTests.class.getName());
+
 	@Autowired
 	@Qualifier("cloudDataSource")
 	DataSource dataSource;
@@ -85,8 +92,8 @@ public class SystemTests {
 	    Timestamp to = new Timestamp(now + 7200 );
 		ReplacementDataSet dataSet = null;
 		
-		try{
-			URL resourceLocation = Object.class.getResource("/dataset-init-scale-out.xml");
+		try{		
+			URL resourceLocation = this.getClass().getClassLoader().getResource("META-INF/sql/dataset-init-scale-out.xml");
 	        dataSet = new ReplacementDataSet(new FlatXmlDataSetBuilder().
 	            build(new FileInputStream(new File(resourceLocation.toURI())))); 
 	        dataSet.addReplacementObject("[from]", from);
@@ -97,21 +104,7 @@ public class SystemTests {
 		}
         return dataSet;
     }
-	
-	protected IDataSet addMachineDataSet() throws Exception
-    {
-	    IDataSet dataSet = null;   
-        try{
-            DataFileLoader loader = new FlatXmlDataFileLoader();
-            dataSet = loader.load("/dataset-machine.xml");
-        }
-        catch (Exception e){
-            e.printStackTrace();
-        }
-        return dataSet;
-    }
-	
-	
+		
 	public void updateTestDatabase(IDataSet dataSet){
 		try {
 			IDatabaseConnection dbConn = new DatabaseDataSourceConnection(dataSource);
@@ -136,6 +129,9 @@ public class SystemTests {
 			updateTestDatabase(initDataSet());
 				  
 			// Test
+			
+			LOG.debug("--------START---------------------------------");
+			
 			Thread.sleep(3000);
 			ScalingRule scalingRule = scalingRuleService.getRule(CLUSTER_ID);
 			Assert.assertEquals(2, scalingRule.getClusterSizeOriginal());
@@ -143,6 +139,11 @@ public class SystemTests {
 			Assert.assertEquals("1,5", jobService.getJob(JOB_ID).getServices());
 			
 			Thread.sleep(5000);
+			scalingRule = scalingRuleService.getRule(CLUSTER_ID);
+			LOG.debug("-----------------------------------------");
+			LOG.debug(Integer.toString(scalingRule.getClusterSizeOriginal()));
+			LOG.debug(Integer.toString(scalingRule.getScheduledScalingState()));
+
 			Assert.assertEquals(0, scalingRuleService.getRule(CLUSTER_ID).getScheduledScalingState());
             Assert.assertEquals("1,2", jobService.getJob(JOB_ID + 1).getServices());  
 		}

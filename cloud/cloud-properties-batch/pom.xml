@@ -13,11 +13,6 @@
       This module provides business application configuration deployed to all cluster members. 
     ]]>
 	</description>
-	<properties>
-		<maven.test.failure.ignore>true</maven.test.failure.ignore>
-		<spring.framework.version>3.1.1.RELEASE</spring.framework.version>
-		<spring.batch.version>2.1.8.RELEASE</spring.batch.version>
-	</properties>
 	<profiles>
 		<profile>
 			<id>strict</id>
@@ -68,7 +63,7 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-test</artifactId>
-			<version>${spring.framework.version}</version>
+			<version>${springframework.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -79,17 +74,17 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-jdbc</artifactId>
-			<version>${spring.framework.version}</version>
+			<version>${springframework.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-tx</artifactId>
-			<version>${spring.framework.version}</version>
+			<version>${springframework.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context</artifactId>
-			<version>${spring.framework.version}</version>
+			<version>${springframework.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>cglib</groupId>
@@ -99,7 +94,7 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-aop</artifactId>
-			<version>${spring.framework.version}</version>
+			<version>${springframework.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.batch</groupId>

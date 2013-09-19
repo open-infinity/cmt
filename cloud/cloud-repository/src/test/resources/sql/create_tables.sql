@@ -201,6 +201,9 @@ CREATE TABLE `machine_type_tbl` (
   `id` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
   `spec` varchar(255) NOT NULL,
+  `cores` int(11) DEFAULT NULL,
+  `ram` int(11) DEFAULT NULL,
+  `disk` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -288,3 +291,21 @@ CREATE TABLE `properties_tbl` (
   `changed_last_update` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP  ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `configuration_template_tbl`;
+
+CREATE TABLE `configuration_template_tbl` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(30) NOT NULL,
+  `description` varchar(256),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `configuration_template_organization_tbl`;
+
+CREATE TABLE `configuration_template_organization_tbl` (
+  `organization_id`bigint(20) NOT NULL AUTO_INCREMENT,
+  `template_id` int(11) NOT NULL,
+  PRIMARY KEY (`organization_id`),
+  CONSTRAINT fk_configuration_template FOREIGN KEY (template_id) REFERENCES configuration_template_tbl(id)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;

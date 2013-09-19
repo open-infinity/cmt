@@ -4,7 +4,7 @@
 . /etc/rc.d/init.d/functions
 
 PIDFILE="/var/lib/mongo/mongos.pid"
-OPTIONS=" --port 27017 --configdb [[CONFIG_SERVERS_SEPARATED_BY_COMMA]] --fork --pidfilepath $PIDFILE --logpath /var/log/mongo/mongos.log  --logappend"
+OPTIONS=" --port 27017 --configdb [[CONFIG_SERVERS_SEPARATED_BY_COMMA]] --fork --pidfilepath $PIDFILE --logpath [[MONGO_LOGPATH]]/mongos.log  --logappend"
 mongos=/usr/bin/mongos
 
 MONGO_USER=mongod

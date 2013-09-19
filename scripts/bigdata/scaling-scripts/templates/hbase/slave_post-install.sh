@@ -26,26 +26,66 @@
 # @since 1.0.0
 #
 
-echo "Creating directories"
+export DATADIR=[[DATABASE_DIR]]
 
-mkdir -p /data/1/dfs/dn /data/2/dfs/dn /data/3/dfs/dn ; mkdir -p /data/1/dfs/dn /data/2/dfs/dn /data/3/dfs/dn 
-chown -R hdfs:hadoop /data/1/dfs/dn /data/2/dfs/dn /data/3/dfs/dn
+echo "Creating log directories"
+if [ "[[CLUSTER_TYPE]]" -eq "hbase" ] ; then
+    groupmems -g hadoop -a hbase
+fi
+mkdir -p [[LOG_DIR]]
+chown hdfs [[LOG_DIR]]
+chown hdfs [[LOG_DIR]]
+chmod g+rwx [[LOG_DIR]]
 
-mkdir -p /data/1/mapred/local /data/2/mapred/local /data/3/mapred/local /data/4/mapred/local; 
-chown -R mapred:hadoop /data/1/mapred/local /data/2/mapred/local /data/3/mapred/local /data/4/mapred/local
+if [ "[[CLUSTER_TYPE]]" -eq "hbase" ] ; then
+    mkdir [[LOG_DIR]]/hbase
+    chown hdfs [[LOG_DIR]]/hbase
+    chgrp hadoop [[LOG_DIR]]/hbase
+    chmod 0775 [[LOG_DIR]]/hbase
+    rm -fR /var/log/hbase
+    ln -s [[LOG_DIR]]/hbase /var/log/hbase
+fi
+
+mkdir [[LOG_DIR]]/hadoop-0.20-mapreduce
+chown mapred [[LOG_DIR]]/hadoop-0.20-mapreduce
+chgrp hadoop [[LOG_DIR]]/hadoop-0.20-mapreduce
+chmod 0775 [[LOG_DIR]]/hadoop-0.20-mapreduce
+rm -fR /var/log/hadoop-0.20-mapreduce
+ln -s [[LOG_DIR]]/hadoop-0.20-mapreduce /var/log/hadoop-0.20-mapreduce
+
+mkdir [[LOG_DIR]]/hadoop-hdfs
+chown hdfs [[LOG_DIR]]/hadoop-hdfs
+chgrp hadoop [[LOG_DIR]]/hadoop-hdfs
+chmod 0775 [[LOG_DIR]]/hadoop-hdfs
+rm -fR /var/log/hadoop-hdfs
+ln -s [[LOG_DIR]]/hadoop-hdfs /var/log/hadoop-hdfs
+
+echo "Creating data directories"
+mkdir -p $DATADIR/1/dfs/dn $DATADIR/2/dfs/dn $DATADIR/3/dfs/dn ; mkdir -p $DATADIR/1/dfs/dn $DATADIR/2/dfs/dn $DATADIR/3/dfs/dn 
+chown -R hdfs:hadoop $DATADIR/1/dfs/dn $DATADIR/2/dfs/dn $DATADIR/3/dfs/dn
+
+mkdir -p $DATADIR/1/mapred/local $DATADIR/2/mapred/local $DATADIR/3/mapred/local $DATADIR/4/mapred/local; 
+chown -R mapred:hadoop $DATADIR/1/mapred/local $DATADIR/2/mapred/local $DATADIR/3/mapred/local $DATADIR/4/mapred/local
 
 #echo "Formatting HDFS"
 #su - hdfs -c 'yes Y | /usr/bin/hadoop --config /etc/hadoop/conf namenode -format' 2>/dev/stdout
 
 echo "Creating SSH keys for hbase and hdfs users"
-mkdir /var/run/hbase/.ssh
-chown hbase /var/run/hbase/.ssh 
-chmod 0700 /var/run/hbase/.ssh
-rm -f /var/run/hbase/.ssh/id_rsa*
-su - hbase -s /bin/bash -c "ssh-keygen -q -t rsa -f /var/run/hbase/.ssh/id_rsa -N \"\""
-mkdir /usr/lib/hadoop-0.20/.ssh
-chown hdfs /usr/lib/hadoop-0.20/.ssh
-chmod 0700 /usr/lib/hadoop-0.20/.ssh
-rm -f /usr/lib/hadoop-0.20/.ssh/id_rsa*
-su - hdfs -s /bin/bash -c "ssh-keygen -q -t rsa -f /usr/lib/hadoop-0.20/.ssh/id_rsa -N \"\""
+
+if [ "[[CLUSTER_TYPE]]" -eq "hbase" ] ; then
+    HBASE_HOMEDIR=`egrep "^hbase:" /etc/passwd | cut -d':' -f6`
+    mkdir $HBASE_HOMEDIR/.ssh
+    chown hbase $HBASE_HOMEDIR/.ssh 
+    chmod 0700 $HBASE_HOMEDIR/.ssh
+    rm -f $HBASE_HOMEDIR/.ssh/id_rsa*
+    su - hbase -s /bin/bash -c "ssh-keygen -q -t rsa -f /var/run/hbase/.ssh/id_rsa -N \"\""
+fi
+
+HDFS_HOMEDIR=`egrep "^hdfs:" /etc/passwd | cut -d':' -f6`
+mkdir $HDFS_HOMEDIR/.ssh
+chown hdfs $HDFS_HOMEDIR/.ssh
+chmod 0700 $HDFS_HOMEDIR/.ssh
+rm -f $HDFS_HOMEDIR/.ssh/id_rsa*
+su - hdfs -s /bin/bash -c "ssh-keygen -q -t rsa -f $HDFS_HOMEDIR/.ssh/id_rsa -N \"\""
+
 

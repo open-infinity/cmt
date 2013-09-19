@@ -4,15 +4,16 @@
 	<groupId>org.openinfinity</groupId>
 	<artifactId>cloud</artifactId>
 	<version>${project.global.version}</version>
-<!-- 	<version>1.2.1</version> -->
 	<packaging>pom</packaging>
 	<properties>
+	    <project.build.jdk.version>1.6</project.build.jdk.version>
 		<project.global.version>1.2.1</project.global.version>
-		<open-infinity-core.version>1.1.0.RELEASE</open-infinity-core.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<slf4j.version>1.6.4</slf4j.version>
-		<spring.maven.artifact.version>3.1.1.RELEASE</spring.maven.artifact.version>
-		<spring.security.version>3.1.0.RELEASE</spring.security.version>
+		<springframework.version>3.1.1.RELEASE</springframework.version>
+		<spring.batch.version>2.1.8.RELEASE</spring.batch.version>
+		<liferay.version>6.0.6</liferay.version>
+		<open-infinity-core.version>1.1.0.RELEASE</open-infinity-core.version>
 		<maven.build.timestamp.format>yyyyMMdd-HHmm</maven.build.timestamp.format>
 	</properties>
 	<modules>
@@ -30,6 +31,7 @@
 		<module>cloud-worker</module>
 		<module>cloud-health-monitoring</module>
 		<module>cloud-properties-batch</module>
+		<module>cloud-configuration-template</module>
 	</modules>
 	<dependencies>
 		<dependency>
@@ -90,27 +92,7 @@
 					</execution>
 				</executions>
 			</plugin>
-<!-- 			<plugin> -->
-<!-- 				<groupId>org.apache.maven.plugins</groupId> -->
-<!-- 				<artifactId>maven-antrun-plugin</artifactId> -->
-<!-- 				<version>1.4</version> -->
-<!-- 				<executions> -->
-<!-- 					<execution> -->
-<!-- 						<id>integration-test-website-resources</id> -->
-<!-- 						<phase>post-integration-test</phase> -->
-<!-- 						<configuration> -->
-<!-- 							<tasks> -->
-<!-- 								<copy todir="target/jbehave-reports/view"> -->
-<!-- 									<fileset dir="src/test/resources/view" /> -->
-<!-- 								</copy> -->
-<!-- 							</tasks> -->
-<!-- 						</configuration> -->
-<!-- 						<goals> -->
-<!-- 							<goal>run</goal> -->
-<!-- 						</goals> -->
-<!-- 					</execution> -->
-<!-- 				</executions> -->
-<!-- 			</plugin> -->
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-deploy-plugin</artifactId>
@@ -123,12 +105,10 @@
 				<configuration>
 					<archive>
 						<manifest>
-							<!--<manifestFile>META-INF/MANIFEST.MF</manifestFile> -->
 							<addClasspath>true</addClasspath>
 						</manifest>
 					</archive>
 					<excludes>
-				<!-- 		<exclude>**/*.xml</exclude>  -->
 						<exclude>**/*.dtd</exclude>
 						<exclude>**/common/domain/*.*</exclude>
 					</excludes>
@@ -179,9 +159,9 @@
 			</plugin>
 		</plugins>
 	</build>
-		<!-- ================================================ -->
-	<!-- Repository Configuration -->
-	<!-- ================================================ -->
+    <!-- ================================================ -->
+    <!-- Repository Configuration -->
+    <!-- ================================================ -->
 	<pluginRepositories>
 		<pluginRepository>
 			<id>maven-repo</id>
@@ -265,10 +245,6 @@
 				<enabled>true</enabled>
 			</releases>
 		</repository>
-<!--		<repository>
-			<id>jboss</id>
-			<url>http://repository.jboss.org/maven2</url>
-		</repository> -->
 		<repository>
 			<id>jboss-public-repository-group</id>
 			<url>https://repository.jboss.org/nexus/content/groups/public-jboss</url>

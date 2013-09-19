@@ -213,7 +213,7 @@ class SSHConnection(object):
             raise MgmtException("SSH not connected")
 
     # A convinience method for sending file to the remote server
-    def send_file_to(self, content, remote_filename, mode=0o600):
+    def send_file_to(self, content, remote_filename, mode=0o600, retries=2):
         if self.__client:
             (dummy, tmpfilename) = tempfile.mkstemp()
             f = open(tmpfilename, "w")
@@ -326,6 +326,23 @@ class SSHConnection(object):
                     return False
                     #raise MgmtException("RPM uninstall in %s failed with a return code %s: %s" % (self.__hostname, retcode, err))
         return True
+
+    # Return user's home directory, like /home/billgates
+    def get_homedir_of(self, username):
+        if username:
+            (r, out, err, all) = self.execute("egrep \"^%s:\" /etc/passwd | cut -d':' -f6" % username)
+            if out:
+                homedir = out.strip()
+                if len(homedir) > 0:
+                    self.__logger.debug("Returning homedir '%s' for user %s" % (homedir, username))
+                    return homedir
+                else:
+                    self.__logger.debug("No homedir found for user %s" % username)
+            else:
+                self.__logger.warn("Can't get homedir, because ssh output is missing")
+        else:
+            self.__logger.warn("Can't get homedir, because username is not valid: %s" % username)
+        return None
 
     def repr(self):
         return "SSHConnection:%s" % (self.__connection)

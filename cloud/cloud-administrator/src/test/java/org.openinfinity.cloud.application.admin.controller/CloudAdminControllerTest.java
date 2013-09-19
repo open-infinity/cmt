@@ -4,6 +4,8 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import static org.junit.Assert.*;
+import org.openinfinity.cloud.application.admin.controller.CloudAdminController;
 import org.openinfinity.cloud.domain.*;
 import org.openinfinity.cloud.domain.repository.administrator.InstanceRepository;
 import org.openinfinity.cloud.domain.repository.administrator.JobRepository;
@@ -20,8 +22,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.fail;
 
 /**
  * Created with IntelliJ IDEA.
@@ -49,9 +49,6 @@ public class CloudAdminControllerTest {
     private static final String MTYPE_LARGE_NAME = "Large";
     private static final String MTYPE_XLARGE_NAME = "XLarge";
     private static final String MTYPE_XXLARGE_NAME = "XXLarge";
-
-    private static final String CTYPE_JBOSS_PORTAL_NAME = "jbossportal";
-    private static final String CTYPE_JBOSS_SERVICE_NAME = "jbossservice";
 
     @Autowired
     private JobRepository jobRepository;
@@ -102,7 +99,8 @@ public class CloudAdminControllerTest {
             liferayService.mockUserWithOrganizations("TOAS");
             MockResourceResponse response = new MockResourceResponse();
             adminController.getCloudProviders(new MockResourceRequest(), response);
-            List<CloudProvider> providers = objectMapper.readValue(response.getContentAsString(), new TypeReference<List<CloudProvider>>(){});
+            List<CloudProvider> providers = objectMapper.readValue(response.getContentAsString(),
+                                            new TypeReference<List<CloudProvider>>(){});
             assertEquals(2, providers.size());
 
 
@@ -118,7 +116,8 @@ public class CloudAdminControllerTest {
         List<MachineType> machineTypes;
         try {
             adminController.getMachineTypes(new MockResourceRequest(), response);
-            machineTypes = objectMapper.readValue(response.getContentAsString(), new TypeReference<List<MachineType>>(){});
+            machineTypes = objectMapper.readValue(response.getContentAsString(), 
+                           new TypeReference<List<MachineType>>(){});
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

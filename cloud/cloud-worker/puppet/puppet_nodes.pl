@@ -31,67 +31,93 @@ my %ebsparameters;
 
 push(@class, "oibasic");
 
-#my $sql = "select machine_extra_ebs_volume_device from machine_tbl where machine_type = 'clustermember' and machine_id = $machine";
-#my $sth = $dbh->prepare($sql);
-#$sth->execute() or die "Error in SQL execute: $DBI::errstr";
-#if($sth->rows == 0) {
-#	%ebsparameters = (
-#		ebsVolumeUsed => 'false',
-#	);
-#} else {
-#	my @row = $sth->fetchrow_array;
-#	%ebsparameters = (
-#		ebsVolumeUsed => 'true',
-#		ebsDeviceName => $row[0],
-#	);
-#}
-#$sth->finish;
-#push(@class, "oiebs");
-#
 if (1) {
 	push(@class, "oihealthmonitoring");
-
-	# Query cluster members
-	my $sql = "select machine_private_dns_name from machine_tbl where machine_cluster_id = $cluster and machine_running > 0";
-	my $sth = $dbh->prepare($sql);
-	$sth->execute() or die "Error in SQL execute: $DBI::errstr";
-	my @addrlist;
+	
+        # Query from machine_tbl, create entris for nodelist.conf from results
+        my $sql = "select machine_id,machine_dns_name,machine_private_dns_name,machine_type,machine_name from machine_tbl where machine_cluster_id = $cluster and machine_running > 0";
+        my $sth = $dbh->prepare($sql);
+        $sth->execute() or die "Error in SQL execute: $DBI::errstr";
         my @datalist;
-	while(my @row = $sth->fetchrow_array) {
-		push(@addrlist, @row);
-	}
-        foreach (@addrlist) {
-                my $hostdata = $_;
-                $hostdata =~ s/\./-/g;
-                $hostdata = $_ . " " . "ip-" . $hostdata;
+        my $node_hostname = "NA";
+        my $dns_name;
+        
+        my ($machine_id, $machine_dns_name, $machine_private_dns_name, $machine_type, $machine_name);
+        $sth->bind_col(1, \$machine_id);
+        $sth->bind_col(2, \$machine_dns_name);
+        $sth->bind_col(3, \$machine_private_dns_name);
+        $sth->bind_col(4, \$machine_type);
+        $sth->bind_col(5, \$machine_name);
+        while ($sth->fetch) { 
+                my $hostname;
+                if ($machine == $machine_id){
+                      $dns_name = $machine_dns_name;
+                }
+		if ($machine_name =~ m/^(mongo|hbase)\d+$/){
+                      $hostname = $machine_name;
+                }
+                else{
+                      $hostname = $machine_private_dns_name;
+                      $hostname =~ s/\./-/g;
+                      $hostname = "ip-" . $hostname;
+                }
+                my $hostdata = $machine_private_dns_name . " " . $machine_dns_name . " " . $hostname . " " . 
+                               $machine_type . " " .  $machine_id;
+                if ($machine eq $machine_id) {
+                        $node_hostname = $hostname;
+                }
                 push(@datalist, $hostdata);
         }
+        $sth->finish;
+        if ($node_hostname eq "NA"){
+                die "Host name assigning failed";
+        }
+
+        # Query machine type in cluster
+       	$sql = "select cluster_machine_type from cluster_tbl where cluster_id = $cluster";
+        $sth = $dbh->prepare($sql);
+        $sth->execute() or die "Error in SQL execute: $DBI::errstr";
+        my @row = $sth->fetchrow_array();
+        my $machineType = $row[0];
+        $sth->finish;
+
+        # Query RAM allocated to machine
+        $sql = "select ram from machine_type_tbl where id = $machineType";
+	$sth = $dbh->prepare($sql);
+	$sth->execute() or die "Error in SQL execute: $DBI::errstr";
+	@row = $sth->fetchrow_array();
+	my $ram = $row[0];
 	$sth->finish;
-	# Decide erb parameters
-	%hm_parameters = (
-		communication_iface => "eth0",
-		host_group => "cluster_" . $cluster,
-		java_home => "/usr/lib/jvm/java-1.6.0-openjdk-1.6.0.0.x86_64/",
-		mail_host => "131.207.105.13",
-		mail_from => "support.toas\@tieto.com",
-		mail_sender_cron_expression => "0 * * * * ? *",
-		default_mail_recepient => "dl.toaspaassupport\@tieto.com",
+        
+        # Query cloud zone
+        $sql = "select cloud_zone from instance_tbl where instance_id = $instance";
+        $sth = $dbh->prepare($sql);
+        $sth->execute() or die "Error in SQL execute: $DBI::errstr";
+        @row = $sth->fetchrow_array();
+        my $cloud = $row[0];
+        $sth->finish; 
+	
+        %hm_parameters = (
+		#FIXME: use cluster_id instead host_group
+                host_group => "cluster_" . $cluster,
+                cloud_zone => $cloud,
+                instance_id => $instance,
+                cluster_id => $cluster,
+                machine_id => $machine,
+                public_ip => $dns_name,
+                hostname => $node_hostname,
+		java_home => "/usr/lib/jvm/java-1.6.0-openjdk-1.6.0.0.x86_64/jre",
+		mail_host => "xxxx",
+		mail_from => "xxxx",
+		default_mail_recepient => "xxxx",
 		toas_collectd_root => "/opt/openinfinity/2.0.0/healthmonitoring/collectd",
                 toas_rrd_http_server_root => "/opt/openinfinity/2.0.0/healthmonitoring/rrd-http-server",
 		toas_monitoring_root => "/opt/openinfinity/2.0.0/healthmonitoring/nodechecker",
-		cluster_member_addresses => \@addrlist,
                 cluster_member_data => \@datalist,
+                tomcat_monitor_role_pwd => "xxxx",
+                tomcat_jmx_port => "xxxxx",
+                threshold_warn_max_jvm_committed =>, roundup($ram * .75 * .95 * 1000000 , 10),
 	);
-}
-
-if($type eq "hmon0" || $type eq "hmon1" || $type eq "hmon2") {
-	push(@class, "oibas");
-	push(@class, "oihealthmonitoring");
-
-	# Decide erb parameters
-	my %pars = (multicastaddress => "224.2.1.39");
-
-	%parameters = (%pars, %hm_parameters);
 }
 
 if($type eq "portal_lb" || $type eq "service_lb") {
@@ -133,12 +159,25 @@ if($type eq "portal_lb" || $type eq "service_lb") {
 	@row = $sth->fetchrow_array();
 	my $db_address = $row[0];
 	$sth->finish;
-	$sql = "select cluster_multicast_address from cluster_tbl where cluster_id = $cluster";
+	# Get multicast address and machine type
+	$sql = "select cluster_multicast_address,cluster_machine_type from cluster_tbl where cluster_id = $cluster";
         $sth = $dbh->prepare($sql);
         $sth->execute() or die "Error in SQL execute: $DBI::errstr";
         @row = $sth->fetchrow_array();
         my $multicastaddress = $row[0];
+	my $machineType = $row[1];
 	$sth->finish;
+
+	# Query memory size
+        $sql = "select ram from machine_type_tbl where id = $machineType";
+        $sth = $dbh->prepare($sql);
+        $sth->execute() or die "Error in SQL execute: $DBI::errstr";
+        @row = $sth->fetchrow_array();
+        my $ram = $row[0];
+        $sth->finish;
+        my $javaMem = jvmMem($ram);
+        my $javaPerm = jvmPerm($javaMem);
+
 	$sql = "select cluster_id from cluster_tbl where instance_id = $instance and cluster_type=7";
 	$sth = $dbh->prepare($sql);
 	$sth->execute() or die "Error in SQL execute: $DBI::errstr";
@@ -147,6 +186,8 @@ if($type eq "portal_lb" || $type eq "service_lb") {
 			dbaddress => $db_address,
 			multicastaddress => $multicastaddress,
 			backup_source_dir => "/opt/openinfinity",
+			jvmmem => $javaMem,
+                        jvmperm => $javaPerm,
 		);
 		if($type eq "portal") {
 			push(@class, "oiportal");
@@ -178,6 +219,8 @@ if($type eq "portal_lb" || $type eq "service_lb") {
 			amAdminPassword => "admin1234",
 			multicastaddress => $multicastaddress,
 			backup_source_dir => "/opt/openinfinity",
+			jvmmem => $javaMem,
+                        jvmperm => $javaPerm,
 		);
 		if($type eq "portal") {
 			push(@class, "oiportal-sso");
@@ -234,12 +277,13 @@ if($type eq "portal_lb" || $type eq "service_lb") {
 	push(@class, "oibackup");
 	push(@class, "oi-identity-gateway");
 } elsif($type eq "bas") {
-	# Query multicast address
-	my $sql = "select cluster_multicast_address from cluster_tbl where cluster_id = $cluster";
+	# Query multicast address and machine type
+	my $sql = "select cluster_multicast_address,cluster_machine_type from cluster_tbl where cluster_id = $cluster";
         my $sth = $dbh->prepare($sql);
         $sth->execute() or die "Error in SQL execute: $DBI::errstr";
         my @row = $sth->fetchrow_array();
         my $multicastaddress = $row[0];
+	my $machineType = $row[1];
 	$sth->finish;
 	
 	# Query cluster id of database cluster
@@ -260,6 +304,16 @@ if($type eq "portal_lb" || $type eq "service_lb") {
 		$db_address = $row[0];
 		$sth->finish;
 	}
+
+	# Query memory size
+	$sql = "select ram from machine_type_tbl where id = $machineType";
+	$sth = $dbh->prepare($sql);
+	$sth->execute() or die "Error in SQL execute: $DBI::errstr";
+	@row = $sth->fetchrow_array();
+	my $ram = $row[0];
+	$sth->finish;
+	my $javaMem = jvmMem($ram);
+	my $javaPerm = jvmPerm($javaMem);
         
         # Puppet modules
         push(@class, "oibackup");
@@ -270,15 +324,18 @@ if($type eq "portal_lb" || $type eq "service_lb") {
 			multicastaddress => $multicastaddress,
                         dbaddress => $db_address,
 			backup_source_dir => "/opt/openinfinity",
+			jvmmem => $javaMem,
+			jvmperm => $javaPerm,
 	);
 	push(@class, "oilttwatch");
 } elsif ($type eq "ee") {
-	# Query multicast address
-	my $sql = "select cluster_multicast_address from cluster_tbl where cluster_id = $cluster";
+	# Query multicast address and machine type
+	my $sql = "select cluster_multicast_address,cluster_machine_type from cluster_tbl where cluster_id = $cluster";
         my $sth = $dbh->prepare($sql);
         $sth->execute() or die "Error in SQL execute: $DBI::errstr";
         my @row = $sth->fetchrow_array();
         my $multicastaddress = $row[0];
+	my $machineType = $row[1];
         $sth->finish;
         
 	# Query cluster id of database cluster
@@ -300,6 +357,16 @@ if($type eq "portal_lb" || $type eq "service_lb") {
 		$sth->finish;
         }
 
+	# Query memory size
+        $sql = "select ram from machine_type_tbl where id = $machineType";
+        $sth = $dbh->prepare($sql);
+        $sth->execute() or die "Error in SQL execute: $DBI::errstr";
+        @row = $sth->fetchrow_array();
+        my $ram = $row[0];
+        $sth->finish;
+        my $javaMem = jvmMem($ram);
+        my $javaPerm = jvmPerm($javaMem);
+
 	# Add Puppet modules        
 	push(@class, "oibas");
 	push(@class, "oitomee");
@@ -311,6 +378,8 @@ if($type eq "portal_lb" || $type eq "service_lb") {
                         multicastaddress => $multicastaddress,
 			dbaddress => $db_address,
 			backup_source_dir => "/opt/openinfinity",
+			jvmmem => $javaMem,
+                        jvmperm => $javaPerm,
         );
 } elsif($type eq "db") {
 	push(@class, "oimariadb");
@@ -608,3 +677,30 @@ print Dump({
 	parameters	=> \%final_parameters,
 });
 
+sub jvmMem {
+	my $machineMem = shift;
+        return roundup($machineMem * 0.75, 10);
+}
+
+sub roundup
+{
+   my $number = shift;
+   my $round = shift;
+
+   if ($number % $round) {
+      return (1 + int($number/$round)) * $round;
+   }
+   else {
+      return $number;
+   }
+}
+
+sub jvmPerm {
+	my $javaMem = shift;
+	
+	if($javaMem < 1000) {
+		return 256;
+	} else {
+		return 512;
+	}
+}

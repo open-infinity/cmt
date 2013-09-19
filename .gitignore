@@ -9,4 +9,10 @@ target/
 
 # ignore IDEA metadata
 *.iml
+.idea/
 
+# ignore generated logs
+*.log
+
+# ignore Apple metadata
+.DS_Store

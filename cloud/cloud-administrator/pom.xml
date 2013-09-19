@@ -7,12 +7,9 @@
 		<version>${project.global.version}</version>
 	   	<relativePath>..</relativePath>    		
     </parent>
-    <groupId>org.openinfinity</groupId>
     <artifactId>cloud-administrator</artifactId>
     <packaging>war</packaging>
     <properties>
-        <liferay.version>6.0.6</liferay.version>
-        <springframework.version>3.1.1.RELEASE</springframework.version>
         <sql.script.path>${project.parent.basedir}/cloud-repository/src/test/resources/sql</sql.script.path>
     </properties>
 
@@ -176,15 +173,15 @@
             <version>4.2</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>4.2</version>
-        </dependency>
-        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.11</version>
         </dependency>
-
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-all</artifactId>
+			<version>1.9.0</version>
+			<scope>test</scope>
+		</dependency>
     </dependencies>
 </project>

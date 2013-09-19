@@ -38,12 +38,11 @@ import org.openinfinity.cloud.domain.ClusterType;
 import org.openinfinity.cloud.domain.Instance;
 import org.openinfinity.cloud.domain.Job;
 import org.openinfinity.cloud.domain.Key;
-import org.openinfinity.cloud.service.administrator.JobService;
 import org.openinfinity.cloud.service.administrator.*;
+import org.openinfinity.cloud.service.liferay.LiferayService;
 import org.openinfinity.cloud.util.AdminException;
-import org.openinfinity.cloud.util.AdminGeneral;
-import org.openinfinity.cloud.util.LiferayService;
 import org.openinfinity.cloud.util.collection.ListUtil;
+import org.openinfinity.cloud.util.http.HttpCodes;
 import org.openinfinity.cloud.util.serialization.JsonDataWrapper;
 import org.openinfinity.cloud.util.serialization.SerializerUtil;
 import org.openinfinity.core.util.ExceptionUtil;
@@ -85,7 +84,6 @@ public class CloudAdminController {
     @Qualifier("liferayService")
     private LiferayService liferayService;
 
-	
 	@Autowired
 	@Qualifier("instanceService")
 	private InstanceService instanceService;
@@ -122,7 +120,7 @@ public class CloudAdminController {
 	public String showView(RenderRequest request, RenderResponse response) {
 		User user = liferayService.getUser(request);
 		if(user == null) {
-			response.setProperty(ResourceResponse.HTTP_STATUS_CODE, AdminGeneral.HTTP_ERROR_CODE_USER_NOT_LOGGED_IN);
+			response.setProperty(ResourceResponse.HTTP_STATUS_CODE, HttpCodes.HTTP_ERROR_CODE_USER_NOT_LOGGED_IN);
 			return "notlogged";
 		}	
 		return "mainview";
@@ -426,7 +424,7 @@ public class CloudAdminController {
 	
 	// Helper functions
 	
-	private void checkIfClusterTypeCreated(Collection<Integer> clusterTypes, int type) throws AdminException{
+	private void checkPlatformExistance(Collection<Integer> clusterTypes, int type) throws AdminException{
 	    if (clusterTypes.contains(new Integer(type))){
 	        throw new AdminException("Cluster type already created for the instance"); 
 	    }
@@ -443,7 +441,7 @@ public class CloudAdminController {
         job.setZone(pm.get("zone"));
             
         if ("true".equals(pm.get("bigdata"))) {
-            checkIfClusterTypeCreated(instanceClusterTypes, ClusterService.CLUSTER_TYPE_BIGDATA);
+            checkPlatformExistance(instanceClusterTypes, ClusterService.CLUSTER_TYPE_BIGDATA);
             job.addService(ClusterService.SERVICE_NAME[ClusterService.CLUSTER_TYPE_BIGDATA],
                            pm.get("bigdataclustersize"),
                            pm.get("bigdatamachinesize"),
@@ -453,7 +451,7 @@ public class CloudAdminController {
             
         }
         if ("true".equals(pm.get("nosql"))) {
-            checkIfClusterTypeCreated(instanceClusterTypes, ClusterService.CLUSTER_TYPE_NOSQL);
+            checkPlatformExistance(instanceClusterTypes, ClusterService.CLUSTER_TYPE_NOSQL);
             job.addService(ClusterService.SERVICE_NAME[ClusterService.CLUSTER_TYPE_NOSQL], 
                            pm.get("nosqlclustersize"), 
                            pm.get("nosqlmachinesize"),
@@ -466,7 +464,6 @@ public class CloudAdminController {
             boolean dbExists = instanceClusterTypes.contains(new Integer(ClusterService.CLUSTER_TYPE_DATABASE));
             boolean portalExists = instanceClusterTypes.contains(new Integer(ClusterService.CLUSTER_TYPE_PORTAL));
             boolean mqExists = instanceClusterTypes.contains(new Integer(ClusterService.CLUSTER_TYPE_MULE_MQ));
-            boolean createDb = false;
             
             if (!dbExists){
                 job.addService(ClusterService.SERVICE_NAME[ClusterService.CLUSTER_TYPE_DATABASE],
@@ -481,25 +478,25 @@ public class CloudAdminController {
         }
         
         if ("true".equals(pm.get("portal"))){
-            checkIfClusterTypeCreated(instanceClusterTypes, ClusterService.CLUSTER_TYPE_PORTAL);
+            checkPlatformExistance(instanceClusterTypes, ClusterService.CLUSTER_TYPE_PORTAL);
             job.addService(ClusterService.SERVICE_NAME[ClusterService.CLUSTER_TYPE_PORTAL], 
                            pm.get("portalclustersize"),
                            pm.get("portalmachinesize"),
                            pm.get("portalimagetype"),
                            pm.get("portalesbvolumesize"));
             if (withIgService && !withEcmService){
-                checkIfClusterTypeCreated(instanceClusterTypes, ClusterService.CLUSTER_TYPE_IDENTITY_GATEWAY);
+                checkPlatformExistance(instanceClusterTypes, ClusterService.CLUSTER_TYPE_IDENTITY_GATEWAY);
                 job.setExtraData(JobService.EXTRA_DATA_PORTAL_IG);
             }
             else if (withEcmService && withIgService){
-                checkIfClusterTypeCreated(instanceClusterTypes, ClusterService.CLUSTER_TYPE_ECM);
+                checkPlatformExistance(instanceClusterTypes, ClusterService.CLUSTER_TYPE_ECM);
                 job.setExtraData(JobService.EXTRA_DATA_PORTAL_IG_ECM);
             }
             else job.setExtraData(JobService.EXTRA_DATA_PORTAL);       
         }
         
         if ("true".equals(pm.get("mq"))){
-            checkIfClusterTypeCreated(instanceClusterTypes, ClusterService.CLUSTER_TYPE_MULE_MQ);
+            checkPlatformExistance(instanceClusterTypes, ClusterService.CLUSTER_TYPE_MULE_MQ);
             job.addService(ClusterService.SERVICE_NAME[ClusterService.CLUSTER_TYPE_MULE_MQ],
                            pm.get("mqclustersize"),
                            pm.get("mqmachinesize"),
@@ -508,7 +505,7 @@ public class CloudAdminController {
         }
         
         if("true".equals(pm.get("bas"))){ 
-            checkIfClusterTypeCreated(instanceClusterTypes, ClusterService.CLUSTER_TYPE_BAS);
+            checkPlatformExistance(instanceClusterTypes, ClusterService.CLUSTER_TYPE_BAS);
             job.addService(ClusterService.SERVICE_NAME[ClusterService.CLUSTER_TYPE_BAS],
                            pm.get("basclustersize"),
                            pm.get("basmachinesize"),
@@ -517,7 +514,7 @@ public class CloudAdminController {
         }
         
         if(withIgService){
-            checkIfClusterTypeCreated(instanceClusterTypes, ClusterService.CLUSTER_TYPE_IDENTITY_GATEWAY);
+            checkPlatformExistance(instanceClusterTypes, ClusterService.CLUSTER_TYPE_IDENTITY_GATEWAY);
             job.addService(ClusterService.SERVICE_NAME[ClusterService.CLUSTER_TYPE_IDENTITY_GATEWAY], 
                            pm.get("igclustersize"),
                            pm.get("igmachinesize"),
@@ -526,7 +523,7 @@ public class CloudAdminController {
         }
         
         if("true".equals(pm.get("ee"))){ 
-            checkIfClusterTypeCreated(instanceClusterTypes, ClusterService.CLUSTER_TYPE_EE);
+            checkPlatformExistance(instanceClusterTypes, ClusterService.CLUSTER_TYPE_EE);
             job.addService(ClusterService.SERVICE_NAME[ClusterService.CLUSTER_TYPE_EE],
                            pm.get("eeclustersize"), 
                            pm.get("eemachinesize"),
@@ -535,7 +532,7 @@ public class CloudAdminController {
         }
         
         if(withEcmService){ 
-            checkIfClusterTypeCreated(instanceClusterTypes, ClusterService.CLUSTER_TYPE_ECM);
+            checkPlatformExistance(instanceClusterTypes, ClusterService.CLUSTER_TYPE_ECM);
             job.addService(ClusterService.SERVICE_NAME[ClusterService.CLUSTER_TYPE_ECM], 
                            pm.get("ecmclustersize"), 
                            pm.get("ecmmachinesize"),

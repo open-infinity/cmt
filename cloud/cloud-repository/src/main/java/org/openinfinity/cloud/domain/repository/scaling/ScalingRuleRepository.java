@@ -65,5 +65,9 @@ public interface ScalingRuleRepository {
      * Update job id.
      */
 	void storeJobId(int clusterId, int jobId);
+
+	void updateExisting(ScalingRule newScalingRule);
+
+	void addNew(ScalingRule newScalingRule);
 	
 }

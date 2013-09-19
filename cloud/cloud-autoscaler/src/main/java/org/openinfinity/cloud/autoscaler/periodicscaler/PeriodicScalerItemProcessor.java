@@ -58,7 +58,7 @@ public class PeriodicScalerItemProcessor implements ItemProcessor<Machine, Job> 
 
 	private static final String MSG_HM_METRIC_NOT_AVAILABLE = "Requested metric is not available";
 	
-	private static final String METRIC_RRD_FILE_LOAD = "load.rrd";
+	private static final String METRIC_RRD_FILE_LOAD = "load_relative.rrd";
 	
 	private static final String METRIC_TYPE_LOAD = "load";
 	

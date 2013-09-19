@@ -9,7 +9,7 @@ class oibas::config {
                 owner => 'toas',
                 group => 'toas',
                 mode => 0755,
-                source => "puppet:///modules/oibas/setenv.sh",
+                content => template("oibas/setenv.sh.erb"),
                 require => Class["oibas::install"],
         }
 
@@ -57,12 +57,31 @@ class oibas::config {
                 mode => 0755,
                 source => "puppet:///modules/oibas/oi-tomcat",
                 require => Class["oibas::install"],
-    }
+        }
 
-    # Try ensure, that the supported Java is chosen
-    exec { "choose-java":
-            command => "/usr/sbin/alternatives --install /usr/bin/java java /usr/lib/jvm/jre-1.6.0-openjdk.x86_64/bin/java 190000",
-            require => Package["java-1.6.0-openjdk"]
-    }
+        file {"/opt/openinfinity/2.0.0/tomcat/conf/jmxremote.password":
+                ensure => present,
+                owner => 'toas',
+                group => 'toas',
+                mode => 0600,
+                content => template("oibas/jmxremote.password.erb"),
+                require => Class["oibas::install"],
+        }
+        
+        file {"/opt/openinfinity/2.0.0/tomcat/conf/jmxremote.access":
+                ensure => present,
+                owner => 'toas',
+                group => 'toas',
+                mode => 0644,
+                source => "puppet:///modules/oibas/jmxremote.access",
+                require => Class["oibas::install"],
+        }
+ 
+
+        # Try to ensure that the supported Java is chosen
+        exec { "choose-java":
+                command => "/usr/sbin/alternatives --install /usr/bin/java java /usr/lib/jvm/jre-1.6.0-openjdk.x86_64/bin/java 190000",
+                require => Package["java-1.6.0-openjdk"]
+        }
 }
 

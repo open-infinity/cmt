@@ -46,6 +46,8 @@ def create_config_context(options):
         return create_mongo_config_context(options)
     if exists(join(storage_dir, "hbase")):
         return create_hbase_config_context(options)
+    if exists(join(storage_dir, "hadoop")):
+        return create_hadoop_config_context(options)
     raise MgmtException("Can't read node information because of unrecognized bigdata configuration.")
 
 # Create HBase config context
@@ -53,6 +55,16 @@ def create_hbase_config_context(options):
     cc = hbase.HBaseConfigContext()
     cc.hmasters   = hbase.get_hbase_masters()
     cc.zookeepers = hbase.get_zookeepers()
+    cc.slaves     = hbase.get_hbase_slaves()
+    cc.hives      = hbase.get_hbase_hives()
+    cc.options    = options
+    return cc
+    
+# Create Hadoop config context
+def create_hadoop_config_context(options):
+    cc = hbase.HBaseConfigContext(hbase = False)
+    cc.hmasters   = hbase.get_hbase_masters()
+    cc.zookeepers = []
     cc.slaves     = hbase.get_hbase_slaves()
     cc.hives      = hbase.get_hbase_hives()
     cc.options    = options

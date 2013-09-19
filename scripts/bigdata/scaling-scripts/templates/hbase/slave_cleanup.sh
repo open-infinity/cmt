@@ -30,12 +30,11 @@
 find /etc -name "*.rpmsave" | xargs rm -fR
 
 # Delete data directories
-rm -fR /data 
+rm -fR [[DATABASE_DIR]]]
 
 # Delete configuration files
 rm -fR /etc/hadoop-0.20 /etc/hbase /etc/zookeeper.dist
 
 # Delete some other directories
-rm -fR /var/zookeeper
-
+rm -fR /var/zookeeper 
 

@@ -26,6 +26,9 @@ import java.util.HashMap;
 
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
+import javax.validation.Valid;
+
+import lombok.NonNull;
 
 import org.apache.log4j.Logger;
 import org.openinfinity.cloud.domain.AuthorizationRoute;
@@ -35,23 +38,26 @@ import org.openinfinity.cloud.domain.Instance;
 import org.openinfinity.cloud.domain.Job;
 import org.openinfinity.cloud.domain.Machine;
 import org.openinfinity.cloud.domain.ScalingRule;
-
 import org.openinfinity.cloud.service.administrator.AuthorizationRoutingService;
 import org.openinfinity.cloud.service.administrator.ClusterService;
 import org.openinfinity.cloud.service.administrator.EC2Wrapper;
 import org.openinfinity.cloud.service.administrator.InstanceService;
 import org.openinfinity.cloud.service.administrator.JobService;
 import org.openinfinity.cloud.service.administrator.MachineService;
+import org.openinfinity.cloud.service.liferay.LiferayService;
+import org.openinfinity.cloud.service.scaling.Enumerations.ScalingState;
 import org.openinfinity.cloud.service.scaling.ScalingRuleService;
-import org.openinfinity.cloud.util.AdminGeneral;
-import org.openinfinity.cloud.util.LiferayService;
+import org.openinfinity.cloud.util.http.HttpCodes;
 import org.openinfinity.cloud.util.serialization.JsonDataWrapper;
 import org.openinfinity.cloud.util.serialization.SerializerUtil;
+import org.openinfinity.core.annotation.NotScript;
 import org.openinfinity.core.util.ExceptionUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.Assert;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.portlet.bind.annotation.ResourceMapping;
@@ -71,7 +77,10 @@ import com.liferay.portal.model.User;
 @RequestMapping(value = "VIEW")
 public class ClusterController {
 	private static final Logger LOG = Logger.getLogger(ClusterController.class.getName());
-
+	
+	private static final int JOB_ID_UNDEFINED = -1;
+	
+	private static final int CLUSTER_SIZE_UNDEFINED = -1;
     @Autowired
     @Qualifier("liferayService")
     private LiferayService liferayService;
@@ -128,11 +137,9 @@ public class ClusterController {
 		if (liferayService.getUser(request, response) == null) return;
 		Machine lb = clusterService.getClustersLoadBalancer(clusterId);
 		if(lb == null) 
-			response.setProperty(ResourceResponse.HTTP_STATUS_CODE, AdminGeneral.HTTP_ERROR_CODE_SERVER_ERROR);
+			response.setProperty(ResourceResponse.HTTP_STATUS_CODE, HttpCodes.HTTP_ERROR_CODE_SERVER_ERROR);
 		else{
 			try{
-				ElasticIP eip  = arService.getClustersElasticIP(clusterId);
-				LOG.debug("arService.getClustersElasticIP(clusterId) =" + arService.getClustersElasticIP(clusterId));
 				SerializerUtil.jsonSerialize(response.getWriter(), arService.getClustersElasticIP(clusterId));		
 			}
 			catch(Exception e)
@@ -171,7 +178,7 @@ public class ClusterController {
 			arService.updateElasticIP(ip);
 		} catch (Exception e) {
 			ExceptionUtil.throwSystemException(e);
-			response.setProperty(ResourceResponse.HTTP_STATUS_CODE, AdminGeneral.HTTP_ERROR_CODE_SERVER_ERROR);	
+			response.setProperty(ResourceResponse.HTTP_STATUS_CODE, HttpCodes.HTTP_ERROR_CODE_SERVER_ERROR);	
 		}
 	}
 	
@@ -195,7 +202,7 @@ public class ClusterController {
 			arService.freeElasticIP(eip);
 		} catch(Exception e){
 			e.printStackTrace();
-			response.setProperty(ResourceResponse.HTTP_STATUS_CODE, AdminGeneral.HTTP_ERROR_CODE_SERVER_ERROR);	
+			response.setProperty(ResourceResponse.HTTP_STATUS_CODE, HttpCodes.HTTP_ERROR_CODE_SERVER_ERROR);	
 		}
 	}
 	
@@ -236,7 +243,7 @@ public class ClusterController {
 			arService.deleteUserAuthorizedIP(ipId);
 		} catch(Exception e){
 			e.printStackTrace();
-			response.setProperty(ResourceResponse.HTTP_STATUS_CODE, AdminGeneral.HTTP_ERROR_CODE_SERVER_ERROR);		
+			response.setProperty(ResourceResponse.HTTP_STATUS_CODE, HttpCodes.HTTP_ERROR_CODE_SERVER_ERROR);		
 		}	
 	}
 		 
@@ -270,7 +277,7 @@ public class ClusterController {
 			SerializerUtil.jsonSerialize(response.getWriter(), ipId);	
 		} catch(Exception e){
 			e.printStackTrace();
-			response.setProperty(ResourceResponse.HTTP_STATUS_CODE, AdminGeneral.HTTP_ERROR_CODE_SERVER_ERROR);		
+			response.setProperty(ResourceResponse.HTTP_STATUS_CODE, HttpCodes.HTTP_ERROR_CODE_SERVER_ERROR);		
 		}	
 	}
 	
@@ -300,54 +307,43 @@ public class ClusterController {
 	}
 
 	@ResourceMapping("scaleCluster")
-	public void scaleService(ResourceRequest request, ResourceResponse response, 
-		@RequestParam("cluster") int clusterId, 
-		@RequestParam("manualScaling") boolean manualScaling, 
-		@RequestParam("machineCount") int newSize,
-		@RequestParam("minSize") int minSize,		
-		@RequestParam("maxSize") int maxSize,
-		@RequestParam("downscaleThreshold") float minClusterLoad, 
-		@RequestParam("upscaleThreshold") float maxClusterLoad, 
-		@RequestParam("automaticScaling") boolean periodicScallingOn,
-		@RequestParam("scalePeriodFrom") long scalePeriodFrom, 
-		@RequestParam("scalePeriodTo") long scalePeriodTo,
-		@RequestParam("scheduledClusterSize") int clusterSizeNew, 
-		@RequestParam("scheduledScaling") boolean scheduledScalingOn) {
+	public void scaleCluster(
+			ResourceRequest request,
+			ResourceResponse response,
+			@RequestParam("cluster") int clusterId, 
+			@RequestParam("periodicScalingOn") boolean periodicScalingOn,
+			@RequestParam("scheduledScalingOn") boolean scheduledScalingOn,
+			@RequestParam("maxNumberOfMachinesPerCluster") int maxNumberOfMachinesPerCluster,		
+			@RequestParam("minNumberOfMachinesPerCluster") int minNumberOfMachinesPerCluster,
+			@RequestParam("maxLoad") float maxLoad, 
+			@RequestParam("minLoad") float minLoad,		 
+			@RequestParam("periodFrom") long periodFrom, 
+			@RequestParam("periodTo") long periodTo,
+			@RequestParam("scheduledClusterSize") int scheduledClusterSize, 
+			@RequestParam("manualScaling") boolean manualScaling, 
+			@RequestParam("manualScalingNewSize") int manualScalingNewSize){
 		
-		try {
-			if (liferayService.getUser(request, response) == null) return;
-			Cluster cluster = clusterService.getCluster(clusterId);
-			Instance instance = instanceService.getInstance(cluster.getInstanceId());
-			int clusterSize = cluster.getNumberOfMachines();
-			int instanceId = cluster.getInstanceId(); 
-			int cloudType = instance.getCloudType();
-			String cloudZone = instance.getZone();
-			int jobId = -1;		
-			
-			if (manualScaling && clusterSize != newSize){   
-			    if (periodicScallingOn) newSize = calculateNewClusterSize(newSize, minSize, maxSize);              
-				jobId = jobService.addJob(new Job("scale_cluster", instanceId, cloudType, JobService.CLOUD_JOB_CREATED, cloudZone, Integer.toString(clusterId),newSize));			
-			}
-			else if (!manualScaling && periodicScallingOn){
-			    newSize = calculateNewClusterSize(clusterSize, minSize, maxSize);
-                if (clusterSize != newSize){
-                    jobId = jobService.addJob(new Job("scale_cluster", instanceId, cloudType, JobService.CLOUD_JOB_CREATED, cloudZone, Integer.toString(clusterId),newSize));    
-                }
-			}			
-			scalingRuleService.store(new ScalingRule(clusterId, periodicScallingOn, scheduledScalingOn, 1,  
-				maxSize, minSize, maxClusterLoad, minClusterLoad, new Timestamp(scalePeriodFrom),
-				new Timestamp(scalePeriodTo), clusterSizeNew, 0, jobId));  
-	        
-		} catch (Exception e) {
-			LOG.error("Error setting up the service: "+e.getMessage());
-			response.setProperty(ResourceResponse.HTTP_STATUS_CODE, AdminGeneral.HTTP_ERROR_CODE_SERVER_ERROR);
-			try {
-				response.getWriter().write(e.getMessage());
-			} catch (IOException ioe) {
-				LOG.error("Error while writing the http reply: "+ioe.getMessage());
-				ioe.printStackTrace();
-			}
+		Assert.notNull(liferayService.getUser(request, response));	
+		ScalingRule scalingRule = new ScalingRule(
+				clusterId,
+				periodicScalingOn,
+				scheduledScalingOn,
+				1,
+				maxNumberOfMachinesPerCluster,
+				minNumberOfMachinesPerCluster,
+				maxLoad,
+				minLoad,
+				new Timestamp(periodFrom),
+				new Timestamp(periodTo),
+				scheduledClusterSize,
+				CLUSTER_SIZE_UNDEFINED, 
+				JOB_ID_UNDEFINED);
+		
+		if (manualScaling && manualScalingNewSize != clusterService.getCluster(scalingRule.getClusterId()).getNumberOfMachines()){
+			Job scalingJob = createScalingJob(scalingRule, manualScalingNewSize);
+			scalingRule.setJobId(jobService.addJob(scalingJob));	
 		}
+		scalingRuleService.store(scalingRule);
 	}
 	
 	@ResourceMapping("getClusterInfo")
@@ -437,16 +433,34 @@ public class ClusterController {
 			scalingRuleData.put("scheduledSize", scalingRule.getClusterSizeNew());
 		}
 		catch(Exception e){
-		//	TODO, catch loadByClusterId exceptions, ignore put exceptions
+		//TODO: catch loadByClusterId exceptions, ignore put exceptions
 			e.printStackTrace();
 			scalingRuleData.put("ruleDefined", false);
 		}	
 		SerializerUtil.jsonSerialize(response.getWriter(), scalingRuleData);
 	}
-	
-	private int calculateNewClusterSize(int refSize, int minSize, int maxSize){
-	    if (refSize < minSize) return minSize;
-	    else if (refSize > maxSize) return maxSize;
-	    else return refSize;
+		
+	public int putValueInRange(int value, int min, int max){  
+	    if (value < min){
+	    	return min;
+	    }
+	    else if (value > max){
+	    	return max;
+	    }
+	    else return value;
 	}
+	
+	private Job createScalingJob(ScalingRule scalingRule, int manualScalingNewSize){	
+		Cluster cluster = clusterService.getCluster(scalingRule.getClusterId());
+		Instance instance = instanceService.getInstance(cluster.getInstanceId());
+					
+		return new Job("scale_cluster", 
+					   cluster.getInstanceId(),
+                	   instance.getCloudType(), 
+			           JobService.CLOUD_JOB_CREATED,
+			           instance.getZone(),
+			           Integer.toString(scalingRule.getClusterId()),
+			           manualScalingNewSize);		
+	}
+	
 }

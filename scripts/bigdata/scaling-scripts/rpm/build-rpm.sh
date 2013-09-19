@@ -40,9 +40,12 @@
 #
 # VERSION HISTORY
 #
-# 1.0    2012-04-03  Initial version
+# 1.0   2012-04-03  Initial version
 #
-# 1.0.1  2012-04-04  Added RPM install retry
+# 1.0.1 2012-04-04  Added RPM install retry
+#
+# 1.1   2013-08-28  MongoDB 2.4.6 and Cloudera 4.3 support. 
+#                   Fixed /etc/hosts generation.
 #
 
 # Update the application files
@@ -57,8 +60,8 @@ cp -pR ../bin $TMPDIR/ROOT/
 
 # Build RPM package
 fpm -s dir -t rpm -C $TMPDIR -p $TARGETDIR -a noarch \
-	-n toas-bigdata-mgmt --version 1.0.1 --iteration 1 \
-	--description "HBase and MongoDB cluster up and down scaling scipts" \
+	-n toas-bigdata-mgmt --version 1.1 --iteration 18 \
+	--description "Hadoop, HBase and MongoDB cluster up and down scaling scipts" \
 	-d "python python-paramiko" \
 	--prefix /opt/bigdata \
 	-C $TMPDIR/ROOT --after-install $SCRIPTDIR/fpm-post-install.sh \

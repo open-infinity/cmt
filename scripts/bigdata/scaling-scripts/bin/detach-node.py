@@ -90,7 +90,7 @@ try:
 
     # Handle the special case for all        
     if hostnames == ['ALL']:
-        if cc.type == "hbase":
+        if cc.type == "hbase" or cc.type == 'hadoop':
             hostnames = []
             for host in cc.hives:
                 hostnames.append(host.hostname)
@@ -110,7 +110,7 @@ try:
     # Iterate hostnames
     for hostname in hostnames:
         if hostname:
-            # Lock the HBase directory tree
+            # Lock the big data directory tree
             if bigdata.acquire("node-%s" % hostname, False):
                 # Reread the config after each removal
                 cc = bigdata.create_config_context(options)

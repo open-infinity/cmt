@@ -80,6 +80,8 @@ try:
     roles = []
     if cc.type == "hbase":
         (roles, counts) = hbase.generate_role_list(cc, node_count)        
+    elif cc.type == "hadoop":
+        (roles, counts) = hbase.generate_role_list(cc, node_count)        
     elif cc.type == "mongodb":
         (roles, counts) = mongodb.generate_role_list(cc, node_count)
 

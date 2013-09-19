@@ -17,9 +17,11 @@
 package org.openinfinity.cloud.service.scaling;
 
 import java.util.Collection;
+
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.openinfinity.cloud.domain.Job;
 import org.openinfinity.cloud.domain.ScalingRule;
 import org.openinfinity.cloud.service.scaling.Enumerations.ScalingState;
@@ -30,7 +32,8 @@ import org.openinfinity.cloud.service.administrator.MachineService;
 import org.openinfinity.core.exception.BusinessViolationException;
 
 /**
- * Service interface implementation of the automated provisioning business rules.
+ * Service interface implementation of the automated provisioning business
+ * rules.
  * 
  * @author Ilkka Leinonen
  * @author Vedran Bartonicek
@@ -40,110 +43,125 @@ import org.openinfinity.core.exception.BusinessViolationException;
 @Service("scalingRuleService")
 public class ScalingRuleServiceImpl implements ScalingRuleService {
 
-	private static final Logger LOG = Logger.getLogger(ScalingRuleServiceImpl.class.getName());
+	private static final Logger LOG = Logger
+			.getLogger(ScalingRuleServiceImpl.class.getName());
 
 	@Autowired
 	ScalingRuleRepository scalingRuleRepository;
-	
+
 	@Autowired
 	MachineService machineService;
-	
+
 	@Autowired
-    ClusterService clusterService;
-	
+	ClusterService clusterService;
+
 	@Autowired
 	JobService jobService;
-	
+
 	@Override
-	public ScalingState calculateScalingState(ScalingRule rule, float load, int clusterId) {
+	public ScalingState calculateScalingState(ScalingRule rule, float load,
+			int clusterId) {
 		validateInput(rule, load, clusterId);
 		return applyScalingRule(load, clusterId, rule);
 	}
 
 	public void validateInput(ScalingRule rule, float load, int clusterId) {
-	    if (rule == null ) throw new BusinessViolationException("Invalid rule");
-		if (load < 0.0 ) throw new BusinessViolationException("Invalid load: [" + load + "]");
-		if (clusterId < 0) throw new BusinessViolationException("Invalid cluster: [" + clusterId + "]");
+		if (rule == null)
+			throw new BusinessViolationException("Invalid rule");
+		if (load < 0.0)
+			throw new BusinessViolationException("Invalid load: [" + load + "]");
+		if (clusterId < 0)
+			throw new BusinessViolationException("Invalid cluster: ["
+					+ clusterId + "]");
 	}
-	
-	public ScalingState applyScalingRule(float load, int clusterId, ScalingRule rule) {
-	    int clusterSize = clusterService.getCluster(clusterId).getNumberOfMachines();
+
+	public ScalingState applyScalingRule(float load, int clusterId,	ScalingRule rule) {
+		int clusterSize = clusterService.getCluster(clusterId).getNumberOfMachines();
 		int maxMachines = rule.getMaxNumberOfMachinesPerCluster();
 		int minMachines = rule.getMinNumberOfMachinesPerCluster();
 		float maxLoad = rule.getMaxLoad();
 		float minLoad = rule.getMinLoad();
-		LOG.debug ("executeBusinessLogic() Parameters: clusterId = " + clusterId
-                + " load = " + load 
-                + " maxMachines = "  + maxMachines
-                + " minMachines = "  + minMachines
-                + " maxLoad = "  + maxLoad
-                + " minLoad = "  + minLoad
-                + " clusterSize = "  + clusterSize);
-		
+		LOG.debug("executeBusinessLogic() Parameters: clusterId = " + clusterId
+				+ " load = " + load + " maxMachines = " + maxMachines
+				+ " minMachines = " + minMachines + " maxLoad = " + maxLoad
+				+ " minLoad = " + minLoad + " clusterSize = " + clusterSize);
+
 		ScalingState state = ScalingState.SCALING_DISABLED;
-		
+
 		boolean scalingJobActive = true;
 		int jobId = rule.getJobId();
 		Job job = null;
-		
+
 		// If there was a scaling job, check if it is ready
-		if (jobId != -1) { 
+		if (jobId != -1) {
 			job = jobService.getJob(jobId);
-			if (job != null){
+			if (job != null) {
 				int jobStatus = job.getJobStatus();
 				if (jobStatus == JobService.CLOUD_JOB_READY)
-				    scalingJobActive = false;
-			} 	
+					scalingJobActive = false;
+			}
+		} else
+			scalingJobActive = false;
+
+		boolean allMachinesConfigured = false;
+
+		if (!scalingJobActive) allMachinesConfigured = machineService.allMachinesConfigured(clusterId);
+
+		LOG.debug("scalingJobReady=" + scalingJobActive	+ " allMachinesConfigured=" + allMachinesConfigured);
+
+		if (!rule.isPeriodicScalingOn() || scalingJobActive || !allMachinesConfigured){
+			state = ScalingState.SCALING_SKIPPED;			
+		} else if (load >= maxLoad && clusterSize < maxMachines){
+			state = ScalingState.SCALING_OUT;
+		} else if (load <= minLoad && clusterSize > minMachines){
+			state = ScalingState.SCALING_IN;
+		} else if (clusterSize >= maxMachines && load > maxLoad){
+			state = ScalingState.SCALING_NEEDED_BUT_IMPOSSIBLE;
+		} else {
+			state = ScalingState.SCALING_NOT_NEEDED;
 		}
-		else scalingJobActive = false;
-		
-        boolean allMachinesConfigured = false;
-        
-        if (!scalingJobActive)
-            allMachinesConfigured = machineService.allMachinesConfigured(clusterId);
 
-        LOG.debug("scalingJobReady=" +  scalingJobActive + " allMachinesConfigured=" + allMachinesConfigured);
-
-		if (!rule.isPeriodicScalingOn() || scalingJobActive || !allMachinesConfigured)
-			state = ScalingState.SCALING_SKIPPED;
-		else if (load >= maxLoad && clusterSize < maxMachines) 
-	        state =  ScalingState.SCALING_OUT;
-	    else if (load <= minLoad && clusterSize > minMachines)
-	        state =  ScalingState.SCALING_IN; 
-		else if (clusterSize >= maxMachines && load > maxLoad) 
-		    state = ScalingState.SCALING_NEEDED_BUT_IMPOSSIBLE;
-		else 
-		    state = ScalingState.SCALING_NOT_NEEDED;
-		
-		LOG.debug ("applyScalingRule() return = " + state.name());
+		LOG.debug("applyScalingRule() return = " + state.name());
 		return state;
 	}
-	
-	public void store (ScalingRule scalingRule){
-		scalingRuleRepository.store(scalingRule);
+
+	/*
+	 * Using two sql requests instead of using single with command
+	 * "on duplicate key update". That is beacuse H2 db, which is used for
+	 * testing, would not support it. -Vedran Bartonicek
+	 */
+	@Transactional
+	public void store(ScalingRule newScalingRule) {
+		ScalingRule scalingRule = scalingRuleRepository.getRule(newScalingRule.getClusterId());
+		if (scalingRule != null) {
+			scalingRuleRepository.updateExisting(newScalingRule);
+		} else {
+			scalingRuleRepository.addNew(newScalingRule);
+		}
 	}
 
-	public ScalingRule getRule(int clusterId){
-        return scalingRuleRepository.getRule(clusterId);
+	public ScalingRule getRule(int clusterId) {
+		return scalingRuleRepository.getRule(clusterId);
 	}
-    
-	public void deleteByClusterId(int id){
+
+	public void deleteByClusterId(int id) {
 		scalingRuleRepository.deleteByClusterId(id);
 	}
 
-	public Collection<ScalingRule> loadAll(){
+	public Collection<ScalingRule> loadAll() {
 		return scalingRuleRepository.loadAll();
 	}
-	
-	public void storeScalingOutParameters(int numberOfMachines, int clusterId){
-		scalingRuleRepository.storeStateScheduledScaling(numberOfMachines, clusterId);
+
+	public void storeScalingOutParameters(int numberOfMachines, int clusterId) {
+		scalingRuleRepository.storeStateScheduledScaling(numberOfMachines,
+				clusterId);
 	}
 
-	public void storeScalingInParameters(int clusterId){
+	public void storeScalingInParameters(int clusterId) {
 		scalingRuleRepository.storeStateScheduledUnScaling(clusterId);
 	}
-	
-	public void storeJobId(int clusterId, int jobId){
-        scalingRuleRepository.storeJobId(clusterId, jobId);
+
+	public void storeJobId(int clusterId, int jobId) {
+		scalingRuleRepository.storeJobId(clusterId, jobId);
 	}
 }

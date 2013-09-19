@@ -21,6 +21,8 @@ import java.sql.Timestamp;
 
 import lombok.Data;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 
 import org.openinfinity.core.annotation.NotScript;
 
@@ -34,6 +36,8 @@ import org.openinfinity.core.annotation.NotScript;
  */
 
 @Data
+@NoArgsConstructor
+@RequiredArgsConstructor
 public class ScalingRule implements Serializable {
 	
 	@NonNull 
@@ -87,5 +91,4 @@ public class ScalingRule implements Serializable {
 	@NonNull 
 	@NotScript
 	private int jobId;
-
 }

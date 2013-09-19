@@ -9,7 +9,6 @@
 		<version>${project.global.version}</version>
 	   	<relativePath>..</relativePath>    	
 	</parent>
-	<groupId>org.openinfinity</groupId>
 	<artifactId>cloud-autoscaler</artifactId>
 	<packaging>jar</packaging>
 	<name>cloud-autoscaler</name>
@@ -18,18 +17,7 @@
       This project project provides analyzes for automated provisioning capabilities for Open Infinity based cloud projects. 
     ]]>
 	</description>
-	<properties>
-		<maven.test.failure.ignore>true</maven.test.failure.ignore>
-		<spring.framework.version>3.1.1.RELEASE</spring.framework.version>
-		<spring.batch.version>2.1.8.RELEASE</spring.batch.version>
-	</properties>
 	<profiles>
-		<profile>
-			<id>strict</id>
-			<properties>
-				<maven.test.failure.ignore>false</maven.test.failure.ignore>
-			</properties>
-		</profile>
 		<profile>
 			<id>compiler</id>
 			<activation>
@@ -73,7 +61,7 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-test</artifactId>
-			<version>${spring.framework.version}</version>
+			<version>${springframework.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -84,17 +72,17 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-jdbc</artifactId>
-			<version>${spring.framework.version}</version>
+			<version>${springframework.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-tx</artifactId>
-			<version>${spring.framework.version}</version>
+			<version>${springframework.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context</artifactId>
-			<version>${spring.framework.version}</version>
+			<version>${springframework.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>cglib</groupId>
@@ -104,7 +92,7 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-aop</artifactId>
-			<version>${spring.framework.version}</version>
+			<version>${springframework.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.batch</groupId>
@@ -222,7 +210,7 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
-				    <skipTests>true</skipTests>
+				    <skipTests>false</skipTests>
 					<includes>
 						<include>**/SystemTests.java</include>
 					</includes>

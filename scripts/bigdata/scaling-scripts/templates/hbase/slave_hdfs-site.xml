@@ -4,10 +4,15 @@
     <configuration>
     <property>
         <name>dfs.data.dir</name>
-        <value>/data/1/dfs/dn,/data/2/dfs/dn,/data/3/dfs/dn</value>
+        <value>[[DATABASE_DIR]]/1/dfs/dn,[[DATABASE_DIR]]/2/dfs/dn,[[DATABASE_DIR]]/3/dfs/dn</value>
+    </property>
+    <property>
+        <name>fs.checkpoint.period</name>
+        <value>5</value> <!-- See: http://www.cloudera.com/content/cloudera-content/cloudera-docs/CDH4/4.2.1/CDH4-Security-Guide/cdh4sg_topic_3_14.html -->
     </property>
     <property>
         <name>dfs.datanode.max.xcievers</name>
         <value>4096</value>
     </property>	
 </configuration>
+
