@@ -28,10 +28,6 @@
 # Delete rpm etc backups
 find /etc -name "*.rpmsave" | xargs rm -fR
 
-# The common package have to be removed too, to ensure full cleanup 
-# (and recovery in case of re-install)
-yum -y erase MariaDB-common
-
 # Purge MariaDB data dir
 rm -fR /var/lib/mysql
 
@@ -40,4 +36,8 @@ rm -fR /etc/hive
 
 # Remove the connector symbolic link
 rm -f /usr/lib/hive/lib/mysql-connector-java.jar
+
+# The common package have to be removed too, to ensure full cleanup 
+# (and recovery in case of re-install)
+yum -y erase MariaDB-common hive-jdbc
 

@@ -47,6 +47,9 @@
 # 1.1   2013-08-28  MongoDB 2.4.6 and Cloudera 4.3 support. 
 #                   Fixed /etc/hosts generation.
 #
+# 1.2   2013-09-19  Hadoop without HBase support
+#                   Apache Hive Support
+#
 
 # Update the application files
 export TMPDIR=/tmp/bigdata-fpm-ROOT
@@ -60,7 +63,7 @@ cp -pR ../bin $TMPDIR/ROOT/
 
 # Build RPM package
 fpm -s dir -t rpm -C $TMPDIR -p $TARGETDIR -a noarch \
-	-n toas-bigdata-mgmt --version 1.1 --iteration 18 \
+	-n toas-bigdata-mgmt --version 1.2 --iteration 3 \
 	--description "Hadoop, HBase and MongoDB cluster up and down scaling scipts" \
 	-d "python python-paramiko" \
 	--prefix /opt/bigdata \

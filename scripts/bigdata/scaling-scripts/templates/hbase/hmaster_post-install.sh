@@ -80,7 +80,7 @@ if [ $? -eq 1 ] ; then
     exit 1
 fi
 
-if [ "[[CLUSTER_TYPE]]" -eq "hbase" ] ; then
+if [ "[[CLUSTER_TYPE]]" == "hbase" ] ; then
     su - hdfs -s /bin/bash -c 'hadoop fs -mkdir /hbase' 
     su - hdfs -s /bin/bash -c 'hadoop fs -chmod -R 775 /hbase' || exit 1
     su - hdfs -s /bin/bash -c 'hadoop fs -chown -R hbase /hbase' || exit 1
@@ -94,7 +94,7 @@ su - hdfs -s /bin/bash -c 'hadoop fs -mkdir -p /mapred/system'
 su - hdfs -s /bin/bash -c 'hadoop fs -chmod -R 775 /mapred/system' || exit 1
 su - hdfs -s /bin/bash -c 'hadoop fs -chown -R mapred /mapred/system' || exit 1
 
-if [ "[[CLUSTER_TYPE]]" -eq "hbase" ] ; then
+if [ "[[CLUSTER_TYPE]]" == "hbase" ] ; then
     su - hdfs -s /bin/bash -c 'hadoop fs -mkdir -p /user/hbase'
     su - hdfs -s /bin/bash -c 'hadoop fs -chmod -R 775 /user/hbase' || exit 1
     su - hdfs -s /bin/bash -c 'hadoop fs -chown -R hbase /user/hbase' || exit 1
@@ -119,7 +119,7 @@ fi
 
 echo "Creating SSH keys for hbase and hdfs users"
 
-if [ "[[CLUSTER_TYPE]]" -eq "hbase" ] ; then
+if [ "[[CLUSTER_TYPE]]" == "hbase" ] ; then
     HBASE_HOMEDIR=`egrep "^hbase:" /etc/passwd | cut -d':' -f6`
     mkdir $HBASE_HOMEDIR/.ssh
     chown hbase $HBASE_HOMEDIR/.ssh 
