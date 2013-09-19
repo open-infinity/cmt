@@ -4,6 +4,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import static org.junit.Assert.*;
 import org.openinfinity.cloud.application.admin.controller.CloudAdminController;
 import org.openinfinity.cloud.domain.*;
 import org.openinfinity.cloud.domain.repository.administrator.InstanceRepository;
@@ -21,8 +22,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.fail;
 
 /**
  * Created with IntelliJ IDEA.

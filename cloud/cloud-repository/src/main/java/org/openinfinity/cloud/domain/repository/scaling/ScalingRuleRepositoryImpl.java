@@ -19,6 +19,8 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.sql.DataSource;
 
@@ -29,6 +31,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.Assert;
 import org.openinfinity.cloud.domain.ScalingRule;
@@ -105,7 +108,11 @@ public class ScalingRuleRepositoryImpl implements ScalingRuleRepository {
 	private RowMapper<ScalingRule> scalingRuleRowMapper;
 	
 	@Autowired
-	public ScalingRuleRepositoryImpl(@Qualifier("cloudDataSource") DataSource dataSource) {
+	@Qualifier("cloudDataSource")
+	private DataSource dataSource;
+
+	@Autowired
+	public ScalingRuleRepositoryImpl(DataSource dataSource) {
 		Assert.notNull(dataSource, "Please define datasource for scaling rule repository.");
 		this.jdbcTemplate = new JdbcTemplate(dataSource);
 	}
@@ -149,7 +156,6 @@ public class ScalingRuleRepositoryImpl implements ScalingRuleRepository {
 	    try {
 	        return (ScalingRule) jdbcTemplate.queryForObject(LOAD_BY_CLUSTER_ID, new Object[]{clusterId}, scalingRuleRowMapper);
 	    } catch (EmptyResultDataAccessException dae) {
-	        //FIXME: Looks like exception is always caught at service level, does not propagate to autoscaler 
 	    }
 	    return null;
 	}
@@ -196,5 +202,45 @@ public class ScalingRuleRepositoryImpl implements ScalingRuleRepository {
             }
         });
     }
+	
+	public void addNew(final ScalingRule newScalingRule){
+		SimpleJdbcInsert insert = new SimpleJdbcInsert(dataSource).withTableName("scaling_rule_tbl");	
+		Map<String,Object> parameters = new HashMap<String,Object>();	
+		parameters.put("cluster_id", newScalingRule.getClusterId());
+		parameters.put("periodic", newScalingRule.isPeriodicScalingOn());
+		parameters.put("scheduled", newScalingRule.isScheduledScalingOn());
+		parameters.put("scaling_state", newScalingRule.getScheduledScalingState());
+		parameters.put("max_machines", newScalingRule.getMaxNumberOfMachinesPerCluster());
+		parameters.put("min_machines", newScalingRule.getMinNumberOfMachinesPerCluster());
+		parameters.put("max_load", newScalingRule.getMaxLoad());
+		parameters.put("min_load", newScalingRule.getMinLoad());
+		parameters.put("period_from", newScalingRule.getPeriodFrom());
+		parameters.put("period_to", newScalingRule.getPeriodTo());
+		parameters.put("size_new", newScalingRule.getClusterSizeNew());
+		parameters.put("size_original", newScalingRule.getClusterSizeOriginal());
+		parameters.put("job_id", newScalingRule.getJobId());
+		insert.execute(parameters);  
+	}
+			
+	@AuditTrail
+	public void updateExisting(final ScalingRule scalingRule) {
+		jdbcTemplate.update(INSERT, new PreparedStatementSetter() {
+			public void setValues(PreparedStatement ps) throws SQLException {	
+				ps.setInt(1, scalingRule.getClusterId()); 
+				ps.setBoolean(2, scalingRule.isPeriodicScalingOn());
+				ps.setBoolean(3, scalingRule.isScheduledScalingOn());
+				ps.setInt(4, scalingRule.getScheduledScalingState());
+				ps.setInt(5, scalingRule.getMaxNumberOfMachinesPerCluster()); 
+				ps.setInt(6, scalingRule.getMinNumberOfMachinesPerCluster());
+				ps.setFloat(7, scalingRule.getMaxLoad());
+				ps.setFloat(8, scalingRule.getMinLoad());
+				ps.setTimestamp(9, scalingRule.getPeriodFrom()); 
+				ps.setTimestamp(10, scalingRule.getPeriodTo());
+				ps.setInt(11, scalingRule.getClusterSizeNew());
+				ps.setInt(12, scalingRule.getClusterSizeOriginal());
+				ps.setInt(13, scalingRule.getJobId());
+			}
+		});			
+	}
 	
 }

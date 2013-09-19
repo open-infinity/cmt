@@ -17,9 +17,11 @@
 package org.openinfinity.cloud.service.scaling;
 
 import java.util.Collection;
+
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.openinfinity.cloud.domain.Job;
 import org.openinfinity.cloud.domain.ScalingRule;
 import org.openinfinity.cloud.service.scaling.Enumerations.ScalingState;
@@ -119,15 +121,23 @@ public class ScalingRuleServiceImpl implements ScalingRuleService {
 		return state;
 	}
 	
-	public void store (ScalingRule scalingRule){
-		scalingRuleRepository.store(scalingRule);
+	/*
+	 * Using two sql requests instead of using single with command 
+	 * "on duplicate key update". That is beacuse H2 db, which is used for
+	 * testing, would not support it. 
+	 * -Vedran Bartonicek
+	 */
+	@Transactional
+	public void store (ScalingRule newScalingRule){
+		ScalingRule scalingRule = scalingRuleRepository.getRule(newScalingRule.getClusterId());
+		if (scalingRule != null){
+			scalingRuleRepository.updateExisting(newScalingRule);
+		} else {
+			scalingRuleRepository.addNew(newScalingRule);
+		}		
 	}
 
 	public ScalingRule getRule(int clusterId){
-		ScalingRule r = scalingRuleRepository.getRule(clusterId);
-		LOG.debug("-------------------------------------------");
-		LOG.debug(Integer.toString(r.getClusterSizeOriginal()));
-
         return scalingRuleRepository.getRule(clusterId);
 	}
     
