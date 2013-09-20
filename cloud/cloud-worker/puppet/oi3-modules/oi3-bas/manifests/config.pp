@@ -10,7 +10,7 @@ class oi3-bas::config {
                 group => 'oiuser',
                 mode => 0755,
                 source => "puppet:///modules/oi3-bas/setenv.sh",
-                require => Class["oibas::install"],
+                require => Class["oi3-bas::install"],
         }
 
 	file {"/opt/openinfinity/3.0.0/tomcat/conf/catalina.properties":
