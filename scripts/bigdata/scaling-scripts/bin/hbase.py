@@ -104,7 +104,7 @@ def generate_role_list(cc, num):
         elif hmcount == 0 and scount >= 3: # Notice: this should be in sync with dfs.replication parameter in hmaster_hdfs-site.xml
             r.append('hmaster')
             hmcount += 1
-        elif cc.hive_support and hive_count == 0 and zcount >= 3:
+        elif cc.hive_support and hive_count == 0 and zcount >= 3 and hmcount == 1:
             r.append('hive')
             hive_count += 1
         else:

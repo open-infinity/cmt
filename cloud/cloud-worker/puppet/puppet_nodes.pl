@@ -402,7 +402,7 @@ if($type eq "portal_lb" || $type eq "service_lb") {
 	%parameters = (
 		rsaprivatekey => $secretKey
 	);
-	push(@class, "toasbigdatamgmt");
+	push(@class, "oi3-bigdatamgmt");
 } elsif($type eq "bigdata_host" || $type eq "nosql_host") {
 	my $sql = "select machine_name from machine_tbl where machine_id = $machine";
 	my $sth = $dbh->prepare($sql);
@@ -413,7 +413,7 @@ if($type eq "portal_lb" || $type eq "service_lb") {
 	%parameters = (
 		hostname => $machineName
 	);
-	push(@class, "toasbigdatahost");
+	push(@class, "oi3-bigdatahost");
 } elsif($type eq "jbossportal") {
 	push(@class, "oijavasehotspot");
 	push(@class, "oibasicjboss");
