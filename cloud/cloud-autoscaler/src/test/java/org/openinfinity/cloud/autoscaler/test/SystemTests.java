@@ -160,7 +160,7 @@ public class SystemTests {
      * After that the mock server is configured to report low load, and scaler should perform
      * scaling in on a cluster.
      */
-	//@Test
+	@Test
     public void periodicScaler_scaleOutScaleIn() throws Exception {
         try{  
             // Init 

@@ -307,7 +307,7 @@ public class ClusterController {
 	}
 
 	@ResourceMapping("scaleCluster")
-	public void scaleService(
+	public void scaleCluster(
 			ResourceRequest request,
 			ResourceResponse response,
 			@RequestParam("cluster") int clusterId, 

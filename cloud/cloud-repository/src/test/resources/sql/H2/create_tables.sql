@@ -48,7 +48,9 @@ CREATE TABLE `cluster_tbl` (
   `cluster_security_group_id` varchar(50) DEFAULT NULL,
   `cluster_security_group_name` varchar(100) DEFAULT NULL,
   `cluster_multicast_address` varchar(50) DEFAULT NULL,
-  `cluster_machine_type` tinyint(4) DEFAULT NULL,
+  `cluster_machine_type` int(11) DEFAULT NULL,
+  `cluster_ebs_image_used` int(11) DEFAULT NULL,
+  `cluster_ebs_volumes_used` int(11) DEFAULT NULL,
   PRIMARY KEY (`cluster_id`)
 );
 
@@ -154,8 +156,8 @@ CREATE TABLE `scaling_rule_tbl` (
   `scaling_state` int(11) NOT NULL,
   `max_machines` int(11) DEFAULT NULL,
   `min_machines` int(11) DEFAULT NULL,
-  `max_cpu_load` int(11) DEFAULT NULL,
-  `min_cpu_load` int(11) DEFAULT NULL,
+  `max_load` int(11) DEFAULT NULL,
+  `min_load` int(11) DEFAULT NULL,
   `period_from` datetime DEFAULT NULL,
   `period_to` datetime DEFAULT NULL,
   `size_new` int(11) DEFAULT NULL,
