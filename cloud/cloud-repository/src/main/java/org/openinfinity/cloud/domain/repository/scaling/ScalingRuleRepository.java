@@ -70,4 +70,6 @@ public interface ScalingRuleRepository {
 
 	void addNew(ScalingRule newScalingRule);
 	
+	void delete(int clusterId);
+	
 }

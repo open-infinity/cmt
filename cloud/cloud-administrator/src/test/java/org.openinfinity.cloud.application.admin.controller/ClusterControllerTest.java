@@ -9,6 +9,9 @@ import javax.portlet.ResourceResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.mock.web.portlet.MockResourceRequest;
 import org.springframework.mock.web.portlet.MockResourceResponse;
 import org.springframework.test.context.ContextConfiguration;
@@ -20,6 +23,7 @@ import com.liferay.portal.model.User;
 
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -79,14 +83,15 @@ public class ClusterControllerTest {
     
     @Mock
     private User mockUser;
-    	
+        
     @Before
     public void initMocks() {
-        MockitoAnnotations.initMocks(this);
+    	MockitoAnnotations.initMocks(this);      
     }
-
+   
     private  ObjectMapper objectMapper = new ObjectMapper();
     
+    // TODO: split this test into two
     @Test
     public void testScaleClusterManualScaleNewSizeNotEqualCurrentSize() {     
         MockResourceResponse response = new MockResourceResponse();
@@ -119,26 +124,25 @@ public class ClusterControllerTest {
 					20              // manualScalingNewSize
 					);
 			
-			// Make sure that job is correctly created
 			Job job = jobService.getJob(1);
 			assertNotNull(job);
         	assertEquals("scale_cluster", job.getJobType());
             assertEquals("1,20", job.getServices()); 
             
-            // Make sure that scaling rule is created
             ScalingRule scalingRule = scalingRuleService.getRule(1);
             assertEquals(200, scalingRule.getMaxNumberOfMachinesPerCluster());
             
-			// Simulate request to scale cluster to size 10, and change 
-			// periodic and scheduled scaling settings
+			// Request to scale cluster from size 10 to size 10, and change 
+			// periodic and scheduled scaling settings.
+            // Request periodic scaling cluster size range 50 -100
 			clusterController.scaleCluster(
 					request,
 					response,
 					1, 				// clusterId
 					false, 			// periodicScalingOn
 					false, 			// scheduledScalingOn
-					200, 			// maxNumberOfMachinesPerCluster
-					1, 				// minNumberOfMachinesPerCluster
+					100, 			// maxNumberOfMachinesPerCluster
+					50,				// minNumberOfMachinesPerCluster
 					(float) 0.9, 	// maxLoad
 					(float) 0.1, 	// minLoad
 					0, 				// periodFrom
@@ -152,13 +156,15 @@ public class ClusterControllerTest {
 			job = jobService.getJob(2);
 			assertNull(job);
 			
-			// Make sure that scaling rule got updated
 			ScalingRule scalingRuleFinal = scalingRuleService.getRule(1);
             assertEquals(false, scalingRuleFinal.isPeriodicScalingOn());
-            assertEquals(false, scalingRuleFinal.isScheduledScalingOn());            
+            assertEquals(false, scalingRuleFinal.isScheduledScalingOn()); 
+            assertEquals(100, scalingRuleFinal.getMaxNumberOfMachinesPerCluster()); 
+            assertEquals(50, scalingRuleFinal.getMinNumberOfMachinesPerCluster());             
         }
         catch (Exception e){
             ExceptionUtil.throwSystemException(e);   
         }
     }
+    
 }

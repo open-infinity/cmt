@@ -14,26 +14,12 @@
  * limitations under the License.
  */
 
-package org.openinfinity.cloud.autoscaler.test;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.net.URL;
-import java.sql.Timestamp;
+package org.openinfinity.cloud.autoscaler.test.function;
 
 import javax.sql.DataSource;
 
 import junit.framework.Assert;
 
-import org.apache.log4j.Logger;
-import org.dbunit.database.DatabaseDataSourceConnection;
-import org.dbunit.database.IDatabaseConnection;
-import org.dbunit.dataset.IDataSet;
-import org.dbunit.dataset.ReplacementDataSet;
-import org.dbunit.dataset.xml.FlatXmlDataSetBuilder;
-import org.dbunit.operation.DatabaseOperation;
-import org.dbunit.util.fileloader.DataFileLoader;
-import org.dbunit.util.fileloader.FlatXmlDataFileLoader;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,24 +27,23 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.openinfinity.cloud.autoscaler.gateway.HttpGateway;
+import org.openinfinity.cloud.autoscaler.test.util.DatabaseUtils;
 import org.openinfinity.cloud.domain.ScalingRule;
 import org.openinfinity.cloud.service.administrator.ClusterService;
 import org.openinfinity.cloud.service.administrator.JobService;
 import org.openinfinity.cloud.service.scaling.ScalingRuleService;
-import org.openinfinity.cloud.service.scaling.ScalingRuleServiceImpl;
 
 /**
- * Batch configuration integration tests.
+ * Cloud-autoscaler periodic scaler, functional tests
  * 
  * @author Vedran Bartonicek
- * @version 1.0.0
- * @since 1.0.0
+ * @version 1.3.0
+ * @since 1.2.0
  */
 
 @ContextConfiguration(locations={"classpath*:META-INF/spring/cloud-autoscaler-test-context.xml"})
 @RunWith(SpringJUnit4ClassRunner.class)
-public class SystemTests {
-	private static final Logger LOG = Logger.getLogger(SystemTests.class.getName());
+public class PeriodicScalerTest {
 
 	@Autowired
 	@Qualifier("cloudDataSource")
@@ -77,7 +62,6 @@ public class SystemTests {
     JobService jobService;
 	
 	private static final int CLUSTER_ID = 1;    
-	private static final int JOB_ID = 0;
 	private static final String MOCK_SERVER_PATH = "src/test/python/mock-rrd-server.py";
 	private static final int AUTOSCALER_PERIOD_MS = 10000;
 	private static final String URL_LOAD_LOW = "http://127.0.0.1:8181/test/load/low";
@@ -85,73 +69,6 @@ public class SystemTests {
     private static final String URL_LOAD_MEDIUM = "http://127.0.0.1:8181/test/load/medium";
     private static final int JOB_UNDEFINED = -1;
     		
-	protected IDataSet initDataSet() throws Exception
-    {
-        long now = System.currentTimeMillis();
-	    Timestamp from = new Timestamp(now + 2100);
-	    Timestamp to = new Timestamp(now + 7200 );
-		ReplacementDataSet dataSet = null;
-		
-		try{		
-			URL resourceLocation = this.getClass().getClassLoader().getResource("META-INF/sql/dataset-init-scale-out.xml");
-	        dataSet = new ReplacementDataSet(new FlatXmlDataSetBuilder().
-	            build(new FileInputStream(new File(resourceLocation.toURI())))); 
-	        dataSet.addReplacementObject("[from]", from);
-	        dataSet.addReplacementObject("[to]", to);
-		}
-		catch (Exception e){
-		    e.printStackTrace();
-		}
-        return dataSet;
-    }
-		
-	public void updateTestDatabase(IDataSet dataSet){
-		try {
-			IDatabaseConnection dbConn = new DatabaseDataSourceConnection(dataSource);
-			DatabaseOperation.CLEAN_INSERT.execute(dbConn, dataSet);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-	/*
-	 * Scheduled scaler scaling out and in system test.
-	 * 
-	 * Database is configured so that scheduled scaler would perform scale out on a cluster.
-	 * After the scheduled scale period expires, the scheduled scaler performs scale in to original
-	 * size on a cluster.
-	 * 
-	 * Expect jobs created, and scaling rule table updates
-	 */
-	@Test
-	public void scheduledScaler_scaleOutScaleIn() throws Exception {
-		try{	
-		    // Init
-			updateTestDatabase(initDataSet());
-				  
-			// Test
-			
-			LOG.debug("--------START---------------------------------");
-			
-			Thread.sleep(3000);
-			ScalingRule scalingRule = scalingRuleService.getRule(CLUSTER_ID);
-			Assert.assertEquals(2, scalingRule.getClusterSizeOriginal());
-			Assert.assertEquals(2, scalingRule.getScheduledScalingState());
-			Assert.assertEquals("1,5", jobService.getJob(JOB_ID).getServices());
-			
-			Thread.sleep(5000);
-			scalingRule = scalingRuleService.getRule(CLUSTER_ID);
-			LOG.debug("-----------------------------------------");
-			LOG.debug(Integer.toString(scalingRule.getClusterSizeOriginal()));
-			LOG.debug(Integer.toString(scalingRule.getScheduledScalingState()));
-
-			Assert.assertEquals(0, scalingRuleService.getRule(CLUSTER_ID).getScheduledScalingState());
-            Assert.assertEquals("1,2", jobService.getJob(JOB_ID + 1).getServices());  
-		}
-		catch (Exception e){
-            e.printStackTrace();
-		}
-	}
-	
 	/*
      * Periodic scaler scaling out and in system test.
      * 
@@ -163,15 +80,13 @@ public class SystemTests {
 	@Test
     public void periodicScaler_scaleOutScaleIn() throws Exception {
         try{  
-            // Init 
-            updateTestDatabase(initDataSet());          
+        	DatabaseUtils.updateTestDatabase(DatabaseUtils.initDataSet(this), dataSource);          
             
             ProcessBuilder pb = new ProcessBuilder("python", MOCK_SERVER_PATH);
             Process p = pb.start();          
                   
             HttpGateway.get(URL_LOAD_MEDIUM);
             
-            // Test 
             Thread.sleep((int)(AUTOSCALER_PERIOD_MS * 1.1));
             ScalingRule scalingRule = scalingRuleService.getRule(CLUSTER_ID);
             Assert.assertEquals(JOB_UNDEFINED, scalingRule.getJobId());
@@ -199,7 +114,6 @@ public class SystemTests {
             Assert.assertFalse(lastScaleOutJobId == lastScaleInJobId);
             Assert.assertEquals("1,1", jobService.getJob(lastScaleInJobId).getServices());       
                
-            // Cleanup 
             p.destroy();         
         }
         catch (Exception e){

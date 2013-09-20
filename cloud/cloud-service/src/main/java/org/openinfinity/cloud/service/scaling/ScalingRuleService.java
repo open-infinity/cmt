@@ -70,5 +70,8 @@ public interface ScalingRuleService {
      * Update job id.
      */
     void storeJobId(int clusterId, int jobId);
+    
+    
+    void delete(int clusterId);
 
 }
