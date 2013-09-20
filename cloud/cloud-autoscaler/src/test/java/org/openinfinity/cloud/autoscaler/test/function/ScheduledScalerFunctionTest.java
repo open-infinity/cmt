@@ -21,6 +21,7 @@ import javax.sql.DataSource;
 import junit.framework.Assert;
 
 import org.apache.log4j.Logger;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,8 +44,8 @@ import org.openinfinity.cloud.service.scaling.ScalingRuleService;
 
 @ContextConfiguration(locations={"classpath*:META-INF/spring/cloud-autoscaler-test-context.xml"})
 @RunWith(SpringJUnit4ClassRunner.class)
-public class ScheduledScalerTest {
-	private static final Logger LOG = Logger.getLogger(ScheduledScalerTest.class.getName());
+public class ScheduledScalerFunctionTest {
+	private static final Logger LOG = Logger.getLogger(ScheduledScalerFunctionTest.class.getName());
 
 	@Autowired
 	@Qualifier("cloudDataSource")
@@ -75,25 +76,21 @@ public class ScheduledScalerTest {
 	 * Expect jobs created, and scaling rule table updates
 	 */
 	@Test
-	public void scheduledScaler_scaleOutScaleIn() throws Exception {
-		try{	
-			DatabaseUtils.updateTestDatabase(DatabaseUtils.initDataSet(this), dataSource);
-				  
-			Thread.sleep(3000);
-			ScalingRule scalingRule = scalingRuleService.getRule(CLUSTER_ID);
-			Assert.assertEquals(2, scalingRule.getClusterSizeOriginal());
-			Assert.assertEquals(2, scalingRule.getScheduledScalingState());
-			Assert.assertEquals("1,5", jobService.getJob(JOB_ID).getServices());
-			
-			Thread.sleep(5000);
-			scalingRule = scalingRuleService.getRule(CLUSTER_ID);
+	@Ignore
+	public void scaleOutScaleIn() throws Exception {
+		DatabaseUtils.updateTestDatabase(DatabaseUtils.initDataSet(this), dataSource);
+			  
+		Thread.sleep(3000);
+		ScalingRule scalingRule = scalingRuleService.getRule(CLUSTER_ID);
+		Assert.assertEquals(2, scalingRule.getClusterSizeOriginal());
+		Assert.assertEquals(2, scalingRule.getScheduledScalingState());
+		Assert.assertEquals("1,5", jobService.getJob(JOB_ID).getServices());
+		
+		Thread.sleep(5000);
+		scalingRule = scalingRuleService.getRule(CLUSTER_ID);
 
-			Assert.assertEquals(0, scalingRuleService.getRule(CLUSTER_ID).getScheduledScalingState());
-            Assert.assertEquals("1,2", jobService.getJob(JOB_ID + 1).getServices());  
-		}
-		catch (Exception e){
-            e.printStackTrace();
-		}
+		Assert.assertEquals(0, scalingRuleService.getRule(CLUSTER_ID).getScheduledScalingState());
+        Assert.assertEquals("1,2", jobService.getJob(JOB_ID + 1).getServices());  
 	}
 	
 }

@@ -35,7 +35,7 @@ import org.openinfinity.cloud.service.administrator.InstanceService;
 import org.openinfinity.cloud.service.administrator.JobService;
 import org.openinfinity.cloud.service.administrator.MachineService;
 import org.openinfinity.cloud.service.healthmonitoring.HealthMonitoringService;
-import org.openinfinity.cloud.service.scaling.Enumerations.ScalingState;
+import org.openinfinity.cloud.service.scaling.Enumerations.ClusterScalingState;
 import org.openinfinity.cloud.service.scaling.ScalingRuleService;
 import org.openinfinity.cloud.domain.ScalingRule;
 import org.openinfinity.core.exception.SystemException;
@@ -49,8 +49,8 @@ import org.springframework.stereotype.Component;
  * 
  * @author Ilkka Leinonen
  * @author Vedran Bartonicek
- * @version 1.0.0
- * @since 1.0.0
+ * @version 1.3.0
+ * @since 1.2.0
  */
 @Component("periodicScalerItemProcessor")
 public class PeriodicScalerItemProcessor implements ItemProcessor<Machine, Job> {
@@ -100,28 +100,32 @@ public class PeriodicScalerItemProcessor implements ItemProcessor<Machine, Job> 
             cluster = clusterService.getCluster(clusterId);
         }
         catch(Exception e){
-            if (rule == null) LOG.info("Rule not defined for cluster " + clusterId);
-            else if (cluster == null) LOG.error("Cluster " + clusterId + " fetching failed.");
+            if (rule == null){ 
+            	LOG.info("Rule not defined for cluster " + clusterId);
+            }
+            else if (cluster == null) {
+            	LOG.error("Cluster " + clusterId + " fetching failed.");
+            }
             return null;
         }
         float load = getClusterLoad(machine);
         LOG.debug("load = " + load);
 
         if (load == -1) return null;
-        ScalingState state = scalingRuleService.calculateScalingState(rule, load, clusterId);
+        ClusterScalingState state = scalingRuleService.calculateScalingState(rule, load, clusterId);
         switch (state) {
-            case SCALING_OUT: 
+            case REQUIRES_SCALING_OUT: 
                 return createJob(machine, cluster, 1);
-            case SCALING_IN:  
+            case REQUIRES_SCALING_IN:  
                 return createJob(machine, cluster, -1);
-            case SCALING_NEEDED_BUT_IMPOSSIBLE: 
+            case REQUIRED_SCALING_IS_NOT_POSSIBLE: 
                 ExceptionUtil.throwSystemException(
                      "Cluster scaling failed. System load [" + load + "%] " +
                      "for cluster [" + clusterId + "] is + too high, but " +
                      "cluster maximum limit has been reached.");
             case SCALING_DISABLED: 
             case SCALING_SKIPPED:
-            case SCALING_NOT_NEEDED:
+            case REQUIRES_NO_SCALING:
         default:
             break;
         }

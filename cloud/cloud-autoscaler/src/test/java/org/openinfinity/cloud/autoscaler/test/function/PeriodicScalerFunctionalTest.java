@@ -20,6 +20,7 @@ import javax.sql.DataSource;
 
 import junit.framework.Assert;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +44,7 @@ import org.openinfinity.cloud.service.scaling.ScalingRuleService;
 
 @ContextConfiguration(locations={"classpath*:META-INF/spring/cloud-autoscaler-test-context.xml"})
 @RunWith(SpringJUnit4ClassRunner.class)
-public class PeriodicScalerTest {
+public class PeriodicScalerFunctionalTest {
 
 	@Autowired
 	@Qualifier("cloudDataSource")
@@ -78,47 +79,44 @@ public class PeriodicScalerTest {
      * scaling in on a cluster.
      */
 	@Test
-    public void periodicScaler_scaleOutScaleIn() throws Exception {
-        try{  
-        	DatabaseUtils.updateTestDatabase(DatabaseUtils.initDataSet(this), dataSource);          
-            
-            ProcessBuilder pb = new ProcessBuilder("python", MOCK_SERVER_PATH);
-            Process p = pb.start();          
+	@Ignore
+    public void scaleOutScaleIn() throws Exception {
+        
+    	DatabaseUtils.updateTestDatabase(DatabaseUtils.initDataSet(this), dataSource);          
+        
+        ProcessBuilder pb = new ProcessBuilder("python", MOCK_SERVER_PATH);
+        Process p = pb.start();          
+              
+        HttpGateway.get(URL_LOAD_MEDIUM);
+        
+        Thread.sleep((int)(AUTOSCALER_PERIOD_MS * 1.1));
+        ScalingRule scalingRule = scalingRuleService.getRule(CLUSTER_ID);
+        Assert.assertEquals(JOB_UNDEFINED, scalingRule.getJobId());
                   
-            HttpGateway.get(URL_LOAD_MEDIUM);
-            
-            Thread.sleep((int)(AUTOSCALER_PERIOD_MS * 1.1));
-            ScalingRule scalingRule = scalingRuleService.getRule(CLUSTER_ID);
-            Assert.assertEquals(JOB_UNDEFINED, scalingRule.getJobId());
-                      
-            HttpGateway.get(URL_LOAD_HIGH);
-            Thread.sleep((int)(AUTOSCALER_PERIOD_MS * 1.1));
-            
-            scalingRule = scalingRuleService.getRule(CLUSTER_ID);
-            int lastScaleOutJobId = scalingRule.getJobId();
-            Assert.assertFalse(JOB_UNDEFINED == lastScaleOutJobId);
-            Assert.assertEquals("1,3", jobService.getJob(lastScaleOutJobId).getServices()); 
-            
-            HttpGateway.get(URL_LOAD_MEDIUM);
-            jobService.updateStatus(lastScaleOutJobId, 10);
+        HttpGateway.get(URL_LOAD_HIGH);
+        Thread.sleep((int)(AUTOSCALER_PERIOD_MS * 1.1));
+        
+        scalingRule = scalingRuleService.getRule(CLUSTER_ID);
+        int lastScaleOutJobId = scalingRule.getJobId();
+        Assert.assertFalse(JOB_UNDEFINED == lastScaleOutJobId);
+        Assert.assertEquals("1,3", jobService.getJob(lastScaleOutJobId).getServices()); 
+        
+        HttpGateway.get(URL_LOAD_MEDIUM);
+        jobService.updateStatus(lastScaleOutJobId, 10);
 
-            Thread.sleep((int)(AUTOSCALER_PERIOD_MS * 1.1));
-            scalingRule = scalingRuleService.getRule(CLUSTER_ID);
-            Assert.assertEquals(lastScaleOutJobId, scalingRule.getJobId());
-            
-            HttpGateway.get(URL_LOAD_LOW);
-            Thread.sleep((int)(AUTOSCALER_PERIOD_MS * 2));
-            
-            scalingRule = scalingRuleService.getRule(CLUSTER_ID);
-            int lastScaleInJobId = scalingRule.getJobId();
-            Assert.assertFalse(lastScaleOutJobId == lastScaleInJobId);
-            Assert.assertEquals("1,1", jobService.getJob(lastScaleInJobId).getServices());       
-               
-            p.destroy();         
-        }
-        catch (Exception e){
-            e.printStackTrace();
-        }
+        Thread.sleep((int)(AUTOSCALER_PERIOD_MS * 1.1));
+        scalingRule = scalingRuleService.getRule(CLUSTER_ID);
+        Assert.assertEquals(lastScaleOutJobId, scalingRule.getJobId());
+        
+        HttpGateway.get(URL_LOAD_LOW);
+        Thread.sleep((int)(AUTOSCALER_PERIOD_MS * 2));
+        
+        scalingRule = scalingRuleService.getRule(CLUSTER_ID);
+        int lastScaleInJobId = scalingRule.getJobId();
+        Assert.assertFalse(lastScaleOutJobId == lastScaleInJobId);
+        Assert.assertEquals("1,1", jobService.getJob(lastScaleInJobId).getServices());       
+           
+        p.destroy();         
     }	
 }
 

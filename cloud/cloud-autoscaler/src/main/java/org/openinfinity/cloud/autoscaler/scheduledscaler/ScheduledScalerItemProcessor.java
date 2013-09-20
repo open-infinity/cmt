@@ -33,11 +33,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
- * Batch processor for verifying the scaling rules.
+ * Scheduled scaler batch processor
  * 
  * @author Vedran Bartonicek
- * @version 1.0.0
- * @since 1.0.0
+ * @version 1.3.0
+ * @since 1.2.0
  */
 @Component("scheduledScalerItemProcessor")
 public class ScheduledScalerItemProcessor implements ItemProcessor<ScalingRule, Job> {
@@ -60,38 +60,34 @@ public class ScheduledScalerItemProcessor implements ItemProcessor<ScalingRule, 
     
 	@Override
 	public Job process(ScalingRule scalingRule) throws Exception {
-		Job ret = null;
 	    Timestamp periodFrom = scalingRule.getPeriodFrom();
 		Timestamp periodTo = scalingRule.getPeriodTo();
 		long now = System.currentTimeMillis();	
 		Timestamp windowStart = new Timestamp(now - deltaMinus );
 		Timestamp windowEnd = new Timestamp(now + deltaPlus); 
 	
-		LOG.debug("periodFrom = " + periodFrom.toString());
-		LOG.debug("periodTo = " + periodTo.toString());
-		LOG.debug("windowStart = " + windowStart.toString());
-		LOG.debug("windowEnd = " + windowEnd.toString());
-		LOG.debug("state = " + scalingRule.getScheduledScalingState());
-		LOG.debug("clusterId = " + scalingRule.getClusterId());
-		
-		//TODO: DB reading should happen in ItemReader, so this below should be redesigned to gain optimal performance.
 		Cluster cluster = clusterService.getCluster(scalingRule.getClusterId());
-		if (windowStart.before(periodFrom) && windowEnd.after(periodFrom) && scalingRule.getScheduledScalingState() == 1){
-			ret = createJob(scalingRule, cluster, scalingRule.getClusterSizeNew());
+		Job job;
+		
+		if (periodTo.before(periodFrom) || periodTo.equals(periodFrom)){
+			job = null;
+		} else if (windowStart.before(periodFrom) && windowEnd.after(periodFrom) && scalingRule.getScheduledScalingState() == 1){
+			job = createJob(scalingRule, cluster, scalingRule.getClusterSizeNew());
 			scalingRuleService.storeScalingOutParameters(cluster.getNumberOfMachines(), scalingRule.getClusterId());
-		}	
-		// Two cases are covered here: periodEnd in window, and both periodStart and periodEnd in window. 
-		// In both cases state goes to idle, and flag for scheduling gets cleared
-		// so batch job doesn't select it any more.
-		else if ((windowStart.before(periodTo) && windowEnd.after(periodTo) && windowStart.after(periodFrom) && scalingRule.getScheduledScalingState() == 2)
-				  || (windowStart.before(periodFrom) && windowEnd.after(periodTo))){
-			ret = createJob(scalingRule, cluster, scalingRule.getClusterSizeOriginal());
-			scalingRuleService.storeScalingInParameters(scalingRule.getClusterId());
-			}
-		else{
-			// border cases fit here e.g. TODO handle cases when windowsStart==periodTo etc.
+		
+		// Scheduled scaling period is over, create a job to return to original size
+		// Update scaling rule, state -> idle
+		} else if ((windowStart.before(periodTo) && windowEnd.after(periodTo)
+				&& windowStart.after(periodFrom) && scalingRule.getScheduledScalingState() == 2)
+				|| (windowStart.before(periodFrom) && windowEnd.after(periodTo))) {
+			job = createJob(scalingRule, cluster, scalingRule.getClusterSizeOriginal());
+			scalingRuleService.storeScalingInParameters(scalingRule
+					.getClusterId());
 		}
-		return ret;
+		else {
+			job = null;
+		}
+		return job;
 	}
 	
 	private Job createJob(ScalingRule scalingRule, Cluster cluster, int scaledClusterSize){

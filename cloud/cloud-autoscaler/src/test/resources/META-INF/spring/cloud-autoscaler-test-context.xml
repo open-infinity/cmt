@@ -21,12 +21,12 @@
         http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
         http://www.springframework.org/schema/task
         http://www.springframework.org/schema/task/spring-task-3.0.xsd">
-    
+	    
 	<context:property-placeholder location="
-	    classpath:system.properties,
-	    classpath:infrastructure.properties,
-	    classpath:healthmonitoring.properties,
-	    classpath:META-INF/properties/cloud-autoscaler.properties" />
+        classpath*:/META-INF/properties/system.properties,
+        classpath*:/META-INF/properties/infrastructure.properties,
+        classpath*:/META-INF/properties/healthmonitoring.properties,
+        classpath*:/META-INF/properties/autoscalertest.properties" />
  
     <import resource="classpath*:META-INF/spring/cloud-context-service.xml" />
 	<import resource="classpath*:META-INF/spring/cloud-context-repository.xml" />
