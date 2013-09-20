@@ -29,7 +29,7 @@
 export DATADIR=[[DATABASE_DIR]]
 
 echo "Creating log directories"
-if [ "[[CLUSTER_TYPE]]" -eq "hbase" ] ; then
+if [ "[[CLUSTER_TYPE]]" == "hbase" ] ; then
     groupmems -g hadoop -a hbase
 fi
 mkdir -p [[LOG_DIR]]
@@ -37,7 +37,7 @@ chown hdfs [[LOG_DIR]]
 chown hdfs [[LOG_DIR]]
 chmod g+rwx [[LOG_DIR]]
 
-if [ "[[CLUSTER_TYPE]]" -eq "hbase" ] ; then
+if [ "[[CLUSTER_TYPE]]" == "hbase" ] ; then
     mkdir [[LOG_DIR]]/hbase
     chown hdfs [[LOG_DIR]]/hbase
     chgrp hadoop [[LOG_DIR]]/hbase
@@ -72,7 +72,7 @@ chown -R mapred:hadoop $DATADIR/1/mapred/local $DATADIR/2/mapred/local $DATADIR/
 
 echo "Creating SSH keys for hbase and hdfs users"
 
-if [ "[[CLUSTER_TYPE]]" -eq "hbase" ] ; then
+if [ "[[CLUSTER_TYPE]]" == "hbase" ] ; then
     HBASE_HOMEDIR=`egrep "^hbase:" /etc/passwd | cut -d':' -f6`
     mkdir $HBASE_HOMEDIR/.ssh
     chown hbase $HBASE_HOMEDIR/.ssh 

@@ -111,9 +111,9 @@ public class ScalingRuleServiceImpl implements ScalingRuleService {
 
 		if (!rule.isPeriodicScalingOn() || scalingJobActive || !allMachinesConfigured){
 			state = ScalingState.SCALING_SKIPPED;			
-		} else if (load >= maxLoad && clusterSize < maxMachines){
+		} else if ((load >= maxLoad && clusterSize < maxMachines) || (clusterSize < minMachines)){
 			state = ScalingState.SCALING_OUT;
-		} else if (load <= minLoad && clusterSize > minMachines){
+		} else if ((load <= minLoad && clusterSize > minMachines) || (clusterSize > maxMachines)){
 			state = ScalingState.SCALING_IN;
 		} else if (clusterSize >= maxMachines && load > maxLoad){
 			state = ScalingState.SCALING_NEEDED_BUT_IMPOSSIBLE;
@@ -139,6 +139,10 @@ public class ScalingRuleServiceImpl implements ScalingRuleService {
 			scalingRuleRepository.addNew(newScalingRule);
 		}
 	}
+
+    public void delete(int clusterId){
+    	scalingRuleRepository.delete(clusterId);
+    }
 
 	public ScalingRule getRule(int clusterId) {
 		return scalingRuleRepository.getRule(clusterId);

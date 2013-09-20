@@ -51,6 +51,7 @@ class HBaseConfigContext(object):
     hives = []
     options = {}
     replication_size = 3
+    hive_support = True
 
     # Constructor
     def __init__(self, hbase=True):
@@ -59,9 +60,10 @@ class HBaseConfigContext(object):
         else:
             self.type = "hadoop"
         bconf = read_hashmap(join(storage_dir, self.type, 'cluster-config'))
-        replication_size = bconf['replication-size']
         if 'replication-size' in bconf:
-            replication_size = int(bconf['replication-size'])
+            self.replication_size = int(bconf['replication-size'])
+        if 'hive-support' in bconf:
+            self.hive_support = (bconf['hive-support'] == 'True')
 
     def get_hmaster(self): 
         if len(self.hmasters) > 0:
@@ -102,7 +104,7 @@ def generate_role_list(cc, num):
         elif hmcount == 0 and scount >= 3: # Notice: this should be in sync with dfs.replication parameter in hmaster_hdfs-site.xml
             r.append('hmaster')
             hmcount += 1
-        elif hive_count == -1: # FIXME 0
+        elif cc.hive_support and hive_count == 0 and zcount >= 3 and hmcount == 1:
             r.append('hive')
             hive_count += 1
         else:
@@ -126,8 +128,8 @@ def count_config_states(cclist, state):
 # Node-related values read from file
 class HBaseNode(Node):
     def __init__(self, role, cluster_type, num = None):
-        if not role in ['hmaster', 'zookeeker', 'slave', 'hive']:
-            raise MgmtException("Uknown role %s" % role)
+        if not role in ['hmaster', 'zookeeper', 'slave', 'hive']:
+            raise MgmtException("Uknown role '%s'" % role)
         if not cluster_type in ['hbase', 'hadoop']:
             raise MgmtException("Uknown cluster type %s" % cluster_type)
         if num != None and type(num) != type(1):
@@ -338,10 +340,11 @@ class HBaseNode(Node):
                             cc = self.recreate_config_context(cc.options)
                             sleep(2.0)
                 elif self.role == 'hive':
-                    self.config_description = 'waiting for hmaster'
-                    while count_config_states(cc.hmasters, 'attached') < 1:
-                        cc = self.recreate_config_context(cc.options)
-                        sleep(2.0)
+                    if len(cc.zookeepers) > 0:
+                        self.config_description = 'waiting for zookeepers'
+                        while count_config_states(cc.zookeepers, 'attached') < 3:
+                            cc = self.recreate_config_context(cc.options)
+                            sleep(2.0)
                 else:
                     raise MgmtException("Uknown role %s" % self.role)
             finally:
@@ -983,6 +986,7 @@ def make_template_params(cc):
     template_params["HIVE_DATABASE_USER_PASSWORD"] = hive_database_user_password
     for hive in cc.hives:
         template_params["METASTORE_HOSTNAME"]      = hive.hostname # TODO: this doesn't work, if there are many hives
+    template_params["HIVE_METASTORE_WAREHOUSE_DIR"] = hive_metastore_warehouse_dir
 
     return template_params
 
@@ -1013,6 +1017,7 @@ def initialize_directories(out, options, hbase = True):
     # Save big data cluster options
     f = open(join(storage_dir, basename, 'cluster-config'), 'w')
     f.write("replication-size: %s\n" % options.replsize)
+    f.write("hive-support: %s\n" % options.hive_support)
     f.close()
 
     # Create a unique bigdata id for the cluster

@@ -1,0 +1,8 @@
+/opt/openinfinity/3.0.0/tomcat/logs/catalina.out { 
+        copytruncate 
+        daily 
+        rotate 7 
+        compress 
+        missingok 
+        size 5M 
+}

@@ -1,5 +1,13 @@
 class oi3-basic::config {
-        file {"/opt/data":
+        file {"/etc/logrotate.d/oi-tomcat":
+		ensure => present,
+		source => "puppet:///modules/oi3-basic/oi-tomcat.logrotate",
+		owner => "root",
+		group => "root",
+		mode => 0644,
+	}
+
+	file {"/opt/data":
                 ensure => directory,
                 owner => 'root',
                 group => 'root',

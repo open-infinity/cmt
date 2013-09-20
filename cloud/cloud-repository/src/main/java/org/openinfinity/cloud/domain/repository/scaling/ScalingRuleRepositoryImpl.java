@@ -35,6 +35,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.Assert;
+import org.openinfinity.cloud.domain.Cluster;
 import org.openinfinity.cloud.domain.ScalingRule;
 
 /**
@@ -240,7 +241,12 @@ public class ScalingRuleRepositoryImpl implements ScalingRuleRepository {
 		parameters.put("job_id", newScalingRule.getJobId());
 		insert.execute(parameters);  
 	}
-			
+
+	@AuditTrail
+	public void delete(final int clusterId) {
+		jdbcTemplate.update("delete from cluster_tbl where cluster_id = " + clusterId);
+	}
+		
 	@AuditTrail
 	public void updateExisting(final ScalingRule scalingRule) {
 		jdbcTemplate.update(UPDATE_EXISTING, new PreparedStatementSetter() {

@@ -13,7 +13,7 @@
     </bean>
 
     <context:property-override location="classpath:override.properties"/>
-
+               
     <jdbc:initialize-database data-source="cloudDataSource">
         <jdbc:script location="file:${sql.script.path}/H2/create_tables.sql"/>
         <jdbc:script location="sql/H2/populate_tables_cluster_controller.sql"/>

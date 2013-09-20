@@ -641,7 +641,7 @@ var instanceManager = {
 				range: true,
 				min: clusterData.clusterMinSize,
 				max: clusterData.clusterMaxSize,
-				values: [ clusterData.clusterMinSize +1 , clusterData.clusterMinSize -1],
+				values: [ clusterData.clusterMinSize +1 , clusterData.clusterMaxSize -1],
 				slide: function( event, ui) {
 					o.clusterSizeRange.text(setRangeText(ui));
 				}

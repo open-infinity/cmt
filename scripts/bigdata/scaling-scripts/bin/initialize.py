@@ -51,6 +51,9 @@ parser = OptionParser()
 parser.add_option("--xml", dest="xml",
                   action="store_true", default=False,
                   help="output in XML instead of plain text", metavar="XML")
+parser.add_option("--hive-support", dest="hive_support",
+                  action="store_true", default=False,
+                  help="HBase: include Hive support in cluster", metavar="HIVE")
 parser.add_option("--replication-size", dest="replsize", default=3,
                   help="replica set size", metavar="REPL")
 (options, args) = parser.parse_args()
@@ -64,8 +67,7 @@ out = OutputWriter(options)
 
 # Initialize HBase
 if cluster_type == "hbase":
-    hbase.initialize_directories(out, options, hbase=False) # TODO: pois
-    #TODO: hbase.initialize_directories(out, options)
+    hbase.initialize_directories(out, options, hbase=True)
 elif cluster_type == "hadoop":
     hbase.initialize_directories(out, options, hbase=False)
 elif cluster_type == "mongodb":
