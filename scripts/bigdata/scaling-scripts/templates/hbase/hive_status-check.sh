@@ -23,9 +23,24 @@
 # @author Timo Saarinen
 #
 
+# Hive MetaStore connection test
 echo "Test connectivity to the metastore"
-hive -e "show tables;" &>/dev/stdout | grep OK &>/dev/null && exit 0
+hive -e "show tables;" &>/dev/stdout | grep OK &>/dev/null || exit 1
 
-hive -e "show tables;"
-echo "ERROR: connectivity metastore failed" >/dev/stderr
+# HiveServer2 command line connectiont test
+echo "Testing HiveServer2"
+beeline -u jdbc:hive2://localhost:10000 -n [[HIVE_DATABASE_USER]] -p [[HIVE_DATABASE_USER_PASSWORD]] -d org.apache.hive.jdbc.HiveDriver -e "show tables" &>/dev/stdout | grep "Connected to" >/dev/null
+if [ $? -ne 0 ] ; then
+    echo "HiveServer2 test failed" >/dev/stderr
+    exit 1
+else
+    echo "HiveServer2 test succeeded" >/dev/stderr
+fi
+
+# To allow Hive work with HBase, the following lines should be added in the 
+# beginning of each script:
+#  ADD JAR /usr/lib/hive/lib/zookeeper.jar;
+#  ADD JAR /usr/lib/hive/lib/hbase.jar;
+#  ADD JAR /usr/lib/hive/lib/hive-hbase-handler-0.10.0-cdh4.2.0.jar
+#  ADD JAR /usr/lib/hive/lib/guava-11.0.2.jar;
 

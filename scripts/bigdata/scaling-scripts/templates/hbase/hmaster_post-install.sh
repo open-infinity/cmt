@@ -101,7 +101,7 @@ if [ "[[CLUSTER_TYPE]]" == "hbase" ] ; then
 fi
 
 su - hdfs -s /bin/bash -c 'hadoop fs -mkdir -p [[TMP_DIR]]'
-su - hdfs -s /bin/bash -c 'hadoop fs -chmod -R 777 [[TMP_DIR]]' || exit 1
+su - hdfs -s /bin/bash -c 'hadoop fs -chmod -R 1777 [[TMP_DIR]]' || exit 1
 su - hdfs -s /bin/bash -c 'hadoop fs -chown -R hdfs:hadoop [[TMP_DIR]]' || exit 1
 
 mkdir -p [[TMP_DIR]]

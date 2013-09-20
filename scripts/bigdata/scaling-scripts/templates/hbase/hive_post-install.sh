@@ -25,7 +25,9 @@
 
 # Install java connector (in addition to installing the rpm)
 echo "Link mysql-connector-java"
-ln -s /usr/share/java/mysql-connector-java.jar /usr/lib/hive/lib/mysql-connector-java.jar || exit 1
+if [ ! -f /usr/lib/hive/lib/mysql-connector-java.jar ] ; then
+    ln -s /usr/share/java/mysql-connector-java.jar /usr/lib/hive/lib/mysql-connector-java.jar || exit 1
+fi
 
 # Set MariaDB password
 echo "Set MariaDB root password"
@@ -55,4 +57,15 @@ fi
 
 # Stop MariaDB (because this script is run before service start phase)
 service mysql stop
+
+# Make needed HDFS directories
+echo "Creating Hive directories"
+su - hdfs -s /bin/bash -c "hdfs dfs -mkdir [[HIVE_METASTORE_WAREHOUSE_DIR]]"
+su - hdfs -s /bin/bash -c "hdfs dfs -chmod 1777 [[HIVE_METASTORE_WAREHOUSE_DIR]]" || exit 1
+su - hdfs -s /bin/bash -c "hdfs dfs -chown hive [[HIVE_METASTORE_WAREHOUSE_DIR]]" || exit 1
+su - hdfs -s /bin/bash -c "hdfs dfs -chgrp hadoop [[HIVE_METASTORE_WAREHOUSE_DIR]]"
+
+# General tmp directory (needed by Hive Metastore Server)
+mkdir [[TMP_DIR]]
+chmod 1777 [[TMP_DIR]]
 

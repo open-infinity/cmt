@@ -986,6 +986,7 @@ def make_template_params(cc):
     template_params["HIVE_DATABASE_USER_PASSWORD"] = hive_database_user_password
     for hive in cc.hives:
         template_params["METASTORE_HOSTNAME"]      = hive.hostname # TODO: this doesn't work, if there are many hives
+    template_params["HIVE_METASTORE_WAREHOUSE_DIR"] = hive_metastore_warehouse_dir
 
     return template_params
 

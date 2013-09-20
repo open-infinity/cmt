@@ -41,3 +41,7 @@ rm -f /usr/lib/hive/lib/mysql-connector-java.jar
 # (and recovery in case of re-install)
 yum -y erase MariaDB-common hive-jdbc
 
+# Remove HDFS directories
+su - hdfs -s /bin/bash -c "hdfs dfs -rm -f -R [[HIVE_METASTORE_WAREHOUSE_DIR]]" || exit 1
+
+
