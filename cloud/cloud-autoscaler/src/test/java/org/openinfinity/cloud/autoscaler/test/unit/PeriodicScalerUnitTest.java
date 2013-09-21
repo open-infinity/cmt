@@ -20,20 +20,13 @@ import javax.sql.DataSource;
 
 import junit.framework.Assert;
 
-import org.junit.Test;
 import org.junit.experimental.theories.DataPoint;
-import org.junit.experimental.theories.DataPoints;
 import org.junit.experimental.theories.Theories;
 import org.junit.experimental.theories.Theory;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.mockito.MockitoAnnotations;
-import org.openinfinity.cloud.autoscaler.gateway.HttpGateway;
-import org.openinfinity.cloud.autoscaler.test.util.DatabaseUtils;
-import org.openinfinity.cloud.domain.ScalingRule;
 import org.openinfinity.cloud.service.administrator.ClusterService;
 import org.openinfinity.cloud.service.administrator.JobService;
 import org.openinfinity.cloud.service.scaling.ScalingRuleService;
@@ -67,15 +60,7 @@ public class PeriodicScalerUnitTest {
     @Qualifier("jobService")
     JobService jobService;
 	
-	private static final int CLUSTER_ID = 1;    
-	private static final String MOCK_SERVER_PATH = "src/test/python/mock-rrd-server.py";
-	private static final int AUTOSCALER_PERIOD_MS = 10000;
-	private static final String URL_LOAD_LOW = "http://127.0.0.1:8181/test/load/low";
-	private static final String URL_LOAD_HIGH = "http://127.0.0.1:8181/test/load/high";
-    private static final String URL_LOAD_MEDIUM = "http://127.0.0.1:8181/test/load/medium";
-    private static final int JOB_UNDEFINED = -1;
-    		
-    @DataPoint
+	@DataPoint
     public static String USERNAME_WITH_SLASH = "optimus/prime";
 
     @Theory

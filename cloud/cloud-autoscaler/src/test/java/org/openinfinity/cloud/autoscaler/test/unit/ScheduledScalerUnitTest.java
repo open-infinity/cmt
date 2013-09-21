@@ -17,6 +17,7 @@
 package org.openinfinity.cloud.autoscaler.test.unit;
 
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.sql.Timestamp;
 
@@ -32,11 +33,17 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
 import org.openinfinity.cloud.autoscaler.scheduledscaler.ScheduledScalerItemProcessor;
+import org.openinfinity.cloud.domain.Cluster;
+import org.openinfinity.cloud.domain.Instance;
 import org.openinfinity.cloud.domain.ScalingRule;
+import org.openinfinity.cloud.service.administrator.ClusterService;
+import org.openinfinity.cloud.service.administrator.InstanceService;
+import org.openinfinity.cloud.service.scaling.ScalingRuleService;
 
 /**
- * Cloud-autoscaler periodic scaler, functional tests
+ * Unit tests for Scheduled scaler.
  * 
  * @author Vedran Bartonicek
  * @version 1.3.0
@@ -50,6 +57,16 @@ public class ScheduledScalerUnitTest {
 	@InjectMocks
 	@Autowired
 	ScheduledScalerItemProcessor itemProcessor;
+	
+	@Autowired
+	@Spy
+	ScalingRuleService scalingRuleService;
+	
+	@Mock
+	ClusterService mockClusterService;
+	
+	@Mock
+	InstanceService mockInstanceService;
 	
 	@Mock
 	ScalingRule mockScalingRule;
@@ -104,8 +121,8 @@ public class ScheduledScalerUnitTest {
 	@Test
 	public void WindowInvalidFromEqualsToPeriodTest() throws Exception {
 		long now = System.currentTimeMillis();						
-		when(mockScalingRule.getPeriodFrom()).thenReturn(new Timestamp(now+1));
-		when(mockScalingRule.getPeriodTo()).thenReturn(new Timestamp(now+1));
+		when(mockScalingRule.getPeriodFrom()).thenReturn(new Timestamp(now));
+		when(mockScalingRule.getPeriodTo()).thenReturn(new Timestamp(now));
 		when(mockScalingRule.getClusterId()).thenReturn(1);	
 		when(mockScalingRule.getScheduledScalingState()).thenReturn(1);	
 		when(mockScalingRule.getClusterSizeNew()).thenReturn(100);	
@@ -113,5 +130,75 @@ public class ScheduledScalerUnitTest {
 		Assert.assertNull(itemProcessor.process(mockScalingRule));	
 	}
 	
+	@Test
+	public void PeriodFromInWindowAndNotRequiredScalingOutTest() throws Exception {
+		long now = System.currentTimeMillis();						
+		when(mockScalingRule.getPeriodFrom()).thenReturn(new Timestamp(now));
+		when(mockScalingRule.getPeriodTo()).thenReturn(new Timestamp(now + 30000));
+		when(mockScalingRule.getClusterId()).thenReturn(1);	
+		when(mockScalingRule.getScheduledScalingState()).thenReturn(0);	
+		when(mockScalingRule.getClusterSizeNew()).thenReturn(100);	
+		
+		Assert.assertNull(itemProcessor.process(mockScalingRule));	
+	}
+	
+	@Test
+	public void PeriodFromInWindowAndRequiredScalingOutTest() throws Exception {
+		long now = System.currentTimeMillis();						
+		when(mockScalingRule.getPeriodFrom()).thenReturn(new Timestamp(now));
+		when(mockScalingRule.getPeriodTo()).thenReturn(new Timestamp(now + 30000));
+		when(mockScalingRule.getClusterId()).thenReturn(1);	
+		when(mockScalingRule.getScheduledScalingState()).thenReturn(1);	
+		when(mockScalingRule.getClusterSizeNew()).thenReturn(100);	
+		
+		Cluster cluster = new Cluster();
+		cluster.setInstanceId(1);
+		cluster.setNumberOfMachines(10);
+		when(mockClusterService.getCluster(1)).thenReturn(cluster);	
+		
+		Instance instance = new Instance();
+		instance.setCloudType(1);
+		instance.setZone("whatever");
+		when(mockInstanceService.getInstance(1)).thenReturn(instance);	
+	
+		Assert.assertNotNull(itemProcessor.process(mockScalingRule));	
+		verify(scalingRuleService).storeScalingOutParameters(10,1);
+	}
+	
+	@Test
+	public void PeriodToInWindowAndNotRequiredScalingInTest() throws Exception {
+		long now = System.currentTimeMillis();						
+		when(mockScalingRule.getPeriodFrom()).thenReturn(new Timestamp(now - 30000));
+		when(mockScalingRule.getPeriodTo()).thenReturn(new Timestamp(now));
+		when(mockScalingRule.getClusterId()).thenReturn(1);	
+		when(mockScalingRule.getScheduledScalingState()).thenReturn(3);	
+		when(mockScalingRule.getClusterSizeNew()).thenReturn(100);		
+
+		Assert.assertNull(itemProcessor.process(mockScalingRule));	
+	}
+	
+	@Test
+	public void PeriodToInWindowAndRequiredScalingInTest() throws Exception {
+		long now = System.currentTimeMillis();						
+		when(mockScalingRule.getPeriodFrom()).thenReturn(new Timestamp(now - 30000));
+		when(mockScalingRule.getPeriodTo()).thenReturn(new Timestamp(now));
+		when(mockScalingRule.getClusterId()).thenReturn(1);	
+		when(mockScalingRule.getScheduledScalingState()).thenReturn(2);	
+		when(mockScalingRule.getClusterSizeNew()).thenReturn(100);	
+		
+		Cluster cluster = new Cluster();
+		cluster.setInstanceId(1);
+		cluster.setNumberOfMachines(10);
+		when(mockClusterService.getCluster(1)).thenReturn(cluster);	
+		
+		Instance instance = new Instance();
+		instance.setCloudType(1);
+		instance.setZone("whatever");
+		when(mockInstanceService.getInstance(1)).thenReturn(instance);	
+
+		Assert.assertNotNull(itemProcessor.process(mockScalingRule));	
+		verify(scalingRuleService).storeScalingInParameters(1);
+	}
+
 }
 

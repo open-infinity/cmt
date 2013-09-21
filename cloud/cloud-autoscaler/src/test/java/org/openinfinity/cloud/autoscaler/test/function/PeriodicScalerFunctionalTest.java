@@ -27,15 +27,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.openinfinity.cloud.autoscaler.gateway.HttpGateway;
 import org.openinfinity.cloud.autoscaler.test.util.DatabaseUtils;
+import org.openinfinity.cloud.autoscaler.test.util.HttpGateway;
 import org.openinfinity.cloud.domain.ScalingRule;
 import org.openinfinity.cloud.service.administrator.ClusterService;
 import org.openinfinity.cloud.service.administrator.JobService;
 import org.openinfinity.cloud.service.scaling.ScalingRuleService;
 
 /**
- * Cloud-autoscaler periodic scaler, functional tests
+ * Functional tests for Periodic scaler.
  * 
  * @author Vedran Bartonicek
  * @version 1.3.0

@@ -71,18 +71,16 @@ public class ScheduledScalerItemProcessor implements ItemProcessor<ScalingRule, 
 		
 		if (periodTo.before(periodFrom) || periodTo.equals(periodFrom)){
 			job = null;
+			
 		} else if (windowStart.before(periodFrom) && windowEnd.after(periodFrom) && scalingRule.getScheduledScalingState() == 1){
 			job = createJob(scalingRule, cluster, scalingRule.getClusterSizeNew());
 			scalingRuleService.storeScalingOutParameters(cluster.getNumberOfMachines(), scalingRule.getClusterId());
 		
-		// Scheduled scaling period is over, create a job to return to original size
-		// Update scaling rule, state -> idle
 		} else if ((windowStart.before(periodTo) && windowEnd.after(periodTo)
 				&& windowStart.after(periodFrom) && scalingRule.getScheduledScalingState() == 2)
 				|| (windowStart.before(periodFrom) && windowEnd.after(periodTo))) {
 			job = createJob(scalingRule, cluster, scalingRule.getClusterSizeOriginal());
-			scalingRuleService.storeScalingInParameters(scalingRule
-					.getClusterId());
+			scalingRuleService.storeScalingInParameters(scalingRule.getClusterId());
 		}
 		else {
 			job = null;

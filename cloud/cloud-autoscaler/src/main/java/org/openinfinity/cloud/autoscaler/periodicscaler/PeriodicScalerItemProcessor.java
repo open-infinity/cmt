@@ -136,8 +136,7 @@ public class PeriodicScalerItemProcessor implements ItemProcessor<Machine, Job> 
 	    JsonParseException, JsonMappingException, SystemException {  
 		String[] metricName = {METRIC_RRD_FILE_LOAD};
 		
-		HealthStatusResponse status = 
-		    healthMonitoringService.getClusterHealthStatusLast(machine, METRIC_TYPE_LOAD, metricName, new Date());		
+		HealthStatusResponse status = healthMonitoringService.getClusterHealthStatusLast(machine, METRIC_TYPE_LOAD, metricName, new Date());		
 		List<SingleHealthStatus> metrics = status.getMetrics();
 		LOG.debug("metrics len " + metrics.size());
         if (metrics.size() > 0){
