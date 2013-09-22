@@ -41,9 +41,9 @@ import org.openinfinity.cloud.service.scaling.ScalingRuleService;
  * @since 1.2.0
  */
 
-@ContextConfiguration(locations={"classpath*:META-INF/spring/cloud-autoscaler-test-context.xml"})
+@ContextConfiguration(locations={"classpath*:META-INF/spring/cloud-autoscaler-test-integration-context.xml"})
 @RunWith(SpringJUnit4ClassRunner.class)
-public class ScheduledScalerFunctionalTest {
+public class ScheduledScalerInegrationTest {
 
 	@Autowired
 	@Qualifier("cloudDataSource")
@@ -74,6 +74,7 @@ public class ScheduledScalerFunctionalTest {
 	 * Expect jobs created, and scaling rule table updates
 	 */
 	@Test
+	@Ignore
 	public void scaleOutScaleIn() throws Exception {
 		DatabaseUtils.updateTestDatabase(DatabaseUtils.initDataSet(this), dataSource);
 			  

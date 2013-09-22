@@ -16,7 +16,6 @@
 
 package org.openinfinity.cloud.autoscaler.periodicscaler;
 
-import org.openinfinity.cloud.service.healthmonitoring.HealthMonitoringService;
 import org.openinfinity.core.annotation.Log;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParametersBuilder;
@@ -41,10 +40,7 @@ public class PeriodicScalerLauncher {
 	
 	@Autowired
 	private JobLauncher jobLauncher;
-	
-	@Autowired
-	private HealthMonitoringService healthMonitoringService;
-		
+			
 	@Log
 	public void launch() throws Exception {
 		jobLauncher.run(job, new JobParametersBuilder().addLong("p_time", System.currentTimeMillis()).toJobParameters());

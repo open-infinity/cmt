@@ -39,7 +39,7 @@ import org.openinfinity.cloud.service.scaling.ScalingRuleService;
  * @since 1.2.0
  */
 
-@ContextConfiguration(locations={"classpath*:META-INF/spring/cloud-autoscaler-test-context.xml"})
+@ContextConfiguration(locations={"classpath*:META-INF/spring/cloud-autoscaler-test-unit-context.xml"})
 //@RunWith(SpringJUnit4ClassRunner.class)
 @RunWith(Theories.class)
 public class PeriodicScalerUnitTest {

@@ -26,7 +26,10 @@ import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.batch.core.Job;
+import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -50,7 +53,7 @@ import org.openinfinity.cloud.service.scaling.ScalingRuleService;
  * @since 1.2.0
  */
 
-@ContextConfiguration(locations={"classpath*:META-INF/spring/cloud-autoscaler-test-context.xml"})
+@ContextConfiguration(locations={"classpath*:META-INF/spring/cloud-autoscaler-test-unit-context.xml"})
 @RunWith(SpringJUnit4ClassRunner.class)
 public class ScheduledScalerUnitTest {
 
@@ -70,6 +73,13 @@ public class ScheduledScalerUnitTest {
 	
 	@Mock
 	ScalingRule mockScalingRule;
+	
+	@Mock
+	private Job mockJob;
+	
+	@Mock
+	private JobLauncher mockJobLauncher;
+	
 	
 	@Value("${deltaPlus}")
     int deltaPlus;
