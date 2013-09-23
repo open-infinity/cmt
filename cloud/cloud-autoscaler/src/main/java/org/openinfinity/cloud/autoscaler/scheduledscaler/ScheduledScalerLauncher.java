@@ -28,7 +28,8 @@ import org.springframework.stereotype.Component;
  * Scheduled batch job launcher.
  * 
  * @author Vedran Bartonicek
- *
+ * @version 1.3.0
+ * @since 1.2.0
  */
 @Component("scheduledScalerLauncher")
 public class ScheduledScalerLauncher {

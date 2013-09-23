@@ -106,65 +106,60 @@ public class ClusterControllerTest {
         when(mockLiferayService.getOrganizationIds(mockUser)).thenReturn(organizationIds);
 
         // Request manual scaling, with new size[20] != current cluster size[10]
-		try {
-			clusterController.scaleCluster(
-					request,
-					response,
-					1, 				// clusterId
-					true, 			// periodicScalingOn
-					true, 			// scheduledScalingOn
-					200, 			// maxNumberOfMachinesPerCluster
-					1, 				// minNumberOfMachinesPerCluster
-					(float) 0.9, 	// maxLoad
-					(float) 0.1, 	// minLoad
-					0, 				// periodFrom
-					0,              // periodTo
-					5,              // scheduledClusterSize
-					true,           // manualScaling
-					20              // manualScalingNewSize
-					);
-			
-			Job job = jobService.getJob(1);
-			assertNotNull(job);
-        	assertEquals("scale_cluster", job.getJobType());
-            assertEquals("1,20", job.getServices()); 
-            
-            ScalingRule scalingRule = scalingRuleService.getRule(1);
-            assertEquals(200, scalingRule.getMaxNumberOfMachinesPerCluster());
-            
-			// Request to scale cluster from size 10 to size 10, and change 
-			// periodic and scheduled scaling settings.
-            // Request periodic scaling cluster size range 50 -100
-			clusterController.scaleCluster(
-					request,
-					response,
-					1, 				// clusterId
-					false, 			// periodicScalingOn
-					false, 			// scheduledScalingOn
-					100, 			// maxNumberOfMachinesPerCluster
-					50,				// minNumberOfMachinesPerCluster
-					(float) 0.9, 	// maxLoad
-					(float) 0.1, 	// minLoad
-					0, 				// periodFrom
-					0,              // periodTo
-					5,              // scheduledClusterSize
-					true,           // manualScaling
-					10              // manualScalingNewSize
-					);
-			
-			// Make sure that no new job is created
-			job = jobService.getJob(2);
-			assertNull(job);
-			
-			ScalingRule scalingRuleFinal = scalingRuleService.getRule(1);
-            assertEquals(false, scalingRuleFinal.isPeriodicScalingOn());
-            assertEquals(false, scalingRuleFinal.isScheduledScalingOn()); 
-            assertEquals(100, scalingRuleFinal.getMaxNumberOfMachinesPerCluster()); 
-            assertEquals(50, scalingRuleFinal.getMinNumberOfMachinesPerCluster());             
-        }
-        catch (Exception e){
-            ExceptionUtil.throwSystemException(e);   
-        }
+		clusterController.scaleCluster(
+				request,
+				response,
+				1, 				// clusterId
+				true, 			// periodicScalingOn
+				true, 			// scheduledScalingOn
+				200, 			// maxNumberOfMachinesPerCluster
+				1, 				// minNumberOfMachinesPerCluster
+				(float) 0.9, 	// maxLoad
+				(float) 0.1, 	// minLoad
+				0, 				// periodFrom
+				0,              // periodTo
+				5,              // scheduledClusterSize
+				true,           // manualScaling
+				20              // manualScalingNewSize
+				);
+		
+		Job job = jobService.getJob(1);
+		assertNotNull(job);
+    	assertEquals("scale_cluster", job.getJobType());
+        assertEquals("1,20", job.getServices()); 
+        
+        ScalingRule scalingRule = scalingRuleService.getRule(1);
+        assertEquals(200, scalingRule.getMaxNumberOfMachinesPerCluster());
+        
+		// Request to scale cluster from size 10 to size 10, and change 
+		// periodic and scheduled scaling settings.
+        // Request periodic scaling cluster size range 50 -100
+		clusterController.scaleCluster(
+				request,
+				response,
+				1, 				// clusterId
+				false, 			// periodicScalingOn
+				false, 			// scheduledScalingOn
+				100, 			// maxNumberOfMachinesPerCluster
+				50,				// minNumberOfMachinesPerCluster
+				(float) 0.9, 	// maxLoad
+				(float) 0.1, 	// minLoad
+				0, 				// periodFrom
+				0,              // periodTo
+				5,              // scheduledClusterSize
+				true,           // manualScaling
+				10              // manualScalingNewSize
+				);
+		
+		// Make sure that no new job is created
+		job = jobService.getJob(2);
+		assertNull(job);
+		
+		ScalingRule scalingRuleFinal = scalingRuleService.getRule(1);
+        assertEquals(false, scalingRuleFinal.isPeriodicScalingOn());
+        assertEquals(false, scalingRuleFinal.isScheduledScalingOn()); 
+        assertEquals(100, scalingRuleFinal.getMaxNumberOfMachinesPerCluster()); 
+        assertEquals(50, scalingRuleFinal.getMinNumberOfMachinesPerCluster());             
     }
     
 }

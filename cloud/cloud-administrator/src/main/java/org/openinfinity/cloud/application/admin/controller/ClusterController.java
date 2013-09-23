@@ -45,7 +45,7 @@ import org.openinfinity.cloud.service.administrator.InstanceService;
 import org.openinfinity.cloud.service.administrator.JobService;
 import org.openinfinity.cloud.service.administrator.MachineService;
 import org.openinfinity.cloud.service.liferay.LiferayService;
-import org.openinfinity.cloud.service.scaling.Enumerations.ScalingState;
+import org.openinfinity.cloud.service.scaling.Enumerations.ClusterScalingState;
 import org.openinfinity.cloud.service.scaling.ScalingRuleService;
 import org.openinfinity.cloud.util.http.HttpCodes;
 import org.openinfinity.cloud.util.serialization.JsonDataWrapper;

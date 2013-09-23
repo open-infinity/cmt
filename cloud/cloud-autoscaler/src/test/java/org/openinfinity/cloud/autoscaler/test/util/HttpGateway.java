@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.openinfinity.cloud.autoscaler.gateway;
+package org.openinfinity.cloud.autoscaler.test.util;
 
 import java.io.InputStream;
 

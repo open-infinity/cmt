@@ -17,18 +17,18 @@
 package org.openinfinity.cloud.service.scaling;
 
 /**
- * Enumaration defining the status of the cluster's balance.
+ * Enumeration defining the status of the cluster's balance.
  * 
  * @author Ilkka Leinonen
  * @version 1.0.0
  * @since 1.0.0
  */
 public final class Enumerations{
-	public enum ScalingState {
-		SCALING_IN,
-		SCALING_OUT,
-		SCALING_NOT_NEEDED,
-		SCALING_NEEDED_BUT_IMPOSSIBLE,
+	public enum ClusterScalingState {
+		REQUIRES_SCALING_IN,
+		REQUIRES_SCALING_OUT,
+		REQUIRES_NO_SCALING,
+		REQUIRED_SCALING_IS_NOT_POSSIBLE,
 		SCALING_DISABLED,
 		SCALING_ONGOING,
 		SCALING_SKIPPED;

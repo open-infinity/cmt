@@ -24,7 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.openinfinity.cloud.domain.Job;
 import org.openinfinity.cloud.domain.ScalingRule;
-import org.openinfinity.cloud.service.scaling.Enumerations.ScalingState;
+import org.openinfinity.cloud.service.scaling.Enumerations.ClusterScalingState;
 import org.openinfinity.cloud.domain.repository.scaling.ScalingRuleRepository;
 import org.openinfinity.cloud.service.administrator.ClusterService;
 import org.openinfinity.cloud.service.administrator.JobService;
@@ -59,7 +59,7 @@ public class ScalingRuleServiceImpl implements ScalingRuleService {
 	JobService jobService;
 
 	@Override
-	public ScalingState calculateScalingState(ScalingRule rule, float load,
+	public ClusterScalingState calculateScalingState(ScalingRule rule, float load,
 			int clusterId) {
 		validateInput(rule, load, clusterId);
 		return applyScalingRule(load, clusterId, rule);
@@ -75,7 +75,7 @@ public class ScalingRuleServiceImpl implements ScalingRuleService {
 					+ clusterId + "]");
 	}
 
-	public ScalingState applyScalingRule(float load, int clusterId,	ScalingRule rule) {
+	public ClusterScalingState applyScalingRule(float load, int clusterId,	ScalingRule rule) {
 		int clusterSize = clusterService.getCluster(clusterId).getNumberOfMachines();
 		int maxMachines = rule.getMaxNumberOfMachinesPerCluster();
 		int minMachines = rule.getMinNumberOfMachinesPerCluster();
@@ -86,7 +86,7 @@ public class ScalingRuleServiceImpl implements ScalingRuleService {
 				+ " minMachines = " + minMachines + " maxLoad = " + maxLoad
 				+ " minLoad = " + minLoad + " clusterSize = " + clusterSize);
 
-		ScalingState state = ScalingState.SCALING_DISABLED;
+		ClusterScalingState state = ClusterScalingState.SCALING_DISABLED;
 
 		boolean scalingJobActive = true;
 		int jobId = rule.getJobId();
@@ -110,15 +110,15 @@ public class ScalingRuleServiceImpl implements ScalingRuleService {
 		LOG.debug("scalingJobReady=" + scalingJobActive	+ " allMachinesConfigured=" + allMachinesConfigured);
 
 		if (!rule.isPeriodicScalingOn() || scalingJobActive || !allMachinesConfigured){
-			state = ScalingState.SCALING_SKIPPED;			
+			state = ClusterScalingState.SCALING_SKIPPED;			
 		} else if ((load >= maxLoad && clusterSize < maxMachines) || (clusterSize < minMachines)){
-			state = ScalingState.SCALING_OUT;
+			state = ClusterScalingState.REQUIRES_SCALING_OUT;
 		} else if ((load <= minLoad && clusterSize > minMachines) || (clusterSize > maxMachines)){
-			state = ScalingState.SCALING_IN;
+			state = ClusterScalingState.REQUIRES_SCALING_IN;
 		} else if (clusterSize >= maxMachines && load > maxLoad){
-			state = ScalingState.SCALING_NEEDED_BUT_IMPOSSIBLE;
+			state = ClusterScalingState.REQUIRED_SCALING_IS_NOT_POSSIBLE;
 		} else {
-			state = ScalingState.SCALING_NOT_NEEDED;
+			state = ClusterScalingState.REQUIRES_NO_SCALING;
 		}
 
 		LOG.debug("applyScalingRule() return = " + state.name());
