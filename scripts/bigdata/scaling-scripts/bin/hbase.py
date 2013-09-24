@@ -49,9 +49,14 @@ class HBaseConfigContext(object):
     zookeepers = []
     slaves = []
     hives = []
-    options = {}
+    
+    options = {}    
     replication_size = 3
-    hive_support = True
+    
+    # Extra features should be False, to not add anything unwanted to existing
+    # installations. See also defaults in initialize.py.
+    hive_support = False
+    pig_support = False
 
     # Constructor
     def __init__(self, hbase=True):
@@ -64,6 +69,8 @@ class HBaseConfigContext(object):
             self.replication_size = int(bconf['replication-size'])
         if 'hive-support' in bconf:
             self.hive_support = (bconf['hive-support'] == 'True')
+        if 'pig-support' in bconf:
+            self.pig_support = (bconf['pig-support'] == 'True')
 
     def get_hmaster(self): 
         if len(self.hmasters) > 0:
@@ -110,7 +117,12 @@ def generate_role_list(cc, num):
         else:
             r.append('slave')
             scount += 1
-    return (r, { 'hmasters' : hmcount, 'zookeepers' : zcount, 'slaves' : scount,'hives' : hive_count })
+    return (r, { 
+        'hmasters' : hmcount, 
+        'zookeepers' : zcount, 
+        'slaves' : scount,
+        'hives' : hive_count,
+        })
 
 # Make directory and don't throw an exception, if it exists already
 def _mkdirs(path, mode = 0777):
@@ -279,25 +291,20 @@ class HBaseNode(Node):
                     rpms_list.push(rpms)
                 elif self.role == "hive":
                     # Install RPM packages
+                    rpms = [
+                                'hive',
+                                'hive-metastore',
+                                'hive-server2',
+                                'MariaDB-server',
+                                'MariaDB-client',
+                                'mysql-connector-java',
+                    ]
                     if self.type == 'hbase':
-                        rpms = [
-                                    'hive',
-                                    'hive-hbase',
-                                    'hive-metastore',
-                                    'hive-server2',
-                                    'MariaDB-server',
-                                    'MariaDB-client',
-                                    'mysql-connector-java',
-                        ]
-                    else:
-                        rpms = [
-                                    'hive',
-                                    'hive-metastore',
-                                    'hive-server2',
-                                    'MariaDB-server',
-                                    'MariaDB-client',
-                                    'mysql-connector-java',
-                        ]
+                        rpms += ['hive-hbase']
+                    if cc.pig_support:
+                        rpms += ['pig']
+                        rpms += ['pig-udf-datafu']
+                    
                     ssh.install(rpms)
                     rpms_list.push(rpms)
                 else:
@@ -1018,6 +1025,7 @@ def initialize_directories(out, options, hbase = True):
     f = open(join(storage_dir, basename, 'cluster-config'), 'w')
     f.write("replication-size: %s\n" % options.replsize)
     f.write("hive-support: %s\n" % options.hive_support)
+    f.write("pig-support: %s\n" % options.pig_support)
     f.close()
 
     # Create a unique bigdata id for the cluster

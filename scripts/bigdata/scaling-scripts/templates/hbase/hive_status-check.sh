@@ -44,3 +44,7 @@ fi
 #  ADD JAR /usr/lib/hive/lib/hive-hbase-handler-0.10.0-cdh4.2.0.jar
 #  ADD JAR /usr/lib/hive/lib/guava-11.0.2.jar;
 
+# To use Pig with HBase, the following statement has to be on top of each script
+#  register /usr/lib/zookeeper/zookeeper-3.4.5-cdh4.2.0.jar
+#  register /usr/lib/hbase/hbase-0.94.2-cdh4.2.0-security.jar
+

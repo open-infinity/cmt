@@ -52,8 +52,11 @@ parser.add_option("--xml", dest="xml",
                   action="store_true", default=False,
                   help="output in XML instead of plain text", metavar="XML")
 parser.add_option("--hive-support", dest="hive_support",
-                  action="store_true", default=False,
+                  action="store_true", default=True,
                   help="HBase: include Hive support in cluster", metavar="HIVE")
+parser.add_option("--pig-support", dest="pig_support",
+                  action="store_true", default=True,
+                  help="HBase: include Pig support in cluster", metavar="PIG")
 parser.add_option("--replication-size", dest="replsize", default=3,
                   help="replica set size", metavar="REPL")
 (options, args) = parser.parse_args()
@@ -64,6 +67,10 @@ cluster_type = args[0]
 
 # Out
 out = OutputWriter(options)
+
+# Check contradictions
+if options.pig_support and not options.hive_support:
+    out.warn("Pig command line tools are not available without Hive")
 
 # Initialize HBase
 if cluster_type == "hbase":
