@@ -1,4 +1,4 @@
-package org.springframework.samples.mvc.basic.account;
+package org.openinfinity.ssp.mvc.controller;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

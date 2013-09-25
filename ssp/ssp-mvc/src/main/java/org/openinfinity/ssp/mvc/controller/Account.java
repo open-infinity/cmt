@@ -1,4 +1,4 @@
-package org.springframework.samples.mvc.basic.account;
+package org.openinfinity.ssp.mvc.controller;
 
 import java.math.BigDecimal;
 import java.util.Date;
