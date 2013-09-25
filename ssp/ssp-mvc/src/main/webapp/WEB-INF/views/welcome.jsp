@@ -27,6 +27,8 @@
 	</ul>
 	<ul>
 		<li><a href="account">@Controller Example</a></li>
+		<li><a href="ssp/home">@Ssp home</a></li>
+		
 	</ul>
 </div>
 </body>

@@ -1,4 +1,4 @@
-package org.openinfinity.ssp.mvc.controller;
+package org.openinfinity.ssp.web.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

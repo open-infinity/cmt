@@ -1,4 +1,4 @@
-package org.openinfinity.ssp.mvc.controller;
+package org.openinfinity.ssp.web.controller;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

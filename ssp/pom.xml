@@ -11,13 +11,14 @@
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
       <slf4j.version>1.6.4</slf4j.version>
       <springframework.version>3.1.1.RELEASE</springframework.version>
+      <open-infinity-core.version>1.1.0.RELEASE</open-infinity-core.version>
   </properties>
     
   <dependencies>
   	<dependency>
   		<groupId>org.openinfinity</groupId>
   		<artifactId>open-infinity-core</artifactId>
-  		<version>1.1.0.RELEASE</version>
+  		<version>${open-infinity-core.version}</version>
   		<scope>provided</scope>
   	</dependency>
   </dependencies>

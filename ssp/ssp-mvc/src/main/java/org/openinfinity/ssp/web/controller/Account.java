@@ -1,4 +1,4 @@
-package org.openinfinity.ssp.mvc.controller;
+package org.openinfinity.ssp.web.controller;
 
 import java.math.BigDecimal;
 import java.util.Date;
