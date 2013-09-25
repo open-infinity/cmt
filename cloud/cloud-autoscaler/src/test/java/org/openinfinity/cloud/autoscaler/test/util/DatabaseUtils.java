@@ -24,6 +24,9 @@ import org.dbunit.operation.DatabaseOperation;
 
 public class DatabaseUtils {
 
+	public static final String SQL_INIT_DB = ("META-INF/sql/dataset-init-scale-out.xml");
+	public static final String SQL_PERIODIC_INIT_SCALE_OUT = ("META-INF/sql/periodic-dataset-init-scale-out.xml");
+
 	public static void updateTestDatabase(IDataSet dataSet, DataSource dataSource){
 		try {
 			IDatabaseConnection dbConn = new DatabaseDataSourceConnection(dataSource);
@@ -33,15 +36,12 @@ public class DatabaseUtils {
 		}
 	}
 	
-	public static IDataSet initDataSet(Object obj) throws Exception
+	public static IDataSet initDataSet(Object obj, String sqlScript, Timestamp from, Timestamp to) throws Exception
     {
-        long now = System.currentTimeMillis();
-	    Timestamp from = new Timestamp(now + 2100);
-	    Timestamp to = new Timestamp(now + 7200 );
 		ReplacementDataSet dataSet = null;
 		
 		try{		
-			URL resourceLocation = obj.getClass().getClassLoader().getResource("META-INF/sql/dataset-init-scale-out.xml");
+			URL resourceLocation = obj.getClass().getClassLoader().getResource(sqlScript);
 	        dataSet = new ReplacementDataSet(new FlatXmlDataSetBuilder().
 	            build(new FileInputStream(new File(resourceLocation.toURI())))); 
 	        dataSet.addReplacementObject("[from]", from);
