@@ -13,34 +13,36 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 @Controller
-@RequestMapping(value="/account")
-public class AccountController {
+@RequestMapping(value="/exampleaccount")
+public class ExampleAccountController {
 
-	private Map<Long, Account> accounts = new ConcurrentHashMap<Long, Account>();
+	private Map<Long, ExampleAccount> accounts = new ConcurrentHashMap<Long, ExampleAccount>();
 	
 	@RequestMapping(method=RequestMethod.GET)
 	public String getCreateForm(Model model) {
-		model.addAttribute(new Account());
-		return "account/createForm";
+		//model.addAttribute(new Account());
+
+		model.addAttribute("exampleaccount", new ExampleAccount());
+		return "exampleaccount/createForm";
 	}
 	
 	@RequestMapping(method=RequestMethod.POST)
-	public String create(@Valid Account account, BindingResult result) {
+	public String create(@Valid ExampleAccount account, BindingResult result) {
 		if (result.hasErrors()) {
-			return "account/createForm";
+			return "exampleaccount/createForm";
 		}
 		this.accounts.put(account.assignId(), account);
-		return "redirect:/account/" + account.getId();
+		return "redirect:/exampleaccount/" + account.getId();
 	}
 	
 	@RequestMapping(value="{id}", method=RequestMethod.GET)
 	public String getView(@PathVariable Long id, Model model) {
-		Account account = this.accounts.get(id);
+		ExampleAccount account = this.accounts.get(id);
 		if (account == null) {
 			throw new ResourceNotFoundException(id);
 		}
-		model.addAttribute(account);
-		return "account/view";
+		model.addAttribute("exampleaccount", account);
+		return "exampleaccount/view";
 	}
 
 }

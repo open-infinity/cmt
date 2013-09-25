@@ -12,7 +12,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.format.annotation.NumberFormat;
 import org.springframework.format.annotation.NumberFormat.Style;
 
-public class Account {
+public class ExampleAccount {
 	
 	private Long id;
 	
