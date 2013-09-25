@@ -7,8 +7,9 @@
 	<br />
 	<div class="sub_menu"><b>The Shopping Application</b></div>
 	<br />	
-	<p><spring:message code="server.time"/> ${serverTime}.</p>
+
+	<p>SSP Home</p>
 		<br/><br/>
-		<a href="manager">View Shopping lists</a> or <a href="productModel">Create a new product</a> or <a href="manager/shoppinglist">Manage Shoppinglists</a>  or <a href="manager/shoppinglist">Manage Catalogues</a>
+		<a href="../account">Account</a> or <a href="productModel">Create a new product</a> or <a href="manager/shoppinglist">Manage Shoppinglists</a>  or <a href="manager/shoppinglist">Manage Catalogues</a>
 		<br/><br/>
 <%@ include file="/WEB-INF/views/common/footer.jsp"%>
