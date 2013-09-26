@@ -1,23 +1,9 @@
 <%@page contentType="text/html;charset=UTF-8"%>
 <%@page pageEncoding="UTF-8"%>
 <%@ page session="false" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
-<%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
-<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+<%@ include file="/WEB-INF/views/common/includes.jsp"%>
+<%@ include file="/WEB-INF/views/common/header.jsp"%>
 
-
-<html>
-<head>
-	<META http-equiv="Content-Type" content="text/html;charset=UTF-8">
-	<title>Create Account</title>
-	<link rel="stylesheet" href="<c:url value="/resources/blueprint/screen.css" />" type="text/css" media="screen, projection">
-	<link rel="stylesheet" href="<c:url value="/resources/blueprint/print.css" />" type="text/css" media="print">
-	<!--[if lt IE 8]>
-		<link rel="stylesheet" href="<c:url value="/resources/blueprint/ie.css" />" type="text/css" media="screen, projection">
-	<![endif]-->
-</head>	
-<body>
 <div class="container">
 	<h1>
 		Create Account
@@ -71,29 +57,11 @@
                     <form:label for="user.postalCode" path="user.postalCode" cssErrorClass="error">Postal code</form:label><br/>
                     <form:input path="user.postalCode" /> <form:errors path="user.postalCode" />
                 </p>                     
-				<p>
-					<form:label for="account.serviceType" path="account.serviceType" cssErrorClass="error">Service type</form:label><br/>
-					<form:input path="account.serviceType" /> <form:errors path="account.serviceType" />
-				</p>
+				 
 				<p>	
-					<form:label for="account.serviceValidFrom" path="account.serviceValidFrom" cssErrorClass="error">Service valid from</form:label><br/>
-					<form:input path="account.serviceValidFrom" /> <form:errors path="account.serviceValidFrom" />
-				</p>
-				    <p> 
-                    <form:label for="account.serviceValidTo" path="account.serviceValidTo" cssErrorClass="error">Service valid to</form:label><br/>
-                    <form:input path="account.serviceValidTo" /> <form:errors path="account.serviceValidTo" />
-                </p>
-                
-				<p>	
-					<input type="submit" />
+					<input type="submit" value="Create" />
 				</p>
 			</fieldset>
 		</form:form>
 	</div>
-	<hr>	
-	<ul>
-		<li> <a href="?locale=en_us">us</a> |  <a href="?locale=en_gb">gb</a> | <a href="?locale=es_es">es</a> | <a href="?locale=de_de">de</a> </li>
-	</ul>	
-</div>
-</body>
-</html>
+<%@ include file="/WEB-INF/views/common/footer.jsp"%>
