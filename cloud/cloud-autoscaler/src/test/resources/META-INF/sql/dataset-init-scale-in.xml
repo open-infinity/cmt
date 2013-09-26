@@ -68,7 +68,7 @@
 		cluster_id = "1"
 		periodic = "1"
 		scheduled = "1"
-	    scaling_state = "1"
+	    scaling_state = "2"
 		max_machines = "12"
 		min_machines = "1"
 		max_load = "0.9"
@@ -76,14 +76,14 @@
 		period_from = "[from]"
 		period_to = "[to]"
 		size_new = "5"
-		size_original = "6"
+		size_original = "1"
 		job_id= "-1"/>
 		
 	<scaling_rule_tbl 
         cluster_id = "2"
         periodic = "1"
         scheduled = "0"
-        scaling_state = "1"
+        scaling_state = "2"
         max_machines = "5"
         min_machines = "1"
         max_load = "0.9"
@@ -91,7 +91,7 @@
         period_from = "[from]"
         period_to = "[to]"
         size_new = "5"
-        size_original = "6"
+        size_original = "1"
         job_id= "-1"/>	
 	
 </dataset> 

@@ -39,7 +39,6 @@ import org.openinfinity.cloud.service.administrator.ClusterService;
 import org.openinfinity.cloud.service.administrator.JobService;
 import org.openinfinity.cloud.service.scaling.ScalingRuleService;
 
-
 /**
  * Functional tests for Periodic scaler.
  * 
@@ -55,9 +54,7 @@ import org.openinfinity.cloud.service.scaling.ScalingRuleService;
 @ContextConfiguration(locations={"classpath*:META-INF/spring/t1-context.xml"})
 @RunWith(SpringJUnit4ClassRunner.class)
 public class ScheduledScalerIntegrationTest {
-
 	private static final int CLUSTER_ID = 1;    
-	private static final int JOB_ID = 0;
 	private static final String MOCK_SERVER_PATH = "src/test/python/mock-rrd-server.py";
 	private static final int AUTOSCALER_PERIOD_MS = 10000;
 	private static final String URL_LOAD_LOW = "http://127.0.0.1:8181/test/load/low";
@@ -65,6 +62,8 @@ public class ScheduledScalerIntegrationTest {
     private static final String URL_LOAD_MEDIUM = "http://127.0.0.1:8181/test/load/medium";
     private static final int JOB_UNDEFINED = -1;
     
+   	private static int jobId = -1;
+
     @Autowired
     private JobLauncherTestUtils jobLauncherTestUtils;
     
@@ -88,31 +87,32 @@ public class ScheduledScalerIntegrationTest {
 	public void scaleOut() throws Exception {
         long now = System.currentTimeMillis();
 	    Timestamp from = new Timestamp(now);
-	    Timestamp to = new Timestamp(now + 10000);
+	    Timestamp to = new Timestamp(now + 3600000);
 		DatabaseUtils.updateTestDatabase(DatabaseUtils.initDataSet(this,
-				DatabaseUtils.SQL_INIT_DB, from, to), dataSource);
+				DatabaseUtils.SQL_SCALE_OUT, from, to), dataSource);
 
 		JobExecution jobExecution = jobLauncherTestUtils.launchJob();
         Assert.assertEquals(jobExecution.getStatus(), BatchStatus.COMPLETED);
 		ScalingRule scalingRule = scalingRuleService.getRule(CLUSTER_ID);
 		Assert.assertEquals(2, scalingRule.getClusterSizeOriginal());
 		Assert.assertEquals(2, scalingRule.getScheduledScalingState());
-		Assert.assertEquals("1,5", jobService.getJob(JOB_ID).getServices());
+		Assert.assertEquals("1,5", jobService.getJob(++jobId).getServices());
 	}
 	
+	@Test
 	public void scaleIn() throws Exception {
         long now = System.currentTimeMillis();
-	    Timestamp from = new Timestamp(now - 10000);
+	    Timestamp from = new Timestamp(now - 3600000);
 	    Timestamp to = new Timestamp(now);
 	    DatabaseUtils.updateTestDatabase(DatabaseUtils.initDataSet(this,
-				DatabaseUtils.SQL_INIT_DB, from, to), dataSource);
+				DatabaseUtils.SQL_SCALE_IN, from, to), dataSource);
 	    
 	    JobExecution jobExecution = jobLauncherTestUtils.launchJob();
         Assert.assertEquals(jobExecution.getStatus(), BatchStatus.COMPLETED);
 	
         ScalingRule scalingRule = scalingRuleService.getRule(CLUSTER_ID);
 		Assert.assertEquals(0, scalingRuleService.getRule(CLUSTER_ID).getScheduledScalingState());
-        Assert.assertEquals("1,2", jobService.getJob(JOB_ID + 1).getServices()); 
+        Assert.assertEquals("1,1", jobService.getJob(++jobId).getServices()); 
 	}
 	
 }

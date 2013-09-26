@@ -57,7 +57,7 @@ import org.openinfinity.cloud.service.scaling.ScalingRuleService;
  * E2E Spring batch testing for Autoscaler.
  * 
  */
-@ContextConfiguration(locations={"classpath*:META-INF/spring/cloud-autoscaler-test-integration-context.xml"})
+@ContextConfiguration(locations={"classpath*:META-INF/spring/t1-context.xml"})
 @RunWith(SpringJUnit4ClassRunner.class)
 public class PeriodicScalerIntegrationTest {
 
@@ -114,10 +114,56 @@ public class PeriodicScalerIntegrationTest {
     	//thenReturn(1);
     	
 		long now = System.currentTimeMillis();
-	    Timestamp from = new Timestamp(now - 10000);
+	    Timestamp from = new Timestamp(now - 3600000);
 	    Timestamp to = new Timestamp(now);
 	    DatabaseUtils.updateTestDatabase(DatabaseUtils.initDataSet(this,
-				DatabaseUtils.SQL_INIT_DB, from, to), dataSource);
+				DatabaseUtils.SQL_SCALE_OUT, from, to), dataSource);
+        
+        ProcessBuilder pb = new ProcessBuilder("python2", MOCK_SERVER_PATH);
+        Process p = pb.start();          
+              
+        HttpGateway.get(URL_LOAD_MEDIUM);
+        
+        Thread.sleep((int)(AUTOSCALER_PERIOD_MS * 1.1));
+        ScalingRule scalingRule = scalingRuleService.getRule(CLUSTER_ID);
+        Assert.assertEquals(JOB_UNDEFINED, scalingRule.getJobId());
+                  
+        HttpGateway.get(URL_LOAD_HIGH);
+        Thread.sleep((int)(AUTOSCALER_PERIOD_MS * 1.1));
+        
+        scalingRule = scalingRuleService.getRule(CLUSTER_ID);
+        int lastScaleOutJobId = scalingRule.getJobId();
+        Assert.assertFalse(JOB_UNDEFINED == lastScaleOutJobId);
+        Assert.assertEquals("1,3", jobService.getJob(lastScaleOutJobId).getServices()); 
+        
+        HttpGateway.get(URL_LOAD_MEDIUM);
+        jobService.updateStatus(lastScaleOutJobId, 10);
+
+        Thread.sleep((int)(AUTOSCALER_PERIOD_MS * 1.1));
+        scalingRule = scalingRuleService.getRule(CLUSTER_ID);
+        Assert.assertEquals(lastScaleOutJobId, scalingRule.getJobId());
+        
+        HttpGateway.get(URL_LOAD_LOW);
+        Thread.sleep((int)(AUTOSCALER_PERIOD_MS * 2));
+        
+        scalingRule = scalingRuleService.getRule(CLUSTER_ID);
+        int lastScaleInJobId = scalingRule.getJobId();
+        Assert.assertFalse(lastScaleOutJobId == lastScaleInJobId);
+        Assert.assertEquals("1,1", jobService.getJob(lastScaleInJobId).getServices());       
+           
+        p.destroy();         
+        
+    }
+    
+    @Test
+	@Ignore
+	public void scaleOutScaleIn() throws Exception {	
+    	
+		long now = System.currentTimeMillis();
+	    Timestamp from = new Timestamp(now - 3600000);
+	    Timestamp to = new Timestamp(now);
+	    DatabaseUtils.updateTestDatabase(DatabaseUtils.initDataSet(this,
+				DatabaseUtils.SQL_SCALE_OUT, from, to), dataSource);
         
         ProcessBuilder pb = new ProcessBuilder("python2", MOCK_SERVER_PATH);
         Process p = pb.start();          

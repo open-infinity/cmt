@@ -24,8 +24,8 @@ import org.dbunit.operation.DatabaseOperation;
 
 public class DatabaseUtils {
 
-	public static final String SQL_INIT_DB = ("META-INF/sql/dataset-init-scale-out.xml");
-	public static final String SQL_PERIODIC_INIT_SCALE_OUT = ("META-INF/sql/periodic-dataset-init-scale-out.xml");
+	public static final String SQL_SCALE_OUT = ("META-INF/sql/dataset-init-scale-out.xml");
+	public static final String SQL_SCALE_IN = ("META-INF/sql/dataset-init-scale-in.xml");
 
 	public static void updateTestDatabase(IDataSet dataSet, DataSource dataSource){
 		try {
