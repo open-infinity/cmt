@@ -44,4 +44,6 @@ public class ScheduledScalerLauncher {
 	public void launch() throws Exception {
 		jobLauncher.run(job, new JobParametersBuilder().addLong("s_time", System.currentTimeMillis()).toJobParameters());
 	}
+	public void launch1() throws Exception {
+	}
 }

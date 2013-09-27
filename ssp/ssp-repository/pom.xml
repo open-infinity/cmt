@@ -6,7 +6,7 @@
 		<groupId>org.openinfinity</groupId>
 		<version>1.3.0</version>
 	</parent>
-	<artifactId>ssp-sitory</artifactId>
+	<artifactId>ssp-repository</artifactId>
 	<dependencies>
 		<dependency>
 			<groupId>org.openinfinity</groupId>

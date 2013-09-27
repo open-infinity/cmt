@@ -76,7 +76,7 @@
 		period_from = "[from]"
 		period_to = "[to]"
 		size_new = "5"
-		size_original = "7"
+		size_original = "6"
 		job_id= "-1"/>
 		
 	<scaling_rule_tbl 
@@ -91,7 +91,7 @@
         period_from = "[from]"
         period_to = "[to]"
         size_new = "5"
-        size_original = "7"
+        size_original = "6"
         job_id= "-1"/>	
 	
 </dataset> 

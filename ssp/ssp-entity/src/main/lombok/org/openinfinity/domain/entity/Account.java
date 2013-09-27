@@ -19,8 +19,6 @@ import java.math.BigInteger;
 import java.sql.Timestamp;
 
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;

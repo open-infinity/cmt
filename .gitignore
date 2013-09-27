@@ -16,3 +16,6 @@ target/
 
 # ignore Apple metadata
 .DS_Store
+
+# ignore Spring IDE metadata
+.springBeans

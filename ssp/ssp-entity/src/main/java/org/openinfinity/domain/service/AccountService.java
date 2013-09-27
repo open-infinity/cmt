@@ -15,13 +15,13 @@
  */
 package org.openinfinity.domain.service;
 
-import org.openinfinity.domain.entity.User;
+import org.openinfinity.domain.entity.Account;
 
 /**
  * Catalogue service interface.
  * 
  * @author Vedran Bartonicek
  */
-public interface AccountService extends AbstractCrudServiceInterface<User> {
+public interface AccountService extends AbstractCrudServiceInterface<Account> {
 	
 }
