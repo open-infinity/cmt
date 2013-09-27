@@ -55,7 +55,7 @@ import org.openinfinity.cloud.service.scaling.ScalingRuleService;
 
 @ContextConfiguration(locations={"classpath*:META-INF/spring/cloud-autoscaler-test-unit-context.xml"})
 @RunWith(SpringJUnit4ClassRunner.class)
-public class ScheduledScalerUnit {
+public class ScheduledScalerUnitTest {
 
 	@InjectMocks
 	@Autowired
@@ -137,7 +137,7 @@ public class ScheduledScalerUnit {
 	public void PeriodFromInWindowAndNotRequiredScalingOutTest() throws Exception {
 		long now = System.currentTimeMillis();						
 		when(mockScalingRule.getPeriodFrom()).thenReturn(new Timestamp(now));
-		when(mockScalingRule.getPeriodTo()).thenReturn(new Timestamp(now + 30000));
+		when(mockScalingRule.getPeriodTo()).thenReturn(new Timestamp(now + 300000));
 		when(mockScalingRule.getClusterId()).thenReturn(1);	
 		when(mockScalingRule.getScheduledScalingState()).thenReturn(0);	
 		when(mockScalingRule.getClusterSizeNew()).thenReturn(100);	
@@ -149,7 +149,7 @@ public class ScheduledScalerUnit {
 	public void PeriodFromInWindowAndRequiredScalingOutTest() throws Exception {
 		long now = System.currentTimeMillis();						
 		when(mockScalingRule.getPeriodFrom()).thenReturn(new Timestamp(now));
-		when(mockScalingRule.getPeriodTo()).thenReturn(new Timestamp(now + 30000));
+		when(mockScalingRule.getPeriodTo()).thenReturn(new Timestamp(now + 300000));
 		when(mockScalingRule.getClusterId()).thenReturn(1);	
 		when(mockScalingRule.getScheduledScalingState()).thenReturn(1);	
 		when(mockScalingRule.getClusterSizeNew()).thenReturn(100);	
@@ -171,7 +171,7 @@ public class ScheduledScalerUnit {
 	@Test
 	public void PeriodToInWindowAndNotRequiredScalingInTest() throws Exception {
 		long now = System.currentTimeMillis();						
-		when(mockScalingRule.getPeriodFrom()).thenReturn(new Timestamp(now - 30000));
+		when(mockScalingRule.getPeriodFrom()).thenReturn(new Timestamp(now - 300000));
 		when(mockScalingRule.getPeriodTo()).thenReturn(new Timestamp(now));
 		when(mockScalingRule.getClusterId()).thenReturn(1);	
 		when(mockScalingRule.getScheduledScalingState()).thenReturn(3);	
@@ -183,10 +183,10 @@ public class ScheduledScalerUnit {
 	@Test
 	public void PeriodToInWindowAndRequiredScalingInTest() throws Exception {
 		long now = System.currentTimeMillis();						
-		when(mockScalingRule.getPeriodFrom()).thenReturn(new Timestamp(now - 30000));
+		when(mockScalingRule.getPeriodFrom()).thenReturn(new Timestamp(now - 300000));
 		when(mockScalingRule.getPeriodTo()).thenReturn(new Timestamp(now));
 		when(mockScalingRule.getClusterId()).thenReturn(1);	
-		when(mockScalingRule.getScheduledScalingState()).thenReturn(2);	
+		when(mockScalingRule.getScheduledScalingState()).thenReturn(0);	
 		when(mockScalingRule.getClusterSizeNew()).thenReturn(100);	
 
 		Cluster cluster = new Cluster();
