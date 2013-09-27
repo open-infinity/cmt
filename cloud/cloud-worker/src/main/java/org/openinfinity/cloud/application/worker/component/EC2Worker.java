@@ -1320,8 +1320,11 @@ public class EC2Worker implements Worker {
 					if(exitStatus == 0 && buffer.length() == 0) {
 						buffer.append("ok");
 					}
-					LOG.info(threadName+": exit-status: "
-							+ exitStatus);
+					if (exitStatus == 0) {
+						LOG.info(threadName + ": exit-status: " + exitStatus);
+					} else {
+						LOG.error(threadName + ": exit-status: " + exitStatus);
+					}
 					
 					break;
 				}

@@ -1,4 +1,4 @@
-class oibigdatahost::config {
+class oi3-bigdatahost::config {
 	file {"/etc/sysconfig/network":
 		ensure => present,
 		owner => 'root',
@@ -8,6 +8,6 @@ class oibigdatahost::config {
 	}
 }
 
-class oibigdatahost {
-	include oibigdatahost::config
+class oi3-bigdatahost {
+	include oi3-bigdatahost::config
 }
