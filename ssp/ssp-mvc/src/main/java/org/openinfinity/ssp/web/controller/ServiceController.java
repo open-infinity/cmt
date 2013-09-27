@@ -135,6 +135,17 @@ public class ServiceController {
 		return "service/purchase";
 	}
 	
+	@Log
+	@AuditTrail(argumentStrategy=ArgumentStrategy.ALL)
+	@RequestMapping(value="/purchase/cancel", method = RequestMethod.GET)
+	public String purchaseCancel(ModelMap modelMap) {
+		User user = new User();
+		Account account = new Account();
+		AccountModel accountCreateModel = new AccountModel(user, account);
+		modelMap.addAttribute("accountModel", accountCreateModel);
+		return "service/view";
+	}
+	
 	
 	private Map<String, String> getValidationMessages(Set<ConstraintViolation<AccountSampleModel>> failures) {
 		Map<String, String> failureMessages = new HashMap<String, String>();

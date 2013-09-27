@@ -38,6 +38,11 @@
                     <form:label for="password" path="password" cssErrorClass="error">Password </form:label><br/>
                     <form:input path="password" /> <form:errors path="password" />
                 </p>
+                
+                <p>
+                    <input type="checkbox" value="keep-signed" /> Keep me signed in
+                </p>
+                <br>
                 <p>
 					<input type="submit" value="Sign in" />
 				</p>
