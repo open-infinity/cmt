@@ -46,7 +46,7 @@ public class HomeController {
 		return "signin/signinForm";
 	}	
 	
-	@RequestMapping(value="/signin", method = RequestMethod.POST)
+	@RequestMapping(value="/signin", method = RequestMethod.GET)
 	public String signInSubmit(Locale locale, Model modelMap) {
 		User user = new User();
 		Account account = new Account();

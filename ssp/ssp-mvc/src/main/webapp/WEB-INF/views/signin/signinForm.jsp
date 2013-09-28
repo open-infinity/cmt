@@ -27,29 +27,16 @@
 		Sign in
 	</h1>
 	<div class="span-12 last">	
-		<%--form:form modelAttribute="account" action="account" method="post"--%>
-		<form:form modelAttribute="signinForm" action="signin" method="post">
-		  	<fieldset>		
-				<p>	
-					<form:label for="username" path="username" cssErrorClass="error">Username</form:label><br/>
-					<form:input path="username" /> <form:errors path="username" />
-				</p>			
-				<p> 
-                    <form:label for="password" path="password" cssErrorClass="error">Password </form:label><br/>
-                    <form:input path="password" /> <form:errors path="password" />
-                </p>
-                
-                <p>
-                    <input type="checkbox" value="keep-signed" /> Keep me signed in
-                </p>
-                <br>
-                <p>
-					<input type="submit" value="Sign in" />
-				</p>
-			</fieldset>
-		</form:form>
-		<h7>Don't have an account? <a href="account"> Sign up here</a> </h7>
-		<p></p>
+		<form name='f' action="<c:url value='j_spring_security_check' />"
+		method='POST'>
+		<fieldset>
+			<p> username <input type='text' name='j_username' value=''> </p>
+			<p> password <input type='text' name='j_password' value=''> </p>
+			<p> <input name="submit" type="submit" value="submit"/> </p>
+			<p> <input name="reset" type="reset"/> </p>
+		</fieldset>
+		
+	</form>
 	</div>
 	
 	<hr>
