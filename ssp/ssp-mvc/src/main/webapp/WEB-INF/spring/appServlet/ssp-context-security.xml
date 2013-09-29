@@ -14,32 +14,24 @@
     <debug />
 
     <global-method-security pre-post-annotations="enabled" />
+   
+   <http pattern="/signin*" security="none"/>
+   <http pattern="/resources*" security="none"/>
 
-    <http pattern="/static/**" security="none"/>
-    <http pattern="/" security="none"/>
-
-    <http use-expressions="true">
-        <intercept-url pattern="/secure/extreme/**" access="hasRole('supervisor')"/>
-        <intercept-url pattern="/service/**" access="isAuthenticated()" />
-        <!--
-             Allow all other requests. In a real application you should
-             adopt a whitelisting approach where access is not allowed by default
-          -->
-        <intercept-url pattern="/**" access="permitAll" />
-        <form-login login-page="/" default-target-url="/signin"/>
-        <logout logout-success-url="/" delete-cookies="JSESSIONID"/>
-        <remember-me />
-<!--
-    Uncomment to enable X509 client authentication support
-        <x509 />
--->
-        <!-- Uncomment to limit the number of sessions a user can have -->
-        <session-management invalid-session-url="/">
-            <concurrency-control max-sessions="1" error-if-maximum-exceeded="true" />
+    
+   <http auto-config="true" use-expressions="true">
+		<form-login login-page="/signin" 
+		            default-target-url="/service"
+		            always-use-default-target='true'
+		            authentication-failure-url="/signin" />
+		<logout logout-success-url="/signin" />
+        <intercept-url pattern="/**" access="hasRole('user')" />
+		
+		<session-management invalid-session-url="/signin">
+			<concurrency-control max-sessions="1" error-if-maximum-exceeded="true" />
         </session-management>
-
-    </http>
-
+	</http>
+	    
     <!--
     Usernames/Passwords are
         rod/koala

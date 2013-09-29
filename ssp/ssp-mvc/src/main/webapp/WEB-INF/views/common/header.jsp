@@ -14,3 +14,4 @@
         <p><h7>TOAS Self service portal </h7></p>
         <hr>
         <br></br>
+        <a href="<c:url value="/j_spring_security_logout" />" > Logout</a>

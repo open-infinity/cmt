@@ -27,7 +27,7 @@
 		Sign in
 	</h1>
 	<div class="span-12 last">	
-		<form name='f' action="<c:url value='j_spring_security_check' />"
+		<form name='signin' action="<c:url value='j_spring_security_check' />"
 		method='POST'>
 		<fieldset>
 			<p> username <input type='text' name='j_username' value=''> </p>
