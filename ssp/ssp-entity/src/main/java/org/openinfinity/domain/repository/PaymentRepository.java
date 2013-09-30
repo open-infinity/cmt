@@ -13,37 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.openinfinity.domain.entity;
+package org.openinfinity.domain.repository;
 
-import java.math.BigInteger;
-import java.sql.Timestamp;
-
-import javax.validation.constraints.NotNull;
-
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-
-import org.openinfinity.core.annotation.NotScript;
+import org.openinfinity.domain.entity.User;
 
 /**
- * SSP Account entity.
+ * Catalogue repository interface.
  * 
  * @author Vedran Bartonicek
  */
-@Data
-@NoArgsConstructor
-@EqualsAndHashCode(exclude={"id"})
-public class Account {
-	
-	@NotScript @NotNull @NonNull
-	private BigInteger id;
-		
-	@NotScript @NotNull @NonNull
-	private Timestamp serviceValidFrom;
-
-	@NotScript @NotNull @NonNull
-	private Timestamp serviceValidTo;
-	
+public interface PaymentRepository extends AbstractCrudRepositoryInterface<User> {
+			
 }

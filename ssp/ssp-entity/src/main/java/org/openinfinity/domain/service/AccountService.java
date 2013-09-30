@@ -18,7 +18,7 @@ package org.openinfinity.domain.service;
 import org.openinfinity.domain.entity.Account;
 
 /**
- * Catalogue service interface.
+ * Account service interface.
  * 
  * @author Vedran Bartonicek
  */

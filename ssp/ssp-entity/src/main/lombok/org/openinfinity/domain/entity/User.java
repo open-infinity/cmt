@@ -28,22 +28,52 @@ import lombok.NonNull;
 import org.openinfinity.core.annotation.NotScript;
 
 /**
- * SSP Account entity.
+ * SSP User entity.
  * 
  * @author Vedran Bartonicek
  */
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(exclude={"id"})
-public class Account {
+public class User {
 	
 	@NotScript @NotNull @NonNull
 	private BigInteger id;
+	
+	@NotScript @NotNull @NonNull
+	private BigInteger accountId;
+	
+	@NotScript @NotNull @NonNull
+	private String username;
+	
+	@NotScript @NotNull @NonNull
+	private String password;
+	
+	@NotScript @NotNull @NonNull
+	private String firstName;
+	
+	@NotScript @NotNull @NonNull
+	private String lastName;
+	
+	@NotScript @NotNull @NonNull
+	private String phone;
 		
 	@NotScript @NotNull @NonNull
-	private Timestamp serviceValidFrom;
-
+	private String email;
+	
 	@NotScript @NotNull @NonNull
-	private Timestamp serviceValidTo;
+	private String addressLine1;
+	
+	@NotScript @NotNull @NonNull
+	private String addressLine2;
+	
+	@NotScript @NotNull @NonNull
+	private String city;
+	
+	@NotScript @NotNull @NonNull
+	private String stateProvinceRegion;
+	
+	@NotScript @NotNull @NonNull
+	private String postalCode;	
 	
 }

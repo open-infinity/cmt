@@ -20,22 +20,22 @@ import java.util.Collection;
 
 import org.openinfinity.core.annotation.AuditTrail;
 import org.openinfinity.core.annotation.Log;
-import org.openinfinity.domain.entity.Account;
-import org.openinfinity.domain.service.AccountService;
+import org.openinfinity.domain.entity.User;
+import org.openinfinity.domain.service.UserService;
 import org.springframework.stereotype.Service;
 
 /**
- * Account service implementation.
+ * User service implementation.
  * 
  * @author Vedran Bartonicek
  */
 @Service
-public class AccountServiceImpl implements AccountService {
+public class UserServiceImpl implements UserService {
 
 	@Override
 	@Log
 	@AuditTrail
-	public Account create(Account product) {
+	public User create(User product) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -43,7 +43,7 @@ public class AccountServiceImpl implements AccountService {
 	@Override
 	@Log
 	@AuditTrail
-	public void update(Account product) {
+	public void update(User product) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -51,7 +51,7 @@ public class AccountServiceImpl implements AccountService {
 	@Override
 	@Log
 	@AuditTrail
-	public Collection<Account> loadAll() {
+	public Collection<User> loadAll() {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -59,7 +59,7 @@ public class AccountServiceImpl implements AccountService {
 	@Override
 	@Log
 	@AuditTrail
-	public Account loadById(BigInteger id) {
+	public User loadById(BigInteger id) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -67,7 +67,7 @@ public class AccountServiceImpl implements AccountService {
 	@Override
 	@Log
 	@AuditTrail
-	public Account loadByUsername(String username) {
+	public User loadByUsername(String username) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -75,7 +75,7 @@ public class AccountServiceImpl implements AccountService {
 	@Override
 	@Log
 	@AuditTrail
-	public void delete(Account product) {
+	public void delete(User product) {
 		// TODO Auto-generated method stub
 		
 	}

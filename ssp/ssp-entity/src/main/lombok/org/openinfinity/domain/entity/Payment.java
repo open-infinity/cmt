@@ -16,8 +16,6 @@
 package org.openinfinity.domain.entity;
 
 import java.math.BigInteger;
-import java.sql.Timestamp;
-
 import javax.validation.constraints.NotNull;
 
 import lombok.Data;
@@ -28,22 +26,37 @@ import lombok.NonNull;
 import org.openinfinity.core.annotation.NotScript;
 
 /**
- * SSP Account entity.
+ * SSP Payment entity.
  * 
  * @author Vedran Bartonicek
  */
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(exclude={"id"})
-public class Account {
+public class Payment {
 	
 	@NotScript @NotNull @NonNull
 	private BigInteger id;
-		
+	
 	@NotScript @NotNull @NonNull
-	private Timestamp serviceValidFrom;
-
+	private BigInteger accountId;
+	
 	@NotScript @NotNull @NonNull
-	private Timestamp serviceValidTo;
+	private Integer paymentType;
+	
+	@NotScript @NotNull @NonNull
+	private String payPalEmail;
+	
+	@NotScript @NotNull @NonNull
+	private String payPalPassword;
+	
+	@NotScript @NotNull @NonNull
+	private String creditCardNumber;
+	
+	@NotScript @NotNull @NonNull
+	private String creditCardType;
+	
+	@NotScript @NotNull @NonNull
+	private String creditCardCSC;
 	
 }

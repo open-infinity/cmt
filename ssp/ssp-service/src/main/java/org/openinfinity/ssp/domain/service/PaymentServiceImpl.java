@@ -20,22 +20,22 @@ import java.util.Collection;
 
 import org.openinfinity.core.annotation.AuditTrail;
 import org.openinfinity.core.annotation.Log;
-import org.openinfinity.domain.entity.Account;
-import org.openinfinity.domain.service.AccountService;
+import org.openinfinity.domain.entity.Payment;
+import org.openinfinity.domain.service.PaymentService;
 import org.springframework.stereotype.Service;
 
 /**
- * Account service implementation.
+ * Payment service implementation.
  * 
  * @author Vedran Bartonicek
  */
 @Service
-public class AccountServiceImpl implements AccountService {
+public class PaymentServiceImpl implements PaymentService {
 
 	@Override
 	@Log
 	@AuditTrail
-	public Account create(Account product) {
+	public Payment create(Payment product) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -43,7 +43,7 @@ public class AccountServiceImpl implements AccountService {
 	@Override
 	@Log
 	@AuditTrail
-	public void update(Account product) {
+	public void update(Payment product) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -51,7 +51,7 @@ public class AccountServiceImpl implements AccountService {
 	@Override
 	@Log
 	@AuditTrail
-	public Collection<Account> loadAll() {
+	public Collection<Payment> loadAll() {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -59,15 +59,7 @@ public class AccountServiceImpl implements AccountService {
 	@Override
 	@Log
 	@AuditTrail
-	public Account loadById(BigInteger id) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	@Log
-	@AuditTrail
-	public Account loadByUsername(String username) {
+	public Payment loadById(BigInteger id) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -75,7 +67,7 @@ public class AccountServiceImpl implements AccountService {
 	@Override
 	@Log
 	@AuditTrail
-	public void delete(Account product) {
+	public void delete(Payment product) {
 		// TODO Auto-generated method stub
 		
 	}
