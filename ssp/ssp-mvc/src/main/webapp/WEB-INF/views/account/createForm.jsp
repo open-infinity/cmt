@@ -10,7 +10,7 @@
 	</h1>
 	<div class="span-12 last">	
 		<%--form:form modelAttribute="account" action="account" method="post"--%>
-		<form:form modelAttribute="accountModel" action="account" method="post">
+		<form:form modelAttribute="accountModel" action="/ssp-mvc/account" method="post">
 		  	<fieldset>		
 				<legend>Account Fields</legend>
 				<p>	

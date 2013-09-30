@@ -1,0 +1,15 @@
+.alligned-left
+{
+float:left;
+#width:110px;
+#height:90px;
+margin:0px 0px 0px 0px;
+}
+
+.alligned-right
+{
+float:right;
+#width:110px;
+#height:90px;
+margin:0px 10px 0px 10px;
+}

@@ -62,7 +62,7 @@
 	        </script>
 	        </div>       
 	        <div class = "button-purchase"> 
-	        <form method="get" action="purchase/cancel">
+	        <form method="get" action="/ssp-mvc/service/purchase/cancel">
 	            <input type="submit" value="Cancel">
 	        </form>
 	        </div>
