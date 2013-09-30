@@ -35,7 +35,6 @@ import org.openinfinity.core.exception.ApplicationException;
 import org.openinfinity.core.exception.BusinessViolationException;
 import org.openinfinity.core.exception.SystemException;
 import org.openinfinity.domain.entity.Account;
-import org.openinfinity.domain.entity.User;
 import org.openinfinity.domain.service.AccountService;
 import org.openinfinity.ssp.web.model.AccountModel;
 import org.openinfinity.ssp.web.model.AccountSampleModel;
@@ -46,7 +45,9 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -101,39 +102,37 @@ public class AccountController {
 		}
 		return localizedErrorMessages;
 	}
+		
+	@Log
+	@AuditTrail(argumentStrategy=ArgumentStrategy.ALL)
+	@RequestMapping(value="{id}", method = RequestMethod.GET)
+	public String viewAccount(@PathVariable Long id, Model model) {
+		// TODO get Account by ID from DB.
+		Account account = new Account();
+		model.addAttribute("accountModel", account);
+		return "account/view";
+	}
+	
+	// TODO: implement me
+	@Log
+	@AuditTrail(argumentStrategy=ArgumentStrategy.ALL)
+	@RequestMapping(method = RequestMethod.PUT)
+	public String editService(Model model) {
+		return "account/view";
+	}
 	
 	@Log
 	@AuditTrail(argumentStrategy=ArgumentStrategy.ALL)
-	@RequestMapping(method = RequestMethod.GET)
-	public String createNewAccount(ModelMap modelMap) {
-		User user = new User();
-		Account account = new Account();
-		AccountModel accountCreateModel = new AccountModel(user, account);
-		modelMap.addAttribute("accountModel", accountCreateModel);
-		return "account/createForm";
-	}
-	/*
-	@RequestMapping(method=RequestMethod.GET)
-	public String getCreateForm(Model model) {
-		//model.addAttribute(new Account());
-
-		model.addAttribute("exampleaccount", new ExampleAccount());
-		return "exampleaccount/createForm";
-	}
-	*/
-	@Log
-	@AuditTrail(argumentStrategy=ArgumentStrategy.ALL) 
-	@RequestMapping(method = RequestMethod.POST)
-	public @ResponseBody Map<String, ? extends Object> create(@Valid @RequestBody AccountSampleModel accountModel, HttpServletResponse response) {
-		Set<ConstraintViolation<AccountSampleModel>> failures = validator.validate(accountModel);
-		if (failures.isEmpty()) {
-			Account account = accountService.create(accountModel.getAccount());
-			return new ModelMap("id", account.getId());
-		} else {
-			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return getValidationMessages(failures);
+	@RequestMapping(value="/edit", method = RequestMethod.POST)
+	public String submitService(@Valid Account account, BindingResult result) {
+		if (result.hasErrors()) {
+			return "account/createForm";
 		}
+		// TODO: store to DB
+		// TODO: perhaps view creation ins better from here, not GET handler 
+		return "redirect:/account/" + account.getId();
 	}
+		
 	
 	private Map<String, String> getValidationMessages(Set<ConstraintViolation<AccountSampleModel>> failures) {
 		Map<String, String> failureMessages = new HashMap<String, String>();

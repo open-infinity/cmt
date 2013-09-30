@@ -54,5 +54,11 @@ public class AccountRepositoryJdbcImpl {
 	
 	@Log
 	@AuditTrail
+	Account loadByUsername(String username){
+		return new Account();
+	}
+	
+	@Log
+	@AuditTrail
 	public void delete (Account product){}
 }

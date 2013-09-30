@@ -67,10 +67,20 @@ public class AccountServiceImpl implements AccountService {
 	@Override
 	@Log
 	@AuditTrail
+	public User loadByUsername(String username) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	@Override
+	@Log
+	@AuditTrail
 	public void delete(Account product) {
 		// TODO Auto-generated method stub
 		
 	}
+	
+	
 
 	/*
 	@Autowired

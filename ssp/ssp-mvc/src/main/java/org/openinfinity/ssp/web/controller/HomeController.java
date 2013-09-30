@@ -15,16 +15,8 @@
  */
 package org.openinfinity.ssp.web.controller;
 
-import java.text.DateFormat;
-import java.util.Date;
 import java.util.Locale;
 
-import org.openinfinity.domain.entity.Account;
-import org.openinfinity.domain.entity.User;
-import org.openinfinity.ssp.web.model.AccountModel;
-import org.openinfinity.ssp.web.model.SigninModel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;

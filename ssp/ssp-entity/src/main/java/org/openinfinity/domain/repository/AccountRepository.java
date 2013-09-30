@@ -23,5 +23,7 @@ import org.openinfinity.domain.entity.Account;
  * @author Vedran Bartonicek
  */
 public interface AccountRepository extends AbstractCrudRepositoryInterface<Account> {
-		
+	
+	Account loadByUsername(String username);
+	
 }
