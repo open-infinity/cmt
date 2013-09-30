@@ -39,19 +39,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @RequestMapping("/")
 public class HomeController {
 	
-	@RequestMapping(method = RequestMethod.GET)
+	@RequestMapping(value="/signin", method = RequestMethod.GET)
 	public String signIn(Locale locale, Model model) {
-		SigninModel signinModel = new SigninModel("username", "password");
-		model.addAttribute("signinForm", signinModel);
 		return "signin/signinForm";
-	}	
-	
-	@RequestMapping(value="/signin", method = RequestMethod.POST)
-	public String signInSubmit(Locale locale, Model modelMap) {
-		User user = new User();
-		Account account = new Account();
-		AccountModel accountCreateModel = new AccountModel(user, account);
-		modelMap.addAttribute("accountModel", accountCreateModel);
-		return "service/view";
 	}	
 }

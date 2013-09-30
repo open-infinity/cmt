@@ -1,4 +1,4 @@
-class oibigdatamgmt::config {
+class oi3-bigdatamgmt::config {
 	file {"/root/.ssh/id_rsa":
                 ensure => present,
                 owner => 'root',
@@ -15,3 +15,4 @@ class oibigdatamgmt::config {
 		mode => 700,
 	}
 }
+

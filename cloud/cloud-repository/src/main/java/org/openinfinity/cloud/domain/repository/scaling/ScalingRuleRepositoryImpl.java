@@ -207,7 +207,7 @@ public class ScalingRuleRepositoryImpl implements ScalingRuleRepository {
 		jdbcTemplate.update(UPDATE_SCHEDULED_SCALING_IN, new PreparedStatementSetter() {
 			public void setValues(PreparedStatement ps) throws SQLException {	
 				ps.setBoolean(1, false); 
-				ps.setInt(2, 0); 
+				ps.setInt(2, 2); 
 				ps.setInt(3, clusterId);
 			}
 		});

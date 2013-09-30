@@ -66,23 +66,33 @@ public class ScheduledScalerItemProcessor implements ItemProcessor<ScalingRule, 
 		Timestamp windowStart = new Timestamp(now - deltaMinus );
 		Timestamp windowEnd = new Timestamp(now + deltaPlus); 
 	
+	    LOG.debug(Integer.toString(scalingRule.getClusterId()));
+   	    LOG.debug("state="+scalingRule.getScheduledScalingState());
+   	    LOG.debug("now=" + (new Timestamp(now)).toString());
+	    LOG.debug("deltaMinus=" + Integer.toString(deltaMinus));
+	    LOG.debug("deltaPlus=" + Integer.toString(deltaPlus));
+
+	    LOG.debug("windowStart=" + windowStart.toString());
+  	    LOG.debug("windowEnd=" + windowEnd.toString());
+   	    LOG.debug("periodFrom=" + periodFrom.toString());
+  	    LOG.debug("periodTo=" + periodTo.toString());
+
 		Cluster cluster = clusterService.getCluster(scalingRule.getClusterId());
 		Job job;
 		
 		if (periodTo.before(periodFrom) || periodTo.equals(periodFrom)){
 			job = null;
+
 			
 		} else if (windowStart.before(periodFrom) && windowEnd.after(periodFrom) && scalingRule.getScheduledScalingState() == 1){
 			job = createJob(scalingRule, cluster, scalingRule.getClusterSizeNew());
 			scalingRuleService.storeScalingOutParameters(cluster.getNumberOfMachines(), scalingRule.getClusterId());
-		
 		} else if ((windowStart.before(periodTo) && windowEnd.after(periodTo)
-				&& windowStart.after(periodFrom) && scalingRule.getScheduledScalingState() == 2)
+				&& windowStart.after(periodFrom) && scalingRule.getScheduledScalingState() == 0)
 				|| (windowStart.before(periodFrom) && windowEnd.after(periodTo))) {
 			job = createJob(scalingRule, cluster, scalingRule.getClusterSizeOriginal());
-			scalingRuleService.storeScalingInParameters(scalingRule.getClusterId());
-		}
-		else {
+			scalingRuleService.storeScalingInParameters(scalingRule.getClusterId());			
+		} else {
 			job = null;
 		}
 		return job;

@@ -111,7 +111,7 @@ public class ScheduledScalerIntegrationTest {
         Assert.assertEquals(jobExecution.getStatus(), BatchStatus.COMPLETED);
 	
         ScalingRule scalingRule = scalingRuleService.getRule(CLUSTER_ID);
-		Assert.assertEquals(0, scalingRuleService.getRule(CLUSTER_ID).getScheduledScalingState());
+		Assert.assertEquals(2, scalingRuleService.getRule(CLUSTER_ID).getScheduledScalingState());
         Assert.assertEquals("1,1", jobService.getJob(++jobId).getServices()); 
 	}
 	
