@@ -25,7 +25,9 @@
 		            always-use-default-target='true'
 		            authentication-failure-url="/signin" />
 		<logout logout-success-url="/signin" />
-        <intercept-url pattern="/**" access="hasRole('user')" />
+		<intercept-url pattern="/account*" access="permitAll" />
+        <intercept-url pattern="/service*" access="hasRole('user')" />
+        <intercept-url pattern="/**" access="denyAll" />
 		
 		<session-management invalid-session-url="/signin">
 			<concurrency-control max-sessions="1" error-if-maximum-exceeded="true" />

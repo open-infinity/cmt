@@ -15,7 +15,7 @@
         <p>       
         <div>
 	        <div class = "alligned-left" ><h4>TOAS Self Service Portal </h4></div>
-	        <div class = "alligned-right" ><a href="/j_spring_security_logout"> Sign out</a></div>
+	        <div class = "alligned-right" ><a href="<c:url value="/j_spring_security_logout" />" > Sign out</a></div>
 	        <div class = "alligned-right" ><a href="/ssp-mvc/service"> View service</a> </div>
 	        <div class = "alligned-right" ><a href="/ssp-mvc/account"> View account</a> </div>
         </div>
