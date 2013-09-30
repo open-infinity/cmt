@@ -24,6 +24,7 @@ import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 
@@ -767,6 +768,7 @@ public class EC2Worker implements Worker {
 		}
 		int small = 0;
 		int large = 0;
+		int xlarge = 0;
 		for(int i = cluster.getNumberOfMachines(); i < numberOfMachines;i++) {
 			String role = roles.get(i-1);
 			
@@ -774,6 +776,8 @@ public class EC2Worker implements Worker {
 				small++;
 			} else if(role.equalsIgnoreCase("shard") || role.equalsIgnoreCase("slave")) {
 				large++;
+			} else if(role.equalsIgnoreCase("hive")) {
+				xlarge++;
 			}
 		}
 		List<String> securityGroups = new ArrayList<String>();
@@ -795,6 +799,13 @@ public class EC2Worker implements Worker {
 			}
 			instances.addAll(reservation.getInstances());
 		}
+		if (xlarge > 0) {
+			reservation = ec2.createInstance(imageId(job, service, cluster), xlarge, key.getName(), job.getZone(), "m1.xlarge", securityGroups);
+			if (reservation == null) {
+				throw new WorkerException("Error creating virtual machines for service " + service);
+			}
+			instances.addAll(reservation.getInstances());
+		}
 		Iterator<com.amazonaws.services.ec2.model.Instance> ite = instances.iterator();
 		int y=cluster.getNumberOfMachines()+1;
 		int type = cluster.getType();
@@ -802,9 +813,9 @@ public class EC2Worker implements Worker {
 			com.amazonaws.services.ec2.model.Instance tempInstance = ite.next();
 			Machine machineTmp = new Machine();
 			if(type == ClusterService.CLUSTER_TYPE_BIGDATA) {
-				machineTmp.setName("hbase"+y);
+				machineTmp.setName("hbase" + y);
 			} else {
-				machineTmp.setName("mongo"+y);
+				machineTmp.setName("mongo" + y);
 			}
 			
 			machineTmp.setCloud(job.getCloud());
@@ -821,6 +832,10 @@ public class EC2Worker implements Worker {
 					machineTmp.setType("slave");
 				} else {
 					machineTmp.setType("shard");
+				}
+			} else if(tempInstance.getInstanceType().equalsIgnoreCase("m1.xlarge")) {
+				if(type == ClusterService.CLUSTER_TYPE_BIGDATA) {
+					machineTmp.setType("hive");
 				}
 			} 
 			int maxWait = 60;
@@ -1028,6 +1043,7 @@ public class EC2Worker implements Worker {
 			machineService.updateMachineConfigure(machine.getId(), MachineService.MACHINE_CONFIGURE_ERROR);
 			return -1;
 		}
+		
 		int small = 0;
 		int large = 0;
 		int xlarge = 0;
@@ -1038,6 +1054,8 @@ public class EC2Worker implements Worker {
 				if(role.equals("zookeeper")) {
 					small++;
 				} else if(role.equals("hmaster")) {
+					xlarge++;
+				} else if(role.equals("hive")) {
 					xlarge++;
 				} else {
 					large++;
@@ -1071,6 +1089,7 @@ public class EC2Worker implements Worker {
 				throw new WorkerException("Error creating virtual machines for service " + service);
 			}
 		}
+		
 		List<com.amazonaws.services.ec2.model.Instance> instances = new ArrayList<com.amazonaws.services.ec2.model.Instance>();
 		instances.addAll(reservation.getInstances());
 		instances.addAll(largeReservation.getInstances());
@@ -1083,6 +1102,7 @@ public class EC2Worker implements Worker {
 	//	Collection<com.amazonaws.services.elasticloadbalancing.model.Instance> lbInstanceList = new ArrayList<com.amazonaws.services.elasticloadbalancing.model.Instance>();
 		int y=1;
 		
+		List<String> roles_unused = new LinkedList<String>(roles);
 		while (ite.hasNext()) {
 			com.amazonaws.services.ec2.model.Instance tempInstance = ite.next();
 			Machine machineTmp = new Machine();
@@ -1108,7 +1128,17 @@ public class EC2Worker implements Worker {
 					machineTmp.setType("shard");
 				}
 			} else if(tempInstance.getInstanceType().equalsIgnoreCase("m1.xlarge")) {
-				machineTmp.setType("hmaster");
+				if (type == ClusterService.CLUSTER_TYPE_BIGDATA) {
+					// Since we know the roles list, we can deal with several
+					// machine type of same size
+					for (String role : new LinkedList<String>(roles_unused)) {
+						if ("hmaster".equals(role) || "hive".equals(role)) {
+							machineTmp.setType(role);
+							roles_unused.remove(role);
+							break;
+						}
+					}
+				}
 			}
 			maxWait = 60;
 			
