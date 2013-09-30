@@ -32,6 +32,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.test.JobLauncherTestUtils;
 import org.mockito.InjectMocks;
 import org.mockito.Matchers;
 import org.mockito.Mock;
@@ -71,7 +74,6 @@ public class PeriodicScalerIntegrationTest {
     private static final int JOB_UNDEFINED = -1;
 	private static final String METRIC_TYPE_LOAD = "load";
 
-    @InjectMocks
 	@Autowired
 	ScheduledScalerItemProcessor itemProcessor;
     
@@ -91,9 +93,9 @@ public class PeriodicScalerIntegrationTest {
     @Qualifier("jobService")
     JobService jobService;
     
-    @Mock
-    HealthMonitoringService mockHealthMonitoringService;
-	  
+    @Autowired
+    private JobLauncherTestUtils jobLauncherTestUtils;
+    	  
 	@Before
 	public void initMocks() {
 		MockitoAnnotations.initMocks(this);
@@ -156,7 +158,7 @@ public class PeriodicScalerIntegrationTest {
     }
     
     @Test
-	@Ignore
+    @Ignore
 	public void scaleOutScaleIn() throws Exception {	
     	
 		long now = System.currentTimeMillis();
@@ -170,12 +172,14 @@ public class PeriodicScalerIntegrationTest {
               
         HttpGateway.get(URL_LOAD_MEDIUM);
         
-        Thread.sleep((int)(AUTOSCALER_PERIOD_MS * 1.1));
+		JobExecution jobExecution = jobLauncherTestUtils.launchJob();
+        Assert.assertEquals(jobExecution.getStatus(), BatchStatus.COMPLETED);
         ScalingRule scalingRule = scalingRuleService.getRule(CLUSTER_ID);
         Assert.assertEquals(JOB_UNDEFINED, scalingRule.getJobId());
                   
         HttpGateway.get(URL_LOAD_HIGH);
-        Thread.sleep((int)(AUTOSCALER_PERIOD_MS * 1.1));
+        jobExecution = jobLauncherTestUtils.launchJob();
+        Assert.assertEquals(jobExecution.getStatus(), BatchStatus.COMPLETED);
         
         scalingRule = scalingRuleService.getRule(CLUSTER_ID);
         int lastScaleOutJobId = scalingRule.getJobId();
@@ -185,12 +189,14 @@ public class PeriodicScalerIntegrationTest {
         HttpGateway.get(URL_LOAD_MEDIUM);
         jobService.updateStatus(lastScaleOutJobId, 10);
 
-        Thread.sleep((int)(AUTOSCALER_PERIOD_MS * 1.1));
+        jobExecution = jobLauncherTestUtils.launchJob();
+        Assert.assertEquals(jobExecution.getStatus(), BatchStatus.COMPLETED);
         scalingRule = scalingRuleService.getRule(CLUSTER_ID);
         Assert.assertEquals(lastScaleOutJobId, scalingRule.getJobId());
         
         HttpGateway.get(URL_LOAD_LOW);
-        Thread.sleep((int)(AUTOSCALER_PERIOD_MS * 2));
+        jobExecution = jobLauncherTestUtils.launchJob();
+        Assert.assertEquals(jobExecution.getStatus(), BatchStatus.COMPLETED);
         
         scalingRule = scalingRuleService.getRule(CLUSTER_ID);
         int lastScaleInJobId = scalingRule.getJobId();

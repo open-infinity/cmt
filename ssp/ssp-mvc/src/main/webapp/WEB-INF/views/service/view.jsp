@@ -26,7 +26,7 @@
             </fieldset>
         </form:form>
         
-        <form method="get" action="service/edit">
+        <form method="get" action="/ssp-mvc/service/edit">
             <input type="submit" value="Edit service">
         </form>
         <br>

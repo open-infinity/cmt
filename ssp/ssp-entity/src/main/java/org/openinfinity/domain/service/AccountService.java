@@ -24,4 +24,6 @@ import org.openinfinity.domain.entity.Account;
  */
 public interface AccountService extends AbstractCrudServiceInterface<Account> {
 	
+	Account loadByUsername(String username);
+	
 }

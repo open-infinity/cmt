@@ -9,7 +9,7 @@
         Edit service
     </h1>
     <div class="span-12 last">  
-        <form:form modelAttribute="accountModel" action="edit" method="post">
+        <form:form modelAttribute="accountModel" action="/ssp-mvc/service/edit" method="post">
             <fieldset>      
                 <p>
                     <form:label for="account.serviceType" path="account.serviceType" cssErrorClass="error">Service type</form:label><br/>

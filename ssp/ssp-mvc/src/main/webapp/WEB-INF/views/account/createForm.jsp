@@ -10,7 +10,7 @@
 	</h1>
 	<div class="span-12 last">	
 		<%--form:form modelAttribute="account" action="account" method="post"--%>
-		<form:form modelAttribute="accountModel" action="account" method="post">
+		<form:form modelAttribute="accountModel" action="/ssp-mvc/account" method="post">
 		  	<fieldset>		
 				<legend>Account Fields</legend>
 				<p>	
@@ -30,6 +30,10 @@
                     <form:input path="user.lastName" /> <form:errors path="user.lastName" />
                 </p>                
                 <p> 
+                <p> 
+                    <form:label for="user.creditCardNumber" path="user.creditCardNumber" cssErrorClass="error">Credit card number</form:label><br/>
+                    <form:input path="user.creditCardNumber" /> <form:errors path="user.creditCardNumber" />
+                </p>    
                     <form:label for="user.phone" path="user.phone" cssErrorClass="error">Phone</form:label><br/>
                     <form:input path="user.phone" /> <form:errors path="user.phone" />
                 </p>  

@@ -12,6 +12,7 @@ public interface LiferayService {
 
     User getUser(PortletRequest request, ResourceResponse response);
 
+    // FIXME: use Collection
     List<String> getOrganizationNames(User user);
     
     List<Long> getOrganizationIds(User user);

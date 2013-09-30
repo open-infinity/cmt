@@ -19,6 +19,7 @@ import java.math.BigInteger;
 import java.sql.Timestamp;
 
 import javax.validation.constraints.NotNull;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -40,10 +41,55 @@ public class Account {
 	private BigInteger id;
 	
 	@NotScript @NotNull @NonNull
-	private BigInteger userId;
+	private String username;
+	
+	@NotScript @NotNull @NonNull
+	private String password;
+	
+	@NotScript @NotNull @NonNull
+	private String firstName;
+	
+	@NotScript @NotNull @NonNull
+	private String lastName;
+	
+	@NotScript @NotNull @NonNull
+	private String paymentType;
+	
+	@NotScript @NotNull @NonNull
+	private String payPalEmail;
+	
+	@NotScript @NotNull @NonNull
+	private String payPalPassword;
+	
+	@NotScript @NotNull @NonNull
+	private String creditCardNumber;
+	
+	@NotScript @NotNull @NonNull
+	private String creditCardType;
+	
+	@NotScript @NotNull @NonNull
+	private String creditCardCSC;
+				
+	@NotScript @NotNull @NonNull
+	private String phone;
 		
 	@NotScript @NotNull @NonNull
-	private BigInteger serviceType;
+	private String email;
+	
+	@NotScript @NotNull @NonNull
+	private String addressLine1;
+	
+	@NotScript @NotNull @NonNull
+	private String addressLine2;
+	
+	@NotScript @NotNull @NonNull
+	private String city;
+	
+	@NotScript @NotNull @NonNull
+	private String stateProvinceRegion;
+	
+	@NotScript @NotNull @NonNull
+	private String postalCode;	
 	
 	@NotScript @NotNull @NonNull
 	private Timestamp serviceValidFrom;
