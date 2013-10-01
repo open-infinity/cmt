@@ -16,8 +16,6 @@
 package org.openinfinity.domain.entity;
 
 import java.math.BigInteger;
-import java.sql.Timestamp;
-
 import javax.validation.constraints.NotNull;
 
 import lombok.Data;

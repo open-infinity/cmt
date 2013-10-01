@@ -35,6 +35,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
+import org.springframework.stereotype.Repository;
 import org.springframework.util.Assert;
 
 /**
@@ -42,6 +43,7 @@ import org.springframework.util.Assert;
  * 
  * @author Vedran Bartonicek
  */
+@Repository
 public class UserRepositoryJdbcImpl implements UserRepository{
 
 	private static final Logger LOG = Logger.getLogger(UserRepositoryJdbcImpl.class.getName());

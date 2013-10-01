@@ -55,5 +55,12 @@
             </user-service>
         </authentication-provider>
     </authentication-manager>
-
+    
+    <!-- 
+    <bean id="daoAuthenticationProvider" class="org.springframework.security.authentication.dao.DaoAuthenticationProvider">
+	    <property name="userDetailsService" ref="inMemoryDaoImpl"/>
+	    <property name="saltSource" ref="saltSource"/>
+	    <property name="passwordEncoder" ref="passwordEncoder"/>
+	</bean>
+    -->
 </beans:beans>
