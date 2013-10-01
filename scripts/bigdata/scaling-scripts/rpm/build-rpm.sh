@@ -52,6 +52,8 @@
 #
 # 1.3   2013-09-24  Apache Pig support implemented
 #
+# 1.3.1 2013-10-01  Hive support related fixes
+#
 
 # Update the application files
 export TMPDIR=/tmp/bigdata-fpm-ROOT
@@ -65,7 +67,7 @@ cp -pR ../bin $TMPDIR/ROOT/
 
 # Build RPM package
 fpm -s dir -t rpm -C $TMPDIR -p $TARGETDIR -a noarch \
-	-n oi3-bigdata-mgmt --version 1.3 --iteration 1 \
+	-n oi3-bigdata-mgmt --version 1.3.1 --iteration 2 \
 	--description "Hadoop, HBase and MongoDB cluster up and down scaling scipts" \
 	-d "python python-paramiko" \
 	--prefix /opt/bigdata \
