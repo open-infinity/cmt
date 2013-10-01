@@ -20,7 +20,7 @@
 #
 # hive_cleanup.sh
 # 
-# shortcut: yum -y erase mysql-connector-java MariaDB-shared MariaDB-server && rm -fR /var/lib/mysql /etc/hive /usr/lib/hive/lib/mysql-connector-java.jar
+# shortcut: yum -y erase mysql-connector-java MariaDB-shared MariaDB-server && rm -fR /var/lib/mysql /etc/my.cnf /etc/my.cnf.d /etc/hive /usr/lib/hive/lib/mysql-connector-java.jar
 #
 # @author Timo Saarinen
 #

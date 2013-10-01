@@ -66,6 +66,6 @@ su - hdfs -s /bin/bash -c "hdfs dfs -chown hive [[HIVE_METASTORE_WAREHOUSE_DIR]]
 su - hdfs -s /bin/bash -c "hdfs dfs -chgrp hadoop [[HIVE_METASTORE_WAREHOUSE_DIR]]"
 
 # General tmp directory (needed by Hive Metastore Server)
-mkdir [[TMP_DIR]]
+mkdir -p [[TMP_DIR]]
 chmod 1777 [[TMP_DIR]]
 

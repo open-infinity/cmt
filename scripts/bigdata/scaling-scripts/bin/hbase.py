@@ -332,26 +332,26 @@ class HBaseNode(Node):
                     if len(cc.zookeepers) > 0:
                         self.config_description = 'waiting for zookeepers'
                         while count_config_states(cc.zookeepers, 'attached') < 3:
-                            cc = self.recreate_config_context(cc.options)
                             sleep(2.0)
+                            cc = self.recreate_config_context(cc.options)
                     self.config_description = 'waiting for initial slaves'
                     while count_config_states(cc.slaves, 'attached') < 3:
-                        cc = self.recreate_config_context(cc.options)
                         sleep(2.0)
+                        cc = self.recreate_config_context(cc.options)
                 elif self.role == 'zookeeper':
                     pass
                 elif self.role == 'slave':
                     if len(cc.zookeepers) > 0:
                         self.config_description = 'waiting for zookeepers'
                         while count_config_states(cc.zookeepers, 'attached') < 3:
-                            cc = self.recreate_config_context(cc.options)
                             sleep(2.0)
+                            cc = self.recreate_config_context(cc.options)
                 elif self.role == 'hive':
                     if len(cc.zookeepers) > 0:
-                        self.config_description = 'waiting for zookeepers'
-                        while count_config_states(cc.zookeepers, 'attached') < 3:
-                            cc = self.recreate_config_context(cc.options)
+                        self.config_description = 'waiting for zookeepers and hmaster'
+                        while count_config_states(cc.zookeepers, 'attached') < 3 and count_config_states(cc.hmasters, 'attached') < 1:
                             sleep(2.0)
+                            cc = self.recreate_config_context(cc.options)
                 else:
                     raise MgmtException("Uknown role %s" % self.role)
             finally:
