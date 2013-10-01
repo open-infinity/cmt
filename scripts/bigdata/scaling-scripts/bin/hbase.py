@@ -347,11 +347,18 @@ class HBaseNode(Node):
                             sleep(2.0)
                             cc = self.recreate_config_context(cc.options)
                 elif self.role == 'hive':
+                    # Wait for ZooKeepers
                     if len(cc.zookeepers) > 0:
-                        self.config_description = 'waiting for zookeepers and hmaster'
-                        while count_config_states(cc.zookeepers, 'attached') < 3 and count_config_states(cc.hmasters, 'attached') < 1:
+                        self.config_description = 'waiting for zookeepers'
+                        while count_config_states(cc.zookeepers, 'attached') < 3:
                             sleep(2.0)
                             cc = self.recreate_config_context(cc.options)
+                            
+                    # Wait for HMaster
+                    self.config_description = 'waiting for hmaster'
+                    while count_config_states(cc.hmasters, 'attached') < 1:
+                        sleep(2.0)
+                        cc = self.recreate_config_context(cc.options)
                 else:
                     raise MgmtException("Uknown role %s" % self.role)
             finally:
