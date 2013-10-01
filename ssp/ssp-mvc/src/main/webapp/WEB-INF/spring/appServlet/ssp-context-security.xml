@@ -16,17 +16,18 @@
     <global-method-security pre-post-annotations="enabled" />
    
    <http pattern="/signin*" security="none"/>
+   
    <http pattern="/resources*" security="none"/>
 
     
    <http auto-config="true" use-expressions="true">
 		<form-login login-page="/signin" 
-		            default-target-url="account"
+		            default-target-url="/product"
 		            always-use-default-target='true'
 		            authentication-failure-url="/signin" />
 		<logout logout-success-url="/signin" />
-		<intercept-url pattern="/user*" access="permitAll" />
-        <intercept-url pattern="/service*" access="hasRole('user')" />
+		<intercept-url pattern="/signup*" access="permitAll" />
+        <intercept-url pattern="/product*" access="hasRole('user')" />
         <intercept-url pattern="/**" access="denyAll" />
 		
 		<session-management invalid-session-url="/signin">

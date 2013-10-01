@@ -20,27 +20,23 @@ import java.util.Collection;
 
 import org.openinfinity.core.annotation.AuditTrail;
 import org.openinfinity.core.annotation.Log;
-import org.openinfinity.domain.entity.User;
-import org.openinfinity.domain.repository.UserRepository;
+import org.openinfinity.domain.entity.Product;
+import org.openinfinity.domain.service.ProductService;
 import org.openinfinity.domain.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
- * User service implementation.
+ * Product service implementation.
  * 
  * @author Vedran Bartonicek
  */
 @Service
-public class UserServiceImpl implements UserService {
+public class ProductServiceImpl implements ProductService {
 
-	@Autowired
-	UserRepository userRepository;
-	
 	@Override
 	@Log
 	@AuditTrail
-	public User create(User product) {
+	public Product create(Product product) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -48,7 +44,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	@Log
 	@AuditTrail
-	public void update(User product) {
+	public void update(Product product) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -56,7 +52,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	@Log
 	@AuditTrail
-	public Collection<User> loadAll() {
+	public Collection<Product> loadAll() {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -64,15 +60,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	@Log
 	@AuditTrail
-	public User loadById(BigInteger id) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	@Log
-	@AuditTrail
-	public User loadByUsername(String username) {
+	public Product loadById(BigInteger id) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -80,14 +68,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	@Log
 	@AuditTrail
-	public BigInteger idByUsername(String username) {
-		return userRepository.idByUsername(username);
-	}
-	
-	@Override
-	@Log
-	@AuditTrail
-	public void delete(User product) {
+	public void delete(Product product) {
 		// TODO Auto-generated method stub
 		
 	}

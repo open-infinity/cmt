@@ -15,19 +15,13 @@
  */
 package org.openinfinity.domain.repository;
 
-import java.math.BigInteger;
-
-import org.openinfinity.domain.entity.User;
+import org.openinfinity.domain.entity.Product;
 
 /**
  * Catalogue repository interface.
  * 
  * @author Vedran Bartonicek
  */
-public interface UserRepository extends AbstractCrudRepositoryInterface<User> {
+public interface ProductRepository extends AbstractCrudRepositoryInterface<Product> {
 		
-	User loadByUsername(String username);
-	
-	BigInteger idByUsername(String username);
-
 }

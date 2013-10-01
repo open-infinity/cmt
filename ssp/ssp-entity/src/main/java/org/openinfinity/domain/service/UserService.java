@@ -15,6 +15,8 @@
  */
 package org.openinfinity.domain.service;
 
+import java.math.BigInteger;
+
 import org.openinfinity.domain.entity.User;
 
 /**
@@ -25,5 +27,7 @@ import org.openinfinity.domain.entity.User;
 public interface UserService extends AbstractCrudServiceInterface<User> {
 	
 	User loadByUsername(String username);
+	
+	BigInteger idByUsername(String username);
 	
 }

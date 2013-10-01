@@ -35,21 +35,15 @@ import org.openinfinity.core.annotation.NotScript;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(exclude={"id"})
-public class Account {
+public class Product {
 	
 	@NotScript @NotNull @NonNull
 	private BigInteger id;
-	
+			
 	@NotScript @NotNull @NonNull
-	private String name;
-	
+	private Timestamp validFrom;
+
 	@NotScript @NotNull @NonNull
-	private BigInteger userId;
+	private Timestamp validTo;
 	
-	@NotScript @NotNull @NonNull
-	private BigInteger serviceId;
-	
-	@NotScript @NotNull @NonNull
-	private BigInteger paymentId;
-				
 }

@@ -15,7 +15,7 @@
  */
 package org.openinfinity.ssp.web.controller;
 
-import java.math.BigInteger;
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -36,8 +36,9 @@ import org.openinfinity.core.exception.ApplicationException;
 import org.openinfinity.core.exception.BusinessViolationException;
 import org.openinfinity.core.exception.SystemException;
 import org.openinfinity.domain.entity.Account;
-import org.openinfinity.domain.entity.User;
+import org.openinfinity.domain.entity.Product;
 import org.openinfinity.domain.service.AccountService;
+import org.openinfinity.domain.service.ProductService;
 import org.openinfinity.ssp.web.model.AccountModel;
 import org.openinfinity.ssp.web.model.AccountSampleModel;
 import org.openinfinity.ssp.web.support.SerializerUtil;
@@ -64,11 +65,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 
 @Controller
-@RequestMapping(value = "/user")
-public class UserController {
+@RequestMapping(value = "/product")
+public class ProductController {
 
 	@Autowired
-	private AccountService accountService;
+	private ProductService productService;
 	
 	@Autowired
 	private Validator validator;
@@ -107,34 +108,56 @@ public class UserController {
 	
 	@Log
 	@AuditTrail(argumentStrategy=ArgumentStrategy.ALL)
-	@RequestMapping(value="{id}", method = RequestMethod.GET)
-	public String getAccountById(@PathVariable Long id, Model model) {
+	@RequestMapping(method = RequestMethod.GET)
+	public String viewProduct(Principal principal, Model model) {
 		// TODO get Account by ID from DB.
-		User user = new User();
-		model.addAttribute("userModel", user);
-		return "user/view";
+		String username = principal.getName(); 
+				
+		// 1) get user id where username = username
+		
+		// get product where userid = user id
+		
+		// 2) if exists, use for model
+		
+		// if not, blank
+		
+		// 3) get uptime from CMT and put it to model
+		
+		// 4) calculate  or fetch cost cost and put it to model
+		
+		Product product = new Product();
+		model.addAttribute("productModel", product);
+		return "product/view";
+	}
+	
+	@Log
+	@AuditTrail(argumentStrategy=ArgumentStrategy.ALL)
+	@RequestMapping(value="{id}", method = RequestMethod.GET)
+	public String viewProduct(@PathVariable Long id, Model model) {
+		// TODO get Account by ID from DB.
+		Account account = new Account();
+		model.addAttribute("accountModel", account);
+		return "product/view";
 	}
 	
 	// TODO: implement me
 	@Log
 	@AuditTrail(argumentStrategy=ArgumentStrategy.ALL)
 	@RequestMapping(method = RequestMethod.PUT)
-	public String editService(Model model) {
-		return "user/view";
+	public String editProduct(Model model) {
+		return "product/view";
 	}
 	
 	@Log
 	@AuditTrail(argumentStrategy=ArgumentStrategy.ALL)
-	@RequestMapping(value="/user", method = RequestMethod.POST)
-	public String submitService(@Valid User user, BindingResult result) {
+	@RequestMapping(method = RequestMethod.POST)
+	public String submitService(@Valid Product product, BindingResult result) {
 		if (result.hasErrors()) {
-			return "user/new";
+			return "product/new";
 		}
-		// TODO: store to DB, set Id to user.
+		// TODO: store to DB
 		// TODO: perhaps view creation ins better from here, not GET handler 
-		// return "redirect:/user/" + user.getId();
-		user.setId(BigInteger.valueOf(1));
-		return "redirect:/payment/" + user.getId();
+		return "redirect:/product/" + product.getId();
 	}
 		
 	

@@ -13,21 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.openinfinity.domain.repository;
+package org.openinfinity.domain.service;
 
-import java.math.BigInteger;
-
-import org.openinfinity.domain.entity.User;
+import org.openinfinity.domain.entity.Product;
 
 /**
- * Catalogue repository interface.
+ * User service interface.
  * 
  * @author Vedran Bartonicek
  */
-public interface UserRepository extends AbstractCrudRepositoryInterface<User> {
+public interface ProductService extends AbstractCrudServiceInterface<Product> {
 		
-	User loadByUsername(String username);
-	
-	BigInteger idByUsername(String username);
-
 }

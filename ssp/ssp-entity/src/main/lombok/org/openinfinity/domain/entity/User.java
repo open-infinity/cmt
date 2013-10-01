@@ -41,9 +41,6 @@ public class User {
 	private BigInteger id;
 	
 	@NotScript @NotNull @NonNull
-	private BigInteger accountId;
-	
-	@NotScript @NotNull @NonNull
 	private String username;
 	
 	@NotScript @NotNull @NonNull

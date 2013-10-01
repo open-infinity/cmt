@@ -39,7 +39,7 @@ public class Payment {
 	private BigInteger id;
 	
 	@NotScript @NotNull @NonNull
-	private BigInteger accountId;
+	private BigInteger userId;
 	
 	@NotScript @NotNull @NonNull
 	private Integer paymentType;
@@ -51,12 +51,21 @@ public class Payment {
 	private String payPalPassword;
 	
 	@NotScript @NotNull @NonNull
-	private String creditCardNumber;
+	private String creditCardCountry;
 	
 	@NotScript @NotNull @NonNull
 	private String creditCardType;
 	
 	@NotScript @NotNull @NonNull
+	private String creditCardNumber;
+	
+	@NotScript @NotNull @NonNull
 	private String creditCardCSC;
+	
+	@NotScript @NotNull @NonNull
+	private String creditCardExpirationMonth;
+	
+	@NotScript @NotNull @NonNull
+	private String creditCardExpirationYear;
 	
 }
