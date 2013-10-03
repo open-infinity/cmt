@@ -1,6 +1,6 @@
 
 jQuery(function($) {
 	$.supersized({
-		slides : [ {image : '../../tap-theme/images/bg.png', title : ''} ]
+		slides : [ {image : '../../openinfinity-theme/images/bg.png', title : ''} ]
 	});
 });
