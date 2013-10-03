@@ -96,7 +96,7 @@ $theme.include($body_top_include)
 	
 	<footer id="footer" role="contentinfo">
 	<p class="powered-by">
-		 <a href="http://www.tieto.com" rel="external"><img src="/tap-theme/images/t.png" /></a>
+		 <a href="http://www.tieto.com" rel="external"><img src="/openinfinity-theme/images/t.png" /></a>
 	</p>
 	</footer>
 
