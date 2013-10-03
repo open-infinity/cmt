@@ -41,7 +41,7 @@ import org.openinfinity.cloud.service.administrator.ClusterService;
 import org.openinfinity.cloud.service.administrator.InstanceService;
 import org.openinfinity.cloud.service.administrator.JobService;
 import org.openinfinity.cloud.service.administrator.MachineService;
-import org.openinfinity.cloud.service.liferay.LiferayService;
+import org.openinfinity.cloud.comon.web.LiferayService;
 import org.openinfinity.cloud.service.scaling.ScalingRuleService;
 import org.openinfinity.cloud.application.admin.controller.ClusterController;
 import org.openinfinity.cloud.domain.Cluster;

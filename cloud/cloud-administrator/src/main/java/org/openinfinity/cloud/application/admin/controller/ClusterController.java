@@ -26,10 +26,6 @@ import java.util.HashMap;
 
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
-import javax.validation.Valid;
-
-import lombok.NonNull;
-
 import org.apache.log4j.Logger;
 import org.openinfinity.cloud.domain.AuthorizationRoute;
 import org.openinfinity.cloud.domain.Cluster;
@@ -44,20 +40,17 @@ import org.openinfinity.cloud.service.administrator.EC2Wrapper;
 import org.openinfinity.cloud.service.administrator.InstanceService;
 import org.openinfinity.cloud.service.administrator.JobService;
 import org.openinfinity.cloud.service.administrator.MachineService;
-import org.openinfinity.cloud.service.liferay.LiferayService;
-import org.openinfinity.cloud.service.scaling.Enumerations.ClusterScalingState;
+import org.openinfinity.cloud.comon.web.LiferayService;
 import org.openinfinity.cloud.service.scaling.ScalingRuleService;
 import org.openinfinity.cloud.util.http.HttpCodes;
 import org.openinfinity.cloud.util.serialization.JsonDataWrapper;
 import org.openinfinity.cloud.util.serialization.SerializerUtil;
-import org.openinfinity.core.annotation.NotScript;
 import org.openinfinity.core.util.ExceptionUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.Assert;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.portlet.bind.annotation.ResourceMapping;

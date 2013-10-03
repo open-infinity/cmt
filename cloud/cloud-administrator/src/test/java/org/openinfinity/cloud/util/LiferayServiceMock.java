@@ -5,10 +5,9 @@ import com.liferay.portal.model.User;
 import javax.portlet.PortletRequest;
 import javax.portlet.ResourceResponse;
 
-import org.openinfinity.cloud.service.liferay.LiferayService;
+import org.openinfinity.cloud.comon.web.LiferayService;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 

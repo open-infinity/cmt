@@ -44,7 +44,7 @@ import com.liferay.portal.model.User;
 import org.openinfinity.cloud.domain.Instance;
 import org.openinfinity.cloud.domain.configurationtemplate.Template;
 import org.openinfinity.cloud.service.configurationtemplate.TemplateService;
-import org.openinfinity.cloud.service.liferay.LiferayService;
+import org.openinfinity.cloud.comon.web.LiferayService;
 import org.openinfinity.cloud.util.collection.ListUtil;
 import org.openinfinity.cloud.util.http.HttpCodes;
 import org.openinfinity.cloud.util.serialization.JsonDataWrapper;
