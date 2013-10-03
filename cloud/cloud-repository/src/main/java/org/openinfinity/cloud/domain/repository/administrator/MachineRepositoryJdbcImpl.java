@@ -186,7 +186,7 @@ public class MachineRepositoryJdbcImpl implements MachineRepository {
 
 	@AuditTrail
 	public void removeMachine(int id) {
-		jdbcTemplate.update("delete from machine_tbl where machine_id = "+id );
+		jdbcTemplate.update("update machine_tbl set active = 0, machine_running = 0 where machine_id = "+id );
 	}
 
 	@AuditTrail
