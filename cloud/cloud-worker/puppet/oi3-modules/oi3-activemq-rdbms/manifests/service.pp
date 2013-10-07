@@ -1,4 +1,4 @@
-class oi3-mariadb::service {
+class oi3-activemq-rdbms::service {
 
 	exec { "create-activemq-db":
 		unless => "/opt/openinfinity/2.0.0/mariadb/bin/mysql -uroot -p${mysql_password} toasactivemq",
