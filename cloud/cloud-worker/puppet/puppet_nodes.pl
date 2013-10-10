@@ -29,7 +29,35 @@ my %postparameters;
 my %hm_parameters;
 my %ebsparameters;
 
-push(@class, "oibasic");
+push(@class, "oi3-basic");
+
+my $sql = "select machine_extra_ebs_volume_device from machine_tbl where machine_type = 'clustermember' and machine_id = $machine";
+my $sth = $dbh->prepare($sql);
+$sth->execute() or die "Error in SQL execute: $DBI::errstr";
+my @row = $sth->fetchrow_array;
+if(!defined($row[0])) {
+        %ebsparameters = (
+                ebsVolumeUsed => 'false',
+                ebsDeviceName => '',
+        );
+} else {
+        %ebsparameters = (
+                ebsVolumeUsed => 'true',
+                ebsDeviceName => $row[0],
+        );
+}
+$sth->finish;
+$sql = "select cluster_ebs_image_used from cluster_tbl where cluster_id = $cluster";
+$sth = $dbh->prepare($sql);
+$sth->execute() or die "Error in SQL execute: $DBI::errstr";
+@row = $sth->fetchrow_array;
+if($row[0] == 1) {
+        $ebsparameters{"ebsImageUsed"} = 'true';
+} else {
+        $ebsparameters{"ebsImageUsed"} ='false';
+}
+$sth->finish;
+push(@class, "oi3-ebs");
 
 if (1) {
 	push(@class, "oihealthmonitoring");

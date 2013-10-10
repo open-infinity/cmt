@@ -613,7 +613,11 @@ public class EC2Wrapper {
 			ExceptionUtil.throwSystemException(message, e);
 		}
 		if(result != null) {
-			return result.getVolumes().get(0).getState();
+			String resultStr = result.getVolumes().get(0).getState();
+			if(resultStr.equals("in-use")) {
+				resultStr = result.getVolumes().get(0).getAttachments().get(0).getState();
+			}
+			return resultStr;
 		} else {
 			return null;
 		}
