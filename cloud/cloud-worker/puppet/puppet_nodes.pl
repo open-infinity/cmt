@@ -413,8 +413,31 @@ if($type eq "portal_lb" || $type eq "service_lb") {
 	push(@class, "oimariadb");
 	push(@class, "oibackup");
 	
+	my $dbrootpass = "";
+        my $sql = "select password from password_tbl where platform = 'mariadb' and user = 'root' and cluster_id = $cluster";
+        my $sth = $dbh->prepare($sql);
+        $sth->execute() or die "Error in SQL execute: $DBI::errstr";
+        my $rows = $sth->rows;
+        my $passFound = 0;
+        if($rows > 0) {
+                my @row = $sth->fetchrow_array();
+                if(defined($row[0])) {
+                        $passFound = 1;
+                        $dbrootpass = $row[0];
+                }
+        }
+        $sth->finish;
+        if(!$passFound) {
+                $dbrootpass = generatePassword(8);
+                $sql = "insert into password_tbl (id, cluster_id, platform, user, password) values (null, $cluster, 'mariadb', 'root', '$dbrootpass')";
+                $sth = $dbh->prepare($sql);
+                $sth->execute();
+                $sth->finish;
+        }
+
 	# Set parameters
 	%parameters = (
+			mysql_password => $dbrootpass,
 			# Production parameters
                         backup_source_dir => "/opt/openinfinity/2.0.0/backup/dumps", # TODO: for others: /opt/openinfinity
         );
@@ -731,4 +754,14 @@ sub jvmPerm {
 	} else {
 		return 512;
 	}
+}
+
+sub generatePassword {
+   my $length = shift;
+   my $possible = 'abcdefghijkmnpqrstuvwxyz23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
+   my $password = "";
+   while (length($password) < $length) {
+     $password .= substr($possible, (int(rand(length($possible)))), 1);
+   }
+   return $password
 }
