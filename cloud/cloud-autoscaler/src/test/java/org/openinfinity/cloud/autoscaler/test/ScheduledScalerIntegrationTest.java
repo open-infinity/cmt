@@ -23,8 +23,11 @@ import javax.sql.DataSource;
 
 import junit.framework.Assert;
 
+<<<<<<< HEAD
 import org.junit.Before;
 import org.junit.Ignore;
+=======
+>>>>>>> Moving ssp under cloud dir
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openinfinity.cloud.domain.Job;
@@ -36,7 +39,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.openinfinity.cloud.autoscaler.test.util.DatabaseUtils;
-import org.openinfinity.cloud.autoscaler.test.util.HttpGateway;
 import org.openinfinity.cloud.domain.ScalingRule;
 import org.openinfinity.cloud.service.administrator.ClusterService;
 import org.openinfinity.cloud.service.administrator.JobService;
