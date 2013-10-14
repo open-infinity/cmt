@@ -9,14 +9,7 @@
         http://www.springframework.org/schema/context/spring-context-3.0.xsd">
 
 	<context:component-scan base-package="org.openinfinity.cloud.service.administrator">
-    </context:component-scan>
-    
-    <context:component-scan base-package="org.openinfinity.cloud.service.healthmonitoring">		
-    </context:component-scan>
-    
-    <context:component-scan base-package="org.openinfinity.cloud.service.scaling">		
-    </context:component-scan>
-    
+    </context:component-scan>  
 	
 	<bean id="plainSocketFactory" class="org.apache.http.conn.scheme.PlainSocketFactory"
 		factory-method="getSocketFactory"></bean>

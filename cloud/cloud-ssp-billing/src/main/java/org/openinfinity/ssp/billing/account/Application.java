@@ -1,4 +1,4 @@
-package org.openinfinity.ssp.accountmanager;
+package org.openinfinity.ssp.billing.account;
 
 import org.apache.commons.daemon.Daemon;
 import org.apache.commons.daemon.DaemonContext;
@@ -17,7 +17,7 @@ public class Application implements Daemon {
 
     @Override
     public void init(DaemonContext arg0) throws DaemonInitException, Exception {
-        this.spring = new ClassPathXmlApplicationContext("/META-INF/spring/ssp-account-manager-context.xml");   
+        this.spring = new ClassPathXmlApplicationContext("/META-INF/spring/ssp-billing-context.xml");   
     }
 
     @Override

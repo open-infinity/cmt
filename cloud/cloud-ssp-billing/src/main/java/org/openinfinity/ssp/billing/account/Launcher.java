@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.openinfinity.ssp.accountmanager;
+package org.openinfinity.ssp.billing.account;
 
 import org.openinfinity.core.annotation.Log;
 import org.springframework.batch.core.Job;

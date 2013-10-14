@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package org.openinfinity.ssp.accountmanager;
+package org.openinfinity.ssp.billing.account;
 
 
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.openinfinity.domain.entity.ssp.Account;
+import org.openinfinity.cloud.domain.ssp.Account;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.stereotype.Component;
 

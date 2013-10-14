@@ -10,26 +10,20 @@
     
 	<context:component-scan base-package="org.openinfinity.cloud.domain.repository.administrator">
     </context:component-scan>
-    
-    <context:component-scan base-package="org.openinfinity.cloud.domain.repository.healthmonitoring">		
-    </context:component-scan>
-    
-    <context:component-scan base-package="org.openinfinity.cloud.domain.repository.scaling">		
-    </context:component-scan>
-       
+          
 	<bean id="cloudDataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
 		destroy-method="close">
 		<property name="driverClass">
-			<value>${jdbc.driverClassName}</value>
+			<value>${cloud.jdbc.driverClassName}</value>
 		</property>
 		<property name="jdbcUrl">
-			<value>${jdbc.url}</value>
+			<value>${cloud.jdbc.url}</value>
 		</property>
 		<property name="user">
-			<value>${jdbc.username}</value>
+			<value>${cloud.jdbc.username}</value>
 		</property>
 		<property name="password">
-			<value>${jdbc.password}</value>
+			<value>${cloud.jdbc.password}</value>
 		</property>
 		<property name="maxPoolSize">
 			<value>30</value>
@@ -44,5 +38,33 @@
 			<value>true</value>
 		</property>
 	</bean>
+	
+	<bean id="sspDataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+        destroy-method="close">
+        <property name="driverClass">
+            <value>${ssp.jdbc.driverClassName}</value>
+        </property>
+        <property name="jdbcUrl">
+            <value>${ssp.jdbc.url}</value>
+        </property>
+        <property name="user">
+            <value>${ssp.jdbc.username}</value>
+        </property>
+        <property name="password">
+            <value>${ssp.jdbc.password}</value>
+        </property>
+        <property name="maxPoolSize">
+            <value>30</value>
+        </property>
+        <property name="minPoolSize">
+            <value>2</value>
+        </property>
+        <property name="numHelperThreads">
+            <value>2</value>
+        </property>
+        <property name="testConnectionOnCheckout">
+            <value>true</value>
+        </property>
+    </bean>
 	
 </beans>

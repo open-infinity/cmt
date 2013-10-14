@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package org.openinfinity.ssp.accountmanager;
+package org.openinfinity.ssp.billing.account;
 
 import org.apache.log4j.Logger;
+import org.openinfinity.cloud.domain.ssp.Account;
+import org.openinfinity.cloud.service.administrator.InstanceService;
 import org.openinfinity.core.exception.SystemException;
 import org.openinfinity.core.util.ExceptionUtil;
-import org.openinfinity.domain.entity.Account;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -34,8 +35,8 @@ public class AccountProcessor implements ItemProcessor<Account, Account> {
 	private static final Logger LOG = Logger.getLogger(AccountProcessor.class.getName());
 
 			
-	//@Autowired
-	//InstanceService instanceService;
+	@Autowired
+	InstanceService instanceService;
 		
 	@Override
 	public Account process(Account account) throws Exception {
