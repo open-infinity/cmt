@@ -17,3 +17,4 @@
         <value>[[DATABASE_DIR]]/1/mapred/local,[[DATABASE_DIR]]/2/mapred/local,[[DATABASE_DIR]]/3/mapred/local</value>
     </property>
 </configuration>
+
