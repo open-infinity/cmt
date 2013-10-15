@@ -17,6 +17,8 @@ package org.openinfinity.ssp.web.controller;
 
 import java.util.Locale;
 
+import org.openinfinity.domain.entity.Account;
+import org.openinfinity.domain.entity.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,6 +35,13 @@ public class HomeController {
 	
 	@RequestMapping(value="/signin", method = RequestMethod.GET)
 	public String signIn(Locale locale, Model model) {
-		return "signin/signinForm";
+		return "signin";
+	}	
+	
+	@RequestMapping(value="/signup", method = RequestMethod.GET)
+	public String signUp(Locale locale, Model model) {
+		User user = new User();
+		model.addAttribute("userModel", user);
+		return "user/new";
 	}	
 }

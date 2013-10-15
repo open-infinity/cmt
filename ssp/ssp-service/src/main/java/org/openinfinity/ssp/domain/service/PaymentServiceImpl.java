@@ -35,7 +35,7 @@ public class PaymentServiceImpl implements PaymentService {
 	@Override
 	@Log
 	@AuditTrail
-	public Payment create(Payment product) {
+	public Payment create(Payment payment) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -43,7 +43,7 @@ public class PaymentServiceImpl implements PaymentService {
 	@Override
 	@Log
 	@AuditTrail
-	public void update(Payment product) {
+	public void update(Payment payment) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -67,7 +67,7 @@ public class PaymentServiceImpl implements PaymentService {
 	@Override
 	@Log
 	@AuditTrail
-	public void delete(Payment product) {
+	public void delete(Payment payment) {
 		// TODO Auto-generated method stub
 		
 	}

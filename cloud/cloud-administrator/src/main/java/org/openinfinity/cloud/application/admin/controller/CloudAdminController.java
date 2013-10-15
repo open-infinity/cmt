@@ -39,7 +39,7 @@ import org.openinfinity.cloud.domain.Instance;
 import org.openinfinity.cloud.domain.Job;
 import org.openinfinity.cloud.domain.Key;
 import org.openinfinity.cloud.service.administrator.*;
-import org.openinfinity.cloud.service.liferay.LiferayService;
+import org.openinfinity.cloud.comon.web.LiferayService;
 import org.openinfinity.cloud.util.AdminException;
 import org.openinfinity.cloud.util.collection.ListUtil;
 import org.openinfinity.cloud.util.http.HttpCodes;

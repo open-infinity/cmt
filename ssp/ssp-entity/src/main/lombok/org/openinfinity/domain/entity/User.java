@@ -16,8 +16,6 @@
 package org.openinfinity.domain.entity;
 
 import java.math.BigInteger;
-import java.sql.Timestamp;
-
 import javax.validation.constraints.NotNull;
 
 import lombok.Data;
@@ -39,9 +37,6 @@ public class User {
 	
 	@NotScript @NotNull @NonNull
 	private BigInteger id;
-	
-	@NotScript @NotNull @NonNull
-	private BigInteger accountId;
 	
 	@NotScript @NotNull @NonNull
 	private String username;

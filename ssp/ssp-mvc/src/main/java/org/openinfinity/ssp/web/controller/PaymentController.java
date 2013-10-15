@@ -34,12 +34,8 @@ import org.openinfinity.core.exception.AbstractCoreException;
 import org.openinfinity.core.exception.ApplicationException;
 import org.openinfinity.core.exception.BusinessViolationException;
 import org.openinfinity.core.exception.SystemException;
-import org.openinfinity.domain.entity.Account;
 import org.openinfinity.domain.entity.Payment;
-import org.openinfinity.domain.entity.User;
-import org.openinfinity.domain.service.AccountService;
 import org.openinfinity.domain.service.PaymentService;
-import org.openinfinity.ssp.web.model.AccountModel;
 import org.openinfinity.ssp.web.model.AccountSampleModel;
 import org.openinfinity.ssp.web.support.SerializerUtil;
 import org.openinfinity.ssp.web.support.ServletUtil;
@@ -47,14 +43,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * 
@@ -113,7 +106,7 @@ public class PaymentController {
 		// TODO get Account by ID from DB.
 		Payment payment = new Payment();
 		model.addAttribute("paymentModel", payment);
-		return "account/createForm";
+		return "payment/new";
 	}
 	
 	// TODO: implement me
@@ -129,7 +122,7 @@ public class PaymentController {
 	@RequestMapping(value="/payment", method = RequestMethod.POST)
 	public String submitService(@Valid Payment payment, BindingResult result) {
 		if (result.hasErrors()) {
-			return "payment/createForm";
+			return "payment/new";
 		}
 		// TODO: store to DB, set Id to user.
 		// TODO: perhaps view creation ins better from here, not GET handler 

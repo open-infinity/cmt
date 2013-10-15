@@ -39,11 +39,17 @@ public class Account {
 	
 	@NotScript @NotNull @NonNull
 	private BigInteger id;
-		
-	@NotScript @NotNull @NonNull
-	private Timestamp serviceValidFrom;
-
-	@NotScript @NotNull @NonNull
-	private Timestamp serviceValidTo;
 	
+	@NotScript @NotNull @NonNull
+	private String name;
+	
+	@NotScript @NotNull @NonNull
+	private BigInteger userId;
+	
+	@NotScript @NotNull @NonNull
+	private BigInteger serviceId;
+	
+	@NotScript @NotNull @NonNull
+	private BigInteger paymentId;
+				
 }

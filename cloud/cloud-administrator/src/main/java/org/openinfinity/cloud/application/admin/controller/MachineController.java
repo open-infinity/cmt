@@ -35,7 +35,7 @@ import org.openinfinity.cloud.service.administrator.EC2Wrapper;
 import org.openinfinity.cloud.service.administrator.InstanceService;
 import org.openinfinity.cloud.service.administrator.KeyService;
 import org.openinfinity.cloud.service.administrator.MachineService;
-import org.openinfinity.cloud.service.liferay.LiferayService;
+import org.openinfinity.cloud.comon.web.LiferayService;
 import org.openinfinity.cloud.util.AdminException;
 import org.openinfinity.cloud.util.serialization.JsonDataWrapper;
 import org.springframework.beans.factory.annotation.Autowired;

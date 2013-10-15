@@ -10,6 +10,11 @@
 	<context:component-scan base-package="org.openinfinity.ssp" />
 
 	<mvc:annotation-driven />
+	
+	<context:property-placeholder location="classpath*:/META-INF/properties/system.properties" />
+        
+	<import resource="classpath*:META-INF/spring/ssp-context-repository.xml" />
+	
 
 	<!-- Forwards requests to the "/" resource to the "welcome" view -->
 	<!--

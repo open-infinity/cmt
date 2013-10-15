@@ -111,6 +111,11 @@ public class MachineConfigurer implements Configurer {
 			m = machineService.getMachine(m.getId());
 			maxWaitForRunning--;
 		}
+		if(maxWaitForRunning == 0) {
+			LOG.error(threadName+": Machine did not start in time, not waiting anymore.");
+			machineService.updateMachineConfigure(m.getId(), MachineService.MACHINE_CONFIGURE_ERROR);
+			return;
+		}
 		if(m.getEbsVolumeSize() > 0) {	
 			String volumeState = ec2.getVolumeState(m.getEbsVolumeId());
 			if(volumeState != null && volumeState.equals("creating")) {
@@ -126,6 +131,11 @@ public class MachineConfigurer implements Configurer {
 					volumeState = ec2.getVolumeState(m.getEbsVolumeId());
 					maxWaitForEBS--;
 				}
+				if(maxWaitForEBS == 0) {
+					LOG.error(threadName+": Creating EBS volume not ready in time, not waiting anymore...");
+					machineService.updateMachineConfigure(m.getId(), MachineService.MACHINE_CONFIGURE_ERROR);
+					return;
+				}
 			}
 			if (volumeState != null && volumeState.equals("available")) {
 				String ebsDevice = null;
@@ -140,7 +150,27 @@ public class MachineConfigurer implements Configurer {
 				ec2.attachVolume(m.getEbsVolumeId(), m.getInstanceId(),
 						ebsDevice);
 				m.setEbsVolumeDevice(ebsDevice);
-				machineService.updateMachine(m);
+				machineService.updateMachine(m);			
+			}
+			volumeState = ec2.getVolumeState(m.getEbsVolumeId());
+			LOG.info(threadName+": Current volume state is "+volumeState);
+			if(volumeState != null && volumeState.equals("attaching")) {
+				int maxWaitForEBS = 96;
+				while(volumeState.equals("attaching") && maxWaitForEBS > 0) {
+					LOG.info(threadName+": Waiting for EBS volume "+m.getEbsVolumeId()+" to be attached");
+					try {
+						Thread.sleep(5000);
+					} catch (InterruptedException e) {
+						LOG.error(threadName+": Someone interrupted my sleep! How rude! "+e.getMessage());
+					}
+					volumeState = ec2.getVolumeState(m.getEbsVolumeId());
+					maxWaitForEBS--;
+				}
+				if(maxWaitForEBS == 0) {
+					LOG.error(threadName+": EBS volume did not attach in time, not waiting anymore");
+					machineService.updateMachineConfigure(m.getId(), MachineService.MACHINE_CONFIGURE_ERROR);
+					return;
+				}
 			}
 		}
 		

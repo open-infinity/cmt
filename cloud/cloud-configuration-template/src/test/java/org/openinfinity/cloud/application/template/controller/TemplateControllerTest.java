@@ -26,7 +26,7 @@ import org.mockito.MockitoAnnotations;
 
 import static org.mockito.Mockito.*;
 
-import org.openinfinity.cloud.service.liferay.LiferayService;
+import org.openinfinity.cloud.comon.web.LiferayService;
 import org.openinfinity.cloud.application.template.controller.TemplateController;
 import org.openinfinity.core.util.ExceptionUtil;
 

@@ -21,7 +21,9 @@ import java.util.Collection;
 import org.openinfinity.core.annotation.AuditTrail;
 import org.openinfinity.core.annotation.Log;
 import org.openinfinity.domain.entity.User;
+import org.openinfinity.domain.repository.UserRepository;
 import org.openinfinity.domain.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -32,6 +34,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserServiceImpl implements UserService {
 
+	@Autowired
+	UserRepository userRepository;
+	
 	@Override
 	@Log
 	@AuditTrail
@@ -70,6 +75,13 @@ public class UserServiceImpl implements UserService {
 	public User loadByUsername(String username) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	@Override
+	@Log
+	@AuditTrail
+	public BigInteger idByUsername(String username) {
+		return userRepository.idByUsername(username);
 	}
 	
 	@Override

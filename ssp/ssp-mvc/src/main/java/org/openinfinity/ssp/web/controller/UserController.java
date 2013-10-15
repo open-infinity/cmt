@@ -15,6 +15,7 @@
  */
 package org.openinfinity.ssp.web.controller;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -127,11 +128,13 @@ public class UserController {
 	@RequestMapping(value="/user", method = RequestMethod.POST)
 	public String submitService(@Valid User user, BindingResult result) {
 		if (result.hasErrors()) {
-			return "user/createForm";
+			return "user/new";
 		}
 		// TODO: store to DB, set Id to user.
 		// TODO: perhaps view creation ins better from here, not GET handler 
-		return "redirect:/user/" + user.getId();
+		// return "redirect:/user/" + user.getId();
+		user.setId(BigInteger.valueOf(1));
+		return "redirect:/payment/" + user.getId();
 	}
 		
 	

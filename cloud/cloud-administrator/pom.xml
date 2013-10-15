@@ -79,6 +79,11 @@
         </profile>
     </profiles>
     <dependencies>
+      <dependency>
+            <groupId>org.openinfinity</groupId>
+            <artifactId>cloud-common-web</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-webmvc-portlet</artifactId>
@@ -150,6 +155,11 @@
         <dependency>
             <groupId>org.openinfinity</groupId>
             <artifactId>cloud-service</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+	    <dependency>
+            <groupId>org.openinfinity</groupId>
+            <artifactId>cloud-common-web</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>

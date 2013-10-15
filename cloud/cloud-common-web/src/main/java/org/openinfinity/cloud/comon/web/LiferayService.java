@@ -1,4 +1,4 @@
-package org.openinfinity.cloud.service.liferay;
+package org.openinfinity.cloud.comon.web;
 
 import java.util.List;
 

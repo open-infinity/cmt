@@ -1,4 +1,4 @@
-package org.openinfinity.cloud.service.liferay;
+package org.openinfinity.cloud.comon.web;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -10,7 +10,6 @@ import javax.portlet.ResourceResponse;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 import org.openinfinity.cloud.util.http.HttpCodes;
-import org.openinfinity.cloud.service.liferay.LiferayServiceImpl;
 import org.openinfinity.core.util.ExceptionUtil;
 
 import com.liferay.portal.kernel.exception.PortalException;

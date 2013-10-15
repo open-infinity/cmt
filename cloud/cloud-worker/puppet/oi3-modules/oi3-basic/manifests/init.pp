@@ -77,6 +77,7 @@ class oi3-basic::install {
 }
 
 class oi3-basic {
+	require oi3-ebs
         include  oi3-basic::install, oi3-basic::config,  oi3-basic::service
 }
 	

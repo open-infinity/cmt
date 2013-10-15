@@ -15,7 +15,7 @@
 				<p> <input type="checkbox" value="keep-signed" /> Keep me signed in </p>
 				<input type="submit" value="Sign in" />
 			</fieldset>
-			<h6>Don't have an account? <a href="account"> Sign up here</a> </h6>
+			<h6>Don't have an account? <a href="signup"> Sign up here</a> </h6>
 	        <p></p>	
 		</form>
 	</div>

@@ -15,6 +15,8 @@
  */
 package org.openinfinity.domain.repository;
 
+import java.math.BigInteger;
+
 import org.openinfinity.domain.entity.User;
 
 /**
@@ -26,4 +28,6 @@ public interface UserRepository extends AbstractCrudRepositoryInterface<User> {
 		
 	User loadByUsername(String username);
 	
+	BigInteger idByUsername(String username);
+
 }

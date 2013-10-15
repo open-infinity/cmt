@@ -3,6 +3,7 @@ class oi3-lttwatch::preconfig {
 	# Make config dir
 	file { "/opt/openinfinity/3.0.0/ltt-watch":
 		ensure => directory, owner => "oiuser", group => "oiuser", mode => 0774,
+		require => Class["oi3-basic::config"],
 	}
 
 	# LTT configuration file

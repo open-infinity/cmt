@@ -325,6 +325,11 @@
 			<version>${project.parent.version}</version>
 		</dependency>
 		<dependency>
+            <groupId>org.openinfinity</groupId>
+            <artifactId>cloud-common-web</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+		<dependency>
 			<groupId>org.openinfinity</groupId>
 			<artifactId>open-infinity-core</artifactId>
 			<version>${open-infinity-core.version}</version>
