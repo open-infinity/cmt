@@ -13,6 +13,7 @@
 		<springframework.version>3.1.1.RELEASE</springframework.version>
 		<spring.batch.version>2.1.8.RELEASE</spring.batch.version>
 		<liferay.version>6.0.6</liferay.version>
+		<junit.version>4.7</junit.version>
 		<mysql.version>5.1.18</mysql.version>
 		
 		<open-infinity-core.version>1.1.0.RELEASE</open-infinity-core.version>
@@ -285,6 +286,16 @@
 				</file>
 			</activation>
 			<build>
+			    <resources>
+				    <resource>
+	                    <directory>src/main/resources</directory>
+	                    <filtering>true</filtering>
+	                </resource> 
+	                <resource>
+	                    <directory>src/main/resources/META-INF</directory>
+	                    <filtering>true</filtering>
+	                </resource> 
+                </resources>
 				<plugins>
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
@@ -306,6 +317,44 @@
 						</executions>
 					</plugin>
 					<plugin>
+		                <groupId>org.apache.maven.plugins</groupId>
+		                <artifactId>maven-surefire-plugin</artifactId>
+		                <version>2.12</version>
+		                <configuration>
+		                <!-- 
+		                    <include>**/*Junit*.java</include>
+		                    <include>**/*Test*.java</include>
+		                    <include>**/*Test.java</include>
+		                    <include>**/*TestCase.java</include>
+		                -->
+		                </configuration>
+		                <dependencies>
+		                      <dependency>
+			                    <groupId>org.apache.maven.surefire</groupId>
+			                    <artifactId>surefire-junit47</artifactId>
+			                    <version>2.12</version>
+		                      </dependency>
+		                </dependencies>
+                    </plugin>
+                    
+                    <plugin>
+		                <groupId>org.apache.maven.plugins</groupId>
+		                <artifactId>maven-dependency-plugin</artifactId>
+		                <executions>
+		                    <execution>
+		                        <id>copy-dependencies</id>
+		                        <phase>package</phase>
+		                        <goals>
+		                            <goal>copy-dependencies</goal>
+		                        </goals>
+		                        <configuration>
+		                            <outputDirectory>${project.build.directory}/lib</outputDirectory>
+		                        </configuration>
+		                    </execution>
+		                </executions>
+		            </plugin>
+            <!-- 
+					<plugin>
 						<groupId>org.projectlombok</groupId>
 						<artifactId>lombok-maven-plugin</artifactId>
 						<version>0.10.8.0</version>
@@ -319,6 +368,7 @@
 							</dependency>
 						</dependencies>
 					</plugin>
+				-->	
 				</plugins>
 			</build>
 		</profile>

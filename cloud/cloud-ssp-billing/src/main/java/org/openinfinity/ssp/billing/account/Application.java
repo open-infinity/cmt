@@ -17,7 +17,7 @@ public class Application implements Daemon {
 
     @Override
     public void init(DaemonContext arg0) throws DaemonInitException, Exception {
-        this.spring = new ClassPathXmlApplicationContext("/META-INF/spring/ssp-billing-context.xml");   
+        this.spring = new ClassPathXmlApplicationContext("/META-INF/spring/cloud-ssp-billing-context.xml");   
     }
 
     @Override

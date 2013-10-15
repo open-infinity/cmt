@@ -264,7 +264,6 @@
 					<archive>
 						<index>true</index>
 						<manifest>
-							<!-- mainClass>org.openinfinity.cloud.autoscaler.application.AutoscalerApplication</mainClass-->
 							<addClasspath>true</addClasspath>
 							<classpathPrefix>lib/</classpathPrefix>
 						</manifest>
