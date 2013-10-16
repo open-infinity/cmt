@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.openinfinity.ssp.billing.payment;
+package org.openinfinity.cloud.ssp.billing.authorization;
 
 import org.openinfinity.core.annotation.Log;
 import org.springframework.batch.core.Job;
@@ -31,10 +31,10 @@ import org.springframework.stereotype.Component;
  * @version 1.3.0
  * @since 1.2.0
  */
-@Component("scheduledScalerLauncher")
-public class Launcher {
+@Component("authorizationLauncher")
+public class AuthorizationLauncher {
 	@Autowired
-	@Qualifier("scheduledJob")
+	@Qualifier("authorizationJob")
 	private Job job;
 	
 	@Autowired
@@ -42,7 +42,7 @@ public class Launcher {
 		
 	@Log
 	public void launch() throws Exception {
-		jobLauncher.run(job, new JobParametersBuilder().addLong("am_time", System.currentTimeMillis()).toJobParameters());
+		jobLauncher.run(job, new JobParametersBuilder().addLong("auth_time", System.currentTimeMillis()).toJobParameters());
 	}
 	public void launch1() throws Exception {
 	}

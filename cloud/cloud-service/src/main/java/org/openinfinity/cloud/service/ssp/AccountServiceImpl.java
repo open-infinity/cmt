@@ -18,9 +18,13 @@ package org.openinfinity.cloud.service.ssp;
 import java.math.BigInteger;
 import java.util.Collection;
 
+import org.openinfinity.cloud.domain.repository.administrator.ClusterRepository;
+import org.openinfinity.cloud.domain.repository.ssp.AccountRepository;
 import org.openinfinity.cloud.domain.ssp.Account;
 import org.openinfinity.core.annotation.AuditTrail;
 import org.openinfinity.core.annotation.Log;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 /**
@@ -31,50 +35,48 @@ import org.springframework.stereotype.Service;
 @Service
 public class AccountServiceImpl implements AccountService {
 
+	@Autowired
+	AccountRepository accountRepository;
+	
 	@Override
 	@Log
 	@AuditTrail
-	public Account create(Account product) {
-		// TODO Auto-generated method stub
-		return null;
+	public Account create(Account account) {
+		return accountRepository.create(account);
 	}
 
 	@Override
 	@Log
 	@AuditTrail
-	public void update(Account product) {
-		// TODO Auto-generated method stub
-		
+	public void update(Account account) {
+		accountRepository.update(account);		
 	}
 
 	@Override
 	@Log
 	@AuditTrail
 	public Collection<Account> loadAll() {
-		// TODO Auto-generated method stub
-		return null;
+		return accountRepository.loadAll();
 	}
 
 	@Override
 	@Log
 	@AuditTrail
 	public Account loadById(BigInteger id) {
-		// TODO Auto-generated method stub
-		return null;
+		return accountRepository.loadById(id);
 	}
 
 	@Override
 	@Log
 	@AuditTrail
 	public Account loadByUsername(String username) {
-		// TODO Auto-generated method stub
-		return null;
+		return accountRepository.loadByUsername(username);
 	}
 	
 	@Override
 	@Log
 	@AuditTrail
-	public void delete(Account product) {
+	public void delete(Account account) {
 		// TODO Auto-generated method stub
 		
 	}

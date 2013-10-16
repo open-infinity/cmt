@@ -16,49 +16,100 @@
 package org.openinfinity.cloud.domain.repository.ssp;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
+import javax.sql.DataSource;
+
+import org.apache.log4j.Logger;
 import org.openinfinity.cloud.domain.ssp.Account;
 import org.openinfinity.core.annotation.AuditTrail;
-import org.openinfinity.core.annotation.Log;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementSetter;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
+import org.springframework.stereotype.Repository;
+import org.springframework.util.Assert;
 
 /**
  * Account repository implementation.
  * 
  * @author Vedran Bartonicek
  */
-public class AccountRepositoryJdbcImpl {
+@Repository
+public class AccountRepositoryJdbcImpl implements AccountRepository{
 
-	@Log
-	@AuditTrail
-	public Account create(Account product){
-		return new Account();
+	private static final Logger LOG = Logger.getLogger(AccountRepositoryJdbcImpl.class.getName());
+
+	private JdbcTemplate jdbcTemplate;
+
+    private DataSource dataSource;
+
+    @Autowired
+	public AccountRepositoryJdbcImpl(@Qualifier("sspDataSource") DataSource dataSource) {
+		Assert.notNull(dataSource, "Please define datasource for instance repository.");
+		this.jdbcTemplate = new JdbcTemplate(dataSource);
+		this.dataSource = dataSource;
 	}
 	
-	@Log
 	@AuditTrail
-	public void update(Account product){}
+	public Account create(final Account account){
+		SimpleJdbcInsert insert = new SimpleJdbcInsert(dataSource).withTableName("account").usingGeneratedKeyColumns("id");
+		Map<String,Object> parameters = new HashMap<String,Object>();
+		parameters.put("organization_id", account.getOrganizationId());
+		parameters.put("name", account.getName());
+		parameters.put("payment_status", account.getPaymentStatus());
+		Number id = insert.executeAndReturnKey(parameters);
+		account.setId(BigInteger.valueOf((Long)id));
+		return account;
+	}
+
+	@AuditTrail
+	public void update(final Account account) {
+		jdbcTemplate.update("update account set organization_id = ?, name = ?, payment_status = ?", 
+				new PreparedStatementSetter() {
+					public void setValues(PreparedStatement ps) throws SQLException {
+						ps.setInt(1, account.getOrganizationId().intValue());
+						ps.setString(2, account.getName());
+						ps.setInt(2, account.getPaymentStatus());
+					}
+				}
+		);
+	}
 	
-	@Log
 	@AuditTrail
 	public Collection<Account> loadAll(){
-		return new ArrayList<Account>();
+		return this.jdbcTemplate.query("select * from account", new AccountWrapper());		
 	}
 	
-	@Log
 	@AuditTrail
 	public Account loadById(BigInteger id){
-		return new Account();
+		return this.jdbcTemplate.queryForObject("select * from account where id = ?", new Object[] { id }, new AccountWrapper());
 	}
-	
-	@Log
+		
 	@AuditTrail
-	Account loadByUsername(String username){
-		return new Account();
+	public void delete (Account account){}
+	
+	private static final class AccountWrapper implements RowMapper<Account> {
+		public Account mapRow(ResultSet rs, int rowNumber) throws SQLException {
+			Account account = new Account();
+			account.setId(BigInteger.valueOf(rs.getInt("id")));
+			account.setOrganizationId(BigInteger.valueOf(rs.getInt("organization_id")));
+			account.setName(rs.getString("name"));
+			account.setPaymentStatus(rs.getInt("payment_status"));
+			return account;
+		}
 	}
-	
-	@Log
-	@AuditTrail
-	public void delete (Account product){}
+
+	@Override
+	public Account loadByUsername(String username) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

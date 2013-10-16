@@ -52,7 +52,7 @@ public class UserRepositoryJdbcImpl implements UserRepository{
     private DataSource dataSource;
 
     @Autowired
-	public UserRepositoryJdbcImpl(@Qualifier("cloudDataSource") DataSource dataSource) {
+	public UserRepositoryJdbcImpl(@Qualifier("sspDataSource") DataSource dataSource) {
 		Assert.notNull(dataSource, "Please define datasource for instance repository.");
 		this.jdbcTemplate = new JdbcTemplate(dataSource);
 		this.dataSource = dataSource;

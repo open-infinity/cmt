@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.openinfinity.ssp.billing.account;
+package org.openinfinity.cloud.ssp.billing.authorization;
 
 
 import java.util.List;
@@ -31,9 +31,9 @@ import org.springframework.stereotype.Component;
  * @version 1.3.0
  * @since 1.3.0
  */
-@Component("periodicScalerItemWriter")
-public class AccountWriter implements ItemWriter<Account> {
-	private static final Logger LOG = Logger.getLogger(AccountWriter.class.getName());
+@Component("authorizationItemWriter")
+public class AuthorizationItemWriter implements ItemWriter<Account> {
+	private static final Logger LOG = Logger.getLogger(AuthorizationItemWriter.class.getName());
 
 	@Override
 	public void write(List<? extends Account> items) throws Exception {

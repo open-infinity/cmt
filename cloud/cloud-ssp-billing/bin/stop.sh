@@ -1,8 +1,8 @@
 #!/bin/bash
 
-JAVA_HOME=/etc/alternatives/java_sdk_openjdk/ 
-CLASS_PATH=/opt/toas/cloudmanagementtools/autoscaler/lib/java/cloud-autoscaler-1.2.0.RELEASE.jar
-CLASS=org.openinfinity.cloud.ssp. 
-PID_FILE=/opt/toas/cloudmanagementtools/autoscaler/var/run/autoscaler.pid
+JAVA_HOME=/usr/lib/jvm/java-6-openjdk-amd64
+CLASS_PATH=/home/vedran/workspace/toas/github/cmt/cloud/cloud-ssp-billing/target/cloud-ssp-billing-1.2.2.jar
+CLASS=org.openinfinity.cloud.ssp.billing.authorization.AuthorizationApplication 
+PID_FILE=/home/vedran/workspace/toas/github/cmt/cloud/cloud-ssp-billing/ssp-billing.pid
 
-/usr/bin/jsvc -home $JAVA_HOME -pidfile $PID_FILE  -cp $CLASS_PATH $CLASS
+/usr/bin/jsvc -stop -pidfile $PID_FILE  -cp $CLASS_PATH $CLASS

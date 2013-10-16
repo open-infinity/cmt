@@ -40,7 +40,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	@Log
 	@AuditTrail
-	public User create(User product) {
+	public User create(User user) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -48,7 +48,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	@Log
 	@AuditTrail
-	public void update(User product) {
+	public void update(User user) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -87,7 +87,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	@Log
 	@AuditTrail
-	public void delete(User product) {
+	public void delete(User user) {
 		// TODO Auto-generated method stub
 		
 	}
