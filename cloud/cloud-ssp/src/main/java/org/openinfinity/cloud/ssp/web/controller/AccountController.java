@@ -27,6 +27,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Valid;
 import javax.validation.Validator;
 
+import org.openinfinity.cloud.domain.ssp.Account;
 import org.openinfinity.cloud.service.ssp.AccountService;
 import org.openinfinity.cloud.ssp.web.model.AccountModel;
 import org.openinfinity.cloud.ssp.web.model.AccountSampleModel;
