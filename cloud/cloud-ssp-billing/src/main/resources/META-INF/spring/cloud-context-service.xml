@@ -12,6 +12,7 @@
 	<context:component-scan base-package="org.openinfinity.cloud.service.administrator">
 	        <context:exclude-filter type="regex" expression="org.openinfinity.cloud.service.administrator.ClusterService.*" /> 
     </context:component-scan>
+    <context:component-scan base-package="org.openinfinity.cloud.service.usage"/>
       
 	
 	<bean id="plainSocketFactory" class="org.apache.http.conn.scheme.PlainSocketFactory"

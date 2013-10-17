@@ -16,11 +16,13 @@
 
 package org.openinfinity.cloud.domain.repository.ssp;
 
+import java.math.BigInteger;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.openinfinity.cloud.domain.ScalingRule;
 import org.openinfinity.cloud.domain.ssp.Account;
+import org.openinfinity.cloud.domain.ssp.User;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 
@@ -34,6 +36,11 @@ import org.springframework.stereotype.Component;
 public class AccountRowMapper implements RowMapper<Account> { 
 	public Account mapRow(ResultSet resultSet, int rowNum) throws SQLException {
 		Account account = new Account();
+		account.setId(BigInteger.valueOf(resultSet.getInt("id")));
+		account.setOrganizationId(BigInteger.valueOf(resultSet.getInt("organization_id")));
+		account.setName(resultSet.getString("name"));
+		account.setStatus(resultSet.getInt("status"));
 		return account;
 	}	
 }
+

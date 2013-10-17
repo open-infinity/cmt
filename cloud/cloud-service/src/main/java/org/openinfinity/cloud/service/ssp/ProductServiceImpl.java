@@ -18,7 +18,7 @@ package org.openinfinity.cloud.service.ssp;
 import java.math.BigInteger;
 import java.util.Collection;
 
-import org.openinfinity.cloud.domain.ssp.Product;
+import org.openinfinity.cloud.domain.ssp.Subscription;
 import org.openinfinity.core.annotation.AuditTrail;
 import org.openinfinity.core.annotation.Log;
 import org.springframework.stereotype.Service;
@@ -34,7 +34,7 @@ public class ProductServiceImpl implements ProductService {
 	@Override
 	@Log
 	@AuditTrail
-	public Product create(Product product) {
+	public Subscription create(Subscription product) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -42,7 +42,7 @@ public class ProductServiceImpl implements ProductService {
 	@Override
 	@Log
 	@AuditTrail
-	public void update(Product product) {
+	public void update(Subscription product) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -50,7 +50,7 @@ public class ProductServiceImpl implements ProductService {
 	@Override
 	@Log
 	@AuditTrail
-	public Collection<Product> loadAll() {
+	public Collection<Subscription> loadAll() {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -58,7 +58,7 @@ public class ProductServiceImpl implements ProductService {
 	@Override
 	@Log
 	@AuditTrail
-	public Product loadById(BigInteger id) {
+	public Subscription loadById(BigInteger id) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -66,7 +66,7 @@ public class ProductServiceImpl implements ProductService {
 	@Override
 	@Log
 	@AuditTrail
-	public void delete(Product product) {
+	public void delete(Subscription product) {
 		// TODO Auto-generated method stub
 		
 	}

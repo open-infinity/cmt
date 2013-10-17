@@ -8,8 +8,8 @@
         http://www.springframework.org/schema/context
         http://www.springframework.org/schema/context/spring-context-3.0.xsd">
     
-	<context:component-scan base-package="org.openinfinity.cloud.domain.repository.administrator">
-    </context:component-scan>
+	<context:component-scan base-package="org.openinfinity.cloud.domain.repository.administrator"/>
+    <context:component-scan base-package="org.openinfinity.cloud.domain.repository.usage"/>
           
 	<bean id="cloudDataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
 		destroy-method="close">

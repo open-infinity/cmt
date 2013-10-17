@@ -15,6 +15,7 @@
  */
 package org.openinfinity.cloud.domain;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -53,6 +54,12 @@ public class UsagePeriod {
 	
 	private Collection<UsageHour> usageHours = Collections.checkedCollection(new ArrayList<UsageHour>(), UsageHour.class);
 	
+	Map<Integer, List<UsageHour>> usageHoursPerMachine;
+	
+	Map<Integer, BigInteger> uptimePerMachine;
+	
+	Map<Integer, BigInteger> downtimePerMachine;
+	
 	public void addUsageHour(UsageHour usageHour) {
 		usageHours.add(usageHour);
 	}
@@ -68,7 +75,7 @@ public class UsagePeriod {
 		LOGGER.debug("Gathering start time: " + gatheringStartTime);
 		LOGGER.debug("Gathering end time: " + gatheringEndTime);
 		long previousGatheringPointOfTime = 0;
-		Map<Integer, List<UsageHour>> usageHoursPerMachine = generateUsageHourTreePerMachineId();
+		usageHoursPerMachine = generateUsageHourTreePerMachineId();
 		for (Map.Entry<Integer, List<UsageHour>> entry : usageHoursPerMachine.entrySet()) {
 			List<UsageHour> usageHoursList = entry.getValue();
 			boolean firstIndex = false;
@@ -78,44 +85,105 @@ public class UsagePeriod {
 				lastIndex  = (index == usageHoursList.size()-1) ? true : false;
 				UsageHour usageHour = usageHoursList.get(index);
 				VirtualMachineState virtualMachineState = usageHour.getVirtualMachineState();
-				LOGGER.trace("Usage hour state modification time: " + usageHour.getTimeStamp().getTime()+ ", previous point of time: " + previousGatheringPointOfTime + ", current time: " + usageHour.getTimeStamp().getTime());
+				LOGGER.debug("Usage hour state modification time: " + usageHour.getTimeStamp().getTime()+ ", previous point of time: " + previousGatheringPointOfTime + ", current time: " + usageHour.getTimeStamp().getTime());
 				switch (virtualMachineState) {
 					case STARTED : 
 						uptime   += (usageHour.getTimeStamp().getTime() - previousGatheringPointOfTime);  
 						previousGatheringPointOfTime = getPointOfTime(gatheringStartTime, gatheringEndTime, firstIndex, lastIndex, usageHour); 
-						LOGGER.trace("State : started, Uptime : " + uptime+ ", previous point of time: " + previousGatheringPointOfTime + ", current time: " + usageHour.getTimeStamp().getTime());
+						LOGGER.debug("State : started, Uptime : " + uptime+ ", previous point of time: " + previousGatheringPointOfTime + ", current time: " + usageHour.getTimeStamp().getTime());
 						break;
 					case STOPPED : 
 						downtime += (usageHour.getTimeStamp().getTime() - previousGatheringPointOfTime);  
 						previousGatheringPointOfTime = getPointOfTime(gatheringStartTime, gatheringEndTime, firstIndex, lastIndex, usageHour); 
-						LOGGER.trace("State : stopped, Downtime : " + uptime + ", previous point of time: " + previousGatheringPointOfTime + ", current time: " + usageHour.getTimeStamp().getTime());
+						LOGGER.debug("State : stopped, Downtime : " + uptime + ", previous point of time: " + previousGatheringPointOfTime + ", current time: " + usageHour.getTimeStamp().getTime());
 						break;
 					case RESUMED : 
 						uptime   += (usageHour.getTimeStamp().getTime() - previousGatheringPointOfTime); 
 						previousGatheringPointOfTime = getPointOfTime(gatheringStartTime, gatheringEndTime, firstIndex, lastIndex, usageHour); 
-						LOGGER.trace("State : resumed, Uptime : " + uptime+ ", previous point of time: " + previousGatheringPointOfTime + ", current time: " + usageHour.getTimeStamp().getTime());
+						LOGGER.debug("State : resumed, Uptime : " + uptime+ ", previous point of time: " + previousGatheringPointOfTime + ", current time: " + usageHour.getTimeStamp().getTime());
 						break;
 					case PAUSED : 
 						downtime += (usageHour.getTimeStamp().getTime() - previousGatheringPointOfTime);  
 						previousGatheringPointOfTime = getPointOfTime(gatheringStartTime, gatheringEndTime, firstIndex, lastIndex, usageHour); 
-						LOGGER.trace("State : paused, Downtime : " + uptime+ ", previous point of time: " + previousGatheringPointOfTime + ", current time: " + usageHour.getTimeStamp().getTime());
+						LOGGER.debug("State : paused, Downtime : " + uptime+ ", previous point of time: " + previousGatheringPointOfTime + ", current time: " + usageHour.getTimeStamp().getTime());
 						break;
 					case TERMINATED : 
 						downtime += (usageHour.getTimeStamp().getTime() - previousGatheringPointOfTime);  
 						previousGatheringPointOfTime = getPointOfTime(gatheringStartTime, gatheringEndTime, firstIndex, lastIndex, usageHour); 
-						LOGGER.trace("State : terminated, Downtime : " + uptime);
+						LOGGER.debug("State : terminated, Downtime : " + uptime);
 						break;
 				}
 				System.out.println("Point of time : " + previousGatheringPointOfTime);
 			}	
 		}
 		long periodTime = endTime.getTime()-startTime.getTime();
-		LOGGER.trace("Period: " + periodTime);
-		LOGGER.trace("System uptime: " + (periodTime - uptime));
-		LOGGER.trace("System downtime: " + (periodTime - (periodTime - uptime)));
+		LOGGER.debug("Period: " + periodTime);
+		LOGGER.debug("System uptime: " + (periodTime - uptime));
+		LOGGER.debug("System downtime: " + (periodTime - (periodTime - uptime)));
 		uptime = (periodTime - uptime);
 		downtime = (periodTime - (periodTime - uptime));	
 	}
+	
+	public void loadUptimeHoursPerMachine() {
+		//FIXME: Problem with downtime calculations
+		long gatheringStartTime = startTime.getTime();
+		long gatheringEndTime = endTime.getTime();	
+		LOGGER.debug("Gathering start time: " + gatheringStartTime);
+		LOGGER.debug("Gathering end time: " + gatheringEndTime);
+		long previousGatheringPointOfTime = 0;
+		usageHoursPerMachine = generateUsageHourTreePerMachineId();
+		for (Map.Entry<Integer, List<UsageHour>> entry : usageHoursPerMachine.entrySet()) {
+			List<UsageHour> usageHoursList = entry.getValue();
+			long machineUptime = 0;
+			long machineDowntime = 0;
+			boolean firstIndex = false;
+			boolean lastIndex = false;
+			for (int index = 0 ; index < usageHoursList.size() ; index++) {
+				firstIndex = (index == 0) ? true : false;
+				lastIndex  = (index == usageHoursList.size()-1) ? true : false;
+				UsageHour usageHour = usageHoursList.get(index);
+				VirtualMachineState virtualMachineState = usageHour.getVirtualMachineState();
+				LOGGER.debug("Usage hour state modification time: " + usageHour.getTimeStamp().getTime()+ ", previous point of time: " + previousGatheringPointOfTime + ", current time: " + usageHour.getTimeStamp().getTime());
+				switch (virtualMachineState) {
+					case STARTED : 
+						machineUptime   += (usageHour.getTimeStamp().getTime() - previousGatheringPointOfTime);  
+						previousGatheringPointOfTime = getPointOfTime(gatheringStartTime, gatheringEndTime, firstIndex, lastIndex, usageHour); 
+						LOGGER.debug("State : started, Uptime : " + machineUptime+ ", previous point of time: " + previousGatheringPointOfTime + ", current time: " + usageHour.getTimeStamp().getTime());
+						break;
+					case STOPPED : 
+						machineDowntime += (usageHour.getTimeStamp().getTime() - previousGatheringPointOfTime);  
+						previousGatheringPointOfTime = getPointOfTime(gatheringStartTime, gatheringEndTime, firstIndex, lastIndex, usageHour); 
+						LOGGER.debug("State : stopped, Downtime : " + machineUptime + ", previous point of time: " + previousGatheringPointOfTime + ", current time: " + usageHour.getTimeStamp().getTime());
+						break;
+					case RESUMED : 
+						machineUptime   += (usageHour.getTimeStamp().getTime() - previousGatheringPointOfTime); 
+						previousGatheringPointOfTime = getPointOfTime(gatheringStartTime, gatheringEndTime, firstIndex, lastIndex, usageHour); 
+						LOGGER.debug("State : resumed, Uptime : " + machineUptime+ ", previous point of time: " + previousGatheringPointOfTime + ", current time: " + usageHour.getTimeStamp().getTime());
+						break;
+					case PAUSED : 
+						machineDowntime += (usageHour.getTimeStamp().getTime() - previousGatheringPointOfTime);  
+						previousGatheringPointOfTime = getPointOfTime(gatheringStartTime, gatheringEndTime, firstIndex, lastIndex, usageHour); 
+						LOGGER.debug("State : paused, Downtime : " + machineUptime+ ", previous point of time: " + previousGatheringPointOfTime + ", current time: " + usageHour.getTimeStamp().getTime());
+						break;
+					case TERMINATED : 
+						machineDowntime += (usageHour.getTimeStamp().getTime() - previousGatheringPointOfTime);  
+						previousGatheringPointOfTime = getPointOfTime(gatheringStartTime, gatheringEndTime, firstIndex, lastIndex, usageHour); 
+						LOGGER.debug("State : terminated, Downtime : " + machineUptime);
+						break;
+				}
+				System.out.println("Point of time : " + previousGatheringPointOfTime);
+			}
+			uptimePerMachine.put(entry.getKey(), BigInteger.valueOf(machineUptime));
+			downtimePerMachine.put(entry.getKey(), BigInteger.valueOf(machineDowntime));
+		}
+		long periodTime = endTime.getTime()-startTime.getTime();
+		LOGGER.debug("Period: " + periodTime);
+		LOGGER.debug("System uptime: " + (periodTime - uptime));
+		LOGGER.debug("System downtime: " + (periodTime - (periodTime - uptime)));
+		uptime = (periodTime - uptime);
+		downtime = (periodTime - (periodTime - uptime));	
+	}
+	
 	
 	private long getPointOfTime(long gatheringStartTime, long gatheringEndTime, boolean firstIndex, boolean lastIndex, UsageHour usageHour) {
 		return firstIndex ? gatheringStartTime : (lastIndex ? gatheringEndTime : usageHour.getTimeStamp().getTime());

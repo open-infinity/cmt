@@ -15,13 +15,13 @@
  */
 package org.openinfinity.cloud.domain.repository.ssp;
 
-import org.openinfinity.cloud.domain.ssp.Product;
+import org.openinfinity.cloud.domain.ssp.Subscription;
 
 /**
  * Catalogue repository interface.
  * 
  * @author Vedran Bartonicek
  */
-public interface ProductRepository extends AbstractCrudRepositoryInterface<Product> {
+public interface ProductRepository extends AbstractCrudRepositoryInterface<Subscription> {
 		
 }

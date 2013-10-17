@@ -13,15 +13,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.openinfinity.cloud.service.ssp;
+package org.openinfinity.cloud.domain.ssp;
 
-import org.openinfinity.cloud.domain.ssp.Subscription;
+import java.math.BigInteger;
+import java.sql.Timestamp;
+
+import javax.validation.constraints.NotNull;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+
+import org.openinfinity.core.annotation.NotScript;
 
 /**
- * User service interface.
+ * SSP Product entity.
  * 
  * @author Vedran Bartonicek
  */
-public interface ProductService extends AbstractCrudServiceInterface<Subscription> {
-		
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(exclude={"id"})
+public class Subscription {
+	
+	@NotScript @NotNull @NonNull
+	private BigInteger id;
+			
+	@NotScript @NotNull @NonNull
+	private Timestamp validFrom;
+
+	@NotScript @NotNull @NonNull
+	private Timestamp validTo;
+	
 }

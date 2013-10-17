@@ -64,7 +64,8 @@ public class AccountRepositoryJdbcImpl implements AccountRepository{
 		Map<String,Object> parameters = new HashMap<String,Object>();
 		parameters.put("organization_id", account.getOrganizationId());
 		parameters.put("name", account.getName());
-		parameters.put("payment_status", account.getPaymentStatus());
+		parameters.put("payment_status", account.getStatus());
+
 		Number id = insert.executeAndReturnKey(parameters);
 		account.setId(BigInteger.valueOf((Long)id));
 		return account;
@@ -77,7 +78,7 @@ public class AccountRepositoryJdbcImpl implements AccountRepository{
 					public void setValues(PreparedStatement ps) throws SQLException {
 						ps.setInt(1, account.getOrganizationId().intValue());
 						ps.setString(2, account.getName());
-						ps.setInt(2, account.getPaymentStatus());
+						ps.setInt(2, account.getStatus());
 					}
 				}
 		);
@@ -102,7 +103,7 @@ public class AccountRepositoryJdbcImpl implements AccountRepository{
 			account.setId(BigInteger.valueOf(rs.getInt("id")));
 			account.setOrganizationId(BigInteger.valueOf(rs.getInt("organization_id")));
 			account.setName(rs.getString("name"));
-			account.setPaymentStatus(rs.getInt("payment_status"));
+			account.setStatus(rs.getInt("status"));
 			return account;
 		}
 	}

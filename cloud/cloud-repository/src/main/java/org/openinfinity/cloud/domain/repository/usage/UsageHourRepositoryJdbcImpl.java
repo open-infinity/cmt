@@ -47,7 +47,7 @@ public class UsageHourRepositoryJdbcImpl implements UsageHourRepository {
 	/**
 	 * Represents the SQL script for loading usage hours by organization id and by usage period.
 	 */
-	private static final String LOAD_USAGE_HOURS_PER_PERIOD_AND_BY_ORGANIZATION_SQL = "SELECT * from usage_hours_tbl WHERE organization_id = ? AND cur_timestamp >= ? AND cur_timestamp <= ?";
+	private static final String LOAD_USAGE_HOURS_PER_PERIOD_AND_BY_ORGANIZATION_SQL = "SELECT * from usage_hours_tbl WHERE organization_id = ? AND UNIX_TIMESTAMP(cur_timestamp) >= ? AND UNIX_TIMESTAMP(cur_timestamp) <= ?";
 
 	/**
 	 * Represents the SQL script for storing usage hour information.

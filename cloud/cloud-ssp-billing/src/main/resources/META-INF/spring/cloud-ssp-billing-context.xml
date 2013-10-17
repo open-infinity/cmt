@@ -82,10 +82,7 @@
     </batch:job>
 		
 	<task:scheduled-tasks>  
-	    <task:scheduled ref="paymentLauncher" method="launch" cron="*/10 * * * * ?"/>    
-	    <!-- 
-	    <task:scheduled ref="periodicScalerLauncher" method="launch" cron="*/10 * * * * ?"/>
-	    -->
+	    <task:scheduled ref="paymentLauncher" method="launch" cron="0/10 * * * * ?"/>    
 	</task:scheduled-tasks>
 		
 </beans>

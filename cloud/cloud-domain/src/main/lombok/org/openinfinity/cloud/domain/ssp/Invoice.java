@@ -28,26 +28,30 @@ import lombok.NonNull;
 import org.openinfinity.core.annotation.NotScript;
 
 /**
- * SSP Product entity.
+ * SSP Bill entity.
  * 
- * Represents a line with product description in a bill.
+ * Represents a single bill that is used to charge a customer for a given period.
  * 
  * @author Vedran Bartonicek
  */
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(exclude={"id"})
-public class Product {
+public class Invoice {
 	
 	@NotScript @NotNull @NonNull
 	private BigInteger id;
 	
 	@NotScript @NotNull @NonNull
-	private BigInteger billId;
+	private BigInteger accountId;
 		
 	@NotScript @NotNull @NonNull
-	private Integer machineId;
+	private Timestamp periodFrom;
 	
 	@NotScript @NotNull @NonNull
-	private Integer size;	
+	private Timestamp periodTo;
+	
+	@NotScript @NotNull @NonNull
+	private Integer status;
+	
 }

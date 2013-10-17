@@ -41,7 +41,7 @@ import org.openinfinity.core.exception.ApplicationException;
 import org.openinfinity.core.exception.BusinessViolationException;
 import org.openinfinity.core.exception.SystemException;
 import org.openinfinity.cloud.domain.ssp.Account;
-import org.openinfinity.cloud.domain.ssp.Product;
+import org.openinfinity.cloud.domain.ssp.Subscription;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Controller;
@@ -124,7 +124,7 @@ public class ProductController {
 		
 		// 4) calculate  or fetch cost cost and put it to model
 		
-		Product product = new Product();
+		Subscription product = new Subscription();
 		model.addAttribute("productModel", product);
 		return "product/view";
 	}
@@ -150,7 +150,7 @@ public class ProductController {
 	@Log
 	@AuditTrail(argumentStrategy=ArgumentStrategy.ALL)
 	@RequestMapping(method = RequestMethod.POST)
-	public String submitService(@Valid Product product, BindingResult result) {
+	public String submitService(@Valid Subscription product, BindingResult result) {
 		if (result.hasErrors()) {
 			return "product/new";
 		}
