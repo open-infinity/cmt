@@ -24,7 +24,9 @@
 
 <!--	<context:property-placeholder location="classpath*:/META-INF/properties/repository.properties" />-->
 
-	<context:component-scan base-package="org.openinfinity.cloud.domain.repository" />
+	<context:component-scan base-package="org.openinfinity.cloud.domain.repository">
+	   <context:exclude-filter type="regex" expression="org.openinfinity.cloud.domain.repository.ssp.*.*" />
+	</context:component-scan>
     <!-- context:property-placeholder location="classpath*:system.properties" /-->
     
 	<tx:annotation-driven transaction-manager="txManager" />

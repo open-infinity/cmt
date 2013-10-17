@@ -21,7 +21,9 @@
     	classpath:/META-INF/properties/jets3.properties,
     	classpath:/META-INF/properties/repository.properties" />  
      
-    <context:component-scan base-package="org.openinfinity"/>   
+    <context:component-scan base-package="org.openinfinity">
+        <context:exclude-filter type="regex" expression="org.openinfinity.cloud.service.ssp.*.*" />
+    </context:component-scan>   
         		    
 	<import resource="classpath*:/META-INF/spring/cloud-context-util.xml" />
 	<import resource="classpath*:/META-INF/spring/cloud-context-core.xml" />

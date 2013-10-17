@@ -23,7 +23,8 @@
         ">
 	
 	<context:component-scan base-package="org.openinfinity.cloud.service">
-	    	    <context:exclude-filter type="regex" expression="org.openinfinity.cloud.service.healthmonitoring.*.*"/>     
+	    <context:exclude-filter type="regex" expression="org.openinfinity.cloud.service.healthmonitoring.*.*"/>    
+        <context:exclude-filter type="regex" expression="org.openinfinity.cloud.service.ssp.*.*" /> 
 	</context:component-scan> 
 
 </beans>

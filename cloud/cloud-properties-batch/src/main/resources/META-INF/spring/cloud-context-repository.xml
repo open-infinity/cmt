@@ -8,7 +8,9 @@
         http://www.springframework.org/schema/context
         http://www.springframework.org/schema/context/spring-context-3.0.xsd">
 
-	<context:component-scan base-package="org.openinfinity.cloud.domain.repository" />
+	<context:component-scan base-package="org.openinfinity.cloud.domain.repository">
+	   <context:exclude-filter type="regex" expression="org.openinfinity.cloud.domain.repository.ssp.*.*" />
+	</context:component-scan>
 	
 	<bean id="cloudDataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
 		destroy-method="close">
