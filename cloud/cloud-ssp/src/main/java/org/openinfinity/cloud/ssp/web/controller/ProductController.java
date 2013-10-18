@@ -68,7 +68,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class ProductController {
 
 	@Autowired
-	private ProductService productService;
+    private InvoiceItemService invoiceItemService;
 	
 	@Autowired
 	private Validator validator;
@@ -124,11 +124,11 @@ public class ProductController {
 		
 		// 4) calculate  or fetch cost cost and put it to model
 		
-		Subscription product = new Subscription();
-		model.addAttribute("productModel", product);
+		//Subscription product = new Subscription();
+		//model.addAttribute("productModel", product);
 		return "product/view";
 	}
-	
+	/*
 	@Log
 	@AuditTrail(argumentStrategy=ArgumentStrategy.ALL)
 	@RequestMapping(value="{id}", method = RequestMethod.GET)
@@ -146,7 +146,7 @@ public class ProductController {
 	public String editProduct(Model model) {
 		return "product/view";
 	}
-	
+
 	@Log
 	@AuditTrail(argumentStrategy=ArgumentStrategy.ALL)
 	@RequestMapping(method = RequestMethod.POST)
@@ -167,5 +167,5 @@ public class ProductController {
 		}
 		return failureMessages;
 	}
-	
+	  */
 }

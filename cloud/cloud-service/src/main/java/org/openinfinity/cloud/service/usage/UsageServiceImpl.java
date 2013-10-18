@@ -69,17 +69,31 @@ public class UsageServiceImpl implements UsageService {
 		usageRepository.store(usageHours);
 	}
 
-	@Log
-	@AuditTrail
-	public UsagePeriod loadUsagePeriod(long organizationId, Date startTime, Date endTime) {
-		Collection<UsageHour> usageHours = usageRepository.loadUsageHoursByOrganizationIdAndUsagePeriod(organizationId, startTime, endTime);
-		UsagePeriod usagePeriod = new UsagePeriod();
-		usagePeriod.setOrganizationId(organizationId);
-		usagePeriod.setStartTime(startTime);
-		usagePeriod.setEndTime(endTime);
-		usagePeriod.setUsageHours(usageHours);
-		usagePeriod.loadUptimeHours();
-		return usagePeriod;
-	}
+    @Log
+    @AuditTrail
+    public UsagePeriod loadUsagePeriod(long organizationId, Date startTime, Date endTime) {
+        UsagePeriod usagePeriod = createUsagePeriod(organizationId, startTime, endTime);
+        usagePeriod.loadUptimeHours();
+        return usagePeriod;
+     }
+
+    @Log
+    @AuditTrail
+    public UsagePeriod loadUsagePeriodPerMachine(long organizationId, Date startTime, Date endTime) {
+        UsagePeriod usagePeriod = createUsagePeriod(organizationId, startTime, endTime);
+        usagePeriod.loadUptimeHoursPerMachine();
+        return usagePeriod;
+        }
+
+    @Log
+    @AuditTrail
+    public UsagePeriod createUsagePeriod(long organizationId, Date startTime, Date endTime) {
+        UsagePeriod usagePeriod = new UsagePeriod();
+        usagePeriod.setOrganizationId(organizationId);
+        usagePeriod.setStartTime(startTime);
+        usagePeriod.setEndTime(endTime);
+        usagePeriod.setUsageHours(usageRepository.loadUsageHoursByOrganizationIdAndUsagePeriod(organizationId, startTime, endTime));
+        return usagePeriod;
+    }
 
 }

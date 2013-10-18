@@ -53,5 +53,11 @@ public class Invoice {
 	
 	@NotScript @NotNull @NonNull
 	private Integer status;
-	
+
+    public Invoice(BigInteger accountId, Timestamp periodFrom, Timestamp periodTo, Integer status) {
+        this.accountId = accountId;
+        this.periodFrom = periodFrom;
+        this.periodTo = periodTo;
+        this.status = status;
+    }
 }

@@ -22,6 +22,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.openinfinity.cloud.domain.UsagePeriod;
 import org.openinfinity.cloud.domain.ssp.Account;
+import org.openinfinity.cloud.domain.ssp.Invoice;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.stereotype.Component;
 
@@ -37,9 +38,16 @@ public class PaymentItemWriter implements ItemWriter<UsagePeriod> {
 	private static final Logger LOG = Logger.getLogger(PaymentItemWriter.class.getName());
 
 	@Override
-	public void write(List<? extends UsagePeriod> items) throws Exception {
-	    for (UsagePeriod item : items) {
-	    	LOG.debug("Writting item with id:" + item.toString());
+    private UsagePeriod usagePeriod;
+            private Account account;
+
+    @Override
+       public void write(List<? extends InvoiceDataContainer> items) throws Exception {
+               for (InvoiceDataContainer invoiceData : items) {
+                    account = invoiceData.getAccount();
+                    usagePeriod = invoiceData.getUsagePeriod();
+                            LOG.debug("Writting invoice");
+                    Invoice invoice = new Invoice(account.getId(), usagePeriod.getStartTime(), usagePeriod.getEndTime(), 0);
         }
     }
 }

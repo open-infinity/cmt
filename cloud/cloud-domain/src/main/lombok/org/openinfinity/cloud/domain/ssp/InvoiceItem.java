@@ -37,7 +37,7 @@ import org.openinfinity.core.annotation.NotScript;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(exclude={"id"})
-public class Product {
+public class InvoiceItem {
 	
 	@NotScript @NotNull @NonNull
 	private BigInteger id;
@@ -47,7 +47,5 @@ public class Product {
 		
 	@NotScript @NotNull @NonNull
 	private Integer machineId;
-	
-	@NotScript @NotNull @NonNull
-	private Integer size;	
+
 }

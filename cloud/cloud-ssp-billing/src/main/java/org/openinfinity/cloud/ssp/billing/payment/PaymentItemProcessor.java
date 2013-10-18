@@ -27,6 +27,7 @@ import org.openinfinity.cloud.domain.ssp.Account;
 import org.openinfinity.cloud.domain.ssp.Invoice;
 import org.openinfinity.cloud.service.administrator.InstanceService;
 import org.openinfinity.cloud.service.usage.UsageService;
+import org.openinfinity.cloud.service.ssp.InvoiceService;
 import org.openinfinity.core.exception.SystemException;
 import org.openinfinity.core.util.ExceptionUtil;
 import org.springframework.batch.item.ItemProcessor;
@@ -39,7 +40,7 @@ import org.springframework.stereotype.Component;
  * @since 1.3.0
  */
 @Component("paymentItemProcessor")
-public class PaymentItemProcessor implements ItemProcessor<Account, UsagePeriod> {
+public class PaymentItemProcessor implements ItemProcessor<Account, InvoiceDataContainer> {
 	private static final Logger LOG = Logger.getLogger(PaymentItemProcessor.class.getName());
 
 			
@@ -53,22 +54,23 @@ public class PaymentItemProcessor implements ItemProcessor<Account, UsagePeriod>
 	InvoiceService invoiceService;
 		
 	@Override
-	public Account process(Account account) throws Exception {
+	public InvoiceDataContainer process(Account account) throws Exception {
 		try {
 			LOG.debug("-------------------------------");
 			LOG.debug("Processing account id:" + account.getOrganizationId());
 						
 			// get startTime
-			Invoice previousInvoice = invoiceService.getPreviousInvoice(account.getId());
-			Date startTime = previousInvoice.getPeriodTo();
+			Invoice previousInvoice = invoiceService.loadLast(account.getId());
+            Date startTime = previousInvoice.getPeriodTo();
 
 			// get endTime
 			Date endTime = new Date();
 						
 			// get usage for period
-			UsagePeriod usagePeriod = usageService.loadUsagePeriod(account.getOrganizationId().intValue(), startTime, endTime);
+            UsagePeriod usagePeriod = usageService.loadUsagePeriodPerMachine(account.getOrganizationId().intValue(), startTime, endTime);
 
-			// create and return InvoiceDataContainer
+
+            // create and return InvoiceDataContainer
 			InvoiceDataContainer invoiceDataContainer = new InvoiceDataContainer(usagePeriod, account);
 			
 			/*
@@ -82,7 +84,7 @@ public class PaymentItemProcessor implements ItemProcessor<Account, UsagePeriod>
 			LOG.debug("downtime:" + usagePeriod.getDowntime());
 			*/
 			
-			return account;
+			return invoiceDataContainer;
 		}
 		catch(SystemException e){
 		    ExceptionUtil.throwBusinessViolationException(e.getMessage(), e);

@@ -90,7 +90,7 @@ public class AccountRepositoryJdbcImpl implements AccountRepository{
 	}
 	
 	@AuditTrail
-	public Account loadById(BigInteger id){
+	public Account load(BigInteger id){
 		return this.jdbcTemplate.queryForObject("select * from account where id = ?", new Object[] { id }, new AccountWrapper());
 	}
 		

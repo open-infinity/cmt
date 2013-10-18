@@ -11,7 +11,7 @@ public  interface AbstractCrudRepositoryInterface<T extends Object> /**extends R
 	
 	public Collection<T> loadAll();
 	
-	public T loadById(BigInteger id);
+	public T load(BigInteger id);
 	
 	public void delete (T product);
 	

@@ -64,7 +64,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	@Log
 	@AuditTrail
-	public User loadById(BigInteger id) {
+	public User load(BigInteger id) {
 		// TODO Auto-generated method stub
 		return null;
 	}

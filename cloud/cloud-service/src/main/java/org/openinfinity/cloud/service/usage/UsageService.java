@@ -73,4 +73,6 @@ public interface UsageService {
 	 */
 	UsagePeriod loadUsagePeriod(long organizationId, Date startTime, Date endTime);
 
+    UsagePeriod loadUsagePeriodPerMachine(int i, Date startTime, Date endTime);
+
 }

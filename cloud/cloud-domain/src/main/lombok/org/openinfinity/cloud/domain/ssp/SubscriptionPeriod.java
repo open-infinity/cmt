@@ -35,7 +35,7 @@ import org.openinfinity.core.annotation.NotScript;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(exclude={"id"})
-public class Subscription {
+public class SubscriptionPeriod {
 	
 	@NotScript @NotNull @NonNull
 	private BigInteger id;
