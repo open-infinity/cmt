@@ -15,71 +15,74 @@
  */
 package org.openinfinity.cloud.service.ssp;
 
-import java.math.BigInteger;
-import java.util.Collection;
-
-import org.openinfinity.cloud.domain.repository.administrator.ClusterRepository;
-import org.openinfinity.cloud.domain.repository.ssp.AccountRepository;
-import org.openinfinity.cloud.domain.ssp.Account;
+import org.openinfinity.cloud.domain.repository.ssp.InvoiceRepository;
+import org.openinfinity.cloud.domain.ssp.Invoice;
 import org.openinfinity.core.annotation.AuditTrail;
 import org.openinfinity.core.annotation.Log;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import java.math.BigInteger;
+import java.util.Collection;
+
 /**
- * Account service implementation.
+ * Invoice service implementation.
  * 
  * @author Vedran Bartonicek
  */
 @Service
-public class AccountServiceImpl implements AccountService {
+public class InvoiceServiceImpl implements InvoiceService {
 
 	@Autowired
-	AccountRepository accountRepository;
+	InvoiceRepository invoiceRepository;
 	
 	@Override
 	@Log
 	@AuditTrail
-	public Account create(Account account) {
-		return accountRepository.create(account);
+	public Invoice create(Invoice invoice) {
+		return invoiceRepository.create(invoice);
 	}
 
 	@Override
 	@Log
 	@AuditTrail
-	public void update(Account account) {
-		accountRepository.update(account);		
+	public void update(Invoice invoice) {
+		invoiceRepository.update(invoice);		
 	}
 
 	@Override
 	@Log
 	@AuditTrail
-	public Collection<Account> loadAll() {
-		return accountRepository.loadAll();
+	public Collection<Invoice> loadAll() {
+		return invoiceRepository.loadAll();
 	}
 
 	@Override
 	@Log
 	@AuditTrail
-	public Account load(BigInteger id) {
-		return accountRepository.load(id);
+	public Invoice load(BigInteger id) {
+		return invoiceRepository.load(id);
 	}
 
-	@Override
-	@Log
-	@AuditTrail
-	public Account loadByUsername(String username) {
-		return accountRepository.loadByUsername(username);
-	}
-	
-	@Override
-	@Log
-	@AuditTrail
-	public void delete(Account account) {
-		// TODO Auto-generated method stub
-		
-	}
+    @Override
+    @Log
+    @AuditTrail
+    public void delete(Invoice invoice) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    @Log
+    @AuditTrail
+    public Invoice loadLast(BigInteger accountId){
+        return invoiceRepository.loadLast(accountId);
+    }
+
+
+
+
+
 	
 	
 

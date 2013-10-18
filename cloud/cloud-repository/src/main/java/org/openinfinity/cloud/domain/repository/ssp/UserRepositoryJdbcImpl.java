@@ -105,9 +105,9 @@ public class UserRepositoryJdbcImpl implements UserRepository{
 	public Collection<User> loadAll(){
 		return this.jdbcTemplate.query("select * from user_tbl", new UserWrapper());		
 	}
-	
-	@AuditTrail
-	public User loadById(BigInteger id){
+
+    @AuditTrail
+	public User load(BigInteger id){
 		return this.jdbcTemplate.queryForObject("select * from user_tbl where user_id = ?", new Object[] { id }, new UserWrapper());
 	}
 	

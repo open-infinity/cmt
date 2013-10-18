@@ -58,7 +58,7 @@ public class PaymentServiceImpl implements PaymentService {
 	@Override
 	@Log
 	@AuditTrail
-	public Payment loadById(BigInteger id) {
+	public Payment load(BigInteger id) {
 		// TODO Auto-generated method stub
 		return null;
 	}
