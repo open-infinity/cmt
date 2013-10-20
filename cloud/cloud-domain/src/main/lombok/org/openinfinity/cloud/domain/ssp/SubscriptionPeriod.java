@@ -16,7 +16,7 @@
 package org.openinfinity.cloud.domain.ssp;
 
 import java.math.BigInteger;
-import java.sql.Timestamp;
+import java.util.Date;
 
 import javax.validation.constraints.NotNull;
 
@@ -41,9 +41,9 @@ public class SubscriptionPeriod {
 	private BigInteger id;
 			
 	@NotScript @NotNull @NonNull
-	private Timestamp validFrom;
+	private Date validFrom;
 
 	@NotScript @NotNull @NonNull
-	private Timestamp validTo;
+	private Date validTo;
 	
 }

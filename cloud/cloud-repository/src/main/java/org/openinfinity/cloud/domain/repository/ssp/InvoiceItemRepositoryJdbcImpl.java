@@ -16,7 +16,7 @@
 package org.openinfinity.cloud.domain.repository.ssp;
 
 import org.apache.log4j.Logger;
-import org.openinfinity.cloud.domain.ssp.Invoice;
+import org.openinfinity.cloud.domain.ssp.InvoiceItem;
 import org.openinfinity.core.annotation.AuditTrail;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -37,12 +37,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
-* Invoice repository implementation.
+* InvoiceItem repository implementation.
 *
 * @author Vedran Bartonicek
 */
 @Repository
-public class InvoiceItemRepositoryJdbcImpl implements InvoiceRepository{
+public class InvoiceItemRepositoryJdbcImpl implements InvoiceItemRepository{
 
 private static final Logger LOG = Logger.getLogger(InvoiceItemRepositoryJdbcImpl.class.getName());
 
@@ -58,60 +58,66 @@ public InvoiceItemRepositoryJdbcImpl(@Qualifier("sspDataSource") DataSource data
 }
 /* AbstractCrudRepositoryInterface */
 @AuditTrail
-    public Invoice create(final Invoice invoice){
+    public InvoiceItem create(final InvoiceItem invoiceItem){
+    /*
     SimpleJdbcInsert insert = new SimpleJdbcInsert(dataSource).withTableName("user_tbl").usingGeneratedKeyColumns("id");
     Map<String,Object> parameters = new HashMap<String,Object>();
-    parameters.put("account_id", invoice.getAccountId());
-    parameters.put("period_from", invoice.getPeriodFrom());
-    parameters.put("period_to", invoice.getPeriodTo());
-    parameters.put("status", invoice.getStatus());
+    parameters.put("account_id", invoiceItem.getAccountId());
+    parameters.put("period_from", invoiceItem.getPeriodFrom());
+    parameters.put("period_to", invoiceItem.getPeriodTo());
+    parameters.put("status", invoiceItem.getStatus());
     LOG.info(parameters.toString());
     Number id = insert.executeAndReturnKey(parameters);
-    invoice.setId(BigInteger.valueOf((Long)id));
-    return invoice;
+    invoiceItem.setId(BigInteger.valueOf((Long)id));
+    */
+    return invoiceItem;
     }
 
 @AuditTrail
-public void update(final Invoice invoice) {
-jdbcTemplate.update("update invoice set account_id = ?, period_from = ?, period_to = ?, status = ?",
+public void update(final InvoiceItem invoiceItem) {
+jdbcTemplate.update("update invoiceItem set account_id = ?, period_from = ?, period_to = ?, status = ?",
     new PreparedStatementSetter() {
         public void setValues(PreparedStatement ps) throws SQLException {
-            ps.setInt(1, invoice.getAccountId().intValue());
-            ps.setTimestamp(2, invoice.getPeriodFrom());
-            ps.setTimestamp(3, invoice.getPeriodTo());
-            ps.setInt(4, invoice.getStatus());
+			/*
+            ps.setInt(1, invoiceItem.getAccountId().intValue());
+            ps.setTimestamp(2, invoiceItem.getPeriodFrom());
+            ps.setTimestamp(3, invoiceItem.getPeriodTo());
+            ps.setInt(4, invoiceItem.getStatus());
+            */
         }
     }
 );
 }
 
 @AuditTrail
-public Collection<Invoice> loadAll(){
-return this.jdbcTemplate.query("select * from user_tbl", new InvoiceRowMapper());
+public Collection<InvoiceItem> loadAll(){
+return this.jdbcTemplate.query("select * from user_tbl", new InvoiceItemRowMapper());
 }
 
 @AuditTrail
-public Invoice load(BigInteger id){
-return this.jdbcTemplate.queryForObject("select * from invoice_tbl where user_id = ?", new Object[] { id }, new InvoiceRowMapper());
+public InvoiceItem load(BigInteger id){
+return this.jdbcTemplate.queryForObject("select * from invoice_tbl where user_id = ?", new Object[] { id }, new InvoiceItemRowMapper());
 }
 
 @AuditTrail
-public void delete (Invoice invoice){}
+public void delete (InvoiceItem invoiceItem){}
 
 @AuditTrail
-public Invoice loadLast(BigInteger accountId){
-return this.jdbcTemplate.queryForObject("select * from invoice_tbl where user_id = ?", new Object[] { accountId }, new InvoiceRowMapper());
+public InvoiceItem loadLast(BigInteger accountId){
+return this.jdbcTemplate.queryForObject("select * from invoice_tbl where user_id = ?", new Object[] { accountId }, new InvoiceItemRowMapper());
 }
 
-private static final class InvoiceRowMapper implements RowMapper<Invoice> {
-public Invoice mapRow(ResultSet rs, int rowNumber) throws SQLException {
-  Invoice invoice = new Invoice();
-  invoice.setId(BigInteger.valueOf(rs.getInt("id")));
-  invoice.setAccountId(BigInteger.valueOf(rs.getInt("account_id")));
-  invoice.setPeriodFrom(rs.getTimestamp("period_from"));
-  invoice.setPeriodTo(rs.getTimestamp("period_to"));
-  invoice.setStatus(rs.getInt("status"));
-  return invoice;
+private static final class InvoiceItemRowMapper implements RowMapper<InvoiceItem> {
+public InvoiceItem mapRow(ResultSet rs, int rowNumber) throws SQLException {
+  InvoiceItem invoiceItem = new InvoiceItem();
+  /*
+  invoiceItem.setId(BigInteger.valueOf(rs.getInt("id")));
+  invoiceItem.setAccountId(BigInteger.valueOf(rs.getInt("account_id")));
+  invoiceItem.setPeriodFrom(rs.getTimestamp("period_from"));
+  invoiceItem.setPeriodTo(rs.getTimestamp("period_to"));
+  invoiceItem.setStatus(rs.getInt("status"));
+  */
+  return invoiceItem;
 }
 }
 

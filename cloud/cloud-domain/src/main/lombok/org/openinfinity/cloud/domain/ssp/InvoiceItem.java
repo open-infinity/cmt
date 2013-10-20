@@ -16,8 +16,6 @@
 package org.openinfinity.cloud.domain.ssp;
 
 import java.math.BigInteger;
-import java.sql.Timestamp;
-
 import javax.validation.constraints.NotNull;
 
 import lombok.Data;

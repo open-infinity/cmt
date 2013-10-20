@@ -15,8 +15,8 @@
  */
 package org.openinfinity.cloud.service.ssp;
 
-import org.openinfinity.cloud.domain.repository.ssp.InvoiceRepository;
-import org.openinfinity.cloud.domain.ssp.Invoice;
+import org.openinfinity.cloud.domain.repository.ssp.InvoiceItemRepository;
+import org.openinfinity.cloud.domain.ssp.InvoiceItem;
 import org.openinfinity.core.annotation.AuditTrail;
 import org.openinfinity.core.annotation.Log;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +26,7 @@ import java.math.BigInteger;
 import java.util.Collection;
 
 /**
- * Invoice service implementation.
+ * InvoiceItem service implementation.
  * 
  * @author Vedran Bartonicek
  */
@@ -39,35 +39,35 @@ public class InvoiceItemServiceImpl implements InvoiceItemService {
 	@Override
 	@Log
 	@AuditTrail
-	public Invoice create(Invoice invoice) {
-		return invoiceItemRepository.create(invoice);
+	public InvoiceItem create(InvoiceItem invoiceItem) {
+		return invoiceItemRepository.create(invoiceItem);
 	}
 
 	@Override
 	@Log
 	@AuditTrail
-	public void update(Invoice invoice) {
-		invoiceItemRepository.update(invoice);		
+	public void update(InvoiceItem invoiceItem) {
+		invoiceItemRepository.update(invoiceItem);		
 	}
 
 	@Override
 	@Log
 	@AuditTrail
-	public Collection<Invoice> loadAll() {
+	public Collection<InvoiceItem> loadAll() {
 		return invoiceItemRepository.loadAll();
 	}
 
 	@Override
 	@Log
 	@AuditTrail
-	public Invoice load(BigInteger id) {
+	public InvoiceItem load(BigInteger id) {
 		return invoiceItemRepository.load(id);
 	}
 
     @Override
     @Log
     @AuditTrail
-    public void delete(Invoice invoice) {
+    public void delete(InvoiceItem invoiceItem) {
         // TODO Auto-generated method stub
 
     }

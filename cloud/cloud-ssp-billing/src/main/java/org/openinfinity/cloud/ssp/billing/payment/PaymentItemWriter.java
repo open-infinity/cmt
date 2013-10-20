@@ -25,7 +25,8 @@ import org.openinfinity.cloud.domain.ssp.Account;
 import org.openinfinity.cloud.domain.ssp.Invoice;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.stereotype.Component;
-
+import java.util.Date;
+import java.sql.Timestamp;
 /**
  * Batch writer.
  * 
@@ -34,21 +35,20 @@ import org.springframework.stereotype.Component;
  * @since 1.3.0
  */
 @Component("paymentItemWriter")
-public class PaymentItemWriter implements ItemWriter<UsagePeriod> {
+public class PaymentItemWriter implements ItemWriter<InvoiceDataContainer> {
 	private static final Logger LOG = Logger.getLogger(PaymentItemWriter.class.getName());
 
-	@Override
     private UsagePeriod usagePeriod;
-            private Account account;
+    private Account account;
 
     @Override
-       public void write(List<? extends InvoiceDataContainer> items) throws Exception {
-               for (InvoiceDataContainer invoiceData : items) {
-                    account = invoiceData.getAccount();
-                    usagePeriod = invoiceData.getUsagePeriod();
-                            LOG.debug("Writting invoice");
-                    Invoice invoice = new Invoice(account.getId(), usagePeriod.getStartTime(), usagePeriod.getEndTime(), 0);
-        }
+	public void write(List<? extends InvoiceDataContainer> items) throws Exception {
+	   for (InvoiceDataContainer invoiceData : items) {
+			account = invoiceData.getAccount();
+			usagePeriod = invoiceData.getUsagePeriod();
+					LOG.debug("Writting invoice");
+			Invoice invoice = new Invoice(account.getId(), new Timestamp(usagePeriod.getStartTime().getTime()), new Timestamp(usagePeriod.getEndTime().getTime()), 0);
+		}
     }
 }
 	  
