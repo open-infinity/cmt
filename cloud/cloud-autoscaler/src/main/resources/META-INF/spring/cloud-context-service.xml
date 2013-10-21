@@ -19,29 +19,29 @@
     
 	
 	<bean id="plainSocketFactory" class="org.apache.http.conn.scheme.PlainSocketFactory"
-		factory-method="getSocketFactory"></bean>
+		factory-method="getSocketFactory"/>
 
 	<bean id="schemeHttp" class="org.apache.http.conn.scheme.Scheme">
-		<constructor-arg value="http"></constructor-arg>
-		<constructor-arg ref="plainSocketFactory"></constructor-arg>
-		<constructor-arg type="int" value="80"></constructor-arg>
+		<constructor-arg value="http"/>
+		<constructor-arg ref="plainSocketFactory"/>
+		<constructor-arg type="int" value="80"/>
 	</bean>
 
 	<bean id="schemeRegistry" class="org.apache.http.conn.scheme.SchemeRegistry">
 		<property name="items">
 			<map>
-				<entry key="http" value-ref="schemeHttp"></entry>
+				<entry key="http" value-ref="schemeHttp"/>
 			</map>
 		</property>
 	</bean>
 
-	<bean id="basicHttpParams" class="org.apache.http.params.BasicHttpParams"></bean>
+	<bean id="basicHttpParams" class="org.apache.http.params.BasicHttpParams"/>
 
 	<bean id="clientConnManager"
 		class="org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager"
 		destroy-method="shutdown">
-		<constructor-arg ref="basicHttpParams"></constructor-arg>
-		<constructor-arg ref="schemeRegistry"></constructor-arg>
+		<constructor-arg ref="basicHttpParams"/>
+		<constructor-arg ref="schemeRegistry"/>
 	</bean>
 	
 	<bean id="retryHandler" class="org.apache.http.impl.client.DefaultHttpRequestRetryHandler">
@@ -50,8 +50,8 @@
 	</bean>
 
 	<bean id="httpClient" class="org.apache.http.impl.client.DefaultHttpClient">
-		<constructor-arg ref="clientConnManager"></constructor-arg>
-		<constructor-arg ref="basicHttpParams"></constructor-arg>
+		<constructor-arg ref="clientConnManager"/>
+		<constructor-arg ref="basicHttpParams"/>
 		<property name="httpRequestRetryHandler" ref="retryHandler" />
 	</bean> 
 	    	

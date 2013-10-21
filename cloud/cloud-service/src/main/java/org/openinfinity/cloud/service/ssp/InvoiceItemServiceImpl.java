@@ -26,11 +26,11 @@ import java.math.BigInteger;
 import java.util.Collection;
 
 /**
- * InvoiceItem service implementation.
+ * InvoiceItemServiceImpl service
  * 
  * @author Vedran Bartonicek
  */
-@Service
+@Service("invoiceItemService")
 public class InvoiceItemServiceImpl implements InvoiceItemService {
 
 	@Autowired

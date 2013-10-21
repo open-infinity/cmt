@@ -24,4 +24,4 @@ import org.openinfinity.cloud.domain.ssp.InvoiceItem;
 */
 public interface InvoiceItemService extends AbstractCrudServiceInterface<InvoiceItem> {
 
-    }
+}

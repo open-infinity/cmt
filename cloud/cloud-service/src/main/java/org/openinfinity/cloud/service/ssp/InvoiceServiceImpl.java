@@ -30,7 +30,7 @@ import java.util.Collection;
  * 
  * @author Vedran Bartonicek
  */
-@Service
+@Service("invoiceService")
 public class InvoiceServiceImpl implements InvoiceService {
 
 	@Autowired

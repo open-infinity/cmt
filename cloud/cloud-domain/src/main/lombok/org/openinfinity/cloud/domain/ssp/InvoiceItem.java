@@ -41,7 +41,7 @@ public class InvoiceItem {
 	private BigInteger id;
 	
 	@NotScript @NotNull @NonNull
-	private BigInteger billId;
+	private BigInteger invoiceId;
 		
 	@NotScript @NotNull @NonNull
 	private Integer machineId;

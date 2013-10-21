@@ -59,7 +59,7 @@ public class InvoiceRepositoryJdbcImpl implements InvoiceRepository{
     /* AbstractCrudRepositoryInterface */
     @AuditTrail
     public Invoice create(final Invoice invoice){
-        SimpleJdbcInsert insert = new SimpleJdbcInsert(dataSource).withTableName("user_tbl").usingGeneratedKeyColumns("id");
+        SimpleJdbcInsert insert = new SimpleJdbcInsert(dataSource).withTableName("invoice").usingGeneratedKeyColumns("id");
         Map<String,Object> parameters = new HashMap<String,Object>();
         parameters.put("account_id", invoice.getAccountId());
         parameters.put("period_from", invoice.getPeriodFrom());
@@ -87,12 +87,12 @@ public class InvoiceRepositoryJdbcImpl implements InvoiceRepository{
 
     @AuditTrail
     public Collection<Invoice> loadAll(){
-        return this.jdbcTemplate.query("select * from user_tbl", new InvoiceRowMapper());
+        return this.jdbcTemplate.query("select * from invoice", new InvoiceRowMapper());
     }
 
     @AuditTrail
     public Invoice load(BigInteger id){
-        return this.jdbcTemplate.queryForObject("select * from invoice_tbl where user_id = ?", new Object[] { id }, new InvoiceRowMapper());
+        return this.jdbcTemplate.queryForObject("select * from invoice where id = ?", new Object[] { id }, new InvoiceRowMapper());
     }
 
     @AuditTrail
@@ -100,7 +100,7 @@ public class InvoiceRepositoryJdbcImpl implements InvoiceRepository{
 
     @AuditTrail
     public Invoice loadLast(BigInteger accountId){
-        return this.jdbcTemplate.queryForObject("select * from invoice_tbl where user_id = ?", new Object[] { accountId }, new InvoiceRowMapper());
+        return this.jdbcTemplate.queryForObject("select * from invoice where period_to = (select max(period_to) from invoice) limit 1", new InvoiceRowMapper());
     }
 
     private static final class InvoiceRowMapper implements RowMapper<Invoice> {

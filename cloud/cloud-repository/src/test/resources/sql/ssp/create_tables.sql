@@ -14,8 +14,8 @@ DROP TABLE IF EXISTS `invoice`;
 CREATE TABLE `invoice` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `account_id` int(11),
-  `periodFrom` timestamp(32),
-  `periodFrom` timestamp(11),
+  `period_from` DATETIME DEFAULT NULL,
+  `period_to` DATETIME DEFAULT NULL,
   `status` int(11),
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
