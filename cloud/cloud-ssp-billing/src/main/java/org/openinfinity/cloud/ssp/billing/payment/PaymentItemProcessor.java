@@ -16,12 +16,9 @@
 
 package org.openinfinity.cloud.ssp.billing.payment;
 
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 
 import org.apache.log4j.Logger;
-import org.openinfinity.cloud.domain.UsageHour;
 import org.openinfinity.cloud.domain.UsagePeriod;
 import org.openinfinity.cloud.domain.ssp.Account;
 import org.openinfinity.cloud.domain.ssp.Invoice;
@@ -49,30 +46,20 @@ public class PaymentItemProcessor implements ItemProcessor<Account, InvoiceDataC
 	
 	@Autowired
 	UsageService usageService;
-	
+
 	@Autowired
 	InvoiceService invoiceService;
-		
+
 	@Override
 	public InvoiceDataContainer process(Account account) throws Exception {
 		try {
-			LOG.debug("-------------------------------");
 			LOG.debug("Processing account id:" + account.getOrganizationId());
 						
-			// get startTime
-			Invoice previousInvoice = invoiceService.loadLast(account.getId());
-            Date startTime = previousInvoice.getPeriodTo();
+			Invoice lastInvoice = invoiceService.loadLast(account.getId());
+            UsagePeriod usagePeriod = usageService.loadUsagePeriodPerMachine(account.getOrganizationId().intValue(), lastInvoice.getPeriodTo(), new Date());
+            InvoiceDataContainer invoiceDataContainer = new InvoiceDataContainer(usagePeriod, account);
+            return invoiceDataContainer;
 
-			// get endTime
-			Date endTime = new Date();
-						
-			// get usage for period
-            UsagePeriod usagePeriod = usageService.loadUsagePeriodPerMachine(account.getOrganizationId().intValue(), startTime, endTime);
-
-
-            // create and return InvoiceDataContainer
-			InvoiceDataContainer invoiceDataContainer = new InvoiceDataContainer(usagePeriod, account);
-			
 			/*
 			for (UsageHour usageHour : usagePeriod.getUsageHours()){
 				LOG.debug("usage hour time:" + usageHour.getTimeStamp());
@@ -84,7 +71,6 @@ public class PaymentItemProcessor implements ItemProcessor<Account, InvoiceDataC
 			LOG.debug("downtime:" + usagePeriod.getDowntime());
 			*/
 			
-			return invoiceDataContainer;
 		}
 		catch(SystemException e){
 		    ExceptionUtil.throwBusinessViolationException(e.getMessage(), e);

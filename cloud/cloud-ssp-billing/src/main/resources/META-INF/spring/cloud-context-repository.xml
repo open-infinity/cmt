@@ -10,8 +10,10 @@
     
 	<context:component-scan base-package="org.openinfinity.cloud.domain.repository.administrator"/>
     <context:component-scan base-package="org.openinfinity.cloud.domain.repository.usage"/>
-          
-	<bean id="cloudDataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+    <context:component-scan base-package="org.openinfinity.cloud.domain.repository.ssp"/>
+
+
+    <bean id="cloudDataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
 		destroy-method="close">
 		<property name="driverClass">
 			<value>${cloud.jdbc.driverClassName}</value>

@@ -17,16 +17,23 @@
 package org.openinfinity.cloud.ssp.billing.payment;
 
 
+import java.math.BigInteger;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.openinfinity.cloud.domain.UsageHour;
 import org.openinfinity.cloud.domain.UsagePeriod;
 import org.openinfinity.cloud.domain.ssp.Account;
 import org.openinfinity.cloud.domain.ssp.Invoice;
+import org.openinfinity.cloud.service.ssp.InvoiceItemService;
+import org.openinfinity.cloud.service.ssp.InvoiceService;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import java.util.Date;
 import java.sql.Timestamp;
+import java.util.Map;
+
 /**
  * Batch writer.
  * 
@@ -38,17 +45,33 @@ import java.sql.Timestamp;
 public class PaymentItemWriter implements ItemWriter<InvoiceDataContainer> {
 	private static final Logger LOG = Logger.getLogger(PaymentItemWriter.class.getName());
 
+    @Autowired
+    InvoiceService invoiceService;
+
+    @Autowired
+    InvoiceItemService invoiceItemService;
+
     private UsagePeriod usagePeriod;
+
     private Account account;
 
     @Override
 	public void write(List<? extends InvoiceDataContainer> items) throws Exception {
-	   for (InvoiceDataContainer invoiceData : items) {
+        for (InvoiceDataContainer invoiceData : items) {
 			account = invoiceData.getAccount();
 			usagePeriod = invoiceData.getUsagePeriod();
-					LOG.debug("Writting invoice");
-			Invoice invoice = new Invoice(account.getId(), new Timestamp(usagePeriod.getStartTime().getTime()), new Timestamp(usagePeriod.getEndTime().getTime()), 0);
-		}
+            LOG.debug("Writting invoice");
+			Invoice invoice = new Invoice(account.getId(),
+                                          new Timestamp(usagePeriod.getStartTime().getTime()),
+                                          new Timestamp(usagePeriod.getEndTime().getTime()),
+                                          0);
+            invoiceService.create(invoice);
+
+            Map<Integer, BigInteger> uptimePerMachine = usagePeriod.getUptimePerMachine();
+            for (Map.Entry<Integer, BigInteger> entry : uptimePerMachine.entrySet()) {
+
+            }
+        }
     }
 }
 	  

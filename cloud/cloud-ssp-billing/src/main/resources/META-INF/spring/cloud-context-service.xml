@@ -8,14 +8,16 @@
         http://www.springframework.org/schema/context
         http://www.springframework.org/schema/context/spring-context-3.0.xsd">
 
- 
+
 	<context:component-scan base-package="org.openinfinity.cloud.service.administrator">
 	        <context:exclude-filter type="regex" expression="org.openinfinity.cloud.service.administrator.ClusterService.*" /> 
     </context:component-scan>
     <context:component-scan base-package="org.openinfinity.cloud.service.usage"/>
-      
-	
-	<bean id="plainSocketFactory" class="org.apache.http.conn.scheme.PlainSocketFactory"
+    <context:component-scan base-package="org.openinfinity.cloud.service.ssp"/>
+
+
+
+    <bean id="plainSocketFactory" class="org.apache.http.conn.scheme.PlainSocketFactory"
 		factory-method="getSocketFactory"></bean>
 
 	<bean id="schemeHttp" class="org.apache.http.conn.scheme.Scheme">
