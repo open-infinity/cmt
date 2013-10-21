@@ -25,8 +25,9 @@ import org.openinfinity.cloud.domain.UsageHour;
 import org.openinfinity.cloud.domain.UsagePeriod;
 import org.openinfinity.cloud.domain.ssp.Account;
 import org.openinfinity.cloud.domain.ssp.Invoice;
-import org.openinfinity.cloud.service.ssp.InvoiceItemService;
+import org.openinfinity.cloud.domain.ssp.InvoiceItem;
 import org.openinfinity.cloud.service.ssp.InvoiceService;
+import org.openinfinity.cloud.service.ssp.InvoiceItemService;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -65,11 +66,13 @@ public class PaymentItemWriter implements ItemWriter<InvoiceDataContainer> {
                                           new Timestamp(usagePeriod.getStartTime().getTime()),
                                           new Timestamp(usagePeriod.getEndTime().getTime()),
                                           0);
-            invoiceService.create(invoice);
-
+            invoice = invoiceService.create(invoice);
             Map<Integer, BigInteger> uptimePerMachine = usagePeriod.getUptimePerMachine();
+            
             for (Map.Entry<Integer, BigInteger> entry : uptimePerMachine.entrySet()) {
-
+				Integer machineId = entry.getKey();
+				BigInteger uptime = entry.getValue();
+				invoiceItemService.create(new InvoiceItem(invoice.getId(), machineId, uptime));
             }
         }
     }

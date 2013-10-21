@@ -66,6 +66,7 @@ public class InvoiceItemRepositoryJdbcImpl implements InvoiceItemRepository{
             Map<String,Object> parameters = new HashMap<String,Object>();
             parameters.put("invoice_id", invoiceItem.getInvoiceId());
             parameters.put("machine_id", invoiceItem.getMachineId());
+            parameters.put("uptime", invoiceItem.getUptime());
             LOG.info(parameters.toString());
             Number id = insert.executeAndReturnKey(parameters);
             invoiceItem.setId(BigInteger.valueOf((Long)id));
@@ -74,11 +75,12 @@ public class InvoiceItemRepositoryJdbcImpl implements InvoiceItemRepository{
 
     @AuditTrail
     public void update(final InvoiceItem invoiceItem) {
-    jdbcTemplate.update("update invoiceItem set invoice_id = ?, machine_id = ?",
+    jdbcTemplate.update("update invoiceItem set invoice_id = ?, machine_id = ?, uptime = ?",
         new PreparedStatementSetter() {
             public void setValues(PreparedStatement ps) throws SQLException {
             ps.setInt(1, invoiceItem.getInvoiceId().intValue());
             ps.setInt(2, invoiceItem.getMachineId());
+            ps.setInt(3, invoiceItem.getUptime().intValue());
             }
         }
     );
@@ -102,6 +104,7 @@ public class InvoiceItemRepositoryJdbcImpl implements InvoiceItemRepository{
             InvoiceItem invoiceItem = new InvoiceItem();
             invoiceItem.setInvoiceId(BigInteger.valueOf(rs.getInt("invoice_id")));
             invoiceItem.setMachineId(rs.getInt("machine_id"));
+            invoiceItem.setUptime(BigInteger.valueOf(rs.getInt("uptime")));
             return invoiceItem;
         }
     }
