@@ -1,13 +1,13 @@
 class oi3-serviceplatform::config inherits oi3-bas::config {
-	#new, not tested. may not be required if bas version used
-	file {"/opt/openinfinity/3.0.0/tomcat/bin/setenv.sh":
-		ensure => present,
-		owner => 'oiuser',
-		group => 'oiuser',
-		mode => 0644,
-		content => template("oi3-serviceplatform/setenv.sh.erb"),
-		require => Class["oi3-serviceplatform::install"],
-	}
+	#bas version used, cannot have duplicate definition
+	#file {"/opt/openinfinity/3.0.0/tomcat/bin/setenv.sh":
+	#	ensure => present,
+	#	owner => 'oiuser',
+	#	group => 'oiuser',
+	#	mode => 0644,
+	#	content => template("oi3-serviceplatform/setenv.sh.erb"),
+	#	require => Class["oi3-serviceplatform::install"],
+	#}
 
 	#new, not tested
 	file {"/opt/openinfinity/3.0.0/tomcat/conf/catalina.properties":
