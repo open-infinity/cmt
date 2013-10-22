@@ -61,8 +61,8 @@ class oi3-bas::config {
     
         file {"/opt/openinfinity/3.0.0/tomcat/conf/jmxremote.password":
                 ensure => present,
-                owner => 'toas',
-                group => 'toas',
+                owner => 'oiuser',
+                group => 'oiuser',
                 mode => 0600,
                 content => template("oi3-bas/jmxremote.password.erb"),
                 require => Class["oi3-bas::install"],
@@ -70,8 +70,8 @@ class oi3-bas::config {
         
         file {"/opt/openinfinity/3.0.0/tomcat/conf/jmxremote.access":
                 ensure => present,
-                owner => 'toas',
-                group => 'toas',
+                owner => 'oiuser',
+                group => 'oiuser',
                 mode => 0644,
                 source => "puppet:///modules/oi3-bas/jmxremote.access",
                 require => Class["oi3-bas::install"],
