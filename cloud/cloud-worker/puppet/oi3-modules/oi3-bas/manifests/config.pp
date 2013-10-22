@@ -65,7 +65,7 @@ class oi3-bas::config {
                 group => 'toas',
                 mode => 0600,
                 content => template("oi3-bas/jmxremote.password.erb"),
-                require => Class["oibas::install"],
+                require => Class["oi3-bas::install"],
         }
         
         file {"/opt/openinfinity/3.0.0/tomcat/conf/jmxremote.access":
@@ -74,7 +74,7 @@ class oi3-bas::config {
                 group => 'toas',
                 mode => 0644,
                 source => "puppet:///modules/oi3-bas/jmxremote.access",
-                require => Class["oibas::install"],
+                require => Class["oi3-bas::install"],
         }
     
 
