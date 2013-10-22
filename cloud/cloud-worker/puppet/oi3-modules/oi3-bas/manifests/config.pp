@@ -9,7 +9,7 @@ class oi3-bas::config {
                 owner => 'oiuser',
                 group => 'oiuser',
                 mode => 0755,
-                content => template("oibas/setenv.sh.erb"),
+                content => template("oi3-bas/setenv.sh.erb"),
                 require => Class["oi3-bas::install"],
         }
 
