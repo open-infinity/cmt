@@ -1,0 +1,11 @@
+OI_HOME=/opt/openinfinity
+OI_VERSION=2.0.0
+TOMCAT_CONF_PATH="$OI_HOME/$OI_VERSION/tomcat/conf"
+
+LTT_OPTS="-Dltt.configuration.filename=$OI_HOME/$OI_VERSION/ltt-watch/ltt.xml"
+CLASS_LOADER_OPTS=-Dorg.apache.catalina.loader.WebappClassLoader.ENABLE_CLEAR_REFERENCES=false
+JVM_MEMORY_OPTS="-Xmx<%= jvmmem %>m -XX:MaxPermSize=<%= jvmperm %>m"
+JMX_OPTS="-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=65329 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=true -Dcom.sun.management.jmxremote.password.file=$TOMCAT_CONF_PATH/jmxremote.password -Dcom.sun.management.jmxremote.access.file=$TOMCAT_CONF_PATH/jmxremote.access"
+
+JAVA_OPTS="$JAVA_OPTS $LTT_OPTS $CLASS_LOADER_OPTS -Duser.timezone=EET -Dfile.encoding=UTF8 $JVM_MEMORY_OPTS"
+CATALINA_OPTS="$CATALINA_OPTS $JMX_OPTS"

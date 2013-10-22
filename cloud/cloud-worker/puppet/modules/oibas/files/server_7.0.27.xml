@@ -136,6 +136,10 @@
                prefix="localhost_access_log." suffix=".txt"
                pattern="%h %l %u %t &quot;%r&quot; %s %b" />
 
+	<!--Open Infinity BAS Session Replication Valve -->
+	<!-- Manager className="com.hazelcast.web.tomcat.HazelcastManager" / --> 	
+	<!--	<Valve className="com.hazelcast.web.tomcat.HazelcastValve" />  -->
+
       </Host>
     </Engine>
   </Service>
