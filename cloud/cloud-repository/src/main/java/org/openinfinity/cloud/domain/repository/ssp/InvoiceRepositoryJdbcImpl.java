@@ -56,7 +56,7 @@ public class InvoiceRepositoryJdbcImpl implements InvoiceRepository{
         this.jdbcTemplate = new JdbcTemplate(dataSource);
         this.dataSource = dataSource;
     }
-    /* AbstractCrudRepositoryInterface */
+
     @AuditTrail
     public Invoice create(final Invoice invoice){
         SimpleJdbcInsert insert = new SimpleJdbcInsert(dataSource).withTableName("invoice").usingGeneratedKeyColumns("id");
@@ -64,7 +64,8 @@ public class InvoiceRepositoryJdbcImpl implements InvoiceRepository{
         parameters.put("account_id", invoice.getAccountId());
         parameters.put("period_from", invoice.getPeriodFrom());
         parameters.put("period_to", invoice.getPeriodTo());
-        parameters.put("status", invoice.getStatus());
+        parameters.put("sentTime", invoice.getSentTime());
+        parameters.put("state", invoice.getState());
         LOG.info(parameters.toString());
         Number id = insert.executeAndReturnKey(parameters);
         invoice.setId(BigInteger.valueOf((Long)id));
@@ -73,13 +74,14 @@ public class InvoiceRepositoryJdbcImpl implements InvoiceRepository{
 
     @AuditTrail
     public void update(final Invoice invoice) {
-        jdbcTemplate.update("update invoice set account_id = ?, period_from = ?, period_to = ?, status = ?",
+        jdbcTemplate.update("update invoice set account_id = ?, period_from = ?, period_to = ?, sent_time = ?, state = ?",
               new PreparedStatementSetter() {
                   public void setValues(PreparedStatement ps) throws SQLException {
                       ps.setInt(1, invoice.getAccountId().intValue());
                       ps.setTimestamp(2, invoice.getPeriodFrom());
                       ps.setTimestamp(3, invoice.getPeriodTo());
-                      ps.setInt(4, invoice.getStatus());
+                      ps.setTimestamp(4, invoice.getSentTime());
+                      ps.setInt(5, invoice.getState());
                   }
               }
         );
@@ -110,7 +112,8 @@ public class InvoiceRepositoryJdbcImpl implements InvoiceRepository{
             invoice.setAccountId(BigInteger.valueOf(rs.getInt("account_id")));
             invoice.setPeriodFrom(rs.getTimestamp("period_from"));
             invoice.setPeriodTo(rs.getTimestamp("period_to"));
-            invoice.setStatus(rs.getInt("status"));
+            invoice.setSentTime(rs.getTimestamp("sent_time"));
+            invoice.setState(rs.getInt("state"));
             return invoice;
         }
     }

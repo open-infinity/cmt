@@ -41,11 +41,7 @@ public interface MachineService {
 	
 	static final int DATA_MACHINE_CONFIGURE_NOT_STARTED = 10;
 	static final int DATA_MACHINE_CONFIGURE_STARTED = 11;
-	
-	static final int MACHINE_SIZE_SMALL = 0;
-	static final int MACHINE_SIZE_MEDIUM = 1;
-	static final int MACHINE_SIZE_LARGE = 2;
-	
+
 	Collection<Machine> getMachines();
 	
 	Collection<Machine> getMachines(int offset, int rows, int instanceId);

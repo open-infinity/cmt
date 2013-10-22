@@ -45,14 +45,21 @@ public class InvoiceItem {
 		
 	@NotScript @NotNull @NonNull
 	private Integer machineId;
+
+    @NotScript @NotNull @NonNull
+    private Integer clusterId;
 	
 	@NotScript @NotNull @NonNull
-	private BigInteger uptime;
-		
-	public InvoiceItem(BigInteger id, Integer machineId, BigInteger uptime){
-		this.invoiceId = id;
-		this.machineId = machineId;
-		this.uptime = uptime;
-	}
+	private BigInteger machineUptime;
 
+    @NotScript @NotNull @NonNull
+    private Integer machineType;
+
+    public InvoiceItem(BigInteger invoiceId, Integer machineId, Integer clusterId, BigInteger machineUptime, Integer machineType) {
+        this.invoiceId = invoiceId;
+        this.machineId = machineId;
+        this.clusterId = clusterId;
+        this.machineUptime = machineUptime;
+        this.machineType = machineType;
+    }
 }

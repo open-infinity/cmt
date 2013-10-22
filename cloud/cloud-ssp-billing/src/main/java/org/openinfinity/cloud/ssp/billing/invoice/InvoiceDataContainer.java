@@ -1,9 +1,7 @@
-package org.openinfinity.cloud.ssp.billing.payment;
+package org.openinfinity.cloud.ssp.billing.invoice;
 
 import org.openinfinity.cloud.domain.UsagePeriod;
 import org.openinfinity.cloud.domain.ssp.Account;
-
-import java.sql.Timestamp;
 
 public class InvoiceDataContainer {
 	

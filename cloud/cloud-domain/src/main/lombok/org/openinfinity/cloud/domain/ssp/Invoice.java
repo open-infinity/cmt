@@ -50,14 +50,50 @@ public class Invoice {
 	
 	@NotScript @NotNull @NonNull
 	private Timestamp periodTo;
-	
-	@NotScript @NotNull @NonNull
-	private Integer status;
 
-    public Invoice(BigInteger accountId, Timestamp periodFrom, Timestamp periodTo, Integer status) {
+    @NotScript @NotNull @NonNull
+    private Timestamp sentTime;
+
+	@NotScript @NotNull @NonNull
+	private Integer state;
+
+    public Invoice(BigInteger accountId, Timestamp periodFrom, Timestamp periodTo, Timestamp sentTime, Integer state) {
         this.accountId = accountId;
         this.periodFrom = periodFrom;
         this.periodTo = periodTo;
-        this.status = status;
+        this.sentTime = sentTime;
+        this.state = state;
     }
+
+    public enum InvoiceState {
+
+        NEW(0),
+
+        SENT(1),
+
+        PAID(2),
+
+        INVALID(3);
+
+        private int state;
+
+        InvoiceState(int state) {
+            this.state = state;
+        }
+
+        public int getValue() {
+            return state;
+        }
+
+    }
+
+    public static InvoiceState getInvoiceState(int value) {
+        switch (value) {
+            case 0 : return InvoiceState.NEW;
+            case 1 : return InvoiceState.SENT;
+            case 2 : return InvoiceState.PAID;
+            default: return InvoiceState.INVALID;
+        }
+    }
+
 }

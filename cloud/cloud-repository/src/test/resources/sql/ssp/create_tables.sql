@@ -4,7 +4,7 @@ CREATE TABLE `account` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `organization_id` int(11),
   `name` varchar(32),
-  `status` int(11),
+  `state` int(11),
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
@@ -16,7 +16,8 @@ CREATE TABLE `invoice` (
   `account_id` int(11),
   `period_from` DATETIME DEFAULT NULL,
   `period_to` DATETIME DEFAULT NULL,
-  `status` int(11),
+  `sent_time` DATETIME DEFAULT NULL,
+  `state` int(11),
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 

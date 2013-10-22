@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.openinfinity.cloud.ssp.billing.payment;
+package org.openinfinity.cloud.ssp.billing.invoice;
 
 import java.util.Date;
 
@@ -36,9 +36,9 @@ import org.springframework.stereotype.Component;
  * @version 1.3.0
  * @since 1.3.0
  */
-@Component("paymentItemProcessor")
-public class PaymentItemProcessor implements ItemProcessor<Account, InvoiceDataContainer> {
-	private static final Logger LOG = Logger.getLogger(PaymentItemProcessor.class.getName());
+@Component("invoiceItemProcessor")
+public class InvoiceItemProcessor implements ItemProcessor<Account, InvoiceDataContainer> {
+	private static final Logger LOG = Logger.getLogger(InvoiceItemProcessor.class.getName());
 
 			
 	@Autowired

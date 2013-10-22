@@ -58,7 +58,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 
 @Controller
-@RequestMapping(value = "/payment")
+@RequestMapping(value = "/invoice")
 public class PaymentController {
 
 	@Autowired
@@ -106,7 +106,7 @@ public class PaymentController {
 		// TODO get Account by ID from DB.
 		Payment payment = new Payment();
 		model.addAttribute("paymentModel", payment);
-		return "payment/new";
+		return "invoice/new";
 	}
 	
 	// TODO: implement me
@@ -114,19 +114,19 @@ public class PaymentController {
 	@AuditTrail(argumentStrategy=ArgumentStrategy.ALL)
 	@RequestMapping(method = RequestMethod.PUT)
 	public String editService(Model model) {
-		return "payment/view";
+		return "invoice/view";
 	}
 	
 	@Log
 	@AuditTrail(argumentStrategy=ArgumentStrategy.ALL)
-	@RequestMapping(value="/payment", method = RequestMethod.POST)
+	@RequestMapping(value="/invoice", method = RequestMethod.POST)
 	public String submitService(@Valid Payment payment, BindingResult result) {
 		if (result.hasErrors()) {
-			return "payment/new";
+			return "invoice/new";
 		}
 		// TODO: store to DB, set Id to user.
 		// TODO: perhaps view creation ins better from here, not GET handler 
-		return "redirect:/payment/" + payment.getId();
+		return "redirect:/invoice/" + payment.getId();
 	}
 		
 	

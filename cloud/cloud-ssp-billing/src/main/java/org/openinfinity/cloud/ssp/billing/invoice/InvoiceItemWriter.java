@@ -14,24 +14,28 @@
  * limitations under the License.
  */
 
-package org.openinfinity.cloud.ssp.billing.payment;
+package org.openinfinity.cloud.ssp.billing.invoice;
 
 
 import java.math.BigInteger;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.openinfinity.cloud.domain.UsageHour;
+import org.openinfinity.cloud.domain.Cluster;
+import org.openinfinity.cloud.domain.Machine;
 import org.openinfinity.cloud.domain.UsagePeriod;
 import org.openinfinity.cloud.domain.ssp.Account;
 import org.openinfinity.cloud.domain.ssp.Invoice;
 import org.openinfinity.cloud.domain.ssp.InvoiceItem;
+import org.openinfinity.cloud.service.administrator.MachineService;
+import org.openinfinity.cloud.service.administrator.ClusterService;
 import org.openinfinity.cloud.service.ssp.InvoiceService;
 import org.openinfinity.cloud.service.ssp.InvoiceItemService;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import java.util.Date;
+
 import java.sql.Timestamp;
 import java.util.Map;
 
@@ -42,15 +46,21 @@ import java.util.Map;
  * @version 1.3.0
  * @since 1.3.0
  */
-@Component("paymentItemWriter")
-public class PaymentItemWriter implements ItemWriter<InvoiceDataContainer> {
-	private static final Logger LOG = Logger.getLogger(PaymentItemWriter.class.getName());
+@Component("invoiceItemWriter")
+public class InvoiceItemWriter implements ItemWriter<InvoiceDataContainer> {
+	private static final Logger LOG = Logger.getLogger(InvoiceItemWriter.class.getName());
 
     @Autowired
     InvoiceService invoiceService;
 
     @Autowired
     InvoiceItemService invoiceItemService;
+
+    @Autowired
+    MachineService machineService;
+
+    @Autowired
+    ClusterService clusterService;
 
     private UsagePeriod usagePeriod;
 
@@ -65,14 +75,16 @@ public class PaymentItemWriter implements ItemWriter<InvoiceDataContainer> {
 			Invoice invoice = new Invoice(account.getId(),
                                           new Timestamp(usagePeriod.getStartTime().getTime()),
                                           new Timestamp(usagePeriod.getEndTime().getTime()),
+                                          new Timestamp(new Date().getTime()),
                                           0);
             invoice = invoiceService.create(invoice);
             Map<Integer, BigInteger> uptimePerMachine = usagePeriod.getUptimePerMachine();
             
             for (Map.Entry<Integer, BigInteger> entry : uptimePerMachine.entrySet()) {
 				Integer machineId = entry.getKey();
-				BigInteger uptime = entry.getValue();
-				invoiceItemService.create(new InvoiceItem(invoice.getId(), machineId, uptime));
+                Machine machine = machineService.getMachine(machineId);
+                Cluster cluster = clusterService.getCluster(machine.getClusterId());
+                invoiceItemService.create(new InvoiceItem(invoice.getId(), machineId, machine.getClusterId(), entry.getValue(), cluster.getMachineType()));
             }
         }
     }

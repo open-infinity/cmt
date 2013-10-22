@@ -1,4 +1,4 @@
-                      /*
+/*
  * Copyright (c) 2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,11 +15,9 @@
  */
 package org.openinfinity.cloud.domain.repository.ssp;
 
-import lombok.NonNull;
 import org.apache.log4j.Logger;
 import org.openinfinity.cloud.domain.ssp.InvoiceItem;
 import org.openinfinity.core.annotation.AuditTrail;
-import org.openinfinity.core.annotation.NotScript;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -30,7 +28,6 @@ import org.springframework.stereotype.Repository;
 import org.springframework.util.Assert;
 
 import javax.sql.DataSource;
-import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -66,7 +63,9 @@ public class InvoiceItemRepositoryJdbcImpl implements InvoiceItemRepository{
             Map<String,Object> parameters = new HashMap<String,Object>();
             parameters.put("invoice_id", invoiceItem.getInvoiceId());
             parameters.put("machine_id", invoiceItem.getMachineId());
-            parameters.put("uptime", invoiceItem.getUptime());
+            parameters.put("cluster_id", invoiceItem.getClusterId());
+            parameters.put("machine_uptime", invoiceItem.getMachineUptime());
+            parameters.put("machine_type", invoiceItem.getMachineType());
             LOG.info(parameters.toString());
             Number id = insert.executeAndReturnKey(parameters);
             invoiceItem.setId(BigInteger.valueOf((Long)id));
@@ -75,15 +74,17 @@ public class InvoiceItemRepositoryJdbcImpl implements InvoiceItemRepository{
 
     @AuditTrail
     public void update(final InvoiceItem invoiceItem) {
-    jdbcTemplate.update("update invoiceItem set invoice_id = ?, machine_id = ?, uptime = ?",
-        new PreparedStatementSetter() {
-            public void setValues(PreparedStatement ps) throws SQLException {
-            ps.setInt(1, invoiceItem.getInvoiceId().intValue());
-            ps.setInt(2, invoiceItem.getMachineId());
-            ps.setInt(3, invoiceItem.getUptime().intValue());
+        jdbcTemplate.update("update invoiceItem set invoice_id = ?, machine_id = ?, cluster_id =  ?, machine_uptime = ?, machine_type = ?",
+            new PreparedStatementSetter() {
+                public void setValues(PreparedStatement ps) throws SQLException {
+                ps.setInt(1, invoiceItem.getInvoiceId().intValue());
+                ps.setInt(2, invoiceItem.getMachineId());
+                ps.setInt(3, invoiceItem.getClusterId());
+                ps.setInt(4, invoiceItem.getMachineUptime().intValue());
+                ps.setInt(5, invoiceItem.getMachineType());
+                }
             }
-        }
-    );
+        );
     }
 
     @AuditTrail
@@ -104,7 +105,10 @@ public class InvoiceItemRepositoryJdbcImpl implements InvoiceItemRepository{
             InvoiceItem invoiceItem = new InvoiceItem();
             invoiceItem.setInvoiceId(BigInteger.valueOf(rs.getInt("invoice_id")));
             invoiceItem.setMachineId(rs.getInt("machine_id"));
-            invoiceItem.setUptime(BigInteger.valueOf(rs.getInt("uptime")));
+            invoiceItem.setClusterId(rs.getInt("cluster_id"));
+            invoiceItem.setMachineUptime(BigInteger.valueOf(rs.getInt("machine_uptime")));
+            invoiceItem.setMachineType(rs.getInt("machine_type"));
+
             return invoiceItem;
         }
     }
