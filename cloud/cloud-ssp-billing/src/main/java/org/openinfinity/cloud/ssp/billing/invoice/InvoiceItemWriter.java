@@ -76,7 +76,7 @@ public class InvoiceItemWriter implements ItemWriter<InvoiceDataContainer> {
                                           new Timestamp(usagePeriod.getStartTime().getTime()),
                                           new Timestamp(usagePeriod.getEndTime().getTime()),
                                           new Timestamp(new Date().getTime()),
-                                          0);
+                                          Invoice.STATE_NEW);
             invoice = invoiceService.create(invoice);
             Map<Integer, BigInteger> uptimePerMachine = usagePeriod.getUptimePerMachine();
             

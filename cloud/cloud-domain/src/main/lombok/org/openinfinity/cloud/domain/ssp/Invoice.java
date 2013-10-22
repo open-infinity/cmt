@@ -26,6 +26,7 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
 import org.openinfinity.core.annotation.NotScript;
+import org.openinfinity.cloud.domain.ssp.SspUtil.InvoiceState;
 
 /**
  * SSP Bill entity.
@@ -38,8 +39,13 @@ import org.openinfinity.core.annotation.NotScript;
 @NoArgsConstructor
 @EqualsAndHashCode(exclude={"id"})
 public class Invoice {
-	
-	@NotScript @NotNull @NonNull
+
+    static public int STATE_NEW = 0;
+    static public int STATE_SENT = 1;
+    static public int STATE_PAID = 2;
+    static public int STATE_INVALID = 3;
+
+    @NotScript @NotNull @NonNull
 	private BigInteger id;
 	
 	@NotScript @NotNull @NonNull
@@ -63,37 +69,6 @@ public class Invoice {
         this.periodTo = periodTo;
         this.sentTime = sentTime;
         this.state = state;
-    }
-
-    public enum InvoiceState {
-
-        NEW(0),
-
-        SENT(1),
-
-        PAID(2),
-
-        INVALID(3);
-
-        private int state;
-
-        InvoiceState(int state) {
-            this.state = state;
-        }
-
-        public int getValue() {
-            return state;
-        }
-
-    }
-
-    public static InvoiceState getInvoiceState(int value) {
-        switch (value) {
-            case 0 : return InvoiceState.NEW;
-            case 1 : return InvoiceState.SENT;
-            case 2 : return InvoiceState.PAID;
-            default: return InvoiceState.INVALID;
-        }
     }
 
 }

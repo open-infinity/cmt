@@ -47,16 +47,40 @@ public class Account {
 	private String name;
 		
 	@NotScript @NotNull @NonNull
-	private Integer status;
-			
+	private Integer state;
+
+    public Account(BigInteger organizationId, String name, Integer state) {
+        this.organizationId = organizationId;
+        this.name = name;
+        this.state = state;
+    }
+
+    public enum State {
+
+        DISABLED(0),
+
+        ENABLED(1),
+
+        INVALID(3);
+
+        private int state;
+
+        State(int state) {
+            this.state = state;
+        }
+
+        public int getValue() {
+            return state;
+        }
+
+    }
+
+    public static State getInvoiceState(int value) {
+        switch (value) {
+            case 0 : return State.DISABLED;
+            case 1 : return State.ENABLED;
+            default: return State.INVALID;
+        }
+    }
+
 }
-
-/* paymentStatus:
- * SERVICE_PAID - service is paid 
- * SERVICE_NOT_PAID - service needs to be paid for
- * 
- * 
- * 
- * 
- */
-

@@ -39,7 +39,7 @@ public class AccountRowMapper implements RowMapper<Account> {
 		account.setId(BigInteger.valueOf(resultSet.getInt("id")));
 		account.setOrganizationId(BigInteger.valueOf(resultSet.getInt("organization_id")));
 		account.setName(resultSet.getString("name"));
-		account.setStatus(resultSet.getInt("status"));
+		account.setState(resultSet.getInt("state"));
 		return account;
 	}	
 }

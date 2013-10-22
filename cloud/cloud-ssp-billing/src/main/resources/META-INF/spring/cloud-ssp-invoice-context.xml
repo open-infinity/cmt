@@ -74,8 +74,8 @@
         <batch:step id="sendInvoice">
             <batch:tasklet transaction-manager="springBatchTxManager"
                            start-limit="3">
-                <batch:chunk reader="invoiceReader" processor="invoiceSendingItemProcessor"
-                             writer="invoiceSendingItemWriter" commit-interval="100" retry-limit="3">
+                <batch:chunk reader="invoiceReader" processor="sendInvoiceItemProcessor"
+                             writer="sendInvoiceItemWriter" commit-interval="100" retry-limit="3">
                     <batch:retryable-exception-classes>
                         <batch:include class="org.springframework.dao.OptimisticLockingFailureException" />
                         <batch:include class="org.springframework.dao.DeadlockLoserDataAccessException" />

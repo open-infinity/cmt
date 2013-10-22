@@ -21,3 +21,14 @@ CREATE TABLE `invoice` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `invoice_item`;
+
+CREATE TABLE `invoice_item` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `invoice_id` int(11),
+  `machine_id` int(11),
+  `cluster_id` int(11),
+  `machine_uptime` DATETIME DEFAULT NULL,
+  `machine_type` int(11),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
