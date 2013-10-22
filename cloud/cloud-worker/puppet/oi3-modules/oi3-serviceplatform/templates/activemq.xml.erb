@@ -32,6 +32,21 @@
       <!--<kahaDB directory="${activemq.base}/data/kahadb"/>-->
 	  <jdbcPersistenceAdapter dataSource="#mysql-ds"/>
     </persistenceAdapter>
+    
+	<systemUsage>
+	    <systemUsage>
+		<memoryUsage>
+		    <memoryUsage limit="20 mb"/>
+		</memoryUsage>
+		<storeUsage>
+		    <storeUsage limit="1 gb"/>
+		</storeUsage>
+		<tempUsage>
+		    <tempUsage limit="100 mb"/>
+		</tempUsage>
+	    </systemUsage>
+	</systemUsage>
+    
 
     <transportConnectors>
       <transportConnector name="openwire" uri="vm://localhost"/>
