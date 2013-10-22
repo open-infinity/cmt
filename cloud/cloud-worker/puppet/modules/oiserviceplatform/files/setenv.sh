@@ -1,1 +1,0 @@
-JAVA_OPTS="-Dltt.configuration.filename=/opt/openinfinity/2.0.0/ltt-watch/ltt.xml -Dwebconsole.type=properties -Dwebconsole.jms.url=tcp://localhost:61616 -Dwebconsole.jmx.url=service:jmx:rmi:///jndi/rmi://localhost:1099/jmxrmi -Dwebconsole.jmx.user= -Dwebconsole.jmx.password="
