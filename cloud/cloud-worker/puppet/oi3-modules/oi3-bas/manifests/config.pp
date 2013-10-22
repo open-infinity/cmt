@@ -9,7 +9,7 @@ class oi3-bas::config {
                 owner => 'oiuser',
                 group => 'oiuser',
                 mode => 0755,
-                source => "puppet:///modules/oi3-bas/setenv.sh",
+                content => template("oibas/setenv.sh.erb"),
                 require => Class["oi3-bas::install"],
         }
 
@@ -58,6 +58,25 @@ class oi3-bas::config {
                 source => "puppet:///modules/oi3-bas/oi-tomcat",
                 require => Class["oi3-bas::install"],
     }
+    
+        file {"/opt/openinfinity/3.0.0/tomcat/conf/jmxremote.password":
+                ensure => present,
+                owner => 'toas',
+                group => 'toas',
+                mode => 0600,
+                content => template("oi3-bas/jmxremote.password.erb"),
+                require => Class["oibas::install"],
+        }
+        
+        file {"/opt/openinfinity/3.0.0/tomcat/conf/jmxremote.access":
+                ensure => present,
+                owner => 'toas',
+                group => 'toas',
+                mode => 0644,
+                source => "puppet:///modules/oi3-bas/jmxremote.access",
+                require => Class["oibas::install"],
+        }
+    
 
     # Try ensure, that the supported Java is chosen
     exec { "choose-java":
