@@ -8,9 +8,12 @@ import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.scheduling.quartz.CronTriggerBean;
 import org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean;
+import org.springframework.scheduling.quartz.SchedulerFactoryBean;
+import org.springframework.stereotype.Service;
 
 /**
  * Class for scheduling jobs in Spring Quartz schduler dynamically, as opposite to static
@@ -19,45 +22,46 @@ import org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean;
  * @see http://darthanthony.wordpress.com/2009/07/07/dynamic-scheduling-with-javaspring/
  * @author Timo Saarinen
  */
+@Service
 public class DynamicQuartzSchedulerManager {
 
 	private Logger logger = Logger.getLogger(DynamicQuartzSchedulerManager.class);
 	
-	private ClassPathXmlApplicationContext context;
+	ClassPathXmlApplicationContext context;
 	
 	private Set<String> jobNames = new TreeSet<String>();
 	
 	// Quartz Factory
 	@Autowired
-	private Scheduler schedulerFactory; // (Scheduler) context.getBean("schedulerFactory");
+	private SchedulerFactoryBean schedulerFactory; // (Scheduler) context.getBean("schedulerFactory");
 
-	public DynamicQuartzSchedulerManager(ClassPathXmlApplicationContext context) {
-		this.context = context;
-	}
-	
 	/**
 	 * Start the scheduler.
 	 */
 	public void start() throws SchedulerException {
-		schedulerFactory.start();
+		assert schedulerFactory != null;
+		schedulerFactory.getScheduler().start();
 	}
 	
 	/**
 	 * Shutdown the scheduler.
 	 */
 	public void stop() throws SchedulerException {
-		schedulerFactory.shutdown();
+		schedulerFactory.getScheduler().shutdown();
 	}
 	
 	/**
 	 * Add and scheduler a job.
 	 * 
+	 * @see http://quartz-scheduler.org/documentation/quartz-1.x/tutorials/crontrigger
 	 * @param jobName Unique name of the job.
 	 * @param job Job object with "run" method.
-	 * @param cronExpression Crontab-like expression, like "0 22 * * * ?". 
+	 * @param cronExpression Crontab-like expression, like "0 0 22 * * ?". 
 	 * @throws Exception
 	 */
 	public void addJob(String jobName, Object job, String cronExpression) throws Exception {
+		logger.debug("Adding job " + jobName);
+		
 		// Because we want to dynamically create scheduled tasks, we can't rely on XML
 		// configuration. Instead we use programmatic process to do a similar thing. 
 		
@@ -79,7 +83,7 @@ public class DynamicQuartzSchedulerManager {
 		trigger.afterPropertiesSet();
 
 		// Add to the schedule
-		schedulerFactory.scheduleJob((JobDetail)jdfb.getObject(), trigger);
+		schedulerFactory.getScheduler().scheduleJob((JobDetail)jdfb.getObject(), trigger);
 		jobNames.add(jobName);
 	}
 
@@ -90,8 +94,9 @@ public class DynamicQuartzSchedulerManager {
 	 * @throws SchedulerException
 	 */
 	public void deleteJob(String jobName) throws SchedulerException {
-		schedulerFactory.unscheduleJob(jobName + "-trigger", "common-trigger-group");
-		schedulerFactory.deleteJob(jobName, "common-job-group");
+		logger.debug("Deleting job " + jobName);
+		schedulerFactory.getScheduler().unscheduleJob(jobName + "-trigger", "common-trigger-group");
+		schedulerFactory.getScheduler().deleteJob(jobName, "common-job-group");
 		jobNames.remove(jobName);
 	}
 
@@ -99,6 +104,7 @@ public class DynamicQuartzSchedulerManager {
 	 * Unschedule and delete all jobs.
 	 */
 	public void delteAlljobs() {
+		logger.debug("Deleting all jobs from scheduler");
 		for (String job_name : new TreeSet<String>(jobNames)) {
 			try {
 				deleteJob(job_name);

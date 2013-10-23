@@ -18,6 +18,11 @@ public class CloudBackupDaemon implements Daemon {
 	private ClassPathXmlApplicationContext context = null;
 	private CloudBackup backup;
 	
+	public CloudBackupDaemon() {
+		// The first log line from this app
+		logger.debug("Cloud Backup started");
+	}
+	
 	@Override
 	public void init(DaemonContext arg0) throws DaemonInitException, Exception {
 		logger.debug("Daemon initializing");
@@ -51,14 +56,5 @@ public class CloudBackupDaemon implements Daemon {
 			context.close();
 			context = null;
 		}
-	}
-
-	/**
-	 * Non-jsvc entry point.
-	 */
-	public void startFromMain() throws Exception {
-		logger.debug("Daemon started from main");
-		init(null);
-		start();		
 	}
 }

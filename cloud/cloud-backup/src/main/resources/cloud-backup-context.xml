@@ -23,7 +23,7 @@
 	<!-- <context:component-scan base-package="org.openinfinity.cloud.domain.repository.deployer"> 
 		</context:component-scan> -->
 
-	<context:component-scan base-package="org.openinfinity.cloud.backup" />
+	<context:component-scan base-package="org.openinfinity.cloud.application.backup" />
 
 	<bean id="cloudDataSource" destroy-method="close"
 		class="org.apache.commons.dbcp.BasicDataSource">
@@ -40,7 +40,7 @@
 		p:dataSource-ref="cloudDataSource" />
 
 	<!-- Quartz scheduler -->
-	<bean id="scheduleFactory"
+	<bean id="schedulerFactory"
 		class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
 		<property name="quartzProperties">
 			<props>
