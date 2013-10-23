@@ -23,11 +23,8 @@ import javax.sql.DataSource;
 
 import junit.framework.Assert;
 
-<<<<<<< HEAD
 import org.junit.Before;
 import org.junit.Ignore;
-=======
->>>>>>> Moving ssp under cloud dir
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openinfinity.cloud.domain.Job;
