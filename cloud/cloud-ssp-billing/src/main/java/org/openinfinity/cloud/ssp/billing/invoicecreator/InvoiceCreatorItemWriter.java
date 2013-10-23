@@ -68,10 +68,15 @@ public class InvoiceCreatorItemWriter implements ItemWriter<InvoiceCreatorDataCo
     @Override
 	public void write(List<? extends InvoiceCreatorDataContainer> items) throws Exception {
         for (InvoiceCreatorDataContainer invoiceData : items) {
+            LOG.debug("write ENTER");
 			account = invoiceData.getAccount();
 			usagePeriod = invoiceData.getUsagePeriod();
-            LOG.debug("Writting invoicecreator");
-			Invoice invoice = new Invoice(account.getId(),
+
+            LOG.debug("accountId:" + account.getId());
+            LOG.debug("usagePeriod start:" + usagePeriod.getStartTime());
+            LOG.debug("usagePeriod end:" + usagePeriod.getEndTime());
+
+            Invoice invoice = new Invoice(account.getId(),
                                           new Timestamp(usagePeriod.getStartTime().getTime()),
                                           new Timestamp(usagePeriod.getEndTime().getTime()),
                                           null,
@@ -87,6 +92,8 @@ public class InvoiceCreatorItemWriter implements ItemWriter<InvoiceCreatorDataCo
                 Cluster cluster = clusterService.getCluster(machine.getClusterId());
                 invoiceItemService.create(new InvoiceItem(invoice.getId(), machineId, machine.getClusterId(), entry.getValue(), cluster.getMachineType()));
             }
+            LOG.debug("write EXIT");
+
         }
     }
 }
