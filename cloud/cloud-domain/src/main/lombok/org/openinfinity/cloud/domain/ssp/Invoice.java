@@ -26,7 +26,6 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
 import org.openinfinity.core.annotation.NotScript;
-import org.openinfinity.cloud.domain.ssp.SspUtil.InvoiceState;
 
 /**
  * SSP Bill entity.
