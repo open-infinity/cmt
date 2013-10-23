@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.openinfinity.cloud.ssp.billing.invoice;
+package org.openinfinity.cloud.ssp.billing.accountauthorizer;
 
 import org.apache.log4j.Logger;
 import org.openinfinity.cloud.domain.ssp.Invoice;
@@ -28,15 +28,15 @@ import org.springframework.stereotype.Component;
  * @version 1.3.0
  * @since 1.3.0
  */
-@Component("sendInvoiceItemProcessor")
-public class SendInvoiceItemProcessor implements ItemProcessor<Invoice, Invoice> {
-	private static final Logger LOG = Logger.getLogger(SendInvoiceItemProcessor.class.getName());
+@Component("notificationItemProcessor")
+public class InvoiceManagerItemProcessor implements ItemProcessor<Invoice, Invoice> {
+	private static final Logger LOG = Logger.getLogger(InvoiceManagerItemProcessor.class.getName());
 
 
 	@Override
 	public Invoice process(Invoice invoice) throws Exception {
 		try {
-			LOG.debug("SendInvoiceItemProcessor, processing invoice id:" + invoice.getId());
+			LOG.debug("InvoiceManagerItemProcessor, processing invoicecreator id:" + invoice.getId());
             invoice.setState(1);
             return invoice;
 		}

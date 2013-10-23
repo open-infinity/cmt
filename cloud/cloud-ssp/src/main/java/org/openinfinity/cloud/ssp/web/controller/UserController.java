@@ -134,7 +134,7 @@ public class UserController {
 		// TODO: perhaps view creation ins better from here, not GET handler 
 		// return "redirect:/user/" + user.getId();
 		user.setId(BigInteger.valueOf(1));
-		return "redirect:/invoice/" + user.getId();
+		return "redirect:/invoicecreator/" + user.getId();
 	}
 		
 	

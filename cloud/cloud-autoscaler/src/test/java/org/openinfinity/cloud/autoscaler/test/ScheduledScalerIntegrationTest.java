@@ -16,18 +16,16 @@
 
 package org.openinfinity.cloud.autoscaler.test;
 
-import java.sql.Timestamp;
-import java.util.Collection;
-
-import javax.sql.DataSource;
-
 import junit.framework.Assert;
-
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.openinfinity.cloud.autoscaler.test.util.DatabaseUtils;
 import org.openinfinity.cloud.domain.Job;
+import org.openinfinity.cloud.domain.ScalingRule;
+import org.openinfinity.cloud.service.administrator.ClusterService;
+import org.openinfinity.cloud.service.administrator.JobService;
+import org.openinfinity.cloud.service.scaling.ScalingRuleService;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.test.JobLauncherTestUtils;
@@ -35,11 +33,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.openinfinity.cloud.autoscaler.test.util.DatabaseUtils;
-import org.openinfinity.cloud.domain.ScalingRule;
-import org.openinfinity.cloud.service.administrator.ClusterService;
-import org.openinfinity.cloud.service.administrator.JobService;
-import org.openinfinity.cloud.service.scaling.ScalingRuleService;
+
+import javax.sql.DataSource;
+import java.sql.Timestamp;
+import java.util.Collection;
 
 /**
  * Functional tests for Periodic scaler.
@@ -110,10 +107,8 @@ public class ScheduledScalerIntegrationTest {
 	    
 	    JobExecution jobExecution = jobLauncherTestUtils.launchJob();
         Assert.assertEquals(jobExecution.getStatus(), BatchStatus.COMPLETED);
-	
 		Assert.assertEquals(2, scalingRuleService.getRule(CLUSTER_ID).getScheduledScalingState());
         Assert.assertEquals("1,1", jobService.getJob(getJobId()).getServices());
-
     }
 
     private int getJobId(){

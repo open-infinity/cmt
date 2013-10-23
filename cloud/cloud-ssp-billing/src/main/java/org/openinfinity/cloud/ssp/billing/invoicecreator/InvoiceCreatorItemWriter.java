@@ -14,12 +14,8 @@
  * limitations under the License.
  */
 
-package org.openinfinity.cloud.ssp.billing.invoice;
+package org.openinfinity.cloud.ssp.billing.invoicecreator;
 
-
-import java.math.BigInteger;
-import java.util.Date;
-import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.openinfinity.cloud.domain.Cluster;
@@ -28,27 +24,30 @@ import org.openinfinity.cloud.domain.UsagePeriod;
 import org.openinfinity.cloud.domain.ssp.Account;
 import org.openinfinity.cloud.domain.ssp.Invoice;
 import org.openinfinity.cloud.domain.ssp.InvoiceItem;
-import org.openinfinity.cloud.service.administrator.MachineService;
 import org.openinfinity.cloud.service.administrator.ClusterService;
-import org.openinfinity.cloud.service.ssp.InvoiceService;
+import org.openinfinity.cloud.service.administrator.MachineService;
 import org.openinfinity.cloud.service.ssp.InvoiceItemService;
+import org.openinfinity.cloud.service.ssp.InvoiceService;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 
+import java.math.BigInteger;
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.Map;
 
 /**
  * Batch writer.
- * 
+ *
  * @author Vedran Bartonicek
  * @version 1.3.0
  * @since 1.3.0
  */
-@Component("invoiceItemWriter")
-public class InvoiceItemWriter implements ItemWriter<InvoiceDataContainer> {
-	private static final Logger LOG = Logger.getLogger(InvoiceItemWriter.class.getName());
+@Component("invoiceCreatorItemWriter")
+public class InvoiceCreatorItemWriter implements ItemWriter<InvoiceCreatorDataContainer> {
+	private static final Logger LOG = Logger.getLogger(InvoiceCreatorItemWriter.class.getName());
 
     @Autowired
     InvoiceService invoiceService;
@@ -67,19 +66,19 @@ public class InvoiceItemWriter implements ItemWriter<InvoiceDataContainer> {
     private Account account;
 
     @Override
-	public void write(List<? extends InvoiceDataContainer> items) throws Exception {
-        for (InvoiceDataContainer invoiceData : items) {
+	public void write(List<? extends InvoiceCreatorDataContainer> items) throws Exception {
+        for (InvoiceCreatorDataContainer invoiceData : items) {
 			account = invoiceData.getAccount();
 			usagePeriod = invoiceData.getUsagePeriod();
-            LOG.debug("Writting invoice");
+            LOG.debug("Writting invoicecreator");
 			Invoice invoice = new Invoice(account.getId(),
                                           new Timestamp(usagePeriod.getStartTime().getTime()),
                                           new Timestamp(usagePeriod.getEndTime().getTime()),
-                                          new Timestamp(new Date().getTime()),
+                                          null,
                                           Invoice.STATE_NEW);
             invoice = invoiceService.create(invoice);
             Map<Integer, BigInteger> uptimePerMachine = usagePeriod.getUptimePerMachine();
-            
+            Assert.notNull(uptimePerMachine);
             for (Map.Entry<Integer, BigInteger> entry : uptimePerMachine.entrySet()) {
 				Integer machineId = entry.getKey();
                 Machine machine = machineService.getMachine(machineId);
@@ -89,4 +88,4 @@ public class InvoiceItemWriter implements ItemWriter<InvoiceDataContainer> {
         }
     }
 }
-	  
+

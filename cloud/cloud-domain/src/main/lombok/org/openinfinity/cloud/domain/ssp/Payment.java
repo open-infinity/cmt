@@ -28,7 +28,7 @@ import org.openinfinity.core.annotation.NotScript;
 /**
  * SSP Payment entity.
  * 
- * This class contains invoice specific information for the user.
+ * This class contains invoicecreator specific information for the user.
  * 
  * @author Vedran Bartonicek
  */

@@ -14,31 +14,31 @@
  * limitations under the License.
  */
 
-package org.openinfinity.cloud.ssp.billing.invoice;
-
-import java.util.Date;
+package org.openinfinity.cloud.ssp.billing.invoicecreator;
 
 import org.apache.log4j.Logger;
 import org.openinfinity.cloud.domain.UsagePeriod;
 import org.openinfinity.cloud.domain.ssp.Account;
 import org.openinfinity.cloud.domain.ssp.Invoice;
 import org.openinfinity.cloud.service.administrator.InstanceService;
-import org.openinfinity.cloud.service.usage.UsageService;
 import org.openinfinity.cloud.service.ssp.InvoiceService;
+import org.openinfinity.cloud.service.usage.UsageService;
 import org.openinfinity.core.exception.SystemException;
 import org.openinfinity.core.util.ExceptionUtil;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
+
 /**
  * @author Vedran Bartonicek
  * @version 1.3.0
  * @since 1.3.0
  */
-@Component("invoiceItemProcessor")
-public class InvoiceItemProcessor implements ItemProcessor<Account, InvoiceDataContainer> {
-	private static final Logger LOG = Logger.getLogger(InvoiceItemProcessor.class.getName());
+@Component("invoiceCreatorItemProcessor")
+public class InvoiceCreatorItemProcessor implements ItemProcessor<Account, InvoiceCreatorDataContainer> {
+	private static final Logger LOG = Logger.getLogger(InvoiceCreatorItemProcessor.class.getName());
 
 			
 	@Autowired
@@ -51,13 +51,13 @@ public class InvoiceItemProcessor implements ItemProcessor<Account, InvoiceDataC
 	InvoiceService invoiceService;
 
 	@Override
-	public InvoiceDataContainer process(Account account) throws Exception {
+	public InvoiceCreatorDataContainer process(Account account) throws Exception {
 		try {
 			LOG.debug("Processing account id:" + account.getOrganizationId());
 						
 			Invoice lastInvoice = invoiceService.loadLast(account.getId());
             UsagePeriod usagePeriod = usageService.loadUsagePeriodPerMachine(account.getOrganizationId().intValue(), lastInvoice.getPeriodTo(), new Date());
-            InvoiceDataContainer invoiceDataContainer = new InvoiceDataContainer(usagePeriod, account);
+            InvoiceCreatorDataContainer invoiceDataContainer = new InvoiceCreatorDataContainer(usagePeriod, account);
             return invoiceDataContainer;
 
 			/*

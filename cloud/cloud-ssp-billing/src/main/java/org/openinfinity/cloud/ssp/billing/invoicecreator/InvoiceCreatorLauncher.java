@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.openinfinity.cloud.ssp.billing.invoice;
+package org.openinfinity.cloud.ssp.billing.invoicecreator;
 
 import org.openinfinity.core.annotation.Log;
 import org.springframework.batch.core.Job;
@@ -31,10 +31,10 @@ import org.springframework.stereotype.Component;
  * @version 1.3.0
  * @since 1.2.0
  */
-@Component("invoiceLauncher")
-public class InvoiceLauncher {
+@Component("invoiceCreatorLauncher")
+public class InvoiceCreatorLauncher {
 	@Autowired
-	@Qualifier("paymentJob")
+	@Qualifier("invoiceCreationJob")
 	private Job job;
 	
 	@Autowired

@@ -15,6 +15,7 @@
  */
 package org.openinfinity.cloud.domain;
 
+import java.lang.Integer;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -125,12 +126,16 @@ public class UsagePeriod {
 	}
 	
 	public void loadUptimeHoursPerMachine() {
-		//FIXME: Problem with downtime calculations
+		//FIXME: Problem with downtime (uptime?)calculations
+        uptimePerMachine = new HashMap<Integer, BigInteger>();
+        downtimePerMachine = new HashMap<Integer, BigInteger>();
+
 		long gatheringStartTime = startTime.getTime();
 		long gatheringEndTime = endTime.getTime();	
 		LOGGER.debug("Gathering start time: " + gatheringStartTime);
 		LOGGER.debug("Gathering end time: " + gatheringEndTime);
-		long previousGatheringPointOfTime = 0;
+        long periodTime = gatheringStartTime - gatheringEndTime;
+        long previousGatheringPointOfTime = 0;
 		usageHoursPerMachine = generateUsageHourTreePerMachineId();
 		for (Map.Entry<Integer, List<UsageHour>> entry : usageHoursPerMachine.entrySet()) {
 			List<UsageHour> usageHoursList = entry.getValue();
@@ -145,43 +150,48 @@ public class UsagePeriod {
 				VirtualMachineState virtualMachineState = usageHour.getVirtualMachineState();
 				LOGGER.debug("Usage hour state modification time: " + usageHour.getTimeStamp().getTime()+ ", previous point of time: " + previousGatheringPointOfTime + ", current time: " + usageHour.getTimeStamp().getTime());
 				switch (virtualMachineState) {
-					case STARTED : 
-						machineUptime   += (usageHour.getTimeStamp().getTime() - previousGatheringPointOfTime);  
+					case STARTED :
+                        machineDowntime += (usageHour.getTimeStamp().getTime() - previousGatheringPointOfTime);
 						previousGatheringPointOfTime = getPointOfTime(gatheringStartTime, gatheringEndTime, firstIndex, lastIndex, usageHour); 
-						LOGGER.debug("State : started, Uptime : " + machineUptime+ ", previous point of time: " + previousGatheringPointOfTime + ", current time: " + usageHour.getTimeStamp().getTime());
+						LOGGER.debug("State : started, machineDowntime : " + machineDowntime+ ", previous point of time: " + previousGatheringPointOfTime + ", current time: " + usageHour.getTimeStamp().getTime());
 						break;
-					case STOPPED : 
-						machineDowntime += (usageHour.getTimeStamp().getTime() - previousGatheringPointOfTime);  
+					case STOPPED :
+                        machineUptime += (usageHour.getTimeStamp().getTime() - previousGatheringPointOfTime);
 						previousGatheringPointOfTime = getPointOfTime(gatheringStartTime, gatheringEndTime, firstIndex, lastIndex, usageHour); 
-						LOGGER.debug("State : stopped, Downtime : " + machineUptime + ", previous point of time: " + previousGatheringPointOfTime + ", current time: " + usageHour.getTimeStamp().getTime());
+						LOGGER.debug("State : stopped, machineUptime : " + machineUptime + ", previous point of time: " + previousGatheringPointOfTime + ", current time: " + usageHour.getTimeStamp().getTime());
 						break;
-					case RESUMED : 
-						machineUptime   += (usageHour.getTimeStamp().getTime() - previousGatheringPointOfTime); 
+					case RESUMED :
+                        machineDowntime   += (usageHour.getTimeStamp().getTime() - previousGatheringPointOfTime);
 						previousGatheringPointOfTime = getPointOfTime(gatheringStartTime, gatheringEndTime, firstIndex, lastIndex, usageHour); 
-						LOGGER.debug("State : resumed, Uptime : " + machineUptime+ ", previous point of time: " + previousGatheringPointOfTime + ", current time: " + usageHour.getTimeStamp().getTime());
+						LOGGER.debug("State : resumed, machineDowntime : " + machineDowntime+ ", previous point of time: " + previousGatheringPointOfTime + ", current time: " + usageHour.getTimeStamp().getTime());
 						break;
-					case PAUSED : 
-						machineDowntime += (usageHour.getTimeStamp().getTime() - previousGatheringPointOfTime);  
+					case PAUSED :
+                        machineUptime += (usageHour.getTimeStamp().getTime() - previousGatheringPointOfTime);
 						previousGatheringPointOfTime = getPointOfTime(gatheringStartTime, gatheringEndTime, firstIndex, lastIndex, usageHour); 
-						LOGGER.debug("State : paused, Downtime : " + machineUptime+ ", previous point of time: " + previousGatheringPointOfTime + ", current time: " + usageHour.getTimeStamp().getTime());
+						LOGGER.debug("State : paused, machineUptime : " + machineUptime+ ", previous point of time: " + previousGatheringPointOfTime + ", current time: " + usageHour.getTimeStamp().getTime());
 						break;
-					case TERMINATED : 
-						machineDowntime += (usageHour.getTimeStamp().getTime() - previousGatheringPointOfTime);  
+					case TERMINATED :
+                        machineUptime += (usageHour.getTimeStamp().getTime() - previousGatheringPointOfTime);
 						previousGatheringPointOfTime = getPointOfTime(gatheringStartTime, gatheringEndTime, firstIndex, lastIndex, usageHour); 
-						LOGGER.debug("State : terminated, Downtime : " + machineUptime);
+						LOGGER.debug("State : terminated, machineUptime : " + machineUptime);
 						break;
 				}
 				System.out.println("Point of time : " + previousGatheringPointOfTime);
 			}
 			uptimePerMachine.put(entry.getKey(), BigInteger.valueOf(machineUptime));
 			downtimePerMachine.put(entry.getKey(), BigInteger.valueOf(machineDowntime));
+            LOGGER.debug("Period: " + periodTime);
+            LOGGER.debug("MachineId: " + entry.getKey());
+
+            LOGGER.debug("System uptime: " + machineUptime);
+            LOGGER.debug("System downtime: " + machineDowntime);
 		}
-		long periodTime = endTime.getTime()-startTime.getTime();
-		LOGGER.debug("Period: " + periodTime);
-		LOGGER.debug("System uptime: " + (periodTime - uptime));
-		LOGGER.debug("System downtime: " + (periodTime - (periodTime - uptime)));
-		uptime = (periodTime - uptime);
-		downtime = (periodTime - (periodTime - uptime));	
+		//long periodTime = endTime.getTime()-startTime.getTime();
+		//LOGGER.debug("Period: " + periodTime);
+		//LOGGER.debug("System uptime: " + (periodTime - uptime));
+		//LOGGER.debug("System downtime: " + (periodTime - (periodTime - uptime)));
+		//uptime = (periodTime - uptime);
+		//downtime = (periodTime - (periodTime - uptime));
 	}
 	
 	

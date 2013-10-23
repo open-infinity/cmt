@@ -64,7 +64,7 @@ public class InvoiceRepositoryJdbcImpl implements InvoiceRepository{
         parameters.put("account_id", invoice.getAccountId());
         parameters.put("period_from", invoice.getPeriodFrom());
         parameters.put("period_to", invoice.getPeriodTo());
-        parameters.put("sentTime", invoice.getSentTime());
+        parameters.put("sent_time", invoice.getSentTime());
         parameters.put("state", invoice.getState());
         LOG.info(parameters.toString());
         Number id = insert.executeAndReturnKey(parameters);

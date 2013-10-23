@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.openinfinity.cloud.ssp.billing.authorization;
+package org.openinfinity.cloud.ssp.billing.accountauthorizer;
 
 import org.openinfinity.core.annotation.Log;
 import org.springframework.batch.core.Job;
@@ -32,7 +32,7 @@ import org.springframework.stereotype.Component;
  * @since 1.2.0
  */
 @Component("authorizationLauncher")
-public class AuthorizationLauncher {
+public class AccountAuhtorizerLauncher {
 	@Autowired
 	@Qualifier("authorizationJob")
 	private Job job;

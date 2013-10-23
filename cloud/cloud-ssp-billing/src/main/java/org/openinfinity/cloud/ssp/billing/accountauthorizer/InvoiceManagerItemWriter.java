@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.openinfinity.cloud.ssp.billing.invoice;
+package org.openinfinity.cloud.ssp.billing.accountauthorizer;
 
 
 import org.apache.log4j.Logger;
@@ -33,9 +33,9 @@ import java.util.List;
  * @version 1.3.0
  * @since 1.3.0
  */
-@Component("sendInvoiceItemWriter")
-public class SendInvoiceItemWriter implements ItemWriter<Invoice> {
-	private static final Logger LOG = Logger.getLogger(SendInvoiceItemWriter.class.getName());
+@Component("notificationItemWriter")
+public class InvoiceManagerItemWriter implements ItemWriter<Invoice> {
+	private static final Logger LOG = Logger.getLogger(InvoiceManagerItemWriter.class.getName());
 
     @Autowired
     InvoiceService invoiceService;

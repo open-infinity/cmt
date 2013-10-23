@@ -56,7 +56,7 @@ public class Invoice {
 	@NotScript @NotNull @NonNull
 	private Timestamp periodTo;
 
-    @NotScript @NotNull @NonNull
+    @NotScript
     private Timestamp sentTime;
 
 	@NotScript @NotNull @NonNull

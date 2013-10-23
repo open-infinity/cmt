@@ -21,8 +21,7 @@
   	
 	<import resource="classpath*:META-INF/spring/cloud-context-service.xml" />
     <import resource="classpath*:META-INF/spring/cloud-context-repository.xml" />
-
-    <context:component-scan base-package="org.openinfinity.cloud.ssp.billing.invoicecreator"/>
+    <context:component-scan base-package="org.openinfinity.cloud.ssp.billing"/>
                
 	<bean id="cloudTxManager" 
 	    class="org.springframework.jdbc.datasource.DataSourceTransactionManager"
@@ -51,12 +50,20 @@
 		</property>
 	</bean>
 
-	<batch:job id="invoiceCreationJob">
-		<batch:step id="createInvoice">
+    <bean id="invoiceReader" class="org.springframework.batch.item.database.JdbcCursorItemReader">
+        <property name="dataSource" ref="sspDataSource"/>
+        <property name="sql" value="select * from invoice where state != 2"/>
+        <property name="rowMapper">
+            <bean id="invoiceRowMapper" class="org.openinfinity.cloud.domain.repository.ssp.InvoiceRowMapper"/>
+        </property>
+    </bean>
+	    	
+	<batch:job id="authorizationJob">
+		<batch:step id="notification" next="authorization">
 			<batch:tasklet transaction-manager="springBatchTxManager"
 				start-limit="3">
-				<batch:chunk reader="accountReader" processor="invoiceCreatorItemProcessor"
-					writer="invoiceCreatorItemWriter" commit-interval="100" retry-limit="3">
+				<batch:chunk reader="invoiceReader" processor="notificationItemProcessor"
+					writer="notificationItemWriter" commit-interval="100" retry-limit="3">
 					<batch:retryable-exception-classes>
                     	<batch:include class="org.springframework.dao.OptimisticLockingFailureException" />
                         <batch:include class="org.springframework.dao.DeadlockLoserDataAccessException" />
@@ -64,9 +71,22 @@
                 </batch:chunk>
 			</batch:tasklet>
 		</batch:step>
-    </batch:job>
+        <batch:step id="authorization">
+            <batch:tasklet transaction-manager="springBatchTxManager"
+                           start-limit="3">
+                <batch:chunk reader="invoiceReader" processor="authorizationItemProcessor"
+                             writer="sendInvoiceItemWriter" commit-interval="100" retry-limit="3">
+                    <batch:retryable-exception-classes>
+                        <batch:include class="org.springframework.dao.OptimisticLockingFailureException" />
+                        <batch:include class="org.springframework.dao.DeadlockLoserDataAccessException" />
+                    </batch:retryable-exception-classes>
+                </batch:chunk>
+            </batch:tasklet>
+        </batch:step>
+	</batch:job>
+	
 	<task:scheduled-tasks>
-	    <task:scheduled ref="invoiceCreatorLauncher" method="launch" cron="0/10 * * * * ?"/>
+	    <task:scheduled ref="authorizationLauncher" method="launch" cron="0/10 * * * * ?"/>
 	</task:scheduled-tasks>
 		
 </beans>

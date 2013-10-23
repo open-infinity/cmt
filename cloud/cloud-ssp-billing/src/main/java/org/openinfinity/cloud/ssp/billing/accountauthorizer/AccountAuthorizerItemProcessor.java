@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.openinfinity.cloud.ssp.billing.authorization;
+package org.openinfinity.cloud.ssp.billing.accountauthorizer;
 
 import org.apache.log4j.Logger;
 import org.openinfinity.cloud.domain.ssp.Account;
@@ -31,8 +31,8 @@ import org.springframework.stereotype.Component;
  * @since 1.3.0
  */
 @Component("authorizationItemProcessor")
-public class AuthorizationItemProcessor implements ItemProcessor<Account, Account> {
-	private static final Logger LOG = Logger.getLogger(AuthorizationItemProcessor.class.getName());
+public class AccountAuthorizerItemProcessor implements ItemProcessor<Account, Account> {
+	private static final Logger LOG = Logger.getLogger(AccountAuthorizerItemProcessor.class.getName());
 
 			
 	@Autowired

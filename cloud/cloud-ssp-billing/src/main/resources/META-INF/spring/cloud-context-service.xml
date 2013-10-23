@@ -10,8 +10,11 @@
 
 
 	<context:component-scan base-package="org.openinfinity.cloud.service.administrator">
-	        <context:exclude-filter type="regex" expression="org.openinfinity.cloud.service.administrator.ClusterService.*" /> 
+            <!--
+	        <context:exclude-filter type="regex" expression="org.openinfinity.cloud.service.administrator.ClusterService.*" />
+	         -->
     </context:component-scan>
+    <context:component-scan base-package="org.openinfinity.cloud.service.scaling"/>
     <context:component-scan base-package="org.openinfinity.cloud.service.usage"/>
     <context:component-scan base-package="org.openinfinity.cloud.service.ssp"/>
 

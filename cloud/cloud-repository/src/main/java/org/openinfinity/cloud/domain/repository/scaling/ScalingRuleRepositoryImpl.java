@@ -15,16 +15,8 @@
  */
 package org.openinfinity.cloud.domain.repository.scaling;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.sql.DataSource;
-
 import org.apache.log4j.Logger;
+import org.openinfinity.cloud.domain.ScalingRule;
 import org.openinfinity.core.annotation.AuditTrail;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -35,8 +27,14 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.Assert;
-import org.openinfinity.cloud.domain.Cluster;
-import org.openinfinity.cloud.domain.ScalingRule;
+
+import javax.sql.DataSource;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Repository interface implementation of the scaling rules for storing cluster specific rules.
@@ -132,7 +130,7 @@ public class ScalingRuleRepositoryImpl implements ScalingRuleRepository {
 	private DataSource dataSource;
 
 	@Autowired
-	public ScalingRuleRepositoryImpl(DataSource dataSource) {
+	public ScalingRuleRepositoryImpl(@Qualifier("cloudDataSource") DataSource dataSource) {
 		Assert.notNull(dataSource, "Please define datasource for scaling rule repository.");
 		this.jdbcTemplate = new JdbcTemplate(dataSource);
 	}

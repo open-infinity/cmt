@@ -1,11 +1,11 @@
-package org.openinfinity.cloud.ssp.billing.authorization;
+package org.openinfinity.cloud.ssp.billing.invoicecreator;
 
 import org.apache.commons.daemon.Daemon;
 import org.apache.commons.daemon.DaemonContext;
 import org.apache.commons.daemon.DaemonInitException;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-public class AuthorizationApplication implements Daemon {
+public class InvoiceCreatorApplication implements Daemon {
     ClassPathXmlApplicationContext spring = null;
     
     @Override
