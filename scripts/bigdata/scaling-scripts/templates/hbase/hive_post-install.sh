@@ -23,7 +23,7 @@
 # @author Timo Saarinen
 #
 
-# Hive-metaserver have to be started as hdfs user instead of hive
+# Hive-metaserver have to be started as hdfs user instead of hive (workaround)
 # https://groups.google.com/a/cloudera.org/forum/#!msg/cdh-user/Zs4X2AcMqRQ/QCpn5VsCskAJ
 sed -i 's/SVC_USER="hive"/SVC_USER="hdfs"/g' /etc/init.d/hive-server2 
 chgrp -R hdfs /var/run/hive && chmod -R g+w /var/run/hive
