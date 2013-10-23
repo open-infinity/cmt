@@ -80,7 +80,9 @@ public class InvoiceCreatorItemWriter implements ItemWriter<InvoiceCreatorDataCo
             Map<Integer, BigInteger> uptimePerMachine = usagePeriod.getUptimePerMachine();
             Assert.notNull(uptimePerMachine);
             for (Map.Entry<Integer, BigInteger> entry : uptimePerMachine.entrySet()) {
-				Integer machineId = entry.getKey();
+                LOG.debug("invoice id:" + invoice.getId());
+
+                Integer machineId = entry.getKey();
                 Machine machine = machineService.getMachine(machineId);
                 Cluster cluster = clusterService.getCluster(machine.getClusterId());
                 invoiceItemService.create(new InvoiceItem(invoice.getId(), machineId, machine.getClusterId(), entry.getValue(), cluster.getMachineType()));
