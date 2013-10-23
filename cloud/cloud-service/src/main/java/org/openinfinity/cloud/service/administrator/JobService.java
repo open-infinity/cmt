@@ -36,5 +36,7 @@ import org.openinfinity.cloud.domain.Job;
 	void setEndTime(int id);
 	
 	void updateStatus(int id, int status);
+
+    void deleteAll();
 	
 }

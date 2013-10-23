@@ -124,7 +124,12 @@ public class JobRepositoryJdbcImpl implements JobRepository {
 		Job job = DataAccessUtils.singleResult(jobs);		
 		return job;
 	}
-	
+
+    @AuditTrail
+    public void deleteAll() {
+        jdbcTemplate.update("delete from job_tbl");
+    }
+
 	@AuditTrail
 	public int addJob(Job job) {
 		SimpleJdbcInsert insert = new SimpleJdbcInsert(dataSource).withTableName("job_tbl").usingGeneratedKeyColumns("job_id");

@@ -39,5 +39,6 @@ public interface JobRepository {
 	Job getJob(int jobId);
 	int addJob(Job job);
 	List<Job> getJobsForInstance(int instanceId);
-	
+    void deleteAll();
+
 }

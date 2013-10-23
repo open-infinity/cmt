@@ -17,14 +17,17 @@
 package org.openinfinity.cloud.autoscaler.test;
 
 import java.sql.Timestamp;
+import java.util.Collection;
 
 import javax.sql.DataSource;
 
 import junit.framework.Assert;
 
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.openinfinity.cloud.domain.Job;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.test.JobLauncherTestUtils;
@@ -54,15 +57,9 @@ import org.openinfinity.cloud.service.scaling.ScalingRuleService;
 @ContextConfiguration(locations={"classpath*:META-INF/spring/t1-context.xml"})
 @RunWith(SpringJUnit4ClassRunner.class)
 public class ScheduledScalerIntegrationTest {
-	private static final int CLUSTER_ID = 1;    
-	private static final String MOCK_SERVER_PATH = "src/test/python/mock-rrd-server.py";
-	private static final int AUTOSCALER_PERIOD_MS = 10000;
-	private static final String URL_LOAD_LOW = "http://127.0.0.1:8181/test/load/low";
-	private static final String URL_LOAD_HIGH = "http://127.0.0.1:8181/test/load/high";
-    private static final String URL_LOAD_MEDIUM = "http://127.0.0.1:8181/test/load/medium";
-    private static final int JOB_UNDEFINED = -1;
-    
-   	private static int jobId = -1;
+
+	private final int CLUSTER_ID = 1;
+    private final int JOB_ID = 0;
 
     @Autowired
     private JobLauncherTestUtils jobLauncherTestUtils;
@@ -83,6 +80,11 @@ public class ScheduledScalerIntegrationTest {
     @Qualifier("jobService")
     JobService jobService;
 
+    @Before
+    public void clearDatabases(){
+        jobService.deleteAll();
+    }
+
 	@Test
 	public void scaleOut() throws Exception {
         long now = System.currentTimeMillis();
@@ -96,7 +98,7 @@ public class ScheduledScalerIntegrationTest {
 		ScalingRule scalingRule = scalingRuleService.getRule(CLUSTER_ID);
 		Assert.assertEquals(2, scalingRule.getClusterSizeOriginal());
 		Assert.assertEquals(2, scalingRule.getScheduledScalingState());
-		Assert.assertEquals("1,5", jobService.getJob(++jobId).getServices());
+		Assert.assertEquals("1,5", jobService.getJob(getJobId()).getServices());
 	}
 	
 	@Test
@@ -110,10 +112,19 @@ public class ScheduledScalerIntegrationTest {
 	    JobExecution jobExecution = jobLauncherTestUtils.launchJob();
         Assert.assertEquals(jobExecution.getStatus(), BatchStatus.COMPLETED);
 	
-        ScalingRule scalingRule = scalingRuleService.getRule(CLUSTER_ID);
 		Assert.assertEquals(2, scalingRuleService.getRule(CLUSTER_ID).getScheduledScalingState());
-        Assert.assertEquals("1,1", jobService.getJob(++jobId).getServices()); 
-	}
+        Assert.assertEquals("1,1", jobService.getJob(getJobId()).getServices());
+
+    }
+
+    private int getJobId(){
+        int jobId = -1;
+        Collection<Job> jobs = jobService.getJobs(1,1);
+        for (Job j : jobs){
+            jobId =  j.getJobId();
+        }
+        return jobId;
+    }
 	
 }
 

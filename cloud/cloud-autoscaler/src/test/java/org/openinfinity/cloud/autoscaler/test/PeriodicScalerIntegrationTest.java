@@ -66,6 +66,7 @@ public class PeriodicScalerIntegrationTest {
 
 	private static final int CLUSTER_ID = 1;    
 	private static final int JOB_ID = 0;
+
 	private static final String MOCK_SERVER_PATH = "src/test/python/mock-rrd-server.py";
 	private static final int AUTOSCALER_PERIOD_MS = 10000;
 	private static final String URL_LOAD_LOW = "http://127.0.0.1:8181/test/load/low";

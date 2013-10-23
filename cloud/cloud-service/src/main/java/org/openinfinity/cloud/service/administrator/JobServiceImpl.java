@@ -56,5 +56,9 @@ public class JobServiceImpl implements JobService {
 	public Collection<Job> getJobs(int status, int limit) {
 		return jobRepository.getJobs(status, limit);
 	}
-	
+
+    @Log
+    public void deleteAll() {
+        jobRepository.deleteAll();
+    }
 }
