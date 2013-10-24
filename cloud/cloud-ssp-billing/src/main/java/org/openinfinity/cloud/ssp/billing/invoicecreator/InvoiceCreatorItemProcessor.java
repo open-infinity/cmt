@@ -17,10 +17,14 @@
 package org.openinfinity.cloud.ssp.billing.invoicecreator;
 
 import org.apache.log4j.Logger;
+import org.openinfinity.cloud.domain.Cluster;
+import org.openinfinity.cloud.domain.Machine;
 import org.openinfinity.cloud.domain.UsagePeriod;
 import org.openinfinity.cloud.domain.ssp.Account;
 import org.openinfinity.cloud.domain.ssp.Invoice;
-import org.openinfinity.cloud.service.administrator.InstanceService;
+import org.openinfinity.cloud.domain.ssp.InvoiceItem;
+import org.openinfinity.cloud.service.administrator.ClusterService;
+import org.openinfinity.cloud.service.administrator.MachineService;
 import org.openinfinity.cloud.service.ssp.InvoiceService;
 import org.openinfinity.cloud.service.usage.UsageService;
 import org.openinfinity.core.exception.SystemException;
@@ -28,8 +32,13 @@ import org.openinfinity.core.util.ExceptionUtil;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 
+import java.math.BigInteger;
+import java.sql.Timestamp;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Map;
 
 /**
  * @author Vedran Bartonicek
@@ -37,40 +46,51 @@ import java.util.Date;
  * @since 1.3.0
  */
 @Component("invoiceCreatorItemProcessor")
-public class InvoiceCreatorItemProcessor implements ItemProcessor<Account, InvoiceCreatorDataContainer> {
+public class InvoiceCreatorItemProcessor implements ItemProcessor<Account, InvoiceAggregator> {
 	private static final Logger LOG = Logger.getLogger(InvoiceCreatorItemProcessor.class.getName());
 
-			
-	@Autowired
-	InstanceService instanceService;
-	
 	@Autowired
 	UsageService usageService;
 
 	@Autowired
 	InvoiceService invoiceService;
 
+    @Autowired
+    MachineService machineService;
+
+    @Autowired
+    ClusterService clusterService;
+
 	@Override
-	public InvoiceCreatorDataContainer process(Account account) throws Exception {
+	public InvoiceAggregator process(Account account) throws Exception {
 		try {
-			LOG.debug("Processing account id:" + account.getOrganizationId());
-						
+			LOG.debug("ENTER InvoiceCreatorItemProcessor::process() account id:" + account.getOrganizationId());
+
+            HashSet<InvoiceItem> invoiceItems = new HashSet<InvoiceItem>();
 			Invoice lastInvoice = invoiceService.loadLast(account.getId());
             UsagePeriod usagePeriod = usageService.loadUsagePeriodPerMachine(account.getOrganizationId().intValue(), lastInvoice.getPeriodTo(), new Date());
-            InvoiceCreatorDataContainer invoiceDataContainer = new InvoiceCreatorDataContainer(usagePeriod, account);
-            return invoiceDataContainer;
 
-			/*
-			for (UsageHour usageHour : usagePeriod.getUsageHours()){
-				LOG.debug("usage hour time:" + usageHour.getTimeStamp());
-				LOG.debug("usage hour state:" + usageHour.getVirtualMachineState());
-			}
-			LOG.debug("startTime:" + startTime.getTime() + " " + startTime);
-			LOG.debug("endTime:" + endTime.getTime() + " " + endTime);
-			LOG.debug("uptime:" + usagePeriod.getUptime());
-			LOG.debug("downtime:" + usagePeriod.getDowntime());
-			*/
-			
+            LOG.debug("accountId:" + account.getId());
+            LOG.debug("usagePeriod start:" + usagePeriod.getStartTime());
+            LOG.debug("usagePeriod end:" + usagePeriod.getEndTime());
+
+            Invoice invoice = new Invoice(account.getId(),
+                    new Timestamp(usagePeriod.getStartTime().getTime()),
+                    new Timestamp(usagePeriod.getEndTime().getTime()),
+                    null,
+                    Invoice.STATE_NEW);
+
+            Map<Integer, Long> uptimePerMachine = usagePeriod.getUptimePerMachine();
+            Assert.notNull(uptimePerMachine);
+
+            for (Map.Entry<Integer, Long> entry : uptimePerMachine.entrySet()) {
+                Integer machineId = entry.getKey();
+                Machine machine = machineService.getMachine(machineId);
+                Cluster cluster = clusterService.getCluster(machine.getClusterId());
+                invoiceItems.add(new InvoiceItem(invoice.getId(), machineId, machine.getClusterId(), entry.getValue(), cluster.getMachineType()));
+            }
+            LOG.debug("write EXIT");
+            return new InvoiceAggregator(invoice, invoiceItems);
 		}
 		catch(SystemException e){
 		    ExceptionUtil.throwBusinessViolationException(e.getMessage(), e);

@@ -28,7 +28,7 @@ CREATE TABLE `invoice_item` (
   `invoice_id` int(11),
   `machine_id` int(11),
   `cluster_id` int(11),
-  `machine_uptime` DATETIME DEFAULT NULL,
+  `machine_uptime` bigint(19) DEFAULT NULL,
   `machine_type` int(11),
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;

@@ -50,12 +50,12 @@ public class InvoiceItem {
     private Integer clusterId;
 	
 	@NotScript @NotNull @NonNull
-	private BigInteger machineUptime;
+	private Long machineUptime;
 
     @NotScript @NotNull @NonNull
     private Integer machineType;
 
-    public InvoiceItem(BigInteger invoiceId, Integer machineId, Integer clusterId, BigInteger machineUptime, Integer machineType) {
+    public InvoiceItem(BigInteger invoiceId, Integer machineId, Integer clusterId, Long machineUptime, Integer machineType) {
         this.invoiceId = invoiceId;
         this.machineId = machineId;
         this.clusterId = clusterId;

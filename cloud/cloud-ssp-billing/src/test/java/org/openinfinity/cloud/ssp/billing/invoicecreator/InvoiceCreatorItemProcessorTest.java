@@ -24,20 +24,15 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.Spy;
-import org.openinfinity.cloud.domain.Cluster;
-import org.openinfinity.cloud.domain.Instance;
 import org.openinfinity.cloud.domain.ssp.Account;
 import org.openinfinity.cloud.service.administrator.ClusterService;
 import org.openinfinity.cloud.service.administrator.InstanceService;
-import org.openinfinity.cloud.service.scaling.ScalingRuleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.math.BigInteger;
 
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -56,10 +51,6 @@ public class InvoiceCreatorItemProcessorTest {
     @Autowired
     InvoiceCreatorItemProcessor itemProcessor;
 
-    @Autowired
-    @Spy
-    ScalingRuleService scalingRuleService;
-
     @Mock
     ClusterService mockClusterService;
 
@@ -77,12 +68,19 @@ public class InvoiceCreatorItemProcessorTest {
 
     @Test
     @Ignore
-    public void PeriodFromInWindowAndRequiredScalingOutTest() throws Exception {
+    public void simpleWriterTest() throws Exception {
+
+        //insert into account (organization_id, name, state)
+        //values(10687, 'test account', 1);
+
         when(mockAccount.getId()).thenReturn(BigInteger.valueOf(1));
-        when(mockAccount.getName()).thenReturn("test_account");
-        when(mockAccount.getOrganizationId()).thenReturn(BigInteger.valueOf(1));
+        when(mockAccount.getName()).thenReturn("test account");
+        when(mockAccount.getOrganizationId()).thenReturn(BigInteger.valueOf(10687));
         when(mockAccount.getState()).thenReturn(1);
 
+        Assert.assertNotNull(itemProcessor.process(mockAccount));
+
+        /*
         Cluster cluster = new Cluster();
         cluster.setInstanceId(1);
         cluster.setNumberOfMachines(10);
@@ -95,6 +93,7 @@ public class InvoiceCreatorItemProcessorTest {
 
         Assert.assertNotNull(itemProcessor.process(mockAccount));
         verify(scalingRuleService).storeScalingOutParameters(10,1);
+        */
     }
 
 }

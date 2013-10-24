@@ -16,7 +16,6 @@
 package org.openinfinity.cloud.domain;
 
 import java.lang.Integer;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -55,11 +54,11 @@ public class UsagePeriod {
 
 	private Collection<UsageHour> usageHours = Collections.checkedCollection(new ArrayList<UsageHour>(), UsageHour.class);
 
-	Map<Integer, List<UsageHour>> usageHoursPerMachine;
+	private Map<Integer, List<UsageHour>> usageHoursPerMachine;
 
-	Map<Integer, BigInteger> uptimePerMachine;
+    private Map<Integer, Long> uptimePerMachine;
 
-	Map<Integer, BigInteger> downtimePerMachine;
+    private Map<Integer, Long> downtimePerMachine;
 
 	public void addUsageHour(UsageHour usageHour) {
 		usageHours.add(usageHour);
@@ -76,7 +75,7 @@ public class UsagePeriod {
 		LOGGER.debug("Gathering start time: " + gatheringStartTime);
 		LOGGER.debug("Gathering end time: " + gatheringEndTime);
 		long previousGatheringPointOfTime = 0;
-		usageHoursPerMachine = generateUsageHourTreePerMachineId();
+		generateUsageHourTreePerMachineId();
 		for (Map.Entry<Integer, List<UsageHour>> entry : usageHoursPerMachine.entrySet()) {
 			List<UsageHour> usageHoursList = entry.getValue();
 			boolean firstIndex = false;
@@ -129,8 +128,8 @@ public class UsagePeriod {
         LOGGER.debug("loadUptimeHoursPerMachine ENTER");
 
         //FIXME: Problem with downtime (uptime?)calculations
-        uptimePerMachine = new HashMap<Integer, BigInteger>();
-        downtimePerMachine = new HashMap<Integer, BigInteger>();
+        uptimePerMachine = new HashMap<Integer, Long>();
+        downtimePerMachine = new HashMap<Integer, Long>();
 
 		long gatheringStartTime = startTime.getTime();
 		long gatheringEndTime = endTime.getTime();
@@ -138,9 +137,9 @@ public class UsagePeriod {
 		LOGGER.debug("Gathering end time: " + gatheringEndTime + " " + endTime);
         LOGGER.debug("OrganizationId: " + organizationId);
 
-        long periodTime = gatheringStartTime - gatheringEndTime;
+        long periodTime = gatheringEndTime - gatheringStartTime;
         long previousGatheringPointOfTime = 0;
-		usageHoursPerMachine = generateUsageHourTreePerMachineId();
+        generateUsageHourTreePerMachineId();
 		for (Map.Entry<Integer, List<UsageHour>> entry : usageHoursPerMachine.entrySet()) {
 			List<UsageHour> usageHoursList = entry.getValue();
 			long machineUptime = 0;
@@ -182,8 +181,8 @@ public class UsagePeriod {
 				}
 				System.out.println("Point of time : " + previousGatheringPointOfTime);
 			}
-			uptimePerMachine.put(entry.getKey(), BigInteger.valueOf(machineUptime));
-			downtimePerMachine.put(entry.getKey(), BigInteger.valueOf(machineDowntime));
+			uptimePerMachine.put(entry.getKey(), machineUptime);
+			downtimePerMachine.put(entry.getKey(), machineDowntime);
             LOGGER.debug("Period: " + periodTime);
             LOGGER.debug("MachineId: " + entry.getKey());
 
@@ -203,19 +202,23 @@ public class UsagePeriod {
 		return firstIndex ? gatheringStartTime : (lastIndex ? gatheringEndTime : usageHour.getTimeStamp().getTime());
 	}
 
-	private Map<Integer, List<UsageHour>> generateUsageHourTreePerMachineId() {
-		Map<Integer, List<UsageHour>> usageHoursPerMachine = new HashMap<Integer, List<UsageHour>>();
+	private void generateUsageHourTreePerMachineId() {
+		this.usageHoursPerMachine = new HashMap<Integer, List<UsageHour>>();
+        LOGGER.debug("UsageHours size:" + usageHours.size());
 		for (UsageHour usageHour : usageHours) {
+            LOGGER.debug("MachineID: " + usageHour.getMachineId());
 			int machineId = usageHour.getMachineId();
-			if (usageHoursPerMachine.containsKey(machineId)) {
-				List<UsageHour> usageHours = usageHoursPerMachine.get(machineId);
-				usageHours.add(usageHour);
+			if (this.usageHoursPerMachine.containsKey(machineId)) {
+				List<UsageHour> usageHours = this.usageHoursPerMachine.get(machineId);
+                LOGGER.debug("Adding usage hour");
+                usageHours.add(usageHour);
 			} else {
-				List<UsageHour> usageHourList = new ArrayList<UsageHour>();
+                LOGGER.debug("new usage hour");
+                List<UsageHour> usageHourList = new ArrayList<UsageHour>();
 				usageHourList.add(usageHour);
-				usageHoursPerMachine.put(machineId, usageHourList);
+				this.usageHoursPerMachine.put(machineId, usageHourList);
 			}
 		}
-		return usageHoursPerMachine;
+        LOGGER.debug("usageHoursPerMachine size:" + usageHoursPerMachine.size());
 	}
 }

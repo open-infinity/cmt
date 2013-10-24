@@ -80,7 +80,7 @@ public class InvoiceItemRepositoryJdbcImpl implements InvoiceItemRepository{
                 ps.setInt(1, invoiceItem.getInvoiceId().intValue());
                 ps.setInt(2, invoiceItem.getMachineId());
                 ps.setInt(3, invoiceItem.getClusterId());
-                ps.setInt(4, invoiceItem.getMachineUptime().intValue());
+                ps.setLong(4, invoiceItem.getMachineUptime());
                 ps.setInt(5, invoiceItem.getMachineType());
                 }
             }
@@ -106,7 +106,7 @@ public class InvoiceItemRepositoryJdbcImpl implements InvoiceItemRepository{
             invoiceItem.setInvoiceId(BigInteger.valueOf(rs.getInt("invoice_id")));
             invoiceItem.setMachineId(rs.getInt("machine_id"));
             invoiceItem.setClusterId(rs.getInt("cluster_id"));
-            invoiceItem.setMachineUptime(BigInteger.valueOf(rs.getInt("machine_uptime")));
+            invoiceItem.setMachineUptime(rs.getLong("machine_uptime"));
             invoiceItem.setMachineType(rs.getInt("machine_type"));
 
             return invoiceItem;

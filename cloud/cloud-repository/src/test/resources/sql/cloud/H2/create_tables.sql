@@ -130,6 +130,9 @@ CREATE TABLE `machine_tbl` (
   `machine_configured` int(11) DEFAULT NULL,
   `machine_last_update` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `machine_cloud_type` int(11) DEFAULT NULL,
+  `machine_extra_ebs_volume_id` varchar(20) DEFAULT NULL,
+  `machine_extra_ebs_volume_device` varchar(20) DEFAULT NULL,
+  `machine_extra_ebs_volume_size` int(11) DEFAULT NULL,
   PRIMARY KEY (`machine_id`)
 );
 

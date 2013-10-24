@@ -15,15 +15,6 @@
  */
 package org.openinfinity.cloud.domain.repository.usage;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-
-import javax.sql.DataSource;
-
 import org.openinfinity.cloud.domain.UsageHour;
 import org.openinfinity.core.annotation.AuditTrail;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +24,14 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.Assert;
+
+import javax.sql.DataSource;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 
 /**
  * JDBC implementation of the usage reporting interface of the virtual machine usage.
@@ -47,7 +46,7 @@ public class UsageHourRepositoryJdbcImpl implements UsageHourRepository {
 	/**
 	 * Represents the SQL script for loading usage hours by organization id and by usage period.
 	 */
-	private static final String LOAD_USAGE_HOURS_PER_PERIOD_AND_BY_ORGANIZATION_SQL = "SELECT * from usage_hours_tbl WHERE organization_id = ? AND UNIX_TIMESTAMP(cur_timestamp) >= ? AND UNIX_TIMESTAMP(cur_timestamp) <= ?";
+	private static final String LOAD_USAGE_HOURS_PER_PERIOD_AND_BY_ORGANIZATION_SQL = "SELECT * from usage_hours_tbl WHERE organization_id = ? AND cur_timestamp >= ? AND cur_timestamp <= ?";
 
 	/**
 	 * Represents the SQL script for storing usage hour information.
