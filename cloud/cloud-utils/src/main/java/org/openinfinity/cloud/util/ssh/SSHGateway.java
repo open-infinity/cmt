@@ -18,6 +18,7 @@ package org.openinfinity.cloud.util.ssh;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -132,6 +133,55 @@ public class SSHGateway {
 		} catch (Throwable throwable) {
 			ExceptionUtil.throwSystemException(throwable);
 		} finally {
+			IOUtil.closeStream(inputStream);
+			IOUtil.closeStream(outputStream);
+			if (channel != null)
+				channel.disconnect();
+			if (session != null)
+				session.disconnect();
+		}
+	}
+	
+	public static void executeRemoteCommandAndStreamOutputToFile(byte[] privateKey, byte[] publicKey, String host, int port, String username, String password, String command, String filename) {
+		InputStream inputStream = null;
+		OutputStream outputStream = null;
+		Session session = null;
+		Channel channel = null;
+		try {
+			// JSC initialization
+			JSch jsch = new JSch();
+			if (privateKey != null) {
+				jsch.addIdentity(username, privateKey, publicKey, password.getBytes());
+			}
+			session = jsch.getSession(username, host, port);
+			if (password != null && password.length() > 0)
+				session.setPassword(password);
+			Properties config = new Properties();
+			config.put("StrictHostKeyChecking", "no");
+			session.setConfig(config);
+			LOGGER.trace("Starting session.");
+			session.connect();
+			LOGGER.trace("Connected to session.");
+			channel = session.openChannel("exec");
+			LOGGER.trace("Starting executing commands to session.");
+
+			// Create the output file
+			FileOutputStream fos = new FileOutputStream(filename);
+			
+			// Run the command
+			LOGGER.trace("Executing command: " + command);
+			((ChannelExec)channel).setCommand(command);
+			outputStream = channel.getOutputStream();
+			inputStream = channel.getInputStream();
+			channel.connect();
+			IOUtil.copyStream(inputStream, fos); // TODO: untested
+			outputStream.flush();
+
+			LOGGER.trace("Execution of commands has been finalized.");
+		} catch (Throwable throwable) {
+			ExceptionUtil.throwSystemException(throwable);
+		} finally {
+			// Cleanup
 			IOUtil.closeStream(inputStream);
 			IOUtil.closeStream(outputStream);
 			if (channel != null)

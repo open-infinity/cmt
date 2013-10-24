@@ -1,7 +1,10 @@
 package org.openinfinity.cloud.application.backup;
 
+import java.util.Date;
+
 import org.apache.log4j.Logger;
 import org.aspectj.weaver.NewConstructorTypeMunger;
+import org.openinfinity.cloud.application.backup.job.InstanceBackupJob;
 import org.quartz.SchedulerException;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -13,9 +16,11 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 public class CloudBackup {
 	private Logger logger = Logger.getLogger(CloudBackup.class);
 	
+	private ClassPathXmlApplicationContext context;
 	private DynamicQuartzSchedulerManager dynamicQuartzSchedulerManager;
 	
 	public CloudBackup(ClassPathXmlApplicationContext context) {
+		this.context = context;
 		dynamicQuartzSchedulerManager = (DynamicQuartzSchedulerManager) context.getBean("dynamicQuartzSchedulerManager");
 		dynamicQuartzSchedulerManager.context = context;
 	}
@@ -32,6 +37,14 @@ public class CloudBackup {
 			
 			// Read instance information from the database
 			// TODO
+			
+			// Local test
+			InstanceBackupJob job = new InstanceBackupJob(context);
+			job.setJobName("test");
+			job.setToasInstanceId(60);
+			job.setHostname("10.33.208.152");
+			job.setUsername("root");
+			dynamicQuartzSchedulerManager.addJob(job.getJobName(), job, "59 " + new Date().getMinutes() + " * * * ?");
 			
 			//dynamicQuartzSchedulerManager.addJob("test", new TestJob(), "*/5 * * * * ?");
 		} catch (SchedulerException e) {

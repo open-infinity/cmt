@@ -5,6 +5,19 @@ package org.openinfinity.cloud.application.backup.job;
  * 
  * @author Timo Saarinen
  */
-public class CipherCommand {
+public class CipherCommand implements Command {
+	private InstanceJob job;
+	
+	public CipherCommand(InstanceJob job) {
+		this.job = job;
+	}
+	
+	public void execute() throws Exception {
+		// TODO
+	}
+	
+	public void undo() throws Exception {
+		// TODO
+	}
 
 }
