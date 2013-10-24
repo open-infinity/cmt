@@ -1,3 +1,5 @@
+DROP TABLE IF EXISTS `DEPLOYMENT`;
+
 DROP TABLE IF EXISTS `account`;
 
 CREATE TABLE `account` (
@@ -6,7 +8,7 @@ CREATE TABLE `account` (
   `name` varchar(32),
   `state` int(11),
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+);
 
 
 DROP TABLE IF EXISTS `invoice`;
@@ -19,7 +21,7 @@ CREATE TABLE `invoice` (
   `sent_time` DATETIME DEFAULT NULL,
   `state` int(11),
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+);
 
 DROP TABLE IF EXISTS `invoice_item`;
 
@@ -31,4 +33,4 @@ CREATE TABLE `invoice_item` (
   `machine_uptime` bigint(19) DEFAULT NULL,
   `machine_type` int(11),
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+);

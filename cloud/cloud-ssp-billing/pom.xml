@@ -11,6 +11,11 @@
 	</parent>
 	<artifactId>cloud-ssp-billing</artifactId>
 	<packaging>jar</packaging>
+    <properties>
+        <sql.script.path>${project.parent.basedir}/cloud-repository/src/test/resources/sql</sql.script.path>
+        <ved>ooooooooo</ved>
+
+    </properties>
 	<name>cloud-ssp-billing</name>
 	<description>
 		<![CDATA[

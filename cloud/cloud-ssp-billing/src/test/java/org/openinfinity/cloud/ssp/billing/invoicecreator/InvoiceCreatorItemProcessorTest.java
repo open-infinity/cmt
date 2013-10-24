@@ -17,83 +17,54 @@
 package org.openinfinity.cloud.ssp.billing.invoicecreator;
 
 import junit.framework.Assert;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.openinfinity.cloud.domain.ssp.Account;
-import org.openinfinity.cloud.service.administrator.ClusterService;
-import org.openinfinity.cloud.service.administrator.InstanceService;
+import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.math.BigInteger;
-
-import static org.mockito.Mockito.when;
-
 /**
- * Unit tests for Scheduled scaler.
+ * integration tests for SSP billing Invoice creator.
  *
  * @author Vedran Bartonicek
  * @version 1.3.0
  * @since 1.3.0
  */
-
-@ContextConfiguration(locations={"classpath*:META-INF/spring/cloud-autoscaler-test-unit-context.xml"})
+//, classpath*:META-INF/spring/cloud-ssp-invoice-context.xml"
+@ContextConfiguration(locations={"classpath*:META-INF/spring/invoicecreator-integration-test-context.xml"})
 @RunWith(SpringJUnit4ClassRunner.class)
 public class InvoiceCreatorItemProcessorTest {
 
-    @InjectMocks
     @Autowired
-    InvoiceCreatorItemProcessor itemProcessor;
+    private JobLauncherTestUtils jobLauncherTestUtils;
 
-    @Mock
-    ClusterService mockClusterService;
-
-    @Mock
-    InstanceService mockInstanceService;
-
-    @Mock
-    Account mockAccount;
 
     @Before
-    public void initMocks() {
-        MockitoAnnotations.initMocks(this);
+    public void setup() {
     }
 
+    @After
+    public void teardown() {
+    }
 
     @Test
     @Ignore
-    public void simpleWriterTest() throws Exception {
+    public void simpleItemWriterTest() throws Exception {
 
-        //insert into account (organization_id, name, state)
-        //values(10687, 'test account', 1);
 
-        when(mockAccount.getId()).thenReturn(BigInteger.valueOf(1));
-        when(mockAccount.getName()).thenReturn("test account");
-        when(mockAccount.getOrganizationId()).thenReturn(BigInteger.valueOf(10687));
-        when(mockAccount.getState()).thenReturn(1);
+        JobExecution jobExecution = jobLauncherTestUtils.launchJob();
+        Assert.assertEquals(jobExecution.getStatus(), BatchStatus.COMPLETED);
+       //ScalingRule scalingRule = scalingRuleService.getRule(CLUSTER_ID);
+       // Assert.assertEquals(2, scalingRule.getClusterSizeOriginal());
+       // Assert.assertEquals(2, scalingRule.getScheduledScalingState());
+       // Assert.assertEquals("1,5", jobService.getJob(getJobId()).getServices());
 
-        Assert.assertNotNull(itemProcessor.process(mockAccount));
-
-        /*
-        Cluster cluster = new Cluster();
-        cluster.setInstanceId(1);
-        cluster.setNumberOfMachines(10);
-        when(mockClusterService.getCluster(1)).thenReturn(cluster);
-
-        Instance instance = new Instance();
-        instance.setCloudType(1);
-        instance.setZone("whatever");
-        when(mockInstanceService.getInstance(1)).thenReturn(instance);
-
-        Assert.assertNotNull(itemProcessor.process(mockAccount));
-        verify(scalingRuleService).storeScalingOutParameters(10,1);
-        */
     }
 
 }

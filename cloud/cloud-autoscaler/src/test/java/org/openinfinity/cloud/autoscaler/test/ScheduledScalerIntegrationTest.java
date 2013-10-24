@@ -23,7 +23,6 @@ import org.junit.runner.RunWith;
 import org.openinfinity.cloud.autoscaler.test.util.DatabaseUtils;
 import org.openinfinity.cloud.domain.Job;
 import org.openinfinity.cloud.domain.ScalingRule;
-import org.openinfinity.cloud.service.administrator.ClusterService;
 import org.openinfinity.cloud.service.administrator.JobService;
 import org.openinfinity.cloud.service.scaling.ScalingRuleService;
 import org.springframework.batch.core.BatchStatus;
@@ -55,7 +54,6 @@ import java.util.Collection;
 public class ScheduledScalerIntegrationTest {
 
 	private final int CLUSTER_ID = 1;
-    private final int JOB_ID = 0;
 
     @Autowired
     private JobLauncherTestUtils jobLauncherTestUtils;
@@ -63,11 +61,7 @@ public class ScheduledScalerIntegrationTest {
 	@Autowired
 	@Qualifier("cloudDataSource")
 	DataSource dataSource;
-	
-	@Autowired
-	@Qualifier("clusterService")
-	ClusterService clusterService;
-	
+
 	@Autowired
     @Qualifier("scalingRuleService")
 	ScalingRuleService scalingRuleService;
