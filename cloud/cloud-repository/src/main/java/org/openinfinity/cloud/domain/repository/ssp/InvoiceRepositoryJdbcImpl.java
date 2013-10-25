@@ -61,14 +61,14 @@ public class InvoiceRepositoryJdbcImpl implements InvoiceRepository{
     public Invoice create(final Invoice invoice){
         SimpleJdbcInsert insert = new SimpleJdbcInsert(dataSource).withTableName("invoice").usingGeneratedKeyColumns("id");
         Map<String,Object> parameters = new HashMap<String,Object>();
-        parameters.put("account_id", invoice.getAccountId());
+        parameters.put("account_id", invoice.getAccountId().intValue());
         parameters.put("period_from", invoice.getPeriodFrom());
         parameters.put("period_to", invoice.getPeriodTo());
         parameters.put("sent_time", invoice.getSentTime());
         parameters.put("state", invoice.getState());
-        LOG.info(parameters.toString());
+        LOG.debug(parameters.toString());
         Number id = insert.executeAndReturnKey(parameters);
-        invoice.setId(BigInteger.valueOf((Long)id));
+        invoice.setId(BigInteger.valueOf(id.longValue()));
         return invoice;
     }
 
@@ -94,15 +94,17 @@ public class InvoiceRepositoryJdbcImpl implements InvoiceRepository{
 
     @AuditTrail
     public Invoice load(BigInteger id){
-        return this.jdbcTemplate.queryForObject("select * from invoice where id = ?", new Object[] { id }, new InvoiceRowMapper());
+        return this.jdbcTemplate.queryForObject("select * from invoice where id = ?", new Object[] { id.intValue() }, new InvoiceRowMapper());
     }
 
     @AuditTrail
-    public void delete (Invoice invoice){}
+    public void delete (Invoice invoice){
+        this.jdbcTemplate.update("delete from invoice where id = ?", invoice.getId().intValue());
+    }
 
     @AuditTrail
     public Invoice loadLast(BigInteger accountId){
-        return this.jdbcTemplate.queryForObject("select * from invoice where period_to = (select max(period_to) from invoice) limit 1", new InvoiceRowMapper());
+        return this.jdbcTemplate.queryForObject("select * from invoice where account_id = ? and period_to = (select max(period_to) from invoice) limit 1", new Object[] { accountId.intValue() }, new InvoiceRowMapper());
     }
 
     private static final class InvoiceRowMapper implements RowMapper<Invoice> {

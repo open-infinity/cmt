@@ -16,18 +16,26 @@
 
 package org.openinfinity.cloud.ssp.billing.invoicecreator;
 
-import junit.framework.Assert;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.openinfinity.cloud.domain.ssp.Invoice;
+import org.openinfinity.cloud.domain.ssp.InvoiceItem;
+import org.openinfinity.cloud.service.ssp.InvoiceItemService;
+import org.openinfinity.cloud.service.ssp.InvoiceService;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import java.math.BigInteger;
+import java.util.Collection;
 
 /**
  * integration tests for SSP billing Invoice creator.
@@ -41,9 +49,19 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 public class InvoiceCreatorItemProcessorTest {
 
+    final int ACCOUNT_ID = 1;
     @Autowired
     private JobLauncherTestUtils jobLauncherTestUtils;
 
+    @Autowired
+    private InvoiceService invoiceService;
+
+    @Autowired
+    private InvoiceItemService invoiceItemService;
+
+    @Autowired
+    @Qualifier("testSspJdbcTemplate")
+    private JdbcTemplate jdbcTemplate;
 
     @Before
     public void setup() {
@@ -51,21 +69,24 @@ public class InvoiceCreatorItemProcessorTest {
 
     @After
     public void teardown() {
+        jdbcTemplate.update("delete from invoice where id > 2");
+        jdbcTemplate.update("delete from invoice_item");
     }
 
     @Test
-    @Ignore
-    public void simpleItemWriterTest() throws Exception {
-
-
+    public void simpleInvoiceCreationTest() throws Exception {
+        Invoice invoice = invoiceService.loadLast(BigInteger.valueOf(ACCOUNT_ID));
+        BigInteger invoiceId = invoice.getId();
         JobExecution jobExecution = jobLauncherTestUtils.launchJob();
-        Assert.assertEquals(jobExecution.getStatus(), BatchStatus.COMPLETED);
-       //ScalingRule scalingRule = scalingRuleService.getRule(CLUSTER_ID);
-       // Assert.assertEquals(2, scalingRule.getClusterSizeOriginal());
-       // Assert.assertEquals(2, scalingRule.getScheduledScalingState());
-       // Assert.assertEquals("1,5", jobService.getJob(getJobId()).getServices());
+        Assert.assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
+        Invoice invoiceNew = invoiceService.loadLast(BigInteger.valueOf(ACCOUNT_ID));
+        Assert.assertEquals(BigInteger.valueOf(invoiceId.intValue() + 1), invoiceNew.getId());
 
+        Collection<InvoiceItem> invoiceItems = invoiceItemService.loadAll();
+        Assert.assertEquals(1, invoiceItems.size());
+        for (InvoiceItem ii : invoiceItems){
+            Assert.assertEquals(invoiceId.intValue() + 1, ii.getInvoiceId().intValue());
+        }
     }
-
 }
 

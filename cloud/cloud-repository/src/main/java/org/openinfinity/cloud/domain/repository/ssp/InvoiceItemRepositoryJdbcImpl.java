@@ -61,14 +61,14 @@ public class InvoiceItemRepositoryJdbcImpl implements InvoiceItemRepository{
         public InvoiceItem create(final InvoiceItem invoiceItem){
             SimpleJdbcInsert insert = new SimpleJdbcInsert(dataSource).withTableName("invoice_item").usingGeneratedKeyColumns("id");
             Map<String,Object> parameters = new HashMap<String,Object>();
-            parameters.put("invoice_id", invoiceItem.getInvoiceId());
+            parameters.put("invoice_id", invoiceItem.getInvoiceId().intValue());
             parameters.put("machine_id", invoiceItem.getMachineId());
             parameters.put("cluster_id", invoiceItem.getClusterId());
             parameters.put("machine_uptime", invoiceItem.getMachineUptime());
             parameters.put("machine_type", invoiceItem.getMachineType());
             LOG.info(parameters.toString());
             Number id = insert.executeAndReturnKey(parameters);
-            invoiceItem.setId(BigInteger.valueOf((Long)id));
+            invoiceItem.setId(BigInteger.valueOf(id.longValue()));
             return invoiceItem;
         }
 
@@ -94,11 +94,13 @@ public class InvoiceItemRepositoryJdbcImpl implements InvoiceItemRepository{
 
     @AuditTrail
     public InvoiceItem load(BigInteger id){
-        return this.jdbcTemplate.queryForObject("select * from invoice_item where id = ?", new Object[] { id }, new InvoiceItemRowMapper());
+        return this.jdbcTemplate.queryForObject("select * from invoice_item where id = ?", new Object[] { id.intValue() }, new InvoiceItemRowMapper());
     }
 
     @AuditTrail
-    public void delete (InvoiceItem invoiceItem){}
+    public void delete (InvoiceItem invoiceItem){
+        this.jdbcTemplate.update("delete from invoice_item where id = ?", invoiceItem.getId().intValue());
+    }
 
     private static final class InvoiceItemRowMapper implements RowMapper<InvoiceItem> {
         public InvoiceItem mapRow(ResultSet rs, int rowNumber) throws SQLException {

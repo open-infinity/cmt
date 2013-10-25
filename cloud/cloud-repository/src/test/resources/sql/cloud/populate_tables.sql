@@ -51,8 +51,7 @@ insert into acl_cluster_type_tbl select 'Tieto Finland', id from cluster_type_tb
 insert into acl_machine_type_tbl select 'TOAS', id from machine_type_tbl;
 insert into acl_machine_type_tbl select 'Tieto Finland', id from machine_type_tbl;
 
-insert into usage_hours_tbl values(1, 10687, 1513, 5, 3532, 5, '2013-10-17 10:30:01');
-insert into usage_hours_tbl values(2, 10687, 1513, 5, 3532, 5, '2013-10-18 10:30:01');
+
 
 
 

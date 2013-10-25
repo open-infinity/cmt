@@ -47,8 +47,9 @@ public class InvoiceCreatorItemWriter implements ItemWriter<InvoiceAggregator> {
 
     @Override
 	public void write(List<? extends InvoiceAggregator> items) throws Exception {
+        LOG.debug("write ENTER");
+
         for (InvoiceAggregator invoiceAggregator : items) {
-            LOG.debug("write ENTER");
             Invoice invoice = invoiceService.create(invoiceAggregator.getInvoice());
             for (InvoiceItem invoiceItem : invoiceAggregator.getInvoiceItems()){
                 invoiceItem.setInvoiceId(invoice.getId());

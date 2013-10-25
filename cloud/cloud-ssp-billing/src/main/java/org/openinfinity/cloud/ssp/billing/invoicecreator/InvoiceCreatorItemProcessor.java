@@ -34,7 +34,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
-import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.HashSet;
@@ -64,7 +63,7 @@ public class InvoiceCreatorItemProcessor implements ItemProcessor<Account, Invoi
 	@Override
 	public InvoiceAggregator process(Account account) throws Exception {
 		try {
-			LOG.debug("ENTER InvoiceCreatorItemProcessor::process() account id:" + account.getOrganizationId());
+			LOG.debug("InvoiceCreatorItemProcessor::process() ENTER, account id:" + account.getOrganizationId());
 
             HashSet<InvoiceItem> invoiceItems = new HashSet<InvoiceItem>();
 			Invoice lastInvoice = invoiceService.loadLast(account.getId());
@@ -82,16 +81,21 @@ public class InvoiceCreatorItemProcessor implements ItemProcessor<Account, Invoi
 
             Map<Integer, Long> uptimePerMachine = usagePeriod.getUptimePerMachine();
             Assert.notNull(uptimePerMachine);
+            LOG.debug("almost adding item");
 
             for (Map.Entry<Integer, Long> entry : uptimePerMachine.entrySet()) {
+                LOG.debug("adding item");
+
                 Integer machineId = entry.getKey();
                 Machine machine = machineService.getMachine(machineId);
                 Cluster cluster = clusterService.getCluster(machine.getClusterId());
                 invoiceItems.add(new InvoiceItem(invoice.getId(), machineId, machine.getClusterId(), entry.getValue(), cluster.getMachineType()));
             }
-            LOG.debug("write EXIT");
+            LOG.debug("InvoiceCreatorItemProcessor::process() EXIT");
+
             return new InvoiceAggregator(invoice, invoiceItems);
-		}
+
+        }
 		catch(SystemException e){
 		    ExceptionUtil.throwBusinessViolationException(e.getMessage(), e);
 			return null;

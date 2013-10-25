@@ -78,3 +78,15 @@ insert into configuration_template_organization_tbl values (1, 1);
 insert into configuration_template_organization_tbl values (2, 1);
 insert into configuration_template_organization_tbl values (3, 2);
 insert into configuration_template_organization_tbl values (4, 2);
+
+-- SSP billing test data
+insert into usage_hours_tbl values(1, 10687, 1513, 5, 3532, 5, '2013-10-17 10:30:01');
+insert into usage_hours_tbl values(2, 10687, 1513, 5, 3532, 5, '2013-10-18 10:30:01');
+insert into machine_tbl (machine_id, machine_instance_id, project_id, machine_name, machine_dns_name, machine_key, active,
+machine_username, machine_running, machine_state, machine_cluster_id, machine_private_dns_name, machine_type, machine_configured,
+machine_last_update, machine_cloud_type, machine_extra_ebs_volume_id, machine_extra_ebs_volume_device, machine_extra_ebs_volume_size)
+values(3532, 'machine1', '0', 'BAS platform', '127.0.0.1', '0', '1', 'root', '1', 'running', '1', 'dns', 'loadbalancer',
+'3', '2013-10-01 13:03:47', '1', 'NULL', 'NULL', '0');
+
+insert into cluster_tbl (cluster_id, cluster_type) values(1, '0');
+-- end of SSP billing test data
