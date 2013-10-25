@@ -11,6 +11,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 /**
  * Base POJO class for InstanceBackupJob and InstanceRestoreJob.
  * 
+ * @see Command
  * @author Timo Saarinen
  */
 abstract public class InstanceJob {
@@ -80,18 +81,21 @@ abstract public class InstanceJob {
 			}
 		} catch (Exception e) {
 			// One of the commands failed. Use the finished list to undo the action.
-			logger.warn("Job " + jobName + " failed. Trying undo.");
-			try {
-				Collections.reverse(finished_commands);
-				for (Command cmd : finished_commands) {
-					cmd.undo();
+			if (finished_commands.size() > 0) {
+				logger.error("Job " + jobName + " failed. Trying undo. " + e.getMessage(), e);
+				try {
+					Collections.reverse(finished_commands);
+					for (Command cmd : finished_commands) {
+						cmd.undo();
+					}
+				} catch (Exception ee) {
+					logger.warn("Job " + jobName + " undo failed too! " + ee.getMessage(), ee);
 				}
-			} catch (Exception ee) {
-				logger.warn("Job " + jobName + " undo failed too!", ee);
+			} else {
+				logger.error("Job " + jobName + " failed. " + e.getMessage(), e);
 			}
 			
-			// Throw a new exception
-			throw new RuntimeException("Job execution failed!", e);
+			// It would be pointless to throw anything at this point
 		}
 	}
 

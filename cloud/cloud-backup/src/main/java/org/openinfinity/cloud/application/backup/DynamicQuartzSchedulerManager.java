@@ -8,8 +8,6 @@ import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.scheduling.quartz.CronTriggerBean;
 import org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
@@ -27,8 +25,6 @@ public class DynamicQuartzSchedulerManager {
 
 	private Logger logger = Logger.getLogger(DynamicQuartzSchedulerManager.class);
 	
-	ClassPathXmlApplicationContext context;
-	
 	private Set<String> jobNames = new TreeSet<String>();
 	
 	// Quartz Factory
@@ -40,6 +36,7 @@ public class DynamicQuartzSchedulerManager {
 	 */
 	public void start() throws SchedulerException {
 		assert schedulerFactory != null;
+		logger.trace("starting scheduler");
 		schedulerFactory.getScheduler().start();
 	}
 	
@@ -47,6 +44,7 @@ public class DynamicQuartzSchedulerManager {
 	 * Shutdown the scheduler.
 	 */
 	public void stop() throws SchedulerException {
+		logger.trace("stopping scheduler");
 		schedulerFactory.getScheduler().shutdown();
 	}
 	
@@ -85,6 +83,8 @@ public class DynamicQuartzSchedulerManager {
 		// Add to the schedule
 		schedulerFactory.getScheduler().scheduleJob((JobDetail)jdfb.getObject(), trigger);
 		jobNames.add(jobName);
+		
+		logger.trace("Job " + jobName + " scheduled");
 	}
 
 	/**
@@ -104,7 +104,7 @@ public class DynamicQuartzSchedulerManager {
 	 * Unschedule and delete all jobs.
 	 */
 	public void delteAlljobs() {
-		logger.debug("Deleting all jobs from scheduler");
+		logger.trace("Deleting all jobs from scheduler");
 		for (String job_name : new TreeSet<String>(jobNames)) {
 			try {
 				deleteJob(job_name);

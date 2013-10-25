@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.apache.log4j.Logger;
 import org.openinfinity.cloud.domain.Key;
 import org.openinfinity.cloud.service.administrator.KeyService;
 import org.openinfinity.cloud.util.ssh.SSHGateway;
@@ -14,27 +15,17 @@ import org.openinfinity.cloud.util.ssh.SSHGateway;
  * @author Timo Saarinen
  */
 public class RemoteMachineCommand implements Command {
-
+	private Logger logger = Logger.getLogger(RemoteMachineCommand.class);
+	
 	private InstanceJob job;
-	private Key privateSshKey;
 	
 	public RemoteMachineCommand(InstanceJob job) throws BackupException {
 		this.job = job;
-
-		// Get private key for SSH
-		if (job.getPassword() == null) {
-			if (job.getToasInstanceId() != -1) {
-				KeyService keyService = (KeyService) job.context.getBean("keyService");
-				privateSshKey = keyService.getKey(job.getToasInstanceId());
-			} else {
-				throw new BackupException("No password or TOAS instance id available for SSH");
-			}
-		}
 	}
 	
 	public void execute() throws Exception {
 		// TODO
-		runCommand("ls");;
+		runCommand("date > /tmp/timotestaa");
 	}
 	
 	public void undo() throws Exception {
@@ -42,6 +33,7 @@ public class RemoteMachineCommand implements Command {
 	}
 
 	private void streamCommandToFile() {
+		logger.trace("streamCommandToFile()");
 		// TODO: executeRemoteCommandAndStreamOutputToFile();
 	}
 	
@@ -59,8 +51,22 @@ public class RemoteMachineCommand implements Command {
 	 */
 	private void runCommands(Collection<String> cmd) throws BackupException {
 		try {
+			// Decided authentication method
+			Key private_ssh_key = null;
+			if (job.getPassword() == null) {				
+				if (job.getToasInstanceId() != -1) {
+					private_ssh_key = getPrivateSshKey();
+					if (private_ssh_key == null) {
+						throw new BackupException("KeyService returned null for instance id " + job.getToasInstanceId() + ". Does the instance really exist?");
+					}
+				} else {
+					throw new BackupException("No password or TOAS instance id available for SSH.");
+				}
+			}
+			
+			logger.trace("Executing remote command: " + cmd);
 			SSHGateway.executeRemoteCommands(
-					privateSshKey.getSecret_key().getBytes(), 
+					private_ssh_key.getSecret_key().getBytes(), 
 					(byte[])null, 
 					job.getHostname(), 
 					job.getPort(), 
@@ -68,8 +74,23 @@ public class RemoteMachineCommand implements Command {
 					job.getPassword(), 
 					cmd);
 		} catch (Exception e) {
-			throw new BackupException("Command execution failed:" + cmd, e);
+			throw new BackupException("Remote shell command execution failed:" + e.getMessage(), e);
 		}
 	}
-	
+
+	/**
+	 * Get private SSH key for the current job.
+	 * @return
+	 * @throws BackupException
+	 */
+	private Key getPrivateSshKey() throws BackupException {
+		// Get private key from Key service
+		if (job.getToasInstanceId() != -1) {
+			logger.trace("Getting SSH private key from KeyService");
+			KeyService keyService = (KeyService) job.context.getBean("keyService");
+			return keyService.getKeyByInstanceId(job.getToasInstanceId());
+		} else {
+			return null;
+		}
+	}
 }

@@ -20,10 +20,14 @@
     	classpath:/META-INF/properties/jets3.properties,
     	classpath:/META-INF/properties/repository.properties" />
 
-	<!-- <context:component-scan base-package="org.openinfinity.cloud.domain.repository.deployer"> 
-		</context:component-scan> -->
-
-	<context:component-scan base-package="org.openinfinity.cloud.application.backup" />
+	<context:component-scan base-package="org.openinfinity.cloud">
+		<context:exclude-filter type="regex" expression=".*ClusterTypeRowMapper.*"/>
+		<context:exclude-filter type="regex" expression=".*ScalingRule.*"/>
+		<context:exclude-filter type="regex" expression=".*HealthMonitoring.*"/>
+		<context:exclude-filter type="regex" expression=".*ClusterService.*"/>
+		<context:exclude-filter type="regex" expression=".*ClusterType.*"/>
+		<context:exclude-filter type="regex" expression=".*Machine.*"/>
+	</context:component-scan>
 
 	<bean id="cloudDataSource" destroy-method="close"
 		class="org.apache.commons.dbcp.BasicDataSource">
@@ -35,6 +39,7 @@
 		<property name="maxActive" value="8" />
 		<property name="maxIdle" value="2" />
 	</bean>
+	
 	<bean id="txManager"
 		class="org.springframework.jdbc.datasource.DataSourceTransactionManager"
 		p:dataSource-ref="cloudDataSource" />

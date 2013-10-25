@@ -5,6 +5,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 /**
  * Retrieves backup package from S3 storage, decrypts it and extracts it to virtual machine.
  * 
+ * @see Command
  * @author Timo Saarinen
  */
 public class InstanceRestoreJob extends InstanceJob {

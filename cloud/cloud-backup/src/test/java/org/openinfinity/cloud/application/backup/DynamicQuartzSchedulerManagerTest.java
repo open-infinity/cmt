@@ -32,7 +32,6 @@ public class DynamicQuartzSchedulerManagerTest {
 		
 		// Create scheduler
 		dynamicQuartzSchedulerManager = (DynamicQuartzSchedulerManager) context.getBean("dynamicQuartzSchedulerManager");
-		dynamicQuartzSchedulerManager.context = context;
 		
 		// Start the scheduler
 		dynamicQuartzSchedulerManager.start();

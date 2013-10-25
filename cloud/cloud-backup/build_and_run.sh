@@ -5,7 +5,7 @@ export PATH=$JAVA_HOME/bin:$PATH
 
 CWD=`pwd`
 cd ..
-mvn -pl cloud-backup install || exit 1
+mvn -pl cloud-backup $@ install || exit 1
 cd $CWD
 
 CLASSPATH=$(find "target" -name '*.jar' | xargs echo | tr ' ' ':')

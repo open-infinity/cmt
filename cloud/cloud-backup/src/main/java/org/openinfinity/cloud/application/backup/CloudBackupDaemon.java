@@ -25,14 +25,15 @@ public class CloudBackupDaemon implements Daemon {
 	
 	@Override
 	public void init(DaemonContext arg0) throws DaemonInitException, Exception {
-		logger.debug("Daemon initializing");
+		logger.trace("Daemon initializing");
+		logger.debug("Getting application context");
 		context = new ClassPathXmlApplicationContext("/cloud-backup-context.xml");
 		backup = new CloudBackup(context);
 	}
 
 	@Override
 	public void start() throws Exception {
-		logger.debug("Daemon starting");
+		logger.trace("Daemon starting");
 		if(context != null) {
 			context.start();
 			backup.initialize();
@@ -41,7 +42,7 @@ public class CloudBackupDaemon implements Daemon {
 
 	@Override
 	public void stop() throws Exception {
-		logger.debug("Daemon stopping");
+		logger.trace("Daemon stopping");
 		if(context != null) {
 			backup.cleanup();
 			context.stop();
@@ -50,7 +51,7 @@ public class CloudBackupDaemon implements Daemon {
 
 	@Override
 	public void destroy() {
-		logger.debug("Daemon destroying");
+		logger.trace("Daemon destroying");
 		if(context != null) {
 			backup = null;
 			context.close();

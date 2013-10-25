@@ -22,7 +22,6 @@ public class CloudBackup {
 	public CloudBackup(ClassPathXmlApplicationContext context) {
 		this.context = context;
 		dynamicQuartzSchedulerManager = (DynamicQuartzSchedulerManager) context.getBean("dynamicQuartzSchedulerManager");
-		dynamicQuartzSchedulerManager.context = context;
 	}
 
 	/**
@@ -41,12 +40,15 @@ public class CloudBackup {
 			// Local test
 			InstanceBackupJob job = new InstanceBackupJob(context);
 			job.setJobName("test");
-			job.setToasInstanceId(60);
-			job.setHostname("10.33.208.152");
+			job.setToasInstanceId(981);
+			job.setHostname("10.33.208.10");
 			job.setUsername("root");
-			dynamicQuartzSchedulerManager.addJob(job.getJobName(), job, "59 " + new Date().getMinutes() + " * * * ?");
+			Date d = new Date(System.currentTimeMillis() + 3000L);
+			dynamicQuartzSchedulerManager.addJob(job.getJobName(), job, "" + d.getSeconds() + " " + d.getMinutes() + " * * * ?");
 			
 			//dynamicQuartzSchedulerManager.addJob("test", new TestJob(), "*/5 * * * * ?");
+
+			logger.debug("Intialize completed and the scheduler started successfully.");
 		} catch (SchedulerException e) {
 			e.printStackTrace();
 		} catch (Exception e) {

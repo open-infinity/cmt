@@ -2,6 +2,7 @@ package org.openinfinity.cloud.application.backup.job;
 
 /**
  * The exception class of cloud-backup application.
+ * 
  * @author Timo Saarinen
  */
 public class BackupException extends Exception {
