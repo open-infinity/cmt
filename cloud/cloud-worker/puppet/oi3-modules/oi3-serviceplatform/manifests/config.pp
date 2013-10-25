@@ -1,23 +1,21 @@
 class oi3-serviceplatform::config inherits oi3-bas::config {
-	#bas version used, cannot have duplicate definition
-	#file {"/opt/openinfinity/3.0.0/tomcat/bin/setenv.sh":
-	#	ensure => present,
-	#	owner => 'oiuser',
-	#	group => 'oiuser',
-	#	mode => 0644,
-	#	content => template("oi3-serviceplatform/setenv.sh.erb"),
-	#	require => Class["oi3-serviceplatform::install"],
-	#}
+	file {"/opt/openinfinity/3.0.0/tomcat/bin/setenv.sh":
+		ensure => present,
+		owner => 'oiuser',
+		group => 'oiuser',
+		mode => 0644,
+		content => template("oi3-serviceplatform/setenv.sh.erb"),
+		require => Class["oi3-serviceplatform::install"],
+	}
 
-	#new, not tested
-	#file {"/opt/openinfinity/3.0.0/tomcat/conf/catalina.properties":
-	#	ensure => present,
-	#	owner => 'oiuser',
-	#	group => 'oiuser',
-	#	mode => 0644,
-	#	source => "puppet:///modules/oi3-serviceplatform/catalina.properties",		
-	#	require => Class["oi3-serviceplatform::install"],
-	#}
+	file {"/opt/openinfinity/3.0.0/tomcat/conf/catalina.properties":
+		ensure => present,
+		owner => 'oiuser',
+		group => 'oiuser',
+		mode => 0644,
+		source => "puppet:///modules/oi3-serviceplatform/catalina.properties",		
+		require => Class["oi3-serviceplatform::install"],
+	}
 
 
 	#rights may require change
@@ -29,8 +27,6 @@ class oi3-serviceplatform::config inherits oi3-bas::config {
 		content => template("oi3-serviceplatform/activemq.xml.erb"),
 		require => Class["oi3-serviceplatform::install"],
 	}
-
-	File["/opt/openinfinity/3.0.0/tomcat/conf/catalina.properties"] {source => "puppet:///modules/oi3-serviceplatform/catalina.properties"}
 
 	file {"/opt/data/.mule":
 		ensure => directory,
