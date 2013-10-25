@@ -189,12 +189,6 @@ public class UsagePeriod {
             LOGGER.debug("System uptime: " + machineUptime);
             LOGGER.debug("System downtime: " + machineDowntime);
 		}
-		//long periodTime = endTime.getTime()-startTime.getTime();
-		//LOGGER.debug("Period: " + periodTime);
-		//LOGGER.debug("System uptime: " + (periodTime - uptime));
-		//LOGGER.debug("System downtime: " + (periodTime - (periodTime - uptime)));
-		//uptime = (periodTime - uptime);
-		//downtime = (periodTime - (periodTime - uptime));
 	}
 
 
@@ -206,14 +200,14 @@ public class UsagePeriod {
 		this.usageHoursPerMachine = new HashMap<Integer, List<UsageHour>>();
         LOGGER.debug("UsageHours size:" + usageHours.size());
 		for (UsageHour usageHour : usageHours) {
-            LOGGER.debug("MachineID: " + usageHour.getMachineId());
+            LOGGER.debug("MachineId: " + usageHour.getMachineId());
 			int machineId = usageHour.getMachineId();
 			if (this.usageHoursPerMachine.containsKey(machineId)) {
 				List<UsageHour> usageHours = this.usageHoursPerMachine.get(machineId);
-                LOGGER.debug("Adding usage hour");
+                LOGGER.debug("Add usage hour");
                 usageHours.add(usageHour);
 			} else {
-                LOGGER.debug("new usage hour");
+                LOGGER.debug("Create new usage hour");
                 List<UsageHour> usageHourList = new ArrayList<UsageHour>();
 				usageHourList.add(usageHour);
 				this.usageHoursPerMachine.put(machineId, usageHourList);

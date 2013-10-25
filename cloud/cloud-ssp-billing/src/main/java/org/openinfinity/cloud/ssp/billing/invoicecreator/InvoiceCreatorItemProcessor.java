@@ -81,20 +81,13 @@ public class InvoiceCreatorItemProcessor implements ItemProcessor<Account, Invoi
 
             Map<Integer, Long> uptimePerMachine = usagePeriod.getUptimePerMachine();
             Assert.notNull(uptimePerMachine);
-            LOG.debug("almost adding item");
-
             for (Map.Entry<Integer, Long> entry : uptimePerMachine.entrySet()) {
-                LOG.debug("adding item");
-
                 Integer machineId = entry.getKey();
                 Machine machine = machineService.getMachine(machineId);
                 Cluster cluster = clusterService.getCluster(machine.getClusterId());
                 invoiceItems.add(new InvoiceItem(invoice.getId(), machineId, machine.getClusterId(), entry.getValue(), cluster.getMachineType()));
             }
-            LOG.debug("InvoiceCreatorItemProcessor::process() EXIT");
-
             return new InvoiceAggregator(invoice, invoiceItems);
-
         }
 		catch(SystemException e){
 		    ExceptionUtil.throwBusinessViolationException(e.getMessage(), e);
