@@ -32,7 +32,7 @@ class oi3-serviceplatform::config inherits oi3-bas::config {
 
 	File["/opt/openinfinity/3.0.0/tomcat/conf/catalina.properties"] {source => "puppet:///modules/oi3-serviceplatform/catalina.properties"}
 
-	file {"/opt/openinfinity/3.0.0/tomcat/.mule":
+	file {"/opt/data/.mule":
 		ensure => directory,
 		owner => 'oiuser',
 		group => 'oiuser',

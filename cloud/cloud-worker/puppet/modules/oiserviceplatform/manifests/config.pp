@@ -10,7 +10,7 @@ class oiserviceplatform::config inherits oibas::config {
 
 	File["/opt/openinfinity/2.0.0/tomcat/conf/catalina.properties"] {source => "puppet:///modules/oiserviceplatform/catalina.properties"}
 
-	file {"/opt/openinfinity/2.0.0/tomcat/.mule":
+	file {"/opt/data/.mule":
 		ensure => directory,
 		owner => 'toas',
 		group => 'toas',
