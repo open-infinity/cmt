@@ -21,7 +21,7 @@
   	
 	<import resource="classpath*:META-INF/spring/cloud-context-service.xml" />
     <import resource="classpath*:META-INF/spring/cloud-context-repository.xml" />
-    <context:component-scan base-package="org.openinfinity.cloud.ssp.billing"/>
+    <context:component-scan base-package="org.openinfinity.cloud.ssp.billing.invoicecreator"/>
                
 	<bean id="cloudTxManager" 
 	    class="org.springframework.jdbc.datasource.DataSourceTransactionManager"
@@ -51,7 +51,7 @@
 	</bean>
 
 	<batch:job id="invoiceCreationJob">
-		<batch:step id="createInvoice" next="sendInvoice">
+		<batch:step id="createInvoice">
 			<batch:tasklet transaction-manager="springBatchTxManager"
 				start-limit="3">
 				<batch:chunk reader="accountReader" processor="invoiceCreatorItemProcessor"
@@ -66,7 +66,7 @@
 	</batch:job>
 
 	<task:scheduled-tasks>
-	    <task:scheduled ref="invoiceLauncher" method="launch" cron="0/10 * * * * ?"/>
+	    <task:scheduled ref="invoiceCreatorLauncher" method="launch" cron="0/10 * * * * ?"/>
 	</task:scheduled-tasks>
 		
 </beans>

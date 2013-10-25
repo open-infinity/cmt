@@ -1,4 +1,4 @@
-#!/bin/bash
+ll targ #!/bin/bash
 
 #USER=vedran
 #JAVA_HOME=/etc/alternatives/java_sdk_openjdk/ 
