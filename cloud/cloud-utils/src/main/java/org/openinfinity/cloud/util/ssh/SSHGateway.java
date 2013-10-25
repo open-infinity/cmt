@@ -107,7 +107,7 @@ public class SSHGateway {
 		try {
 			JSch jsch = new JSch();
 			if (privateKey != null) {
-				jsch.addIdentity(username, privateKey, publicKey, password.getBytes());
+				jsch.addIdentity(username, privateKey, publicKey, password != null ? password.getBytes() : null);
 			}
 			session = jsch.getSession(username, host, port);
 			if (password != null && password.length() > 0)
@@ -151,7 +151,7 @@ public class SSHGateway {
 			// JSC initialization
 			JSch jsch = new JSch();
 			if (privateKey != null) {
-				jsch.addIdentity(username, privateKey, publicKey, password.getBytes());
+				jsch.addIdentity(username, privateKey, publicKey, password != null ? password.getBytes() : null);
 			}
 			session = jsch.getSession(username, host, port);
 			if (password != null && password.length() > 0)
