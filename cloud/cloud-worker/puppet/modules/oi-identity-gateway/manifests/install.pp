@@ -1,12 +1,12 @@
 class oi-identity-gateway::install {
-	package { ["java-1.6.0-openjdk", "oi-ssotools-2.0.0-1", "oi-tomcat-7.0.27-1"]:
+	package { ["java-1.6.0-openjdk", "oi-ssotools-2.0.0-1", "oi-tomcat-2.0.0-1"]:
 		ensure => present,
 		require => Class["oibasic"]
 	}
 
 	package { ["oi-identitygateway-2.0.0-1"]:
 		ensure => present,
-		require => Package["oi-tomcat-7.0.27-1"]
+		require => Package["oi-tomcat-2.0.0-1"]
 	}
 	
 	package {"haproxy":

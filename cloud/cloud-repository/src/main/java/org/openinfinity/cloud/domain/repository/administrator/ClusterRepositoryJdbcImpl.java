@@ -131,7 +131,7 @@ public class ClusterRepositoryJdbcImpl implements ClusterRepository {
 
 	@AuditTrail
 	public void deleteCluster(Cluster cluster) {
-		jdbcTemplate.update("delete from cluster_tbl where cluster_id = "+cluster.getId());
+		jdbcTemplate.update("update cluster_tbl set cluster_live = 0 where cluster_id = "+cluster.getId());
 
 	}
 
