@@ -50,6 +50,8 @@ import java.util.Collection;
 public class InvoiceCreatorItemProcessorTest {
 
     final int ACCOUNT_ID = 1;
+    final long EXPECTED_UPTIME = 300000;
+
     @Autowired
     private JobLauncherTestUtils jobLauncherTestUtils;
 
@@ -86,6 +88,8 @@ public class InvoiceCreatorItemProcessorTest {
         Assert.assertEquals(1, invoiceItems.size());
         for (InvoiceItem ii : invoiceItems){
             Assert.assertEquals(invoiceId.intValue() + 1, ii.getInvoiceId().intValue());
+            Assert.assertEquals(invoiceId.intValue() + 1, ii.getInvoiceId().intValue());
+            Assert.assertEquals(EXPECTED_UPTIME, ii.getMachineUptime().longValue());
         }
     }
 }
