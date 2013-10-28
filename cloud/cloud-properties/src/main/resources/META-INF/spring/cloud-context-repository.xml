@@ -22,10 +22,9 @@
         http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
         ">
 
-<!--	<context:property-placeholder location="classpath*:/META-INF/properties/repository.properties" />-->
-
-	<context:component-scan base-package="org.openinfinity.cloud.domain.repository" />
-    <!-- context:property-placeholder location="classpath*:system.properties" /-->
+	<context:component-scan base-package="org.openinfinity.cloud.domain.repository">
+	   <context:exclude-filter type="regex" expression="org.openinfinity.cloud.domain.repository.ssp.*.*" />
+	</context:component-scan>
     
 	<tx:annotation-driven transaction-manager="txManager" />
 

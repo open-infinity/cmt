@@ -14,6 +14,9 @@ target/
 # ignore generated logs
 *.log
 
+# ignore generated process id files
+*.pid
+
 # ignore Apple metadata
 .DS_Store
 

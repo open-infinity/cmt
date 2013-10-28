@@ -21,7 +21,7 @@
     </bean>
 
     <jdbc:initialize-database data-source="cloudDataSource">
-  		<jdbc:script location="classpath:sql/H2/create_tables.sql"/>
+  		<jdbc:script location="classpath:sql/cloud/H2/create_tables.sql"/>
 	</jdbc:initialize-database>
     
 	<bean id="txManager"
@@ -33,7 +33,7 @@
 	    <context:exclude-filter type="regex" expression="org.openinfinity.cloud.service.healthmonitoring.*.*" />
 	    <context:exclude-filter type="regex" expression="org.openinfinity.cloud.domain.repository.deployer.*.*" />
 	    <context:exclude-filter type="regex" expression="org.openinfinity.cloud.service.deployer.*.*" />
-	    
+	    <context:exclude-filter type="regex" expression="org.openinfinity.cloud.domain.repository.ssp.*.*" />
 	</context:component-scan>
 	
   	<tx:annotation-driven transaction-manager="txManager"/>

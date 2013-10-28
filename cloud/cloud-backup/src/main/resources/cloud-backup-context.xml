@@ -27,6 +27,7 @@
 		<context:exclude-filter type="regex" expression=".*ClusterService.*"/>
 		<context:exclude-filter type="regex" expression=".*ClusterType.*"/>
 		<context:exclude-filter type="regex" expression=".*Machine.*"/>
+        <context:exclude-filter type="regex" expression=".*ssp.*"/>
 	</context:component-scan>
 
 	<bean id="cloudDataSource" destroy-method="close"

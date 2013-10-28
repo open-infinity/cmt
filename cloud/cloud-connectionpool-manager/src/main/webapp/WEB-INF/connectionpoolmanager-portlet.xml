@@ -29,7 +29,10 @@
 	<context:property-placeholder location="classpath*:META-INF/properties/system.properties. ,
 	    									classpath:META-INF/properties/infrastructure.properties" />
 
-	<context:component-scan base-package="org.openinfinity" />
+	<context:component-scan base-package="org.openinfinity">
+	   <context:exclude-filter type="regex" expression="org.openinfinity.cloud.domain.repository.ssp.*.*" />
+       <context:exclude-filter type="regex" expression="org.openinfinity.cloud.service.ssp.*.*" /> 
+	</context:component-scan>
 
 	<mvc:annotation-driven/>
 
