@@ -149,10 +149,16 @@ public class RemoteMachineCommand implements Command {
 
 			// SSH Gateway call
 			logger.debug("Executing remote command: " + cmd);
-			retval = SSHGateway.executeRemoteCommandAndStreamOutputToFile(
-					private_ssh_key.getSecret_key().getBytes(), (byte[]) null,
-					job.getHostname(), job.getPort(), job.getUsername(),
-					job.getPassword(), cmd, local_stdout_file);
+			retval = SSHGateway.executeRemoteCommandWithLocalFileStreams(
+					private_ssh_key.getSecret_key().getBytes(), 
+					(byte[]) null,
+					job.getHostname(), 
+					job.getPort(), 
+					job.getUsername(),
+					job.getPassword(), 
+					cmd, 
+					null, 
+					local_stdout_file);
 			logger.trace("Command execution finished with return value "
 					+ retval + ".");
 		} catch (Exception e) {

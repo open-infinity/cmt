@@ -15,6 +15,8 @@
  */
 package org.openinfinity.cloud.util.ssh;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -143,7 +145,9 @@ public class SSHGateway {
 	}
 
 	/**
-	 * Execute a command in remote host and stream its output to local file system.
+	 * Execute a command in remote host and stream its output to local file system. Also, the
+	 * input can be streamed from local file, but it's not recommended to use both input
+	 * and output at same time currently, because either can block the other.
 	 * The SSH key can be read with KeyService and then converted to an expected form using
 	 * <code>Key.getSecret_key().getBytes()</code>.
 	 * 
@@ -154,11 +158,14 @@ public class SSHGateway {
 	 * @param username		Remote host username
 	 * @param password		Remote host password (can be null)
 	 * @param command		Single shell command to be execute in the remote host
-	 * @param filename		Filename in local file system
+	 * @param inFilename	Filename in local file system to be used in remote command's 
+	 * 						input stream. Can be null.
+	 * @param outFilename	Filename in local file system to be used in remote command's 
+	 * 						output stream. Can be null.
 	 * @return Exit status of the process or -1 if exit status is not available.
 	 * @author Timo Saarinen
 	 */
-	public static int executeRemoteCommandAndStreamOutputToFile(byte[] privateKey, byte[] publicKey, String host, int port, String username, String password, String command, String filename) {
+	public static int executeRemoteCommandWithLocalFileStreams(byte[] privateKey, byte[] publicKey, String host, int port, String username, String password, String command, String inFilename, String outFilename) {
 		int exit_status = -1;
 		InputStream inputStream = null;
 		OutputStream outputStream = null;
@@ -182,10 +189,14 @@ public class SSHGateway {
 			channel = session.openChannel("exec");
 			LOGGER.trace("Starting executing commands to session.");
 
-			// Create the output file
-			FileOutputStream fos = null;
-			if (filename != null) {
-				fos = new FileOutputStream(filename);
+			// Create local files
+			OutputStream fos = null;
+			if (outFilename != null) {
+				fos = new BufferedOutputStream(new FileOutputStream(outFilename));
+			}
+			InputStream fis = null;
+			if (inFilename != null) {
+				fis = new BufferedInputStream(new FileInputStream(inFilename));
 			}
 			
 			// Run the command
@@ -194,14 +205,21 @@ public class SSHGateway {
 			outputStream = channel.getOutputStream();
 			inputStream = channel.getInputStream();
 			channel.connect();
+			if (fis != null) {
+				IOUtil.copyStream(fis, outputStream);
+			}
 			if (fos != null) {
 				IOUtil.copyStream(inputStream, fos);
 			}
 			
-			// Close local file
+			// Close local files
 			if (fos != null) {
 				fos.flush();
 				fos.close();
+			}
+			if (fis != null) {
+				outputStream.flush();
+				fis.close();
 			}
 			
 			// Exit code
