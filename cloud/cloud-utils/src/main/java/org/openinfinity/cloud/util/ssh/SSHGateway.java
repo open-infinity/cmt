@@ -41,7 +41,8 @@ import com.jcraft.jsch.Session;
  * Utility for accessing SSH server.
  * 
  * @author Ilkka Leinonen
- * @version 1.0.0
+ * @author Timo Saarinen
+ * @version 1.1.0
  * @since 1.2.0
  */
 public class SSHGateway {
@@ -126,7 +127,7 @@ public class SSHGateway {
 				outputStream = channel.getOutputStream();
 				inputStream = channel.getInputStream();
 				channel.connect();
-				IOUtil.copyStream(inputStream, outputStream);
+				IOUtil.copyStream(inputStream, outputStream); // what should this do??
 				outputStream.flush();
 			}
 			LOGGER.trace("Execution of commands has been finalized.");
@@ -141,8 +142,25 @@ public class SSHGateway {
 				session.disconnect();
 		}
 	}
-	
-	public static void executeRemoteCommandAndStreamOutputToFile(byte[] privateKey, byte[] publicKey, String host, int port, String username, String password, String command, String filename) {
+
+	/**
+	 * Execute a command in remote host and stream its output to local file system.
+	 * The SSH key can be read with KeyService and then converted to an expected form using
+	 * <code>Key.getSecret_key().getBytes()</code>.
+	 * 
+	 * @param privateKey 	SSH key to be used.
+	 * @param publicKey		Can be null.
+	 * @param host     		Remote host ip address or hostname  
+	 * @param port			Remote SSH port
+	 * @param username		Remote host username
+	 * @param password		Remote host password (can be null)
+	 * @param command		Single shell command to be execute in the remote host
+	 * @param filename		Filename in local file system
+	 * 
+	 * @return Exit status of the process or -1 if exit status is not available.
+	 */
+	public static int executeRemoteCommandAndStreamOutputToFile(byte[] privateKey, byte[] publicKey, String host, int port, String username, String password, String command, String filename) {
+		int exit_status = -1;
 		InputStream inputStream = null;
 		OutputStream outputStream = null;
 		Session session = null;
@@ -166,7 +184,10 @@ public class SSHGateway {
 			LOGGER.trace("Starting executing commands to session.");
 
 			// Create the output file
-			FileOutputStream fos = new FileOutputStream(filename);
+			FileOutputStream fos = null;
+			if (filename != null) {
+				fos = new FileOutputStream(filename);
+			}
 			
 			// Run the command
 			LOGGER.trace("Executing command: " + command);
@@ -174,10 +195,17 @@ public class SSHGateway {
 			outputStream = channel.getOutputStream();
 			inputStream = channel.getInputStream();
 			channel.connect();
-			IOUtil.copyStream(inputStream, fos); // TODO: untested
-			outputStream.flush();
-
-			LOGGER.trace("Execution of commands has been finalized.");
+			if (fos != null) {
+				IOUtil.copyStream(inputStream, fos);
+			}
+			
+			// Close local file
+			if (fos != null) {
+				fos.flush();
+				fos.close();
+			}
+			exit_status = channel.getExitStatus();
+			LOGGER.trace("Execution of commands was finished with exit status " + exit_status + ".");
 		} catch (Throwable throwable) {
 			ExceptionUtil.throwSystemException(throwable);
 		} finally {
@@ -189,6 +217,7 @@ public class SSHGateway {
 			if (session != null)
 				session.disconnect();
 		}
+		return exit_status;
 	}
 	
 	public static int checkAck(InputStream inputStream) throws SystemException {
