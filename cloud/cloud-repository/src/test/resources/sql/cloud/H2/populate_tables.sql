@@ -80,8 +80,8 @@ insert into configuration_template_organization_tbl values (3, 2);
 insert into configuration_template_organization_tbl values (4, 2);
 
 -- SSP billing test data
-insert into usage_hours_tbl values(1, 10687, 1513, 5, 3532, 5, '2013-10-17 10:30:01');
-insert into usage_hours_tbl values(2, 10687, 1513, 5, 3532, 5, '2013-10-18 10:30:01');
+insert into usage_hours_tbl values(1, 10687, 1513, 5, 3532, 1, '2013-10-17 10:30:01');
+insert into usage_hours_tbl values(2, 10687, 1513, 5, 3532, 3, '2013-10-17 10:35:01');
 insert into machine_tbl (machine_id, machine_instance_id, project_id, machine_name, machine_dns_name, machine_key, active,
 machine_username, machine_running, machine_state, machine_cluster_id, machine_private_dns_name, machine_type, machine_configured,
 machine_last_update, machine_cloud_type, machine_extra_ebs_volume_id, machine_extra_ebs_volume_device, machine_extra_ebs_volume_size)

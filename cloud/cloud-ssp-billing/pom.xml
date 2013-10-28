@@ -13,15 +13,8 @@
 	<packaging>jar</packaging>
     <properties>
         <sql.script.path>${project.parent.basedir}/cloud-repository/src/test/resources/sql</sql.script.path>
-        <ved>ooooooooo</ved>
-
     </properties>
 	<name>cloud-ssp-billing</name>
-	<description>
-		<![CDATA[
-      Blabla. 
-    ]]>
-	</description>
 	<profiles>
 		<profile>
 			<id>compiler</id>
@@ -148,7 +141,7 @@
         <dependency>
             <groupId>commons-daemon</groupId>
             <artifactId>commons-daemon</artifactId>
-            <version>1.0.10</version>
+            <version>1.0.15</version>
         </dependency>
         
 		<dependency>
@@ -204,7 +197,7 @@
                 <filtering>true</filtering>
             </testResource>
             <testResource>
-                <directory>src/test/resources/META-INF</directory>
+                <directory>src/test/resources/META-INF/spring</directory>
                 <filtering>true</filtering>
             </testResource>
         </testResources>
