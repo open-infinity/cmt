@@ -1,5 +1,6 @@
 package org.openinfinity.cloud.application.backup.job;
 
+import java.io.File;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -12,6 +13,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  * Base POJO class for InstanceBackupJob and InstanceRestoreJob.
  * 
  * @see Command
+ * 
  * @author Timo Saarinen
  */
 abstract public class InstanceJob {
@@ -47,6 +49,11 @@ abstract public class InstanceJob {
 	 */
 	private String localPackageDirectory;
 
+	/**
+	 * File object representing location of the local file. This is set by Command class subclasses.
+	 */
+	private File localBackupFile;
+	
 	/**
 	 * TOAS instance id.
 	 */
@@ -142,6 +149,10 @@ abstract public class InstanceJob {
 	public void setPort(int port) {
 		this.port = port;
 	}
-
-
+	public File getLocalBackupFile() {
+		return localBackupFile;
+	}
+	public void setLocalBackupFile(File localBackupFile) {
+		this.localBackupFile = localBackupFile;
+	}
 }

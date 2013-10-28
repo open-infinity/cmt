@@ -41,7 +41,6 @@ import com.jcraft.jsch.Session;
  * Utility for accessing SSH server.
  * 
  * @author Ilkka Leinonen
- * @author Timo Saarinen
  * @version 1.1.0
  * @since 1.2.0
  */
@@ -156,8 +155,8 @@ public class SSHGateway {
 	 * @param password		Remote host password (can be null)
 	 * @param command		Single shell command to be execute in the remote host
 	 * @param filename		Filename in local file system
-	 * 
 	 * @return Exit status of the process or -1 if exit status is not available.
+	 * @author Timo Saarinen
 	 */
 	public static int executeRemoteCommandAndStreamOutputToFile(byte[] privateKey, byte[] publicKey, String host, int port, String username, String password, String command, String filename) {
 		int exit_status = -1;
@@ -166,7 +165,7 @@ public class SSHGateway {
 		Session session = null;
 		Channel channel = null;
 		try {
-			// JSC initialization
+			// JSCH initialization
 			JSch jsch = new JSch();
 			if (privateKey != null) {
 				jsch.addIdentity(username, privateKey, publicKey, password != null ? password.getBytes() : null);
@@ -204,6 +203,8 @@ public class SSHGateway {
 				fos.flush();
 				fos.close();
 			}
+			
+			// Exit code
 			exit_status = channel.getExitStatus();
 			LOGGER.trace("Execution of commands was finished with exit status " + exit_status + ".");
 		} catch (Throwable throwable) {

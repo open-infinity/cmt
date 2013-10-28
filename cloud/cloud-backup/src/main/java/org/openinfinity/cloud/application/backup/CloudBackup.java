@@ -43,6 +43,7 @@ public class CloudBackup {
 			job.setToasInstanceId(981);
 			job.setHostname("10.33.208.10");
 			job.setUsername("root");
+			job.setLocalPackageDirectory("/var/tmp");
 			Date d = new Date(System.currentTimeMillis() + 3000L);
 			dynamicQuartzSchedulerManager.addJob(job.getJobName(), job, "" + d.getSeconds() + " " + d.getMinutes() + " * * * ?");
 			
