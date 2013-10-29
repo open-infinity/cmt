@@ -22,6 +22,8 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
+import java.math.BigInteger;
+
 /**
  * @author Vedran Bartonicek
  * @version 1.3.0
@@ -34,7 +36,7 @@ public class Template implements Comparable{
     
     @NonNull
     @NotScript
-    private int id;
+    private BigInteger id;
     
     @NonNull
     @NotScript
@@ -47,6 +49,6 @@ public class Template implements Comparable{
     @Override
     public int compareTo(Object o) {
         // TODO Auto-generated method stub
-        return this.id - ((Template)o).getId();
+        return this.id.intValue() - ((Template)o).getId().intValue();
     }
 }

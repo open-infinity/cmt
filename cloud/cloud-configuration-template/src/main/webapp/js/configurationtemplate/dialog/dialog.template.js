@@ -13,11 +13,7 @@
 
         editTemplate: function (id) {
             console.log("argument id:" + id);
-            # get template data
 
-            # put template data into edit dialog
-
-            # show dialog
             $("#dialog-template-edit").dialog("open");
 
 
