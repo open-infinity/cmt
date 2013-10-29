@@ -92,7 +92,7 @@ public class TemplateRepositoryJdbcImpl implements TemplateRepository {
 
     private class TemplateRowMapper implements RowMapper<Template> {
 		public Template mapRow(ResultSet resultSet, int rowNum) throws SQLException {    
-		    return new Template(resultSet.getInt("id"),
+		    return new Template(BigInteger.valueOf(resultSet.getInt("id")),
 		                        resultSet.getString("name"),
 		                        resultSet.getString("description"));
 		}

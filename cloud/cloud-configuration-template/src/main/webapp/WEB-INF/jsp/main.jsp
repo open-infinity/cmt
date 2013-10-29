@@ -77,6 +77,11 @@
 		-->
 	</div>
 
+	<div id="dialog-template-edit">
+        <table id="template-edit-grid">a</table>
+        <div id="template-edit-grid-pager">1</div>
+	</div>
+
 </body>
 </html>
 

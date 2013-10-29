@@ -3,7 +3,7 @@
 
 <liferay-portlet-app>
 	<portlet>
-		<portlet-name>cloudtemplate</portlet-name>
+		<portlet-name>configurationtemplate</portlet-name>
 		<icon>/icon.png</icon>
 		<instanceable>true</instanceable>
 		<!-- 
@@ -11,7 +11,7 @@
 		<header-portlet-css>/css/plugins/ui.jqgrid.css</header-portlet-css>
 		-->
 		
-		<header-portlet-css>/css/cloudtemplate.css</header-portlet-css>
+		<header-portlet-css>/css/configurationtemplate.css</header-portlet-css>
         <header-portlet-css>/css/plugins/ui.jqgrid.css</header-portlet-css>
         
 		<header-portlet-javascript>/js/plugins/jquery.metadata.js</header-portlet-javascript>
@@ -23,29 +23,30 @@
 		
 		<!-- import modules -->
 		<!--
-		<header-portlet-javascript>/js/cloudtemplate/main.js</header-portlet-javascript>
-		<header-portlet-javascript>/js/cloudtemplate/widgets/platformselect.js</header-portlet-javascript>
-		<header-portlet-javascript>/js/cloudtemplate/resource/resource.js</header-portlet-javascript>
+		<header-portlet-javascript>/js/configurationtemplate/main.js</header-portlet-javascript>
+		<header-portlet-javascript>/js/configurationtemplate/widgets/platformselect.js</header-portlet-javascript>
+		<header-portlet-javascript>/js/configurationtemplate/resource/resource.js</header-portlet-javascript>
 		
 		-->
-		<header-portlet-javascript>/js/cloudtemplate/main.js</header-portlet-javascript>
-		<header-portlet-javascript>/js/cloudtemplate/template.js</header-portlet-javascript>
+		<header-portlet-javascript>/js/configurationtemplate/main.js</header-portlet-javascript>
+		<header-portlet-javascript>/js/configurationtemplate/template.js</header-portlet-javascript>
 		
 		<!--
-		<header-portlet-javascript>/js/cloudtemplate/util/util.js</header-portlet-javascript>
+		<header-portlet-javascript>/js/configurationtemplate/util/util.js</header-portlet-javascript>
 		<header-portlet-javascript>/js/cloudadmin/poller/datapoller.js</header-portlet-javascript>
 		-->
 
-		<!-- dialogs -->
-		<!--
-		<footer-portlet-javascript>/js/cloudadmin/dialog/dialog.instance.js</footer-portlet-javascript>
-		<footer-portlet-javascript>/js/cloudadmin/dialog/dialog.cluster.js</footer-portlet-javascript>
-		<footer-portlet-javascript>/js/cloudadmin/dialog/dialog.machine.js</footer-portlet-javascript>				
-		<footer-portlet-javascript>/js/cloudadmin/dialog/dialog.service.js</footer-portlet-javascript>
+		<!-- dialog -->
+        <footer-portlet-javascript>/js/configurationtemplate/dialog/dialog.template.js</footer-portlet-javascript>
+
+        <!--
+        <footer-portlet-javascript>/js/cloudadmin/dialog/dialog.instance.js</footer-portlet-javascript>
+        <footer-portlet-javascript>/js/cloudadmin/dialog/dialog.cluster.js</footer-portlet-javascript>
+        <footer-portlet-javascript>/js/cloudadmin/dialog/dialog.machine.js</footer-portlet-javascript>
+        <footer-portlet-javascript>/js/cloudadmin/dialog/dialog.service.js</footer-portlet-javascript>
         -->
         
 		<!-- main app -->
-		<footer-portlet-javascript>/js/cloudtemplate/main.js</footer-portlet-javascript>
 	</portlet>
 	<role-mapper>
 		<role-name>administrator</role-name>

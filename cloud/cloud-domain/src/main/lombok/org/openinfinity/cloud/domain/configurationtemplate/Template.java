@@ -48,5 +48,5 @@ public class Template implements Comparable{
     public int compareTo(Object o) {
         // TODO Auto-generated method stub
         return this.id - ((Template)o).getId();
-    }   
+    }
 }

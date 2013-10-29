@@ -7,8 +7,8 @@
 	xsi:schemaLocation="http://java.sun.com/xml/ns/portlet/portlet-app_2_0.xsd http://java.sun.com/xml/ns/portlet/portlet-app_2_0.xsd"
 >
 	<portlet>
-		<portlet-name>cloudtemplate</portlet-name>
-		<display-name>cloudtemplate</display-name>
+		<portlet-name>configurationtemplate</portlet-name>
+		<display-name>configurationtemplate</display-name>
 		<portlet-class>org.springframework.web.portlet.DispatcherPortlet</portlet-class>
 		
 		<supports>
@@ -18,12 +18,12 @@
 		</supports>
 		
 		<supported-locale>en</supported-locale>
-		<resource-bundle>cloudtemplate</resource-bundle>
+		<resource-bundle>configurationtemplate</resource-bundle>
 		
 		<portlet-info>
-			<title>CloudTemplate</title>
-			<short-title>CloudTemplate</short-title>
-			<keywords>cloudtemplate</keywords>
+			<title>CloudConfigurationTemplate</title>
+			<short-title>CloudConfigurationTemplate</short-title>
+			<keywords>configurationtemplate</keywords>
 		</portlet-info>
 		
 		<portlet-preferences>
