@@ -27,7 +27,7 @@ class oi3-activiti-rdbms::config {
         }		
 	file { "/opt/openinfinity/3.0.0/activiti/dbschema/activiti.mysql.create.history.sql":
                 ensure => present,
-                source => "puppet:///modules/oi3-mariadb/activiti.mysql.create.history.sql",
+                source => "puppet:///modules/oi3-activiti-rdbms/activiti.mysql.create.history.sql",
                 owner => "root",
                 group => "root",
 	      require => Class["oi3-rdbms::service"],
@@ -35,7 +35,7 @@ class oi3-activiti-rdbms::config {
         }		
 	file { "/opt/openinfinity/3.0.0/activiti/dbschema/activiti.mysql.create.identity.sql":
                 ensure => present,
-                source => "puppet:///modules/oi3-mariadb/activiti.mysql.create.identity.sql",
+                source => "puppet:///modules/oi3-activiti-rdbms/activiti.mysql.create.identity.sql",
                 owner => "root",
                 group => "root",
 	      require => Class["oi3-rdbms::service"],
