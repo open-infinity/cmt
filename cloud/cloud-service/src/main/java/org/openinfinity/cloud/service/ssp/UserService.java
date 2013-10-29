@@ -18,6 +18,7 @@ package org.openinfinity.cloud.service.ssp;
 import java.math.BigInteger;
 
 import org.openinfinity.cloud.domain.ssp.User;
+import org.openinfinity.cloud.service.common.AbstractCrudServiceInterface;
 
 /**
  * User service interface.

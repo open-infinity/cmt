@@ -17,6 +17,7 @@ package org.openinfinity.cloud.domain.repository.ssp;
 
 import java.math.BigInteger;
 
+import org.openinfinity.cloud.domain.repository.common.AbstractCrudRepositoryInterface;
 import org.openinfinity.cloud.domain.ssp.User;
 
 /**

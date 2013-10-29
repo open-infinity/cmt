@@ -15,12 +15,8 @@
  */
 package org.openinfinity.cloud.domain.repository.configurationtemplate;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.List;
-
-import javax.sql.DataSource;
-
+import org.openinfinity.cloud.domain.configurationtemplate.Template;
+import org.openinfinity.core.annotation.AuditTrail;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -29,8 +25,12 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
-import org.openinfinity.cloud.domain.configurationtemplate.Template;
-import org.openinfinity.core.annotation.AuditTrail;
+import javax.sql.DataSource;
+import java.math.BigInteger;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * JDBC Repository implementation of the <code>org.openinfinity.core.cloud.deployer.repository.DeploymentRepository</code> interface.
@@ -65,7 +65,32 @@ public class TemplateRepositoryJdbcImpl implements TemplateRepository {
                                   new TemplateRowMapper());
     }
 
-	private class TemplateRowMapper implements RowMapper<Template> {
+    @Override
+    public Template create(Template product) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void update(Template product) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public Collection<Template> loadAll() {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public Template load(BigInteger id) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void delete(Template product) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    private class TemplateRowMapper implements RowMapper<Template> {
 		public Template mapRow(ResultSet resultSet, int rowNum) throws SQLException {    
 		    return new Template(resultSet.getInt("id"),
 		                        resultSet.getString("name"),

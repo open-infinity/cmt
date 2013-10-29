@@ -75,8 +75,7 @@ public class TemplateControllerTest {
             
         try{
             templateController.getTemplatesForUser(request, response, 1, 1);
-            JsonNode rootNode = objectMapper.readValue(response.getContentAsString(), 
-                                             JsonNode.class);
+            JsonNode rootNode = objectMapper.readValue(response.getContentAsString(), JsonNode.class);
             
             int templatesExpected = 1;
             int rowsFound = 0;        

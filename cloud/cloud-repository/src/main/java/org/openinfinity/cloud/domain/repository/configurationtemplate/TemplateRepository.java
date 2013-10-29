@@ -15,9 +15,10 @@
  */
 package org.openinfinity.cloud.domain.repository.configurationtemplate;
 
-import java.util.List;
-
 import org.openinfinity.cloud.domain.configurationtemplate.Template;
+import org.openinfinity.cloud.domain.repository.common.AbstractCrudRepositoryInterface;
+
+import java.util.List;
 
 /**
  * CRUD interface for storing <code>org.openinfinity.core.cloud.domain.template</code> objects.
@@ -26,7 +27,7 @@ import org.openinfinity.cloud.domain.configurationtemplate.Template;
  * @version 1.3.0
  * @since 1.3.0
  */
-public interface TemplateRepository {
+public interface TemplateRepository extends AbstractCrudRepositoryInterface<Template> {
 	
     List<Template> getTemplates(Long oid);
 

@@ -1,4 +1,4 @@
-package org.openinfinity.cloud.domain.repository.ssp;
+package org.openinfinity.cloud.domain.repository.common;
 
 import java.math.BigInteger;
 import java.util.Collection;
