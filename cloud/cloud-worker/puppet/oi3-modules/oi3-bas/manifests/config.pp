@@ -80,8 +80,8 @@ class oi3-bas::config {
 
     # Try ensure, that the supported Java is chosen
     exec { "choose-java":
-            command => "/usr/sbin/alternatives --install /usr/bin/java java /usr/lib/jvm/jre-1.6.0-openjdk.x86_64/bin/java 190000",
-            require => Package["java-1.6.0-openjdk"]
+            command => "/usr/sbin/alternatives --install /usr/bin/java java /usr/lib/jvm/jre-1.7.0-openjdk.x86_64/bin/java 190000",
+            require => Package["java-1.7.0-openjdk"]
     }
 }
 
