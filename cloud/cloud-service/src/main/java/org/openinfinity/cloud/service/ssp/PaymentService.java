@@ -16,6 +16,7 @@
 package org.openinfinity.cloud.service.ssp;
 
 import org.openinfinity.cloud.domain.ssp.Payment;
+import org.openinfinity.cloud.service.common.AbstractCrudServiceInterface;
 
 
 /**

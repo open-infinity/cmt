@@ -16,17 +16,20 @@
 
 package org.openinfinity.cloud.application.template.controller;
 
-import java.util.List;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Set;
-
-import javax.portlet.ActionRequest;
-import javax.portlet.RenderRequest;
-import javax.portlet.RenderResponse;
-import javax.portlet.ResourceRequest;
-import javax.portlet.ResourceResponse;
-
+import com.liferay.portal.model.User;
+import org.apache.log4j.Logger;
+import org.openinfinity.cloud.comon.web.LiferayService;
+import org.openinfinity.cloud.domain.configurationtemplate.Template;
+import org.openinfinity.cloud.service.configurationtemplate.TemplateService;
+import org.openinfinity.cloud.util.collection.ListUtil;
+import org.openinfinity.cloud.util.http.HttpCodes;
+import org.openinfinity.cloud.util.serialization.JsonDataWrapper;
+import org.openinfinity.cloud.util.serialization.SerializerUtil;
+import org.openinfinity.core.exception.AbstractCoreException;
+import org.openinfinity.core.exception.ApplicationException;
+import org.openinfinity.core.exception.BusinessViolationException;
+import org.openinfinity.core.exception.SystemException;
+import org.openinfinity.core.util.ExceptionUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
@@ -37,23 +40,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.portlet.ModelAndView;
 import org.springframework.web.portlet.bind.annotation.RenderMapping;
 import org.springframework.web.portlet.bind.annotation.ResourceMapping;
-import org.apache.log4j.Logger;
 
-import com.liferay.portal.model.User;
-
-import org.openinfinity.cloud.domain.Instance;
-import org.openinfinity.cloud.domain.configurationtemplate.Template;
-import org.openinfinity.cloud.service.configurationtemplate.TemplateService;
-import org.openinfinity.cloud.comon.web.LiferayService;
-import org.openinfinity.cloud.util.collection.ListUtil;
-import org.openinfinity.cloud.util.http.HttpCodes;
-import org.openinfinity.cloud.util.serialization.JsonDataWrapper;
-import org.openinfinity.cloud.util.serialization.SerializerUtil;
-import org.openinfinity.core.exception.AbstractCoreException;
-import org.openinfinity.core.exception.ApplicationException;
-import org.openinfinity.core.exception.BusinessViolationException;
-import org.openinfinity.core.exception.SystemException;
-import org.openinfinity.core.util.ExceptionUtil;
+import javax.portlet.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Spring portlet controller for handling templates.
@@ -147,6 +139,18 @@ public class TemplateController {
         } catch (Exception e){
             ExceptionUtil.throwSystemException(e);  
         }
-    } 
-    
+    }
+
+    @ResourceMapping(PATH_EDIT_TEMPLATE)
+    public void editTemplatesForUser(ResourceRequest request, ResourceResponse response,
+                                    @RequestParam("page") int page, @RequestParam("rows") int rows)
+            throws Exception {
+        try{
+
+
+        } catch (Exception e){
+            ExceptionUtil.throwSystemException(e);
+        }
+    }
+
 }

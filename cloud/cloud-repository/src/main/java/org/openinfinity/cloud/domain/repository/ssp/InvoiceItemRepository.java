@@ -15,9 +15,8 @@
 */
 package org.openinfinity.cloud.domain.repository.ssp;
 
+import org.openinfinity.cloud.domain.repository.common.AbstractCrudRepositoryInterface;
 import org.openinfinity.cloud.domain.ssp.InvoiceItem;
-
-import java.math.BigInteger;
 
 /**
  *

@@ -15,16 +15,17 @@
  */
 package org.openinfinity.cloud.service.configurationtemplate;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
+import org.openinfinity.cloud.domain.configurationtemplate.Template;
+import org.openinfinity.cloud.domain.repository.configurationtemplate.TemplateRepository;
+import org.openinfinity.core.annotation.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import org.openinfinity.core.annotation.Log;
-import org.openinfinity.cloud.domain.configurationtemplate.Template;
-import org.openinfinity.cloud.domain.repository.configurationtemplate.TemplateRepository;
+import java.math.BigInteger;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author Vedran Bartonicek
@@ -37,13 +38,36 @@ public class TemplateServiceImpl implements TemplateService {
 	@Autowired
 	private TemplateRepository templateRepository;
 	
-	@Log 
+    @Override
+    public Template create(Template product) {
+        return null;
+    }
+
+    @Override
+    public void update(Template product) {
+    }
+
+    @Override
+    public Collection<Template> loadAll() {
+        return null;
+    }
+
+    @Override
+    public Template load(BigInteger id) {
+        return null;
+    }
+
+    @Override
+    public void delete(Template product) {
+    }
+
+    @Log
+    @Override
     public Set<Template> getTemplates(List<Long> organizationIds) {
-	    Set<Template> templates = new HashSet<Template>();
-	    for(Long oid: organizationIds){
-	        templates.addAll(templateRepository.getTemplates(oid));
-	    }
+        Set<Template> templates = new HashSet<Template>();
+        for(Long oid: organizationIds){
+            templates.addAll(templateRepository.getTemplates(oid));
+        }
         return templates;
     }
-	
 }

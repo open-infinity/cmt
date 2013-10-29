@@ -16,6 +16,7 @@
 package org.openinfinity.cloud.service.ssp;
 
 import org.openinfinity.cloud.domain.ssp.Account;
+import org.openinfinity.cloud.service.common.AbstractCrudServiceInterface;
 
 /**
  * Account service interface.
