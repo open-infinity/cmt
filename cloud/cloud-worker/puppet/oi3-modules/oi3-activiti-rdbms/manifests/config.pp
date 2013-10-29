@@ -1,11 +1,19 @@
 class oi3-activiti-rdbms::config {
 	
 	# Directory for activiti schema files
-	file { "/opt/openinfinity/3.0.0/activiti/dbschema":
+	file { "/opt/openinfinity/3.0.0/activiti":
 		ensure => directory,
 		group => "root",
 		owner => "root",
 		require => Class["oi3-rdbms::service"],
+	}
+
+	# Directory for activiti schema files
+	file { "/opt/openinfinity/3.0.0/activiti/dbschema":
+		ensure => directory,
+		group => "root",
+		owner => "root",
+		require => file["/opt/openinfinity/3.0.0/activiti"],
 	}
 	
 	# Activiti schema create scripts

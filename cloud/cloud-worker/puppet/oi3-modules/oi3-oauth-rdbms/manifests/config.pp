@@ -1,14 +1,21 @@
 class oi3-oauth-rdbms::config {
 	
 	# Directory for oauth schema files
+	file { "/opt/openinfinity/3.0.0/oauth":
+		ensure => directory,
+		group => "root",
+		owner => "root",
+		require => Class["oi3-rdbms::service"],
+	}
+
+	# Directory for oauth schema files
 	file { "/opt/openinfinity/3.0.0/oauth/dbschema":
 		ensure => directory,
 		group => "root",
 		owner => "root",
-		#require => Class["oi3-rdbms::service"],
-		require => Class["oi3-rdbms::service"],
+		require => file["/opt/openinfinity/3.0.0/oauth"],
 	}
-	
+
 	# Oauth schema create scripts
 	file { "/opt/openinfinity/3.0.0/oauth/dbschema/oauth-schema.sql":
                 ensure => present,
