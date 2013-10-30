@@ -78,8 +78,17 @@
 	</div>
 
 	<div id="dialog-template-edit">
-        <table id="template-edit-grid">a</table>
-        <div id="template-edit-grid-pager">2</div>
+        <div id="edit-template-fields">
+            <p> ID <input type='text' value=''> </p>
+            <p> Name <input type='text' value=''> </p>
+            <p> Description <input type='text' value=''> </p>
+        </div>
+        <br>
+        <table id="template-edit-element-grid"></table>
+        <div id="template-edit-element-grid-pager"></div>
+        <br>
+        <table id="template-edit-organization-grid"></table>
+        <div id="template-edit-organization-grid-pager"></div>
 	</div>
 
 </body>

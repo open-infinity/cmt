@@ -15,14 +15,15 @@
  */
 package org.openinfinity.cloud.service.configurationtemplate;
 
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.openinfinity.cloud.domain.configurationtemplate.Organization;
 import org.openinfinity.cloud.domain.repository.configurationtemplate.OrganizationRepository;
 import org.openinfinity.core.annotation.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.math.BigInteger;
+import java.util.Collection;
 
 
 
@@ -32,16 +33,36 @@ import org.springframework.stereotype.Service;
  * @since 1.3.0
  */
 
-@Service("configurationTemplateOrganizationService")
+@Service("organizationServiceImpl")
 public class OrganizationServiceImpl implements OrganizationService {
 	private static final Logger LOGGER = Logger.getLogger(OrganizationServiceImpl.class.getName());
 
 	@Autowired
 	private OrganizationRepository organizationRepository;
-	
-	@Log
-    public List<Organization> getAll() {
-        return organizationRepository.getAll();
+
+    @Override
+    public Organization create(Organization organization) {
+        return organizationRepository.create(organization);
     }
-	
+
+    @Override
+    public void update(Organization organization) {
+        organizationRepository.update(organization);
+    }
+
+    @Log
+    public Collection<Organization> loadAll() {
+        return organizationRepository.loadAll();
+    }
+
+    @Override
+    public Organization load(BigInteger id) {
+        return organizationRepository.load(id);
+    }
+
+    @Override
+    public void delete(Organization organization) {
+        organizationRepository.delete(organization);
+    }
+
 }

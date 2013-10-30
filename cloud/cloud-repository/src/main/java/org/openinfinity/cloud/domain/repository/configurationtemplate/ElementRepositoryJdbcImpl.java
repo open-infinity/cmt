@@ -15,16 +15,17 @@
  */
 package org.openinfinity.cloud.domain.repository.configurationtemplate;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.List;
-
 import org.openinfinity.cloud.domain.configurationtemplate.Element;
 import org.openinfinity.core.annotation.AuditTrail;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigInteger;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
 
 /**
  * JDBC Repository implementation of the <code>org.openinfinity.core.cloud.deployer.repository.DeploymentRepository</code> interface.
@@ -40,25 +41,43 @@ public class ElementRepositoryJdbcImpl implements ElementRepository {
 	private static final String GET_ALL_SQL = 
 	        "SELECT * FROM CONFIGURATION_ELEMENT_TABLE";
 
+    @Override
+    public Element create(Element product) {
+        return null;
+    }
+
+    @Override
+    public void update(Element product) {
+    }
+
     @AuditTrail
     @Transactional
-    public List<Element> getAll() {
+    public List<Element> loadAll() {
         // TODO Auto-generated method stub
         return null;
     }
-   
-	private class ElementRowMapper implements RowMapper<Element> {
+
+    @Override
+    public Element load(BigInteger id) {
+        return null;      }
+
+    @Override
+    public void delete(Element product) {
+    }
+
+    private class ElementRowMapper implements RowMapper<Element> {
 		
 		public Element mapRow(ResultSet resultSet, int rowNum) throws SQLException {    
 		    return new Element(resultSet.getInt("id"),
 		                       resultSet.getInt("type"),
 		                       resultSet.getString("name"),
-		                       resultSet.getInt("version"),
+		                       resultSet.getString("version"),
 		                       resultSet.getString("description"),
 		                       resultSet.getInt("parameterKey"),
 		                       resultSet.getInt("minMachines"),
 		                       resultSet.getInt("maxMachines"),
-		                       resultSet.getInt("minReplicationMachines"),
+                               resultSet.getBoolean("replicated"),
+                               resultSet.getInt("minReplicationMachines"),
 		                       resultSet.getInt("maxReplicationMachines"));
 		}
 	}

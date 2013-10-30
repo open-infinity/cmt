@@ -15,14 +15,15 @@
  */
 package org.openinfinity.cloud.service.configurationtemplate;
 
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.openinfinity.cloud.domain.configurationtemplate.Element;
 import org.openinfinity.cloud.domain.repository.configurationtemplate.ElementRepository;
 import org.openinfinity.core.annotation.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.math.BigInteger;
+import java.util.Collection;
 
 
 
@@ -32,16 +33,36 @@ import org.springframework.stereotype.Service;
  * @since 1.3.0
  */
 
-@Service("configurationElementService")
+@Service("elementServiceImpl")
 public class ElementServiceImpl implements ElementService {
 	private static final Logger LOGGER = Logger.getLogger(ElementServiceImpl.class.getName());
 
 	@Autowired
 	private ElementRepository elementRepository;
-	
-	@Log
-    public List<Element> getAll() {
-        return elementRepository.getAll();
+
+    @Override
+    public Element create(Element element) {
+        return elementRepository.create(element);
     }
-	
+
+    @Override
+    public void update(Element element) {
+        elementRepository.delete(element);
+    }
+
+    @Log
+    public Collection<Element> loadAll() {
+        return elementRepository.loadAll();
+    }
+
+    @Override
+    public Element load(BigInteger id) {
+        return elementRepository.load(id);
+    }
+
+    @Override
+    public void delete(Element element) {
+        elementRepository.delete(element);
+    }
+
 }

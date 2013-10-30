@@ -15,9 +15,8 @@
  */
 package org.openinfinity.cloud.domain.repository.configurationtemplate;
 
-import java.util.List;
-
 import org.openinfinity.cloud.domain.configurationtemplate.Element;
+import org.openinfinity.cloud.domain.repository.common.AbstractCrudRepositoryInterface;
 
 /**
  * CRUD interface for storing <code>org.openinfinity.core.cloud.domain.template</code> objects.
@@ -26,8 +25,6 @@ import org.openinfinity.cloud.domain.configurationtemplate.Element;
  * @version 1.3.0
  * @since 1.3.0
  */
-public interface ElementRepository {
+public interface ElementRepository extends AbstractCrudRepositoryInterface<Element> {
 	
-    List<Element> getAll();
-
 }

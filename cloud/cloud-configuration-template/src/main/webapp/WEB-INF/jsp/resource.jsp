@@ -15,7 +15,12 @@ var portletURL = new urlContainer("portletURL");
 
 portletURL.initialize({
     template: {
-    	getTemplatesForUserURL :   '<portlet:resourceURL id="getTemplatesForUser"/>',	
+        createTemplateURL :   '<portlet:resourceURL id="createTemplate"/>',
+        deleteTemplateURL :   '<portlet:resourceURL id="deleteTemplate"/>',
+        editTemplateURL :   '<portlet:resourceURL id="editTemplate"/>',
+    	getTemplatesForUserURL :   '<portlet:resourceURL id="getTemplatesForUser"/>',
+    	getElementsForTemplateURL :   '<portlet:resourceURL id="getElementsForTemplate"/>',
+    	getOrganizationsForTemplateURL :   '<portlet:resourceURL id="getOrganizationsForTemplate"/>',
     },
     organization: {
     	availableClustersURL :     '<portlet:resourceURL id="availableClusters"/>',    	
@@ -24,6 +29,11 @@ portletURL.initialize({
     	machineURL :               '<portlet:resourceURL id="machine"/>',
     }
 });
+ private static final String PATH_GET_ELEMENTS_FOR_TEMPLATE = "getElementsForTemplate";
+     private static final String PATH_GET_ORGANIZATIONS_FOR_TEMPLATE = "getOrganizationsForTemplate";
 
+     private static final String PATH_EDIT_TEMPLATE = "editTemplate";
+     private static final String PATH_CREATE_TEMPLATE = "createTemplate";
+     private static final String PATH_DELETE_TEMPLATE = "deleteTemplate";
 console.log("portletURL.url=", portletURL.url);
 </script>

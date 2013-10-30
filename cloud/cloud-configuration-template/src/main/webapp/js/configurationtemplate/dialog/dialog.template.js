@@ -12,6 +12,80 @@
 
         edit: function (id) {
             console.log("edit with argument id:" + id);
+            $("#template-edit-element-grid").jqGrid({
+                //url: portletURL.url.template.getTemplatesForUserURL,
+                //url: portletURL.url.machine.machineListURL + "&instanceId=" + instanceId
+                url: portletURL.url.template.getElementsForTemplate + "&templateId=" id,
+                datatype: "json",
+                jsonReader : {
+                    repeatitems : false,
+                    id: "Id",
+                    root : function(obj) { return obj.rows;},
+                    page : function(obj) {return obj.page;},
+                    total : function(obj) {return obj.total;},
+                    records : function(obj) {return obj.records;}
+                    },
+                colNames:['id', 'type', 'name', 'version', 'description', 'parameterKey',
+                          'minMachines', 'maxMachines', 'minReplMachns', 'maxReplMachns'],
+                colModel:[
+                          {name:'id', index:'id', width:50, align:"center"},
+                          {name:'type', index:'type', width:50, align:"center"},
+                          {name:'name', index:'name', width:50, align:"center"},
+                          {name:'version', index:'version', width:50, align:"center"},
+                          {name:'description', index:'description', width:100, align:"center"},
+                          {name:'parameterKey', index:'parameterKey', width:100, align:"center"},
+                          {name:'minMachines', index:'minMachines', width:100, align:"center"},
+                          {name:'maxMachines', index:'maxMachines', width:100, align:"center"},
+                          {name:'minReplicationMachines', index:'minReplicationMachines', width:100, align:"center"},
+                          {name:'maxReplicationMachines', index:'maxReplicationMachines', width:100, align:"center"}
+                          ],
+                rowNum: 10,
+                width: 750,
+                height: 300,
+                pager: '#template-edit-element-grid-pager',
+                sortname: 'id',
+                viewrecords: true,
+                shrinkToFit: false,
+                sortorder: 'id'
+            });
+
+            $("#template-edit-organization-grid").jqGrid({
+                url: portletURL.url.template.getTemplatesForUserURL,
+                datatype: "json",
+                jsonReader : {
+                    repeatitems : false,
+                    id: "Id",
+                    root : function(obj) { return obj.rows;},
+                    page : function(obj) {return obj.page;},
+                    total : function(obj) {return obj.total;},
+                    records : function(obj) {return obj.records;}
+                    },
+                colNames:[
+                    'organizationId', 'companyId', 'parentOrganizationId', 'treePath', 'name',
+                    'type_', 'recursable', 'regionId', 'countryId', 'statusId', 'comments'
+                ],
+                colModel:[
+                    {name:'organizationId', index:'organizationId', width:50, align:"center"},
+                    {name:'companyId', index:'companyId', width:50, align:"center"},
+                    {name:'parentOrganizationId', index:'parentOrganizationId', width:50, align:"center"},
+                    {name:'treePath', index:'treePath', width:50, align:"center"},
+                    {name:'name', index:'name', width:50, align:"center"},
+                    {name:'type_', index:'type_', width:50, align:"center"},
+                    {name:'recursable', index:'recursable', width:50, align:"center"},
+                    {name:'regionId', index:'regionId', width:50, align:"center"},
+                    {name:'countryId', index:'countryId', width:50, align:"center"},
+                    {name:'statusId', index:'statusId', width:50, align:"center"},
+                    {name:'comments', index:'comments', width:50, align:"center"}
+                ],
+                rowNum: 10,
+                width: 900,
+                height: 300,
+                pager: '#template-edit-organization-grid-pager',
+                sortname: 'id',
+                viewrecords: true,
+                shrinkToFit: false,
+                sortorder: 'id'
+            });
             /*
             template.tableEdit.jqGrid({
                 url: portletURL.url.template.getTemplatesForUserURL,
@@ -83,17 +157,19 @@
 
 	// Initialize the dialogs
 	$("#dialog-template-edit").dialog({
+	    title: "Edit template",
 		autoOpen: false,
 		modal: true,
-		width: 475,
-		height: 340
+		width: 1000,
+		height: 1000
 	});
 
     $("#dialog-template-create").dialog({
+  	    title: "Create template",
         autoOpen: false,
         modal: true,
-        width: 475,
-        height: 340
+        width: 1000,
+        height: 1000
     });
 
 

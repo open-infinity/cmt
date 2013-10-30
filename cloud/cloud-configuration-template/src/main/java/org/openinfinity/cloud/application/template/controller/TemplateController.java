@@ -61,18 +61,24 @@ import java.util.Set;
 public class TemplateController {
 	
 	private static final String PATH_GET_TEMPLATES_FOR_USER = "getTemplatesForUser";
-    private static final String PATH_GET_TEMPLATES_FOR_ORGANIZATION = "getTemplatesForOrganization";
+    private static final String PATH_GET_ELEMENTS_FOR_TEMPLATE = "getElementsForTemplate";
+    private static final String PATH_GET_ORGANIZATIONS_FOR_TEMPLATE = "getOrganizationsForTemplate";
+
     private static final String PATH_EDIT_TEMPLATE = "editTemplate";
-    private static final String PATH_ADD_TEMPLATE = "addTemplate";
+    private static final String PATH_CREATE_TEMPLATE = "createTemplate";
     private static final String PATH_DELETE_TEMPLATE = "deleteTemplate";
-    private static final String PATH_USE_TEMPLATE = "useTemplate";
 
     private static final Logger LOG = Logger.getLogger(TemplateController.class.getName());
 
 	@Autowired
-	@Qualifier("configurationTemplateService")
+	@Qualifier("templateService")
 	private TemplateService templateService;
-	
+    /*
+    @Autowired
+    @Qualifier("elementService")
+    private ElementService elementService;
+	*/
+
 	@Autowired
 	LiferayService liferayService;
 	
@@ -142,10 +148,56 @@ public class TemplateController {
     }
 
     @ResourceMapping(PATH_EDIT_TEMPLATE)
-    public void editTemplatesForUser(ResourceRequest request, ResourceResponse response,
+    public void getTemplate(ResourceRequest request, ResourceResponse response,
                                     @RequestParam("page") int page, @RequestParam("rows") int rows)
             throws Exception {
         try{
+            // get template data
+
+            // get all elements
+
+            // serialize and return
+
+
+        } catch (Exception e){
+            ExceptionUtil.throwSystemException(e);
+        }
+    }
+
+    @ResourceMapping(PATH_GET_ELEMENTS_FOR_TEMPLATE)
+    public void getElementsForTemplate(ResourceRequest request, ResourceResponse response,
+                                       @RequestParam("page") int page, @RequestParam("rows") int rows,
+                                       @RequestParam("templateId") int templateId)
+            throws Exception {
+        try{
+
+            // get all elements
+
+            // get elements for template
+
+            // wrap
+
+            // serialize and return
+
+
+        } catch (Exception e){
+            ExceptionUtil.throwSystemException(e);
+        }
+    }
+
+    @ResourceMapping(PATH_GET_ORGANIZATIONS_FOR_TEMPLATE)
+    public void getOrganizationsForTemplate(ResourceRequest request, ResourceResponse response,
+                                       @RequestParam("page") int page, @RequestParam("rows") int rows)
+            throws Exception {
+        try{
+
+            // get all organizations
+
+            // get organizations for template
+
+            // wrap
+
+            // serialize and return
 
 
         } catch (Exception e){

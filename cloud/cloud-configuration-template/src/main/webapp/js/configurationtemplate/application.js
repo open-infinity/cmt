@@ -56,7 +56,8 @@ jQuery(function($){
                 sortname: 'id',
                 viewrecords: true,
                 shrinkToFit: false,
-                sortorder: 'id'
+                sortorder: 'id',
+                ondblClickRow: app.editTemplate
             })
         },
 

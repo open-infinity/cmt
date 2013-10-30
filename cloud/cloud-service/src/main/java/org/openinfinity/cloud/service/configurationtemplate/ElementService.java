@@ -15,9 +15,8 @@
  */
 package org.openinfinity.cloud.service.configurationtemplate;
 
-import java.util.List;
-
 import org.openinfinity.cloud.domain.configurationtemplate.Element;
+import org.openinfinity.cloud.service.common.AbstractCrudServiceInterface;
 
 
 /**
@@ -27,8 +26,6 @@ import org.openinfinity.cloud.domain.configurationtemplate.Element;
  * @version 1.3.0
  * @since 1.3.0
  */
-public interface ElementService {
-	
-    List<Element> getAll();
+public interface ElementService extends AbstractCrudServiceInterface<Element> {
 	
 }

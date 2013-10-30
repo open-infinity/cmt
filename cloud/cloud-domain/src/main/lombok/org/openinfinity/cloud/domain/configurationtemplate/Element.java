@@ -46,7 +46,7 @@ public class Element {
     
     @NonNull
     @NotScript
-    private int version;
+    private String version;
     
     @NonNull
     @NotScript
@@ -63,6 +63,10 @@ public class Element {
     @NonNull
     @NotScript
     private int maxMachines;
+
+    @NonNull
+    @NotScript
+    private boolean replicated;
     
     @NonNull
     @NotScript

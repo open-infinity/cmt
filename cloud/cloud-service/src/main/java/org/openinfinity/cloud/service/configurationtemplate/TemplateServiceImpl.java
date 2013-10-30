@@ -33,7 +33,7 @@ import java.util.Set;
  * @since 1.3.0
  */
 
-@Service("configurationTemplateService")
+@Service("templateService")
 public class TemplateServiceImpl implements TemplateService {
 	@Autowired
 	private TemplateRepository templateRepository;
@@ -65,7 +65,7 @@ public class TemplateServiceImpl implements TemplateService {
     @Override
     public Set<Template> getTemplates(List<Long> organizationIds) {
         Set<Template> templates = new HashSet<Template>();
-        for(Long oid: organizationIds){
+        for(Long oid : organizationIds){
             templates.addAll(templateRepository.getTemplates(oid));
         }
         return templates;
