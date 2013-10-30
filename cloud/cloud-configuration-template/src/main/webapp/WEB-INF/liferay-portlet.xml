@@ -22,15 +22,16 @@
 		-->		
 		
 		<!-- import modules -->
-		<!--
-		<header-portlet-javascript>/js/configurationtemplate/main.js</header-portlet-javascript>
-		<header-portlet-javascript>/js/configurationtemplate/widgets/platformselect.js</header-portlet-javascript>
-		<header-portlet-javascript>/js/configurationtemplate/resource/resource.js</header-portlet-javascript>
-		
-		-->
-		<header-portlet-javascript>/js/configurationtemplate/main.js</header-portlet-javascript>
-		<header-portlet-javascript>/js/configurationtemplate/template.js</header-portlet-javascript>
-		
+        <header-portlet-javascript>/js/configurationtemplate/init.js</header-portlet-javascript>
+
+        <!--
+        <header-portlet-javascript>/js/configurationtemplate/init.js</header-portlet-javascript>
+        <header-portlet-javascript>/js/configurationtemplate/widgets/platformselect.js</header-portlet-javascript>
+        <header-portlet-javascript>/js/configurationtemplate/resource/resource.js</header-portlet-javascript>
+
+        -->
+		<header-portlet-javascript>/js/configurationtemplate/application.js</header-portlet-javascript>
+
 		<!--
 		<header-portlet-javascript>/js/configurationtemplate/util/util.js</header-portlet-javascript>
 		<header-portlet-javascript>/js/cloudadmin/poller/datapoller.js</header-portlet-javascript>

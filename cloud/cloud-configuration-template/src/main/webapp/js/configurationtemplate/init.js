@@ -17,3 +17,9 @@
  * @version 1.3.0 
  * @since 1.3.0
  */
+
+ var app = window.app || new Object();
+ app.templatesTable = new Object();
+ app.dialog = new Object();
+ app.dialog.template = new Object();
+
