@@ -32,11 +32,11 @@ import java.math.BigInteger;
 @Data
 @NoArgsConstructor
 @RequiredArgsConstructor
-public class Template implements Comparable{
+public class ConfigurationTemplate implements Comparable{
     
     @NonNull
     @NotScript
-    private BigInteger id;
+    private int id;
     
     @NonNull
     @NotScript
@@ -49,6 +49,6 @@ public class Template implements Comparable{
     @Override
     public int compareTo(Object o) {
         // TODO Auto-generated method stub
-        return this.id.intValue() - ((Template)o).getId().intValue();
+        return this.id - ((ConfigurationTemplate)o).getId();
     }
 }

@@ -15,15 +15,14 @@
  */
 package org.openinfinity.cloud.service.configurationtemplate;
 
-import java.util.List;
-
 import org.apache.log4j.Logger;
-import org.openinfinity.cloud.domain.configurationtemplate.ElementDependency;
-import org.openinfinity.cloud.domain.repository.configurationtemplate.ElementDependencyRepository;
+import org.openinfinity.cloud.domain.configurationtemplate.ConfigurationElementDependency;
+import org.openinfinity.cloud.domain.repository.configurationtemplate.ConfigurationElementDependencyRepository;
 import org.openinfinity.core.annotation.Log;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 
 
@@ -33,16 +32,16 @@ import org.springframework.stereotype.Service;
  * @since 1.3.0
  */
 
-@Service("ConfigurationElementDependencyService")
-public class ElementDependencyServiceImpl implements ElementDependencyService {
-	private static final Logger LOGGER = Logger.getLogger(ElementDependencyServiceImpl.class.getName());
+@Service
+public class ConfigurationElementDependencyServiceImpl implements ConfigurationElementDependencyService {
+	private static final Logger LOGGER = Logger.getLogger(ConfigurationElementDependencyServiceImpl.class.getName());
 
 	@Autowired
-	private ElementDependencyRepository elementDependencyRepository;
+	private ConfigurationElementDependencyRepository configurationElementDependencyRepository;
 	
 	@Log
-    public List<ElementDependency> getAll() {
-        return elementDependencyRepository.getAll();
+    public List<ConfigurationElementDependency> getAll() {
+        return configurationElementDependencyRepository.getAll();
     }
 	
 }

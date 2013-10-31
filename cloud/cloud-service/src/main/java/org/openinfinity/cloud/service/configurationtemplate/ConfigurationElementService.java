@@ -15,8 +15,10 @@
  */
 package org.openinfinity.cloud.service.configurationtemplate;
 
-import org.openinfinity.cloud.domain.configurationtemplate.Element;
+import org.openinfinity.cloud.domain.configurationtemplate.ConfigurationElement;
 import org.openinfinity.cloud.service.common.AbstractCrudServiceInterface;
+
+import java.util.Collection;
 
 
 /**
@@ -26,6 +28,8 @@ import org.openinfinity.cloud.service.common.AbstractCrudServiceInterface;
  * @version 1.3.0
  * @since 1.3.0
  */
-public interface ElementService extends AbstractCrudServiceInterface<Element> {
-	
+public interface ConfigurationElementService extends AbstractCrudServiceInterface<ConfigurationElement> {
+
+    Collection<ConfigurationElement> loadAllForTemplate(int templateId);
+
 }

@@ -30,7 +30,7 @@ import lombok.RequiredArgsConstructor;
 @Data
 @NoArgsConstructor
 @RequiredArgsConstructor
-public class ElementDependency {
+public class ConfigurationElementDependency {
     
     @NonNull
     @NotScript

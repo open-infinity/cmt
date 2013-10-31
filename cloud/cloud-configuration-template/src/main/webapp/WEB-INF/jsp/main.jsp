@@ -62,7 +62,6 @@
 		        <button id="edit-template">Edit</button>
 		        <button id="new-template">New</button>
 		        <button id="delete-template">Delete</button>
-	            <button id="assign-template">Assign</button>
             </div>
     	</div>
 

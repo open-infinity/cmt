@@ -309,16 +309,15 @@ CREATE TABLE `configuration_template_tbl` (
 DROP TABLE IF EXISTS `configuration_template_organization_tbl`;
 
 CREATE TABLE `configuration_template_organization_tbl` (
-  `organization_id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `organization_id` bigint(20) NOT NULL,
   `template_id` int(11) NOT NULL,
-  PRIMARY KEY (`organization_id`),
   CONSTRAINT fk_configuration_template FOREIGN KEY (template_id) REFERENCES configuration_template_tbl(id)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `configuration_template_element_tbl`;
+DROP TABLE IF EXISTS `configuration_element_tbl`;
 
-CREATE TABLE `configuration_template_element_tbl` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `configuration_element_tbl` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `type` int(11) NOT NULL,
   `name` varchar(30) NOT NULL,
   `version` varchar(30) NOT NULL,
@@ -330,5 +329,13 @@ CREATE TABLE `configuration_template_element_tbl` (
   `minReplicationMachines` int(11),
   `maxReplicationMachines` int(11),
   PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `configuration_template_element_tbl`;
+
+CREATE TABLE `configuration_template_element_tbl` (
+  `template_id` int(11) NOT NULL,
+  `element_id` int(11) NOT NULL,
+  CONSTRAINT fk_configuration_element FOREIGN KEY (element_id) REFERENCES configuration_element_tbl(id)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 

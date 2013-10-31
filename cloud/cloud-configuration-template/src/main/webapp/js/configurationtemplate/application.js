@@ -68,7 +68,6 @@ jQuery(function($){
         bindEventHandlers: function(){
             $("#edit-template").bind( "click", app.editTemplate);
             $("#new-template").bind( "click", app.createNewTemplate);
-            $("#assign-template").bind( "click", app.assignTemplate);
             $("#delete-template").bind( "click", app.deleteTemplate);
         },
 
@@ -88,6 +87,14 @@ jQuery(function($){
         deleteTemplate: function(){
             alert( "User clicked on 'Delete '" );
             app.dialog.template.remove(1);
+            $.ajax({
+              url: portletURL.url.template.getElementsForTemplateURL + "&page=1" + "&rows=5" +"&templateId=2",
+              cache: false
+            })
+              .done(function( res ) {
+                console.log(res);
+              });
+
         },
 
         editTemplate: function(){
@@ -98,10 +105,6 @@ jQuery(function($){
             } else {
                 alert("Please select row");
             }
-        },
-
-        assignTemplate: function(){
-            alert( "User clicked on 'Assign '" );
         },
 
         addTab: function(){

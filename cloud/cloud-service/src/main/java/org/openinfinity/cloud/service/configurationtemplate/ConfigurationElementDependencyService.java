@@ -15,9 +15,9 @@
  */
 package org.openinfinity.cloud.service.configurationtemplate;
 
-import java.util.List;
+import org.openinfinity.cloud.domain.configurationtemplate.ConfigurationElementDependency;
 
-import org.openinfinity.cloud.domain.configurationtemplate.ElementDependency;
+import java.util.List;
 
 
 /**
@@ -27,8 +27,8 @@ import org.openinfinity.cloud.domain.configurationtemplate.ElementDependency;
  * @version 1.3.0
  * @since 1.3.0
  */
-public interface ElementDependencyService {
+public interface ConfigurationElementDependencyService {
 	
-    List<ElementDependency> getAll();
+    List<ConfigurationElementDependency> getAll();
 	
 }

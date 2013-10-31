@@ -13,9 +13,7 @@
         edit: function (id) {
             console.log("edit with argument id:" + id);
             $("#template-edit-element-grid").jqGrid({
-                //url: portletURL.url.template.getTemplatesForUserURL,
-                //url: portletURL.url.machine.machineListURL + "&instanceId=" + instanceId
-                url: portletURL.url.template.getElementsForTemplate + "&templateId=" id,
+                url: portletURL.url.template.getElementsForTemplateURL + "&templateId=" + id,
                 datatype: "json",
                 jsonReader : {
                     repeatitems : false,
@@ -26,7 +24,7 @@
                     records : function(obj) {return obj.records;}
                     },
                 colNames:['id', 'type', 'name', 'version', 'description', 'parameterKey',
-                          'minMachines', 'maxMachines', 'minReplMachns', 'maxReplMachns'],
+                          'minMachines', 'maxMachines', 'replicated', 'minReplMachns', 'maxReplMachns', 'selectedForTemplate'],
                 colModel:[
                           {name:'id', index:'id', width:50, align:"center"},
                           {name:'type', index:'type', width:50, align:"center"},
@@ -36,17 +34,31 @@
                           {name:'parameterKey', index:'parameterKey', width:100, align:"center"},
                           {name:'minMachines', index:'minMachines', width:100, align:"center"},
                           {name:'maxMachines', index:'maxMachines', width:100, align:"center"},
+                          {name:'replicated', index:'replicated', width:50, align:"center"},
                           {name:'minReplicationMachines', index:'minReplicationMachines', width:100, align:"center"},
-                          {name:'maxReplicationMachines', index:'maxReplicationMachines', width:100, align:"center"}
+                          {name:'maxReplicationMachines', index:'maxReplicationMachines', width:100, align:"center"},
+                          {name:'maxReplicationMachines', index:'selectedForTemplate', width:20, align:"selectedForTemplate"}
+
                           ],
                 rowNum: 10,
-                width: 750,
+                width: 900,
                 height: 300,
                 pager: '#template-edit-element-grid-pager',
                 sortname: 'id',
                 viewrecords: true,
                 shrinkToFit: false,
                 sortorder: 'id'
+                //multiselect: true,
+                //loadonce: true,
+                //loadComplete: function(){
+                //    alert("load complete");
+                    /*var ret;
+                    alert("This function is executed immediately after\n data is loaded. We try to update data in row 13.");
+                    ret = jQuery("#list15").jqGrid('getRowData',"13");
+                    if(ret.id == "13"){
+                        jQuery("#list15").jqGrid('setRowData',ret.id,{note:"<font color='red'>Row 13 is updated!</font>"})
+                    } */
+                //}
             });
 
             $("#template-edit-organization-grid").jqGrid({
@@ -161,7 +173,16 @@
 		autoOpen: false,
 		modal: true,
 		width: 1000,
-		height: 1000
+		height: 1000 ,
+		buttons: {
+            "Submit changes": function() {
+              $(this).dialog( "close" );
+              // post all
+            },
+            Cancel: function() {
+              $(this).dialog( "close" );
+            }
+        }
 	});
 
     $("#dialog-template-create").dialog({

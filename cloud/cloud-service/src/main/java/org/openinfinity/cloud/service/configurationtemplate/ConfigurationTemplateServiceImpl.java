@@ -15,8 +15,8 @@
  */
 package org.openinfinity.cloud.service.configurationtemplate;
 
-import org.openinfinity.cloud.domain.configurationtemplate.Template;
-import org.openinfinity.cloud.domain.repository.configurationtemplate.TemplateRepository;
+import org.openinfinity.cloud.domain.configurationtemplate.ConfigurationTemplate;
+import org.openinfinity.cloud.domain.repository.configurationtemplate.ConfigurationTemplateRepository;
 import org.openinfinity.core.annotation.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,40 +33,40 @@ import java.util.Set;
  * @since 1.3.0
  */
 
-@Service("templateService")
-public class TemplateServiceImpl implements TemplateService {
+@Service
+public class ConfigurationTemplateServiceImpl implements ConfigurationTemplateService {
 	@Autowired
-	private TemplateRepository templateRepository;
+	private ConfigurationTemplateRepository ConfigurationTemplateRepository;
 	
     @Override
-    public Template create(Template product) {
+    public ConfigurationTemplate create(ConfigurationTemplate configurationTemplate) {
         return null;
     }
 
     @Override
-    public void update(Template product) {
+    public void update(ConfigurationTemplate configurationTemplate) {
     }
 
     @Override
-    public Collection<Template> loadAll() {
+    public Collection<ConfigurationTemplate> loadAll() {
         return null;
     }
 
     @Override
-    public Template load(BigInteger id) {
+    public ConfigurationTemplate load(BigInteger id) {
         return null;
     }
 
     @Override
-    public void delete(Template product) {
+    public void delete(ConfigurationTemplate configurationTemplate) {
     }
 
     @Log
     @Override
-    public Set<Template> getTemplates(List<Long> organizationIds) {
-        Set<Template> templates = new HashSet<Template>();
+    public Set<ConfigurationTemplate> getTemplates(List<Long> organizationIds) {
+        Set<ConfigurationTemplate> templates = new HashSet<ConfigurationTemplate>();
         for(Long oid : organizationIds){
-            templates.addAll(templateRepository.getTemplates(oid));
+            templates.addAll(ConfigurationTemplateRepository.getTemplates(oid));
         }
         return templates;
     }
