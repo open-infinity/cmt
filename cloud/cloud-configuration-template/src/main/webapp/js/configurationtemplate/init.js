@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (c) 2013 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,23 +12,14 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
-package org.openinfinity.cloud.service.configurationtemplate;
-
-import java.util.List;
-
-import org.openinfinity.cloud.domain.configurationtemplate.Element;
-
-
-/**
- * Template interface for management of cloud configuration tempaltes.
- * 
+ *
  * @author Vedran Bartonicek
- * @version 1.3.0
+ * @version 1.3.0 
  * @since 1.3.0
  */
-public interface ElementService {
-	
-    List<Element> getAll();
-	
-}
+
+ var app = window.app || new Object();
+ app.templatesTable = new Object();
+ app.dialog = new Object();
+ app.dialog.template = new Object();
+

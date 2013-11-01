@@ -3,6 +3,6 @@
 
 <display>
 	<category name="Open Infinity">
-		<portlet id="cloudtemplate" />
+		<portlet id="configurationtemplate" />
 	</category>
 </display>

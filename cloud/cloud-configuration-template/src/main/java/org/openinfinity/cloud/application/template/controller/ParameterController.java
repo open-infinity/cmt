@@ -16,7 +16,6 @@
 
 package org.openinfinity.cloud.application.template.controller;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -26,9 +25,7 @@ import javax.portlet.RenderResponse;
 import javax.portlet.ResourceResponse;
 
 import org.openinfinity.cloud.domain.configurationtemplate.ParameterKey;
-import org.openinfinity.cloud.domain.configurationtemplate.Template;
 import org.openinfinity.cloud.service.configurationtemplate.ParameterKeyService;
-import org.openinfinity.cloud.service.configurationtemplate.TemplateService;
 import org.openinfinity.cloud.util.serialization.SerializerUtil;
 import org.openinfinity.core.annotation.AuditTrail;
 import org.openinfinity.core.annotation.Log;
@@ -37,7 +34,6 @@ import org.openinfinity.core.exception.ApplicationException;
 import org.openinfinity.core.exception.BusinessViolationException;
 import org.openinfinity.core.exception.SystemException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;

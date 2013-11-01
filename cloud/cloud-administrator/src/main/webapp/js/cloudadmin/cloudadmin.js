@@ -1015,7 +1015,8 @@ var instanceManager = {
 					}
 					catch(e){
 						console.log("Exception thrown: " + e.message);
-					}
+		                initClusterConfigureDialog
+		            }
 				});
 			}
 			

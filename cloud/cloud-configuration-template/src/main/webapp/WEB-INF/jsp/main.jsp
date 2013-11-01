@@ -45,16 +45,16 @@
     
     <div id="tab_title">TAB TITLE</div>
     <div id="tab_content">TAB CONTENT</div>
-    
+
     <div id="tabs">
         <ul>
 			<li><a href="#tabs-1">Templates</a></li>
-			<!-- 
+			<!--
 			<li><a href="#tabs-2">Template 1</a></li>
 			<li><a href="#tabs-3">Template 2</a></li>
-			-->	
+			-->
         </ul>
-	
+
 		<div id="tabs-1">
 			<table id="templates-grid"> </table>
 			<div id="template-grid-pager"> </div>
@@ -62,19 +62,32 @@
 		        <button id="edit-template">Edit</button>
 		        <button id="new-template">New</button>
 		        <button id="delete-template">Delete</button>
-	            <button id="assign-template">Assign</button>  
             </div>
     	</div>
-		
-		<!--  
+
+		<!--
 		<div id="tabs-2">
 		  Template slkdhf 2
 		</div>
-		
+
 		<div id="tabs-3">
-		  Template lkjh 3  
+		  Template lkjh 3
 		</div>
 		-->
+	</div>
+
+	<div id="dialog-template-edit">
+        <div id="edit-template-fields">
+            <p> ID <input type='text' value=''> </p>
+            <p> Name <input type='text' value=''> </p>
+            <p> Description <input type='text' value=''> </p>
+        </div>
+        <br>
+        <table id="template-edit-element-grid"></table>
+        <div id="template-edit-element-grid-pager"></div>
+        <br>
+        <table id="template-edit-organization-grid"></table>
+        <div id="template-edit-organization-grid-pager"></div>
 	</div>
 
 </body>

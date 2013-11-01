@@ -15,7 +15,7 @@
  */
 package org.openinfinity.cloud.domain.repository.configurationtemplate;
 
-import org.openinfinity.cloud.domain.configurationtemplate.Template;
+import org.openinfinity.cloud.domain.configurationtemplate.ConfigurationTemplate;
 import org.openinfinity.core.annotation.AuditTrail;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -40,7 +40,7 @@ import java.util.List;
  * @since 1.3.0
  */
 @Repository
-public class TemplateRepositoryJdbcImpl implements TemplateRepository {
+public class ConfigurationTemplateRepositoryJdbcImpl implements ConfigurationTemplateRepository {
 
 	private JdbcTemplate jdbcTemplate;
 	
@@ -50,49 +50,49 @@ public class TemplateRepositoryJdbcImpl implements TemplateRepository {
         "inner join configuration_template_organization_tbl on " +
         "configuration_template_tbl.id = configuration_template_organization_tbl.template_id " +
         "where organization_id = ?";
-    
+
     @Autowired
-    public TemplateRepositoryJdbcImpl(@Qualifier("cloudDataSource") DataSource dataSource) {
+    public ConfigurationTemplateRepositoryJdbcImpl(@Qualifier("cloudDataSource") DataSource dataSource) {
         Assert.notNull(dataSource, "Please define datasource for scaling rule repository.");
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
     
     @AuditTrail
     @Transactional
-    public List<Template> getTemplates(Long oid) {
+    public List<ConfigurationTemplate> getTemplates(Long oid) {
         return jdbcTemplate.query(GET_ALL_FOR_ORGANIZATION_SQL,
                                   new Object[] {oid},
                                   new TemplateRowMapper());
     }
 
     @Override
-    public Template create(Template product) {
+    public ConfigurationTemplate create(ConfigurationTemplate configurationTemplate) {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
-    public void update(Template product) {
+    public void update(ConfigurationTemplate configurationTemplate) {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
-    public Collection<Template> loadAll() {
+    public Collection<ConfigurationTemplate> loadAll() {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
-    public Template load(BigInteger id) {
+    public ConfigurationTemplate load(BigInteger id) {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
-    public void delete(Template product) {
+    public void delete(ConfigurationTemplate configurationTemplate) {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    private class TemplateRowMapper implements RowMapper<Template> {
-		public Template mapRow(ResultSet resultSet, int rowNum) throws SQLException {    
-		    return new Template(resultSet.getInt("id"),
+    private class TemplateRowMapper implements RowMapper<ConfigurationTemplate> {
+		public ConfigurationTemplate mapRow(ResultSet resultSet, int rowNum) throws SQLException {    
+		    return new ConfigurationTemplate(resultSet.getInt("id"),
 		                        resultSet.getString("name"),
 		                        resultSet.getString("description"));
 		}

@@ -216,10 +216,13 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>2.12</version>
 				<configuration>
+                    <!--
 					<include>**/*Junit*.java</include>
                     <include>**/*Test*.java</include>
                     <include>**/*Test.java</include>
                     <include>**/*TestCase.java</include>
+                    -->
+                <skipTests>true</skipTests>
 				</configuration>
 				<dependencies>
                 <dependency>

@@ -15,16 +15,16 @@
  */
 package org.openinfinity.cloud.domain.repository.configurationtemplate;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.List;
-
-import org.openinfinity.cloud.domain.configurationtemplate.ElementDependency;
+import org.openinfinity.cloud.domain.configurationtemplate.ConfigurationElementDependency;
 import org.openinfinity.core.annotation.AuditTrail;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
 
 /**
  * JDBC Repository implementation of the <code>org.openinfinity.core.cloud.deployer.repository.DeploymentRepository</code> interface.
@@ -34,24 +34,23 @@ import org.springframework.transaction.annotation.Transactional;
  * @since 1.3.0
  */
 
-@Repository("configurationElementDependencyRepository")
-public class ElementDependencyRepositoryJdbcImpl implements ElementDependencyRepository {
+@Repository
+public class ConfigurationElementDependencyRepositoryJdbcImpl implements ConfigurationElementDependencyRepository {
 
 	private JdbcTemplate jdbcTemplate;
-	private static final String GET_ALL_SQL = 
-	        "SELECT * FROM CONFIGURATION_ELEMENT_TABLE";
+	private static final String GET_ALL_SQL = "SELECT * FROM CONFIGURATION_ELEMENT_TABLE";
 
     @AuditTrail
     @Transactional
-    public List<ElementDependency> getAll() {
+    public List<ConfigurationElementDependency> getAll() {
         // TODO Auto-generated method stub
         return null;
     }
     
-  	private class ElementDependencyRowMapper implements RowMapper<ElementDependency> {
+  	private class ElementDependencyRowMapper implements RowMapper<ConfigurationElementDependency> {
 		
-		public ElementDependency mapRow(ResultSet resultSet, int rowNum) throws SQLException {    
-		    return new ElementDependency(resultSet.getInt("id"),
+		public ConfigurationElementDependency mapRow(ResultSet resultSet, int rowNum) throws SQLException {    
+		    return new ConfigurationElementDependency(resultSet.getInt("id"),
 		                       resultSet.getInt("element_from"),
 		                       resultSet.getInt("element_to"));
 		}

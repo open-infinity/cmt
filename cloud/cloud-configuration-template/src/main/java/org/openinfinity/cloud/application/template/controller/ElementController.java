@@ -16,19 +16,8 @@
 
 package org.openinfinity.cloud.application.template.controller;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-
-import javax.portlet.ActionRequest;
-import javax.portlet.RenderRequest;
-import javax.portlet.RenderResponse;
-import javax.portlet.ResourceResponse;
-
-import org.openinfinity.cloud.domain.configurationtemplate.Element;
-import org.openinfinity.cloud.domain.configurationtemplate.Template;
-import org.openinfinity.cloud.service.configurationtemplate.ElementService;
-import org.openinfinity.cloud.service.configurationtemplate.TemplateService;
+import org.openinfinity.cloud.domain.configurationtemplate.ConfigurationElement;
+import org.openinfinity.cloud.service.configurationtemplate.ConfigurationElementService;
 import org.openinfinity.cloud.util.serialization.SerializerUtil;
 import org.openinfinity.core.annotation.AuditTrail;
 import org.openinfinity.core.annotation.Log;
@@ -37,14 +26,19 @@ import org.openinfinity.core.exception.ApplicationException;
 import org.openinfinity.core.exception.BusinessViolationException;
 import org.openinfinity.core.exception.SystemException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.portlet.ModelAndView;
 import org.springframework.web.portlet.bind.annotation.ResourceMapping;
+
+import javax.portlet.ActionRequest;
+import javax.portlet.RenderRequest;
+import javax.portlet.RenderResponse;
+import javax.portlet.ResourceResponse;
+import java.util.Collection;
+import java.util.Map;
 
 /**
  * Spring portlet controller for handling templates.
@@ -57,10 +51,10 @@ import org.springframework.web.portlet.bind.annotation.ResourceMapping;
 @RequestMapping("VIEW")
 public class ElementController {
 	
-	private static final String PATH_GET_TEMPLATES_BY_ORGANIZATION = "getTemplatesByOrganization";
+	private static final String PATH_GET_ELEMENTS = "getAllElements";
 	
 	@Autowired
-	private ElementService configurationElementService;
+	private ConfigurationElementService configurationElementService;
 	
 	@ExceptionHandler({ApplicationException.class, BusinessViolationException.class,
 	                   SystemException.class})
@@ -85,24 +79,15 @@ public class ElementController {
 
 		return modelAndView;
     }
-	
-	
+
     @Log
     @AuditTrail
     @Transactional
-    @ResourceMapping(PATH_GET_TEMPLATES_BY_ORGANIZATION)
-    public void loadClusters(ResourceResponse response, 
-                             @RequestParam("organizationId") int organizationId)
-                             throws Exception {    
-        
-        // TODO
-        @SuppressWarnings("unchecked")
-        List<Element> templatesList = configurationElementService.getAll();
-        
-        if(templatesList !=  null) 
-            SerializerUtil.jsonSerialize(response.getWriter(), templatesList);
-        
-        else return;   
+    @ResourceMapping(PATH_GET_ELEMENTS)
+    public void getAllElements(ResourceResponse response) throws Exception {
+        Collection<ConfigurationElement> elements = configurationElementService.loadAll();
+        if (elements !=  null) SerializerUtil.jsonSerialize(response.getWriter(), elements);
+        else return;
     } 
 		
 }

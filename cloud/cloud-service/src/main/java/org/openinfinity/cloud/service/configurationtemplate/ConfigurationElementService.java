@@ -15,33 +15,21 @@
  */
 package org.openinfinity.cloud.service.configurationtemplate;
 
-import java.util.List;
+import org.openinfinity.cloud.domain.configurationtemplate.ConfigurationElement;
+import org.openinfinity.cloud.service.common.AbstractCrudServiceInterface;
 
-import org.apache.log4j.Logger;
-import org.openinfinity.cloud.domain.configurationtemplate.Element;
-import org.openinfinity.cloud.domain.repository.configurationtemplate.ElementRepository;
-import org.openinfinity.core.annotation.Log;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
+import java.util.Collection;
 
 
 /**
+ * Template interface for management of cloud configuration tempaltes.
+ * 
  * @author Vedran Bartonicek
  * @version 1.3.0
  * @since 1.3.0
  */
+public interface ConfigurationElementService extends AbstractCrudServiceInterface<ConfigurationElement> {
 
-@Service("configurationElementService")
-public class ElementServiceImpl implements ElementService {
-	private static final Logger LOGGER = Logger.getLogger(ElementServiceImpl.class.getName());
+    Collection<ConfigurationElement> loadAllForTemplate(int templateId);
 
-	@Autowired
-	private ElementRepository elementRepository;
-	
-	@Log
-    public List<Element> getAll() {
-        return elementRepository.getAll();
-    }
-	
 }

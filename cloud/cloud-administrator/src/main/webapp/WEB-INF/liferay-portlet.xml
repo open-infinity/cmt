@@ -25,7 +25,7 @@
 		<header-portlet-javascript>/js/cloudadmin/resource/resource.js</header-portlet-javascript>
 		<!--  <header-portlet-javascript>/js/cloudadmin/poller/datapoller.js</header-portlet-javascript> -->
 
-		<!-- dialogs -->
+		<!-- dialog -->
 		<footer-portlet-javascript>/js/cloudadmin/dialog/dialog.instance.js</footer-portlet-javascript>
 		<footer-portlet-javascript>/js/cloudadmin/dialog/dialog.cluster.js</footer-portlet-javascript>
 		<footer-portlet-javascript>/js/cloudadmin/dialog/dialog.machine.js</footer-portlet-javascript>				

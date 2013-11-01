@@ -15,22 +15,20 @@
  */
 package org.openinfinity.cloud.service.configurationtemplate;
 
-import org.openinfinity.cloud.domain.configurationtemplate.Template;
-import org.openinfinity.cloud.service.common.AbstractCrudServiceInterface;
+import org.openinfinity.cloud.domain.configurationtemplate.ConfigurationElementDependency;
 
 import java.util.List;
-import java.util.Set;
 
 
 /**
- * Template interface for management of cloud configuration templates.
+ * Template interface for management of cloud configuration tempaltes.
  * 
  * @author Vedran Bartonicek
  * @version 1.3.0
  * @since 1.3.0
  */
-public interface TemplateService extends AbstractCrudServiceInterface<Template> {
+public interface ConfigurationElementDependencyService {
 	
-    Set<Template> getTemplates(List<Long> organizationIds);
+    List<ConfigurationElementDependency> getAll();
 	
 }

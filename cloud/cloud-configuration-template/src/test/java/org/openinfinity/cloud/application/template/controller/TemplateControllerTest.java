@@ -1,34 +1,27 @@
 package org.openinfinity.cloud.application.template.controller;
 
-import java.util.LinkedList;
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.mock.web.portlet.MockResourceRequest;
-import org.springframework.mock.web.portlet.MockResourceResponse;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
 import com.liferay.portal.model.User;
-
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import static junit.framework.Assert.assertEquals;
-
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-
-import static org.mockito.Mockito.*;
-
 import org.openinfinity.cloud.comon.web.LiferayService;
-import org.openinfinity.cloud.application.template.controller.TemplateController;
 import org.openinfinity.core.util.ExceptionUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mock.web.portlet.MockResourceRequest;
+import org.springframework.mock.web.portlet.MockResourceResponse;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import java.util.LinkedList;
+import java.util.List;
+
+import static junit.framework.Assert.assertEquals;
+import static org.mockito.Mockito.*;
 
 /**
  * Tests for TemplateController
@@ -44,7 +37,6 @@ public class TemplateControllerTest {
 
     @InjectMocks
     @Autowired
-    @Qualifier("configurationTemplateController")
     private TemplateController templateController;
     
     @Mock

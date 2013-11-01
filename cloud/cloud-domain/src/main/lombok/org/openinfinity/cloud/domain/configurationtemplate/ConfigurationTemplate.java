@@ -22,6 +22,8 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
+import java.math.BigInteger;
+
 /**
  * @author Vedran Bartonicek
  * @version 1.3.0
@@ -30,7 +32,7 @@ import lombok.RequiredArgsConstructor;
 @Data
 @NoArgsConstructor
 @RequiredArgsConstructor
-public class Element {
+public class ConfigurationTemplate implements Comparable{
     
     @NonNull
     @NotScript
@@ -38,38 +40,15 @@ public class Element {
     
     @NonNull
     @NotScript
-    private int type;
-    
-    @NonNull
-    @NotScript
     private String name;
     
     @NonNull
     @NotScript
-    private int version;
-    
-    @NonNull
-    @NotScript
     private String description;
-    
-    @NonNull
-    @NotScript
-    private int parameterKey; 
-    
-    @NonNull
-    @NotScript
-    private int minMachines;
-    
-    @NonNull
-    @NotScript
-    private int maxMachines;
-    
-    @NonNull
-    @NotScript
-    private int minReplicationMachines;
-    
-    @NonNull
-    @NotScript
-    private int maxReplicationMachines;
-    
+
+    @Override
+    public int compareTo(Object o) {
+        // TODO Auto-generated method stub
+        return this.id - ((ConfigurationTemplate)o).getId();
+    }
 }

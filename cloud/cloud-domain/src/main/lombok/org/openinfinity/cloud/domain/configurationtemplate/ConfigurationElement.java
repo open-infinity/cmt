@@ -30,7 +30,7 @@ import lombok.RequiredArgsConstructor;
 @Data
 @NoArgsConstructor
 @RequiredArgsConstructor
-public class Template implements Comparable{
+public class ConfigurationElement {
     
     @NonNull
     @NotScript
@@ -38,15 +38,42 @@ public class Template implements Comparable{
     
     @NonNull
     @NotScript
+    private int type;
+    
+    @NonNull
+    @NotScript
     private String name;
     
     @NonNull
     @NotScript
+    private String version;
+    
+    @NonNull
+    @NotScript
     private String description;
+    
+    @NonNull
+    @NotScript
+    private int parameterKey; 
+    
+    @NonNull
+    @NotScript
+    private int minMachines;
+    
+    @NonNull
+    @NotScript
+    private int maxMachines;
 
-    @Override
-    public int compareTo(Object o) {
-        // TODO Auto-generated method stub
-        return this.id - ((Template)o).getId();
-    }   
+    @NonNull
+    @NotScript
+    private boolean replicated;
+    
+    @NonNull
+    @NotScript
+    private int minReplicationMachines;
+    
+    @NonNull
+    @NotScript
+    private int maxReplicationMachines;
+    
 }
