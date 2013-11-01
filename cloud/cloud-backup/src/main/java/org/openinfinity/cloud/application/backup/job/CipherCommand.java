@@ -40,6 +40,7 @@ public class CipherCommand implements Command {
 	 * Cipher backup package.
 	 */
 	public void cipher() throws Exception {
+		logger.trace("cipher");
 		// TODO
 	}
 	
@@ -47,6 +48,7 @@ public class CipherCommand implements Command {
 	 * Decipher backup package.
 	 */
 	public void decipher() throws Exception {
+		logger.trace("decipher");
 		// TODO
 	}
 	

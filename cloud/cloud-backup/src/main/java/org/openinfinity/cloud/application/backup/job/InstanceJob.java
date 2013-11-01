@@ -45,6 +45,11 @@ abstract public class InstanceJob {
 	private String password;
 
 	/**
+	 * Eucalyptus instance id.
+	 */
+	private String virtualMachineInstanceId;
+	
+	/**
 	 * Directory, where the package is to be stored in the local host.
 	 */
 	private String localPackageDirectory;
@@ -83,9 +88,11 @@ abstract public class InstanceJob {
 		try {
 			// Execute the commands
 			for (Command cmd : commands) {
+				logger.debug("Executing " + cmd.getClass().getSimpleName());
 				cmd.execute();
 				finished_commands.add(cmd);
 			}
+			logger.debug("All commands executed successfully.");
 		} catch (Exception e) {
 			// One of the commands failed. Use the finished list to undo the action.
 			if (finished_commands.size() > 0) {
@@ -93,8 +100,10 @@ abstract public class InstanceJob {
 				try {
 					Collections.reverse(finished_commands);
 					for (Command cmd : finished_commands) {
+						logger.info("Undoing " + cmd.getClass().getSimpleName());
 						cmd.undo();
 					}
+					logger.info("" + finished_commands.size() + " undo steps completed");
 				} catch (Exception ee) {
 					logger.warn("Job " + jobName + " undo failed too! " + ee.getMessage(), ee);
 				}
@@ -155,4 +164,11 @@ abstract public class InstanceJob {
 	public void setLocalBackupFile(File localBackupFile) {
 		this.localBackupFile = localBackupFile;
 	}
+	public String getVirtualMachineInstanceId() {
+		return virtualMachineInstanceId;
+	}
+	public void setVirtualMachineInstanceId(String virtualMachineInstanceId) {
+		this.virtualMachineInstanceId = virtualMachineInstanceId;
+	}
+
 }
