@@ -59,7 +59,7 @@
 	<property name="url" value="jdbc:mysql://<%= dbaddress %>/toasactivemq?relaxAutoCommit=true&amp;autoReconnect=true"/>
 	<property name="validationQuery" value="select 1"/>
 	<property name="username" value="activemq"/>
-	<property name="password" value="toasactivemq"/>
+	<property name="password" value="${amq_password}"/>
 	<property name="maxActive" value="200"/>
 	<property name="poolPreparedStatements" value="true"/>
  </bean>

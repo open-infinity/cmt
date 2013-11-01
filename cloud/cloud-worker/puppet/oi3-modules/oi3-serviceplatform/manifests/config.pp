@@ -63,7 +63,18 @@ class oi3-serviceplatform::config inherits oi3-bas::config {
 		source => "puppet:///modules/oi3-serviceplatform/webconsole-embedded.xml",		
 		require => Class["oi3-serviceplatform::install"],
 	}
-	
+
+	# oauth webapp configuratio override
+	file {"/opt/openinfinity/3.0.0/tomcat/webapps/oauth/WEB-INF/classes/oauth-repository.properties":
+		ensure => present,
+		owner => 'oiuser',
+		group => 'oiuser',
+		mode => 0644,
+		content => template("oi3-serviceplatform/oauth-repository.properties.erb"),
+		require => Class["oi3-serviceplatform::install"],
+	}
+
+
 	# new not tested
 	# Http basic authentication enabling for activemq webconsole. Note tomcat_users
 	file {"/opt/openinfinity/3.0.0/tomcat/webapps/activemq-web-console/WEB-INF/web.xml":
