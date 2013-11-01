@@ -39,7 +39,7 @@ import java.util.Collection;
 @Repository
 public class ConfigurationElementRepositoryJdbcImpl implements ConfigurationElementRepository {
 
-	private static final String GET_ALL_SQL = "select * from configuration_template_tbl";
+	private static final String GET_ALL_SQL = "select * from configuration_element_tbl";
 
     private static final String GET_ALL_FOR_TEMPLATE_SQL =
             "select configuration_element_tbl.* from configuration_element_tbl " +

@@ -65,7 +65,7 @@
             </div>
     	</div>
 
-		<!--
+		<%--
 		<div id="tabs-2">
 		  Template slkdhf 2
 		</div>
@@ -73,21 +73,68 @@
 		<div id="tabs-3">
 		  Template lkjh 3
 		</div>
-		-->
+		--%>
 	</div>
 
 	<div id="dialog-template-edit">
-        <div id="edit-template-fields">
-            <p> ID <input type='text' value=''> </p>
-            <p> Name <input type='text' value=''> </p>
-            <p> Description <input type='text' value=''> </p>
+        <div id="edit-template-fields" class="template-edit-dialog-item">
+            <p> <div class="template-label">ID</div> <input type='text' value=''> </p>
+            <p> <div class="template-label">Name</div> <input type='text' value=''> </p>
+            <p> <div class="template-label">Description</div> <input type='text' value=''> </p>
         </div>
         <br>
-        <table id="template-edit-element-grid"></table>
-        <div id="template-edit-element-grid-pager"></div>
+        <div id="elements-selection-container" class="template-edit-dialog-item">
+            <div id="selected-elements-container" class="template-edit-dialog-item elements-container">
+                <div class = "elements-container-title">Selected elements</div>
+                <div class = "elements-container-columns">
+                    <div class="name">Platform</div><div class="version">Version</div></li>
+                </div>
+                <div class="elements-list-container">
+                    <ul id="selected-elements">
+                      <li class="ui-state-default"><div class="name">bas</div><div class="version">1.2.2</div></li>
+                      <li class="ui-state-default"><div class="name">ig</div><div class="version">1.2.2</div></li>
+                    </ul>
+                </div>
+            </div>
+            <div id="all-elements-container" class="template-edit-dialog-item elements-container">
+                <div class = "elements-container-title">All elements</div>
+                <div class = "elements-container-columns">
+                    <div class="name">Platform</div><div class="version">Version</div></li>
+                </div>
+                <div class="elements-list-container">
+                    <ul id="all-elements">
+                        <li class="ui-state-default"><div class="name">portal</div><div class="version">1.2.2</div></li>
+                        <li class="ui-state-default"><div class="name">mq</div><div class="version">1.2.2</div></li>
+                        <li class="ui-state-default"><div class="name">rdbms</div><div class="version">1.2.2</div></li>
+                        <li class="ui-state-default"><div class="name">nosql</div><div class="version">1.2.2</div></li>
+                        <li class="ui-state-default"><div class="name">portal</div><div class="version">1.2.2</div></li> <li class="ui-state-default"><div class="name">portal</div><div class="version">1.2.2</div></li>
+                        <li class="ui-state-default"><div class="name">mq</div><div class="version">1.2.2</div></li>
+                        <li class="ui-state-default"><div class="name">rdbms</div><div class="version">1.2.2</div></li>
+                        <li class="ui-state-default"><div class="name">nosql</div><div class="version">1.2.2</div></li>
+                        <li class="ui-state-default"><div class="name">portal</div><div class="version">1.2.2</div></li> <li class="ui-state-default"><div class="name">portal</div><div class="version">1.2.2</div></li>
+                        <li class="ui-state-default"><div class="name">mq</div><div class="version">1.2.2</div></li>
+                        <li class="ui-state-default"><div class="name">rdbms</div><div class="version">1.2.2</div></li>
+                        <li class="ui-state-default"><div class="name">nosql</div><div class="version">1.2.2</div></li>
+                        <li class="ui-state-default"><div class="name">portal</div><div class="version">1.2.2</div></li> <li class="ui-state-default"><div class="name">portal</div><div class="version">1.2.2</div></li>
+                        <li class="ui-state-default"><div class="name">mq</div><div class="version">1.2.2</div></li>
+                        <li class="ui-state-default"><div class="name">rdbms</div><div class="version">1.2.2</div></li>
+                        <li class="ui-state-default"><div class="name">nosql</div><div class="version">1.2.2</div></li>
+                        <li class="ui-state-default"><div class="name">portal</div><div class="version">1.2.2</div></li> <li class="ui-state-default"><div class="name">portal</div><div class="version">1.2.2</div></li>
+                        <li class="ui-state-default"><div class="name">mq</div><div class="version">1.2.2</div></li>
+                        <li class="ui-state-default"><div class="name">rdbms</div><div class="version">1.2.2</div></li>
+                        <li class="ui-state-default"><div class="name">nosql</div><div class="version">1.2.2</div></li>
+                        <li class="ui-state-default"><div class="name">portal</div><div class="version">1.2.2</div></li>
+
+
+                    </ul>
+                </div>
+            </div>
+        </div>
         <br>
+        <%--
         <table id="template-edit-organization-grid"></table>
         <div id="template-edit-organization-grid-pager"></div>
+        --%>
 	</div>
 
 </body>
