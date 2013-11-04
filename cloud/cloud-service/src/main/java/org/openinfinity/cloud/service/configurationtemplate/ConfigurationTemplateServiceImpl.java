@@ -36,7 +36,7 @@ import java.util.Set;
 @Service
 public class ConfigurationTemplateServiceImpl implements ConfigurationTemplateService {
 	@Autowired
-	private ConfigurationTemplateRepository ConfigurationTemplateRepository;
+	private ConfigurationTemplateRepository configurationTemplateRepository;
 	
     @Override
     public ConfigurationTemplate create(ConfigurationTemplate configurationTemplate) {
@@ -54,7 +54,7 @@ public class ConfigurationTemplateServiceImpl implements ConfigurationTemplateSe
 
     @Override
     public ConfigurationTemplate load(BigInteger id) {
-        return null;
+        return configurationTemplateRepository.load(id);
     }
 
     @Override
@@ -66,7 +66,7 @@ public class ConfigurationTemplateServiceImpl implements ConfigurationTemplateSe
     public Set<ConfigurationTemplate> getTemplates(List<Long> organizationIds) {
         Set<ConfigurationTemplate> templates = new HashSet<ConfigurationTemplate>();
         for(Long oid : organizationIds){
-            templates.addAll(ConfigurationTemplateRepository.getTemplates(oid));
+            templates.addAll(configurationTemplateRepository.getTemplates(oid));
         }
         return templates;
     }

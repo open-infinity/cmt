@@ -1,58 +1,58 @@
 (function($) {
-	var template = window.app.dialog.template || {};
+    var template = window.app.dialog.template || {};
     template.elementsTable = $("edit-template-elements-grid");
-	$.extend(template, {
+    $.extend(template, {
 
-		create: function () {
-		},
+        create: function () {
+        },
 
-		remove: function (id) {
+        remove: function (id) {
             console.log("remove with argument id:" + id);
         },
 
         edit: function (id) {
+
+            // Show configuration Template data
+            var jqxhrTemplate = $.ajax({
+                url: portletURL.url.template.getTemplateURL + "&templateId=" + id,
+                dataType: "json"
+                }).done(function(data) {
+                    console.log(data);
+                    $("#template-id-value").text(data.id);
+                    $("#template-name + input").val(data.name);
+                    $("#template-description + input").val(data.description);
+                }).fail(function(jqXHR, textStatus, errorThrown) {
+                    console.log("Error fetching template");
+            });
+
+            // Show configuraiton elements
+            var jqxhrElement = $.ajax({
+                url: portletURL.url.template.getElementsForTemplateURL + "&templateId=" + id,
+                dataType: "json"
+            }).done(function(data) {
+                var htmlTemplate = "<li class='ui-state-default'>\
+                                        <div class='name'></div>\
+                                        <div class='version'></div>\
+                                    </li>";
+                var listAvailable = $("#available-elements");
+                var listSelected = $("#selected-elements");
+                var selectedIndices = [];
+                $.each(data.selectedElements, function(index, value){
+                    storeElementToDom(htmlTemplate, value, listSelected);
+                    selectedIndices.push(value.id);
+                });
+                $.each(data.availableElements, function(index, value){
+                    if (selectedIndices.indexOf(value.id) == -1){
+                        storeElementToDom(htmlTemplate, value, listAvailable);
+                    }
+                });
+                configureDragAndDrop();
+
+            }).fail(function(jqXHR, textStatus, errorThrown) {
+                console.log("Error fetching elements for template ");
+            });
+
             console.log("edit with argument id:" + id);
-           $( "li", "#all-elements" ).draggable({
-                revert: "invalid",
-                containment: "document",
-                helper: "clone",
-                cursor: "move",
-                scroll:true
-            });
-
-            $("#all-elements-container").droppable({
-                accept: "#selected-elements > li",
-                activeClass: "ui-state-highlight",
-                drop: function( event, ui ) {
-                    unSelect( ui.draggable );
-                }
-            });
-
-            $("#selected-elements-container").droppable({
-                accept: "#all-elements > li",
-                activeClass: "ui-state-highlight",
-                drop: function( event, ui ) {
-                    select( ui.draggable );
-                }
-            });
-
-            $( "li", "#selected-elements" ).draggable({
-                revert: "invalid",
-                containment: "document",
-                helper: "clone",
-                cursor: "move",
-                scroll:true
-            });
-
-            function select(item){
-                var sel = $("#selected-elements");
-                item.appendTo(sel).fadeIn();
-            }
-
-            function unSelect(item){
-                var unSel = $("#all-elements");
-                item.appendTo(unSel).fadeIn();
-            }
 
             /*
             $("#template-edit-organization-grid").jqGrid({
@@ -95,73 +95,89 @@
 
             */
             $("#dialog-template-edit").dialog("open");
-
-
-           /*
-             <div id="edit-template-dialog">
-             	    <div id="edit-template-fields">
-                         <p> Name <input type='text' value=''> </p>
-                         <p> Description <input type='text' value=''> </p>
-                         <p> ID <input type='text' value=''> </p>
-             	    </div>
-                     <table id="edit-template-elements-grid">elem</table>
-                     <div id="edit-template-elements-pager">1</div>
-
-                     <table id="edit-template-organizations-grid">org</table>
-                     <div id="edit-template-organizations">2</div>
-             	</div>
-
-           */
-            /*
-            var urlData = portletURL.url.cluster.getClusterInfoURL + "&clusterId=" + id;
-
-            //Clear cluster data
-            $("#clusterdatatable tr:gt(0)").remove();
-
-            $.getJSON(urlData, function(data) {
-                    $.each(data, function(key,val) {
-                        $('#clusterdatatable > tbody:last').append('<tr><td>' + key + '</td><td>' + val + '</td></tr>');
-                    });
-            });
-
-            cloudadmin.dialog.updateClusterStatusTable(id);
-
-            $("#clusterdatatable tr:even").addClass("odd");
-            $("#clusterstatustable tr:even").addClass("odd");
-                                                   0
-            $("#clusterdialog").dialog("open");
-            */
         }
-	});
+    });
 
-	// Initialize the dialogs
+    // Initialize the dialogs
 
-	$("#dialog-template-edit").dialog({
-	    title: "Edit template",
-		autoOpen: false,
-		modal: true,
-		width: 1000,
-		height: 1000 ,
-		buttons: {
-            "Submit changes": function() {
-              $(this).dialog( "close" );
-              // post all
+    $("#dialog-template-edit").dialog({
+        title: "Edit template",
+        autoOpen: false,
+        modal: true,
+        width: 1000,
+        height: 1000 ,
+        buttons: {
+                "Submit changes": function() {
+                cleanUpDialog();
+                $(this).dialog( "close" );
             },
             Cancel: function() {
-              $(this).dialog( "close" );
+                cleanUpDialog();
+                $(this).dialog( "close" );
             }
         }
-	});
-
-
+    });
 
     $("#dialog-template-create").dialog({
-  	    title: "Create template",
+        title: "Create template",
         autoOpen: false,
         modal: true,
         width: 700,
         height: 1000
     });
 
+    function storeElementToDom(htmlTemplate, value, list){
+        list.append(htmlTemplate);
+        var lastChild = list.find("li:last-child");
+        lastChild.find(".name").text(value.name);
+        lastChild.find(".version").text(value.version);
+        $.data(lastChild, "config", value);
+    }
+
+    function configureDragAndDrop(){
+        $("li", "#available-elements" ).draggable({
+            revert: "invalid",
+            containment: "document",
+            helper: "clone",
+            cursor: "move",
+            scroll:true
+        });
+        $("#available-elements-container").droppable({
+            accept: "#selected-elements > li",
+            activeClass: "ui-state-highlight",
+            drop: function(event, ui) {
+                unSelect(ui.draggable);
+            }
+        });
+        $("#selected-elements-container").droppable({
+            accept: "#available-elements > li",
+            activeClass: "ui-state-highlight",
+            drop: function(event, ui) {
+                select(ui.draggable);
+            }
+        });
+        $("li", "#selected-elements" ).draggable({
+            revert: "invalid",
+            containment: "document",
+            helper: "clone",
+            cursor: "move",
+            scroll:true
+        });
+    }
+
+    function select(item){
+        var selected = $("#selected-elements");
+        item.appendTo(selected).fadeIn();
+    }
+
+    function unSelect(item){
+        var available = $("#available-elements");
+        item.appendTo(available).fadeIn();
+    }
+
+    function cleanUpDialog(){
+        $("#selected-elements").empty();
+        $("#available-elements").empty();
+    }
 
 })(jQuery);
