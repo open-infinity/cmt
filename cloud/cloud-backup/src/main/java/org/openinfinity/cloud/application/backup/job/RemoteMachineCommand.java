@@ -64,6 +64,8 @@ public class RemoteMachineCommand implements Command {
 	 * Create and compress backup file.
 	 */
 	private void backup() throws Exception {
+		logger.trace("backup");
+		
 		// Decide the filename
 		File package_file = new File(job.getLocalPackageDirectory(),
 				"instance" + job.getToasInstanceId() + "-"
@@ -111,7 +113,17 @@ public class RemoteMachineCommand implements Command {
 	 * Extract the backup file to remote host.
 	 */
 	private void restore() throws Exception {
-		throw new BackupException("UNIMPLEMENTED!"); // TODO
+		logger.trace("restore");
+		if (true) throw new BackupException("UNIMPLEMENTED!"); // TODO
+	
+		// Finally delete the local backup file
+		File f = job.getLocalBackupFile();
+		if (f != null) {
+			f.delete();
+			job.setLocalBackupFile(null);
+		} else {
+			throw new BackupException("Backup file not defined!");
+		}
 	}
 	
 	/**

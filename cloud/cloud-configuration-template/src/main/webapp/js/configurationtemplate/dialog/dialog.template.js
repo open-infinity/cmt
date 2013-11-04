@@ -12,55 +12,49 @@
 
         edit: function (id) {
             console.log("edit with argument id:" + id);
-            $("#template-edit-element-grid").jqGrid({
-                url: portletURL.url.template.getElementsForTemplateURL + "&templateId=" + id,
-                datatype: "json",
-                jsonReader : {
-                    repeatitems : false,
-                    id: "Id",
-                    root : function(obj) { return obj.rows;},
-                    page : function(obj) {return obj.page;},
-                    total : function(obj) {return obj.total;},
-                    records : function(obj) {return obj.records;}
-                    },
-                colNames:['id', 'type', 'name', 'version', 'description', 'parameterKey',
-                          'minMachines', 'maxMachines', 'replicated', 'minReplMachns', 'maxReplMachns', 'selectedForTemplate'],
-                colModel:[
-                          {name:'id', index:'id', width:50, align:"center"},
-                          {name:'type', index:'type', width:50, align:"center"},
-                          {name:'name', index:'name', width:50, align:"center"},
-                          {name:'version', index:'version', width:50, align:"center"},
-                          {name:'description', index:'description', width:100, align:"center"},
-                          {name:'parameterKey', index:'parameterKey', width:100, align:"center"},
-                          {name:'minMachines', index:'minMachines', width:100, align:"center"},
-                          {name:'maxMachines', index:'maxMachines', width:100, align:"center"},
-                          {name:'replicated', index:'replicated', width:50, align:"center"},
-                          {name:'minReplicationMachines', index:'minReplicationMachines', width:100, align:"center"},
-                          {name:'maxReplicationMachines', index:'maxReplicationMachines', width:100, align:"center"},
-                          {name:'maxReplicationMachines', index:'selectedForTemplate', width:20, align:"selectedForTemplate"}
-
-                          ],
-                rowNum: 10,
-                width: 900,
-                height: 300,
-                pager: '#template-edit-element-grid-pager',
-                sortname: 'id',
-                viewrecords: true,
-                shrinkToFit: false,
-                sortorder: 'id'
-                //multiselect: true,
-                //loadonce: true,
-                //loadComplete: function(){
-                //    alert("load complete");
-                    /*var ret;
-                    alert("This function is executed immediately after\n data is loaded. We try to update data in row 13.");
-                    ret = jQuery("#list15").jqGrid('getRowData',"13");
-                    if(ret.id == "13"){
-                        jQuery("#list15").jqGrid('setRowData',ret.id,{note:"<font color='red'>Row 13 is updated!</font>"})
-                    } */
-                //}
+           $( "li", "#all-elements" ).draggable({
+                revert: "invalid",
+                containment: "document",
+                helper: "clone",
+                cursor: "move",
+                scroll:true
             });
 
+            $("#all-elements-container").droppable({
+                accept: "#selected-elements > li",
+                activeClass: "ui-state-highlight",
+                drop: function( event, ui ) {
+                    unSelect( ui.draggable );
+                }
+            });
+
+            $("#selected-elements-container").droppable({
+                accept: "#all-elements > li",
+                activeClass: "ui-state-highlight",
+                drop: function( event, ui ) {
+                    select( ui.draggable );
+                }
+            });
+
+            $( "li", "#selected-elements" ).draggable({
+                revert: "invalid",
+                containment: "document",
+                helper: "clone",
+                cursor: "move",
+                scroll:true
+            });
+
+            function select(item){
+                var sel = $("#selected-elements");
+                item.appendTo(sel).fadeIn();
+            }
+
+            function unSelect(item){
+                var unSel = $("#all-elements");
+                item.appendTo(unSel).fadeIn();
+            }
+
+            /*
             $("#template-edit-organization-grid").jqGrid({
                 url: portletURL.url.template.getTemplatesForUserURL,
                 datatype: "json",
@@ -98,34 +92,7 @@
                 shrinkToFit: false,
                 sortorder: 'id'
             });
-            /*
-            template.tableEdit.jqGrid({
-                url: portletURL.url.template.getTemplatesForUserURL,
-                datatype: "json",
-                jsonReader : {
-                    repeatitems : false,
-                    id: "Id",
-                    root : function(obj) { return obj.rows;},
-                    page : function(obj) {return obj.page;},
-                    total : function(obj) {return obj.total;},
-                    records : function(obj) {return obj.records;}
-                    },
-                colNames:['Id', 'Name', 'Description'],
-                colModel:[
-                          {name:'id', index:'id', width:50, align:"center"},
-                          {name:'name', index:'name', width:150, align:"left"},
-                          // 545
-                          {name:'description', index:'description', width:535, align:"left"}
-                          ],
-                rowNum: 10,
-                width: 750,
-                height: 300,
-                pager: '#template-grid-pager',
-                sortname: 'id',
-                viewrecords: true,
-                shrinkToFit: false,
-                sortorder: 'id'
-            })
+
             */
             $("#dialog-template-edit").dialog("open");
 
@@ -161,13 +128,14 @@
 
             $("#clusterdatatable tr:even").addClass("odd");
             $("#clusterstatustable tr:even").addClass("odd");
-
+                                                   0
             $("#clusterdialog").dialog("open");
             */
         }
 	});
 
 	// Initialize the dialogs
+
 	$("#dialog-template-edit").dialog({
 	    title: "Edit template",
 		autoOpen: false,
@@ -185,11 +153,13 @@
         }
 	});
 
+
+
     $("#dialog-template-create").dialog({
   	    title: "Create template",
         autoOpen: false,
         modal: true,
-        width: 1000,
+        width: 700,
         height: 1000
     });
 
