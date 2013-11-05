@@ -1,6 +1,7 @@
-%define oipuppetmodules_version 1.2.1
-#%define oi_version 3.0.0
-%define sourcetag CMT_{oi-puppetmodules_version}
+%define oipuppetmodules_version 1.3.0
+#%define oipuppetmodules_version 1.2.1
+#%define sourcetag CMT_{oi-puppetmodules_version}
+%define sourcetag master
 
 %define release 1
 %define CMT_HOME opt/toas/cloudmanagementtools
@@ -15,7 +16,7 @@ Group:         Development/Java
 License:        Apache
 URL:            http://www.tieto.com/openinfinity
 
-#Source0:        https://github.com/open-infinity/cmt/archive/CMT-1.2.1.zip
+#Source0:        https://github.com/open-infinity/cmt/archive/%{sourcetag}
 Source0:         https://codeload.github.com/open-infinity/cmt/zip/%{sourcetag}
 
 BuildArch:	noarch
@@ -23,7 +24,7 @@ BuildArch:	noarch
 #Requires:   
 
 %description
-This package contains OpenInfinity Core libraries %{oicore_version} for OpenInfinity BAS %{oi_version}
+This package contains OpenInfinity Puppet modules %{oipuppetmodules_version} for OpenInfinity MWS installation
 
 %prep
 %setup -T -a 0 -c
