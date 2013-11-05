@@ -17,6 +17,16 @@ class oi3-serviceplatform::config inherits oi3-bas::config {
                 require => Class["oi3-serviceplatform::install"],
         }
 
+	file {"/opt/openinfinity/3.0.0/tomcat/conf/tomcat_users.xml":
+		ensure => present,
+		owner => 'oiuser',
+		group => 'oiuser',
+		mode => 0644,
+		content => template("oi3-serviceplatform/tomcat_users.xml.erb"),
+		require => Class["oi3-serviceplatform::install"],
+	}
+
+
 	#rights may require change
 	file {"/opt/openinfinity/3.0.0/tomcat/conf/activemq.xml":
 		ensure => present,
@@ -109,18 +119,6 @@ class oi3-serviceplatform::config inherits oi3-bas::config {
 		group => 'oiuser',
 		mode => 0644,
 		content => template("oi3-serviceplatform/oauth-repository.properties.erb"),
-		require => Class["oi3-serviceplatform::install"],
-	}
-
-
-	# new not tested
-	# Http basic authentication enabling for activemq webconsole. Note tomcat_users
-	file {"/opt/openinfinity/3.0.0/tomcat/webapps/activemq-web-console/WEB-INF/web.xml":
-		ensure => present,
-		owner => 'oiuser',
-		group => 'oiuser',
-		mode => 0644,
-		content => template("oi3-serviceplatform/amqwebconsole_web.xml.erb"),
 		require => Class["oi3-serviceplatform::install"],
 	}
 
