@@ -1,6 +1,5 @@
-%define oipuppetmodules_version 1.3.0
-#%define oipuppetmodules_version 1.2.1
-#%define sourcetag CMT_{oi-puppetmodules_version}
+%define oipuppetmodules_version 1.3.0_RC1
+#%define sourcetag CMT_%{oi-puppetmodules_version}
 %define sourcetag master
 
 %define release 1

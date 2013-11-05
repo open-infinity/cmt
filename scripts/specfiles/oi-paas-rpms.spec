@@ -1,5 +1,5 @@
 %define name	oi_paas_packages
-%define version 3.0.0
+%define version 3.0.0_MS2
 %define release 1
 
 Name:	%{name}
