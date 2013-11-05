@@ -41,6 +41,14 @@ class oi3-activiti-rdbms::config {
 	      require => Class["oi3-rdbms::service"],
                 notify => Class["oi3-activiti-rdbms::service"],
         }		
+	file { "/opt/openinfinity/3.0.0/activiti/dbschema/activiti.mysql.add.oiuser.sql":
+                ensure => present,
+                owner => "root",
+                group => "root",
+                content => template("oi3-activiti-rdbms/activiti.mysql.add.oiuser.sql.erb"),		
+	      require => Class["oi3-rdbms::service"],
+                notify => Class["oi3-activiti-rdbms::service"],
+        }		
 	
 }
 
