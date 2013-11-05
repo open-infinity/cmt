@@ -17,12 +17,12 @@ class oi3-serviceplatform::config inherits oi3-bas::config {
                 require => Class["oi3-serviceplatform::install"],
         }
 
-	file {"/opt/openinfinity/3.0.0/tomcat/conf/tomcat_users.xml":
+	file {"/opt/openinfinity/3.0.0/tomcat/conf/tomcat-users.xml":
 		ensure => present,
 		owner => 'oiuser',
 		group => 'oiuser',
 		mode => 0644,
-		content => template("oi3-serviceplatform/tomcat_users.xml.erb"),
+		content => template("oi3-serviceplatform/tomcat-users.xml.erb"),
 		require => Class["oi3-serviceplatform::install"],
 	}
 
