@@ -67,6 +67,6 @@ public class ConfigurationElementServiceImpl implements ConfigurationElementServ
 
     @Override
     public Collection<ConfigurationElement> loadAllForTemplate(int templateId) {
-        return null;
+        return configurationElementRepository.loadAllForTemplate(templateId);
     }
 }

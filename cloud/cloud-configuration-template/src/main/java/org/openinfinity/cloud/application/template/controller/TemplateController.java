@@ -44,6 +44,7 @@ import org.springframework.web.portlet.bind.annotation.ResourceMapping;
 
 import javax.portlet.*;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.util.*;
 
 /**
@@ -64,22 +65,24 @@ public class TemplateController {
     private static final String PATH_GET_ORGANIZATIONS_FOR_TEMPLATE = "getOrganizationsForTemplate";
 
     private static final String PATH_EDIT_TEMPLATE = "editTemplate";
+    private static final String PATH_GET_TEMPLATE = "getTemplate";
+
     private static final String PATH_CREATE_TEMPLATE = "createTemplate";
     private static final String PATH_DELETE_TEMPLATE = "deleteTemplate";
 
     private static final Logger LOG = Logger.getLogger(TemplateController.class.getName());
 
 	@Autowired
-	//@Qualifier("configurationTemplateService")
 	private ConfigurationTemplateService configurationTemplateService;
 
     @Autowired
-    //@Qualifier("configurationElementService")
     private ConfigurationElementService configurationElementService;
 
+    @Autowired
+    private ConfigurationElementWrapper elementsWrapper;
 
-	@Autowired
-	LiferayService liferayService;
+    @Autowired
+	private LiferayService liferayService;
 	
 	@RenderMapping
     public String showView(RenderRequest request, RenderResponse response) {
@@ -143,46 +146,28 @@ public class TemplateController {
         }
     }
 
-    @ResourceMapping(PATH_EDIT_TEMPLATE)
-    public void getTemplate(ResourceRequest request, ResourceResponse response,
-                                    @RequestParam("page") int page, @RequestParam("rows") int rows)
-            throws Exception {
+    @ResourceMapping(PATH_GET_TEMPLATE)
+    public void getTemplate(ResourceRequest request, ResourceResponse response, @RequestParam("templateId") int templateId) throws Exception {
         try{
-            // get ConfigurationTemplate data
-
-            // get all elements
-
-            // serialize and return
-
-
+            SerializerUtil.jsonSerialize(response.getWriter(), configurationTemplateService.load(BigInteger.valueOf(templateId)));
         } catch (Exception e){
             ExceptionUtil.throwSystemException(e);
         }
     }
 
     @ResourceMapping(PATH_GET_ELEMENTS_FOR_TEMPLATE)
-    public void getElementIdsForTemplate(ResourceRequest request, ResourceResponse response,
-                                       @RequestParam("page") int page, @RequestParam("rows") int rows,
-                                       @RequestParam("templateId") int templateId)
-            throws Exception {
+    public void getElementIdsForTemplate(ResourceRequest request, ResourceResponse response, @RequestParam("templateId") int templateId) throws Exception {
         try{
-
-            // get all elements
-            Collection<ConfigurationElement> elements = configurationElementService.loadAll();
-
-            // get elements for ConfigurationTemplate
+            LOG.debug("ENTER getElementIdsForTemplate");
+            LOG.debug("templateId:" + templateId);
+            Collection<ConfigurationElement> allElements = configurationElementService.loadAll();
+            elementsWrapper.setAvailableElements(allElements);
+            LOG.debug(allElements);
             Collection<ConfigurationElement> elementsForTemplate = configurationElementService.loadAllForTemplate(templateId);
-
-            //
-            List<ConfigurationElementWithSelection> elementsWithSelection = new ArrayList<ConfigurationElementWithSelection>();
-            for (ConfigurationElement elem : elements){
-                for (ConfigurationElement elementForTemplate : elementsForTemplate){
-                   if (elem == elementForTemplate){
-                       elementsWithSelection.add(new ConfigurationElementWithSelection(elem, true));
-                   }
-                }
-            }
-            sliceAndSerialize(response, elementsWithSelection, page, rows);
+            elementsWrapper.setSelectedElements(elementsForTemplate);
+            LOG.debug(elementsForTemplate);
+            LOG.debug(elementsWrapper);
+            SerializerUtil.jsonSerialize(response.getWriter(), elementsWrapper);
 
         } catch (Exception e){
             ExceptionUtil.throwSystemException(e);

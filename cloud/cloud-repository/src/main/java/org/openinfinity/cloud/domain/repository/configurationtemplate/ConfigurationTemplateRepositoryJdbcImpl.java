@@ -51,6 +51,8 @@ public class ConfigurationTemplateRepositoryJdbcImpl implements ConfigurationTem
         "configuration_template_tbl.id = configuration_template_organization_tbl.template_id " +
         "where organization_id = ?";
 
+    private static final String GET_BY_ID = "select * from configuration_template_tbl where id = ?";
+
     @Autowired
     public ConfigurationTemplateRepositoryJdbcImpl(@Qualifier("cloudDataSource") DataSource dataSource) {
         Assert.notNull(dataSource, "Please define datasource for scaling rule repository.");
@@ -82,7 +84,9 @@ public class ConfigurationTemplateRepositoryJdbcImpl implements ConfigurationTem
 
     @Override
     public ConfigurationTemplate load(BigInteger id) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return jdbcTemplate.queryForObject(GET_BY_ID,
+                new Object[] {id},
+                new TemplateRowMapper());
     }
 
     @Override

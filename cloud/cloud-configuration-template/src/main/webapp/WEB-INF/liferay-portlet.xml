@@ -17,6 +17,7 @@
 		<header-portlet-javascript>/js/plugins/jquery.metadata.js</header-portlet-javascript>
 		<header-portlet-javascript>/js/plugins/i18n/grid.locale-en.js</header-portlet-javascript>
 		<header-portlet-javascript>/js/plugins/jquery.jqGrid.min.js</header-portlet-javascript>
+		<header-portlet-javascript>/js/plugins/mustache.js</header-portlet-javascript>
 		<!--
 		<header-portlet-javascript>/js/plugins/jquery.mb.slider.js</header-portlet-javascript>
 		-->		

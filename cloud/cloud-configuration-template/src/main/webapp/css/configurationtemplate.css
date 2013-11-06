@@ -1,73 +1,66 @@
-.elements-list-container ul{
-list-style-type: none;
-margin: 0;
-padding: 0;
-margin-bottom: 10px;
+.elements-list-container ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    margin-bottom: 10px;
+}
+.elements-list-container li {
+    margin: 5px 5px 5px 10px;
+    padding: 5px;
+    width: 155px;
+    border-radius:2px;
+}
+.template-edit-dialog-item {
+    border-style:solid;
+    border-width:1px;
+    border-color:#C4C4C4;
+    border-radius:5px;
+    font-family: Verdana, Arial, sans-serif;
+    font-size: 12px;
+    font-style: normal;
+    width: 560px;
 }
 
-.elements-list-container li{
-margin: 5px 5px 5px 10px;
-padding: 5px;
-width: 155px;
-border-radius:2px;}
-
-.template-edit-dialog-item{
-border-style:solid;
-border-width:1px;
-border-color:#C4C4C4;
-border-radius:5px;
-font-family: Verdana, Arial, sans-serif;
-font-size: 12px;
-font-style: normal;
-width: 560px;
+.template-label {
 }
 
-.template-label{
-    
+.template-id{
+    font-size: 14px;
+    font-style: bold;
 }
 
-#elements-selection-container{
-top:10px;
-
-height: 300px;
-float:left;
+#elements-selection-container {
+    top:10px;
+    height: 300px;
+    float:left;
+}
+.elements-container {
+    width: 200px;
+    float:left;
+    margin:10px;
+}
+.elements-container-title {
+    margin:5px 5px 15px 10px;
+    font-weight:bold;
+}
+.elements-container-columns {
+    margin:5px 5px 0px 10px;
+}
+.elements-list-container {
+    overflow-y:auto;
+    height: 230px;
 }
 
-.elements-container{
-width: 200px;
-float:left;
-margin:10px;
+#selected-elements-container {
 }
 
-.elements-container-title{
-margin:5px 5px 15px 10px;
-font-weight:bold;
-
+#available-elements-container {
+    height: 280px;
+    float:right;
 }
-.elements-container-columns{
-margin:5px 5px 0px 10px;
+.version {
 }
-
-.elements-list-container{
-overflow-y:auto;
-height: 230px;
+.name {
+    float:left;
+    width:120px;
 }
-
-#selected-elements-container{
-}
-
-#all-elements-container{
-height: 280px;
-float:right;
-}
-
-.version{
-}
-
-.name{
-float:left;
-width:120px;
-}
-
-
-

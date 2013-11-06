@@ -18,6 +18,7 @@ portletURL.initialize({
         createTemplateURL :   '<portlet:resourceURL id="createTemplate"/>',
         deleteTemplateURL :   '<portlet:resourceURL id="deleteTemplate"/>',
         editTemplateURL :   '<portlet:resourceURL id="editTemplate"/>',
+        getTemplateURL :   '<portlet:resourceURL id="getTemplate"/>',
     	getTemplatesForUserURL :   '<portlet:resourceURL id="getTemplatesForUser"/>',
     	getElementsForTemplateURL :   '<portlet:resourceURL id="getElementsForTemplate"/>',
     	getOrganizationsForTemplateURL :   '<portlet:resourceURL id="getOrganizationsForTemplate"/>',
