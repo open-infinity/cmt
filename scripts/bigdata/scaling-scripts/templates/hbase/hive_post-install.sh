@@ -69,10 +69,12 @@ service mysql stop
 
 # Make needed HDFS directories
 echo "Creating Hive directories"
-su - hdfs -s /bin/bash -c "hdfs dfs -mkdir [[HIVE_METASTORE_WAREHOUSE_DIR]]"
-su - hdfs -s /bin/bash -c "hdfs dfs -chmod 1777 [[HIVE_METASTORE_WAREHOUSE_DIR]]" || exit 1
-su - hdfs -s /bin/bash -c "hdfs dfs -chown hive [[HIVE_METASTORE_WAREHOUSE_DIR]]" || exit 1
-su - hdfs -s /bin/bash -c "hdfs dfs -chgrp hadoop [[HIVE_METASTORE_WAREHOUSE_DIR]]"
+su - hdfs -s /bin/bash -c "hadoop fs -mkdir [[HIVE_METASTORE_WAREHOUSE_DIR]]"
+su - hdfs -s /bin/bash -c "hadoop fs -chmod 1777 [[HIVE_METASTORE_WAREHOUSE_DIR]]" || exit 1
+su - hdfs -s /bin/bash -c "hadoop fs -chown hive [[HIVE_METASTORE_WAREHOUSE_DIR]]" || exit 1
+su - hdfs -s /bin/bash -c "hadoop fs -chgrp hadoop [[HIVE_METASTORE_WAREHOUSE_DIR]]" || exit 1
+su - hdfs -s /bin/bash -c "hadoop fs -chmod -R 1777 /tmp" || exit 1
+su - hdfs -s /bin/bash -c "hadoop fs -chmod -R 1777 [[TMP_DIR]]" || exit 1
 
 # General tmp directory (needed by Hive Metastore Server)
 mkdir -p [[TMP_DIR]]

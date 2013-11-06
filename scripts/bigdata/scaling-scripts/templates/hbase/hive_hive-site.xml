@@ -1,4 +1,4 @@
-@role:hive /etc/hive/conf/hive-site.xml
+@role:hive /etc/hive/conf.dist/hive-site.xml
 <?xml version="1.0"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one or more
