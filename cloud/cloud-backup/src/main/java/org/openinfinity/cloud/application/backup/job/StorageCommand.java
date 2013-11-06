@@ -41,6 +41,8 @@ public class StorageCommand implements Command {
 			store();
 		} else if (job instanceof InstanceRestoreJob) {
 			restore();
+		} else if (job instanceof InstanceDeleteJob) {
+			delete();
 		} else {
 			throw new BackupException("Unexpected base class " + job.getClass());
 		}
@@ -57,6 +59,8 @@ public class StorageCommand implements Command {
 		} else if (job instanceof InstanceRestoreJob) {
 			job.getLocalBackupFile().delete();
 			job.setLocalBackupFile(null);
+		} else if (job instanceof InstanceDeleteJob) {
+			throw new BackupException("Delete can't be undoed!");
 		} else {
 			throw new BackupException("Unexpected base class " + job.getClass());
 		}
@@ -123,6 +127,15 @@ public class StorageCommand implements Command {
 		logger.debug("Backup bucket saved to local file " + job.getLocalBackupFile());
 		
 		logger.trace("restore completed");
+	}
+
+	/**
+	 * Delete backup file in S3 storage.
+	 */
+	public void delete() throws Exception {
+		// Delete the backup from bucket repository
+		logger.info("Deleting backup file from bucket repository");
+		bucketRepository.deleteObject(getBucketNameForJob(), getBucketKeyForJob());
 	}
 
 	private String getBucketNameForJob() {
