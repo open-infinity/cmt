@@ -76,6 +76,13 @@ su - hdfs -s /bin/bash -c "hadoop fs -chgrp hadoop [[HIVE_METASTORE_WAREHOUSE_DI
 su - hdfs -s /bin/bash -c "hadoop fs -chmod -R 1777 /tmp" || exit 1
 su - hdfs -s /bin/bash -c "hadoop fs -chmod -R 1777 [[TMP_DIR]]" || exit 1
 
+# This may look ugly, but is probably the only way to fix the following 
+# map/reduce problem
+# java.io.FileNotFoundException: File does not exist: hdfs://hbase7:8020/usr/lib/hive/lib/hive-builtins-0.10.0-cdh4.4.0.jar
+su - hdfs -c "hadoop fs -mkdir /usr/lib/hive/lib" || exit 1
+su - hdfs -c "hadoop fs -put `find /usr/lib/hive/lib/ -name "hive-builtin*jar"` /usr/lib/hive/lib/"
+
+
 # General tmp directory (needed by Hive Metastore Server)
 mkdir -p [[TMP_DIR]]
 chmod 1777 [[TMP_DIR]]
