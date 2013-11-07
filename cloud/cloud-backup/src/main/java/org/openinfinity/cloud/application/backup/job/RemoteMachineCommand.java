@@ -89,8 +89,8 @@ public class RemoteMachineCommand implements Command {
 
 		// Ensure integrity of the package
 		logger.info("Testing package integrity in " + package_file);
-		int local_exit_status = runLocalCommand("tar -tJf " + package_file
-				+ "");
+		int local_exit_status = Tools.runLocalCommand("tar -tJf " + package_file
+				+ "", logger);
 		if (local_exit_status > 0) {
 			// Delete and fail
 			package_file.delete();
@@ -196,23 +196,5 @@ public class RemoteMachineCommand implements Command {
 		} else {
 			return null;
 		}
-	}
-
-	/**
-	 * Execute command in local host. Quote marks are not permitted as part of
-	 * the command.
-	 * 
-	 * @return exit value of the command
-	 */
-	private int runLocalCommand(String cmd) throws IOException {
-		logger.debug("Running local command: " + cmd);
-		try {
-			// Run and wait for completion of the command
-			Process p = Runtime.getRuntime().exec(cmd);
-			return p.waitFor();
-		} catch (InterruptedException exception) {
-			logger.warn("Local command waiting was interrupted unexpectedly");
-		}
-		return -1;
 	}
 }

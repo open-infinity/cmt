@@ -56,7 +56,14 @@
 			<artifactId>quartz</artifactId>
 			<version>1.8.5</version>
 		</dependency>
-		
+
+		<!-- Cryptography dependencies -->
+		<dependency>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcprov-jdk16</artifactId>
+			<version>1.46</version>
+		</dependency>
+
 		<!-- Spring Batch unit test -->
 		<dependency>
 			<groupId>org.springframework.batch</groupId>
