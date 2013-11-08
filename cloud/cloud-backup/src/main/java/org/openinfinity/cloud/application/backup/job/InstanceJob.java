@@ -9,6 +9,8 @@ import org.apache.log4j.Logger;
 import org.openinfinity.cloud.application.backup.CloudBackup;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import com.amazonaws.services.identitymanagement.model.GetAccountSummaryRequest;
+
 /**
  * Base POJO class for InstanceBackupJob and InstanceRestoreJob.
  * 
@@ -115,6 +117,19 @@ abstract public class InstanceJob {
 		}
 	}
 
+	/**
+	 * Returns instance email address. This is needed by GPG encryption/decryption.
+	 * @throws BackupException if TOAS instance id is not available
+	 * @return Email address, which can be used by GPG.
+	 */
+	public String getInstanceEmail() throws BackupException {
+		if (toasInstanceId != -1) {
+			return "toas-instance-" + toasInstanceId + "@tieto.com";
+		} else {
+			throw new BackupException("Can't generate instance email address, because TOAS instance id is not available."); 
+		}
+	}
+	
 	// ---- Getters & Setters ----------------------------------------------------------------------
 	public String getPassword() {
 		return password;
