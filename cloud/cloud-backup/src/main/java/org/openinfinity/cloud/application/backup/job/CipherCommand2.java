@@ -8,28 +8,22 @@ import java.io.RandomAccessFile;
 import java.security.NoSuchAlgorithmException;
 import java.security.Security;
 
-import javax.crypto.Cipher;
-import javax.crypto.CipherInputStream;
-import javax.crypto.CipherOutputStream;
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.openinfinity.core.crypto.CryptoSupport;
 
 /**
  * Takes care of encyrpting/decrypting a package.
  * 
  * @author Timo Saarinen
  */
-public class CipherCommand implements Command {
-	private Logger logger = Logger.getLogger(CipherCommand.class);
+public class CipherCommand2 implements Command {
+	private Logger logger = Logger.getLogger(CipherCommand2.class);
 
 	private InstanceJob job;
 	
-	public CipherCommand(InstanceJob job) {
+	public CipherCommand2(InstanceJob job) {
 		this.job = job;
 	}
 	
@@ -59,6 +53,10 @@ public class CipherCommand implements Command {
 	private void cipher() throws Exception {
 		logger.trace("cipher");
 
+		CryptoSupport crypto = new CryptoSupport();
+		
+
+/*		
 		// Get cipher
 		SecretKey secret_key = getInstanceSecretKey();
 		Cipher cipher = Cipher.getInstance("DES");
@@ -86,6 +84,7 @@ public class CipherCommand implements Command {
 		// Update backup file name and delete plain one
 		job.setLocalBackupFile(cipherFile);
 		plainFile.delete();
+*/		
 	}
 	
 	/**
@@ -94,6 +93,7 @@ public class CipherCommand implements Command {
 	private void decipher() throws Exception {
 		logger.trace("decipher");
 
+/*		
 		// Get cipher
 		SecretKey secret_key = getInstanceSecretKey();
 		Cipher cipher = Cipher.getInstance("DES");
@@ -119,42 +119,7 @@ public class CipherCommand implements Command {
 		// Update backup file name and delete the ciphered
 		job.setLocalBackupFile(plainFile);
 		plainFile.delete();
+*/		
 	}
 
-	private SecretKey getInstanceSecretKey() throws NoSuchAlgorithmException, BackupException, IOException {
-		// Bouncy Castle provider is used to get better randomness for the keys
-		Security.addProvider(new BouncyCastleProvider());
-
-		File key_file = new File("/tmp/instance-" + job.getToasInstanceId() + "_des.key");
-		if (key_file.exists()) {
-			// Load secret key from local file
-			RandomAccessFile f = new RandomAccessFile(key_file.toString(), "r");
-			byte[] bytes = new byte[(int)f.length()];
-			f.read(bytes);
-			f.close();
-/* Requires Java 7			
-			byte[] bytes = Files.readAllBytes(Paths.get(key_file.toString()));
-*/			
-
-			SecretKey secret_key = new SecretKeySpec(bytes, 0, bytes.length, "DES");
-			return secret_key;
-		} else {
-			// Generate key
-			KeyGenerator keygen = KeyGenerator.getInstance("DES");
-		    SecretKey secret_key = keygen.generateKey();
-		    
-		    // Save key to local file
-		    byte[] bytes = secret_key.getEncoded();
-		    if (bytes != null) {
-		    	FileOutputStream fos = new FileOutputStream(key_file);
-		    	fos.write(bytes);
-		    	fos.flush();
-		    	fos.close();
-		    } else {
-		    	throw new BackupException("Can't encode the symmetric key!");
-		    }
-		    
-		    return secret_key;
-		}
-	}
 }
