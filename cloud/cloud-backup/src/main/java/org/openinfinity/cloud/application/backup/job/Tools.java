@@ -1,5 +1,6 @@
 package org.openinfinity.cloud.application.backup.job;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
 
@@ -42,4 +43,20 @@ public class Tools {
 		return runLocalCommand(cmd, logger, Level.WARN);
 	}
 
+	/**
+	 * Replaces the current extension of the file with a new one.
+	 * 
+	 * @param f   File
+	 * @param ext New Extension without a dot. If the extension is null, 
+	 *            the old extension will be just removed.
+	 * @return File name with the new extension
+	 */
+	public static File replaceExtension(File f, String ext) {
+		String fname = f.toString();
+		if (ext != null) {
+			return new File(fname.substring(0, fname.lastIndexOf('.')), "." + ext);
+		} else {
+			return new File(fname.substring(0, fname.lastIndexOf('.')));
+		}
+	}
 }
