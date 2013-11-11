@@ -1,0 +1,43 @@
+global
+        daemon
+        user haproxy
+        group haproxy
+        pidfile /var/run/haproxy.pid
+
+defaults
+        log     global
+        stats   enable
+        mode    http
+        option  httplog
+        option  dontlognull
+        option  dontlog-normal
+        retries 3
+        option  redispatch
+        contimeout 4000
+        clitimeout 60000
+        srvtimeout 30000
+
+
+frontend main *:80
+	default_backend bas
+	
+#frontend main_ssl
+#        bind 0.0.0.0:443 ssl crt /opt/certificates/example.pem #prefer-server-ciphers
+#        default_backend bas	
+
+#frontend stats *:8080
+#	default_backend stats
+
+backend bas
+	balance leastconn
+	<% i = 1 %>	
+	<% portal_addresses.each do |portal_address| %>
+		server server<%= i %> <%= portal_address %>:8080 check
+	<% i = i +1 %>
+	<% end %>
+
+#backend stats
+#	stats enable
+#	stats uri /stats
+#	stats realm Haproxy\ Statistics
+#	stats auth haproxy:toashaproxy
