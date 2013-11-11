@@ -15,12 +15,13 @@
         http://www.springframework.org/schema/task/spring-task-3.0.xsd">
 
 	<context:property-placeholder
-		location="classpath:/META-INF/properties/system.properties,
-    	classpath:/META-INF/properties/infrastructure.properties,
-    	classpath:/META-INF/properties/jets3.properties,
-    	classpath:/META-INF/properties/repository.properties" />
+		location="classpath*:/META-INF/properties/system.properties,
+    	classpath*:/META-INF/properties/infrastructure.properties,
+    	classpath*:/META-INF/properties/jets3.properties,
+    	classpath*:/META-INF/properties/crypto.properties,
+    	classpath*:/META-INF/properties/repository.properties" />
 
-	<context:component-scan base-package="org.openinfinity.cloud">
+	<context:component-scan base-package="org.openinfinity">
 		<context:exclude-filter type="regex" expression=".*ClusterTypeRowMapper.*"/>
 		<context:exclude-filter type="regex" expression=".*ScalingRule.*"/>
 		<context:exclude-filter type="regex" expression=".*HealthMonitoring.*"/>
@@ -29,6 +30,15 @@
 		<context:exclude-filter type="regex" expression=".*Machine.*"/>
         <context:exclude-filter type="regex" expression=".*ssp.*"/>
 	</context:component-scan>
+
+	<bean id="cryptoSupport" class="org.openinfinity.core.crypto.CryptoSupport">
+		<constructor-arg name="rsaPublicKeyPath" value="${rsa.public.key.path}" />
+		<constructor-arg name="rsaPrivateKeyPath" value="${rsa.private.key.path}" />
+<!--
+		<constructor-arg name="rsaPublicKeyPath" value="/home/saarktim/shared/toas/keys/public" />
+		<constructor-arg name="rsaPrivateKeyPath" value="/home/saarktim/shared/toas/keys/private" />
+-->
+	</bean>
 
 	<bean id="cloudDataSource" destroy-method="close"
 		class="org.apache.commons.dbcp.BasicDataSource">

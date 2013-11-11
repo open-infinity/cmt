@@ -13,7 +13,7 @@ public class InstanceBackupJob extends InstanceJob {
 		this.context = context;
 		
 		commands.add(new RemoteMachineCommand(this));
-		commands.add(new CipherCommand(this));
+		commands.add(new CipherCommand2(this));
 		commands.add(new StorageCommand(this));
 	}
 }
