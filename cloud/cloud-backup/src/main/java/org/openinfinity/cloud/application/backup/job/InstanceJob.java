@@ -7,6 +7,8 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.openinfinity.cloud.application.backup.CloudBackup;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.amazonaws.services.identitymanagement.model.GetAccountSummaryRequest;
@@ -18,7 +20,7 @@ import com.amazonaws.services.identitymanagement.model.GetAccountSummaryRequest;
  * 
  * @author Timo Saarinen
  */
-abstract public class InstanceJob {
+abstract public class InstanceJob implements ApplicationContextAware {
 	private Logger logger = Logger.getLogger(InstanceJob.class);
 
 	/**
@@ -83,8 +85,6 @@ abstract public class InstanceJob {
 	 * Needed by Quartz Scheduler.
 	 */
 	public final void run() throws Exception {
-		assert context != null;
-		
 		logger.debug("Executing commands");
 		List<Command> finished_commands = new LinkedList<Command>();
 		try {
@@ -186,4 +186,9 @@ abstract public class InstanceJob {
 		this.virtualMachineInstanceId = virtualMachineInstanceId;
 	}
 
+	@Override
+	public void setApplicationContext(ApplicationContext context) {
+		logger.trace("setApplicationContext(" + context + ")");
+		this.context = (ClassPathXmlApplicationContext) context;
+	}
 }

@@ -5,6 +5,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 import java.security.Security;
 
@@ -20,11 +22,14 @@ import org.apache.log4j.Logger;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 /**
- * Takes care of encyrpting/decrypting a package.
+ * Takes care of encyrpting/decrypting a package. This implementation is based on 
+ * standard JCE API.
  * 
  * @author Timo Saarinen
  */
 public class CipherCommand implements Command {
+	private final static String ALGORITHM = "Blowfish";
+	
 	private Logger logger = Logger.getLogger(CipherCommand.class);
 
 	private InstanceJob job;
@@ -61,7 +66,7 @@ public class CipherCommand implements Command {
 
 		// Get cipher
 		SecretKey secret_key = getInstanceSecretKey();
-		Cipher cipher = Cipher.getInstance("DES");
+		Cipher cipher = Cipher.getInstance(ALGORITHM);
 		cipher.init(Cipher.ENCRYPT_MODE, secret_key);
 
 		// Create plain input
@@ -69,12 +74,13 @@ public class CipherCommand implements Command {
 		FileInputStream fis = new FileInputStream(plainFile);
 		
 		// Create ciphered output
-		File cipherFile = new File(plainFile, ".des"); 
+		File cipherFile = new File(plainFile + ".ciphered"); 
 		FileOutputStream fos = new FileOutputStream(cipherFile);
 		CipherOutputStream cos = new CipherOutputStream(fos, cipher);
 		
 		// Copy all data
-		IOUtils.copy(fis, cos);
+		//IOUtils.copy(fis, cos);
+		Tools.copyStreams(fis, cos);
 		
 		// Close streams
 		cos.flush();
@@ -96,8 +102,8 @@ public class CipherCommand implements Command {
 
 		// Get cipher
 		SecretKey secret_key = getInstanceSecretKey();
-		Cipher cipher = Cipher.getInstance("DES");
-		cipher.init(Cipher.ENCRYPT_MODE, secret_key);
+		Cipher cipher = Cipher.getInstance(ALGORITHM);
+		cipher.init(Cipher.DECRYPT_MODE, secret_key);
 
 		// Create ciphered input
 		File cipherFile = job.getLocalBackupFile();
@@ -109,7 +115,8 @@ public class CipherCommand implements Command {
 		FileOutputStream fos = new FileOutputStream(plainFile);
 		
 		// Copy all data
-		IOUtils.copy(cis, fos);
+		//IOUtils.copy(cis, fos);
+		Tools.copyStreams(cis, fos);
 		
 		// Close streams
 		fos.flush();
@@ -118,29 +125,29 @@ public class CipherCommand implements Command {
 
 		// Update backup file name and delete the ciphered
 		job.setLocalBackupFile(plainFile);
-		plainFile.delete();
+		cipherFile.delete();
 	}
 
 	private SecretKey getInstanceSecretKey() throws NoSuchAlgorithmException, BackupException, IOException {
 		// Bouncy Castle provider is used to get better randomness for the keys
 		Security.addProvider(new BouncyCastleProvider());
 
-		File key_file = new File("/tmp/instance-" + job.getToasInstanceId() + "_des.key");
+		File key_file = new File("/tmp/instance-" + job.getToasInstanceId() + "_secret.key");
 		if (key_file.exists()) {
 			// Load secret key from local file
+/* Works in Java 1.6			
 			RandomAccessFile f = new RandomAccessFile(key_file.toString(), "r");
 			byte[] bytes = new byte[(int)f.length()];
 			f.read(bytes);
 			f.close();
-/* Requires Java 7			
-			byte[] bytes = Files.readAllBytes(Paths.get(key_file.toString()));
 */			
+			byte[] bytes = Files.readAllBytes(Paths.get(key_file.toString()));
 
-			SecretKey secret_key = new SecretKeySpec(bytes, 0, bytes.length, "DES");
+			SecretKey secret_key = new SecretKeySpec(bytes, 0, bytes.length, ALGORITHM);
 			return secret_key;
 		} else {
 			// Generate key
-			KeyGenerator keygen = KeyGenerator.getInstance("DES");
+			KeyGenerator keygen = KeyGenerator.getInstance(ALGORITHM);
 		    SecretKey secret_key = keygen.generateKey();
 		    
 		    // Save key to local file

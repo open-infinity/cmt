@@ -33,10 +33,12 @@ public class StorageCommand implements Command {
 
 	public StorageCommand(InstanceJob job) {
 		this.job = job;
-		this.bucketRepository = (BucketRepository) job.context.getBean("jetS3Repository");
 	}
 
 	public void execute() throws Exception {
+		if (bucketRepository == null)
+			bucketRepository = (BucketRepository) job.context.getBean("jetS3Repository");
+		
 		if (job instanceof InstanceBackupJob) {
 			store();
 		} else if (job instanceof InstanceRestoreJob) {

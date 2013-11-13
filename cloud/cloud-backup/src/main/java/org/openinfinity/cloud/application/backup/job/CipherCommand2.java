@@ -5,6 +5,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import java.security.NoSuchAlgorithmException;
 import java.security.Security;
 
@@ -14,7 +16,9 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.openinfinity.core.crypto.CryptoSupport;
 
 /**
- * Takes care of encyrpting/decrypting a package.
+ * Takes care of encyrpting/decrypting a package. This implementation depends on
+ * Open Infinity Core CryptoSupport module, which currently relies on keyzcar 0.71g 
+ * library, which relies on JCE itself.
  * 
  * @author Timo Saarinen
  */
@@ -53,38 +57,46 @@ public class CipherCommand2 implements Command {
 	private void cipher() throws Exception {
 		logger.trace("cipher");
 
-		CryptoSupport crypto = new CryptoSupport();
-		
+		// Initiate the oicore crypto module
+		CryptoSupport crypto = (CryptoSupport)job.context.getBean("cryptoSupport");
 
-/*		
-		// Get cipher
-		SecretKey secret_key = getInstanceSecretKey();
-		Cipher cipher = Cipher.getInstance("DES");
-		cipher.init(Cipher.ENCRYPT_MODE, secret_key);
-
-		// Create plain input
+		// Create input stream
 		File plainFile = job.getLocalBackupFile();
 		FileInputStream fis = new FileInputStream(plainFile);
-		
-		// Create ciphered output
-		File cipherFile = new File(plainFile, ".des"); 
+        FileChannel fic = fis.getChannel();
+        ByteBuffer bbi = ByteBuffer.allocate(8192);
+
+		// Create output stream		
+		File cipherFile = new File(plainFile + ".ciphered"); 
 		FileOutputStream fos = new FileOutputStream(cipherFile);
-		CipherOutputStream cos = new CipherOutputStream(fos, cipher);
-		
-		// Copy all data
-		IOUtils.copy(fis, cos);
-		
-		// Close streams
-		cos.flush();
+        FileChannel foc = fos.getChannel();
+		ByteBuffer bbo = ByteBuffer.allocate(8192);
+
+		// Cipher
+		int n;
+		while ((n = fic.read(bbi)) != -1) {
+			if (n == 0) {
+				continue;
+			} else {
+				bbi.position(0);
+				bbi.limit(n);
+				bbo.position(0);
+				bbo.limit(n);
+				crypto.encrypt(bbi, bbo);
+				foc.write(bbo);
+			}
+		}
+
+		// Close input/output elements
 		fos.flush();
-		cos.close();
+		foc.close();
 		fos.close();
+		fic.close();
 		fis.close();
-		
+
 		// Update backup file name and delete plain one
 		job.setLocalBackupFile(cipherFile);
 		plainFile.delete();
-*/		
 	}
 	
 	/**
@@ -93,33 +105,46 @@ public class CipherCommand2 implements Command {
 	private void decipher() throws Exception {
 		logger.trace("decipher");
 
-/*		
-		// Get cipher
-		SecretKey secret_key = getInstanceSecretKey();
-		Cipher cipher = Cipher.getInstance("DES");
-		cipher.init(Cipher.ENCRYPT_MODE, secret_key);
+		// Initiate the oicore crypto module
+		CryptoSupport crypto = (CryptoSupport)job.context.getBean("cryptoSupport");
 
-		// Create ciphered input
+		// Create input stream
 		File cipherFile = job.getLocalBackupFile();
 		FileInputStream fis = new FileInputStream(cipherFile);
-		CipherInputStream cis = new CipherInputStream(fis, cipher);
-		
-		// Create ciphered output
+        FileChannel fic = fis.getChannel();
+        ByteBuffer bbi = ByteBuffer.allocate(8192);
+
+		// Create output stream		
 		File plainFile = Tools.replaceExtension(cipherFile, null); 
 		FileOutputStream fos = new FileOutputStream(plainFile);
-		
-		// Copy all data
-		IOUtils.copy(cis, fos);
-		
-		// Close streams
+        FileChannel foc = fos.getChannel();
+		ByteBuffer bbo = ByteBuffer.allocate(8192);
+
+		// Decipher
+		int n;
+		while ((n = fic.read(bbi)) != -1) {
+			if (n == 0) {
+				continue;
+			} else {
+				bbi.position(0);
+				bbi.limit(n);
+				bbo.position(0);
+				bbo.limit(n);
+				crypto.decrypt(bbi, bbo);
+				foc.write(bbo);
+			}
+		}
+
+		// Close input/output elements
 		fos.flush();
+		foc.close();
 		fos.close();
+		fic.close();
 		fis.close();
 
-		// Update backup file name and delete the ciphered
+		// Update backup file name and delete plain one
 		job.setLocalBackupFile(plainFile);
-		plainFile.delete();
-*/		
+		cipherFile.delete();
 	}
 
 }
