@@ -1,0 +1,56 @@
+#!/bin/bash
+# chkconfig: - 85 15
+# description: Jakarta Tomcat Java Servlets and JSP server
+# processname: tomcat
+# pidfile: /var/run/tomcat.pid
+# config:
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+# Source networking configuration.
+. /etc/sysconfig/network
+
+# Check that networking is up.
+
+[ ${NETWORKING} = "no" ] && exit 0
+
+CATALINA_HOME=/opt/openinfinity/3.0.0/tomcat; export CATALINA_HOME
+JAVA_HOME=/etc/alternatives/jre/; export JAVA_HOME
+TOMCAT_OWNER=toas; export TOMCAT_OWNER
+
+# See how we were called.
+  case "$1" in
+    start)
+          # Start daemon.
+          echo -n "Starting Tomcat: "
+          su $TOMCAT_OWNER -c "cd $CATALINA_HOME && $CATALINA_HOME/bin/startup.sh"
+          RETVAL=$?
+          echo
+          [ $RETVAL = 0 ] && touch /var/lock/subsys/tomcat
+          ;;
+    stop)
+          # Stop daemons.
+          echo -n "Shutting down Tomcat: "
+          su $TOMCAT_OWNER -c $CATALINA_HOME/bin/shutdown.sh
+	  sleep 10
+          RETVAL=$?
+          echo
+          [ $RETVAL = 0 ] && rm -f /var/lock/subsys/tomcat
+          ;;
+    restart)
+          $0 stop
+          $0 start
+          ;;
+    condrestart)
+         [ -e /var/lock/subsys/tomcat ] && $0 restart
+         ;;
+    status)
+          status tomcat
+          ;;
+    *)
+          echo "Usage: $0 {start|stop|restart|status}"
+          exit 1
+  esac
+
+exit 0
