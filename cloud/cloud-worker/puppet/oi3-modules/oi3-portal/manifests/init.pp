@@ -26,7 +26,7 @@ class oi3-portal::install {
 	}
 }
 
-class oiportal::config {
+class oi3-portal::config {
 	exec {"set-privileges":
 		command => "/bin/chown -R oiuser:oiuser /opt/openinfinity/3.0.0",
 		require => Class["oi3-portal::install"],
@@ -100,7 +100,7 @@ class oiportal::config {
                 group => 'oiuser',
                 mode => 0600,
                 source => "puppet:///oi3-modules/oi3-portal/context.xml",
-                require => Class["oiportal::install"],
+                require => Class["oi3-portal::install"],
         }
 
         file {"/opt/openinfinity/3.0.0/tomcat/conf/jmxremote.password":
@@ -140,7 +140,7 @@ class oiportal::config {
 	}
 }
 
-class oiportal::service {
+class oi3-portal::service {
 	service {"oi-tomcat":
 		ensure => running,
 		hasrestart => true,
@@ -149,7 +149,7 @@ class oiportal::service {
 	}
 }
 
-class oiportal {
+class oi3-portal {
 	require oi3-ebs
 	require oi3-basic	
 	include oi3-portal::install
