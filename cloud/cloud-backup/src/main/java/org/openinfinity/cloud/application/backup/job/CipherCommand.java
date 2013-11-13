@@ -5,6 +5,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 import java.security.Security;
 
@@ -21,7 +23,7 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 /**
  * Takes care of encyrpting/decrypting a package. This implementation is based on 
- * standard javax.crypto application interface.
+ * standard JCE API.
  * 
  * @author Timo Saarinen
  */
@@ -77,7 +79,8 @@ public class CipherCommand implements Command {
 		CipherOutputStream cos = new CipherOutputStream(fos, cipher);
 		
 		// Copy all data
-		IOUtils.copy(fis, cos);
+		//IOUtils.copy(fis, cos);
+		Tools.copyStreams(fis, cos);
 		
 		// Close streams
 		cos.flush();
@@ -100,7 +103,7 @@ public class CipherCommand implements Command {
 		// Get cipher
 		SecretKey secret_key = getInstanceSecretKey();
 		Cipher cipher = Cipher.getInstance(ALGORITHM);
-		cipher.init(Cipher.ENCRYPT_MODE, secret_key);
+		cipher.init(Cipher.DECRYPT_MODE, secret_key);
 
 		// Create ciphered input
 		File cipherFile = job.getLocalBackupFile();
@@ -112,7 +115,8 @@ public class CipherCommand implements Command {
 		FileOutputStream fos = new FileOutputStream(plainFile);
 		
 		// Copy all data
-		IOUtils.copy(cis, fos);
+		//IOUtils.copy(cis, fos);
+		Tools.copyStreams(cis, fos);
 		
 		// Close streams
 		fos.flush();
@@ -131,13 +135,13 @@ public class CipherCommand implements Command {
 		File key_file = new File("/tmp/instance-" + job.getToasInstanceId() + "_secret.key");
 		if (key_file.exists()) {
 			// Load secret key from local file
+/* Works in Java 1.6			
 			RandomAccessFile f = new RandomAccessFile(key_file.toString(), "r");
 			byte[] bytes = new byte[(int)f.length()];
 			f.read(bytes);
 			f.close();
-/* Requires Java 7			
-			byte[] bytes = Files.readAllBytes(Paths.get(key_file.toString()));
 */			
+			byte[] bytes = Files.readAllBytes(Paths.get(key_file.toString()));
 
 			SecretKey secret_key = new SecretKeySpec(bytes, 0, bytes.length, ALGORITHM);
 			return secret_key;

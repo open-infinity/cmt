@@ -18,7 +18,7 @@ import org.openinfinity.core.crypto.CryptoSupport;
 /**
  * Takes care of encyrpting/decrypting a package. This implementation depends on
  * Open Infinity Core CryptoSupport module, which currently relies on keyzcar 0.71g 
- * library.
+ * library, which relies on JCE itself.
  * 
  * @author Timo Saarinen
  */
@@ -67,7 +67,7 @@ public class CipherCommand2 implements Command {
         ByteBuffer bbi = ByteBuffer.allocate(8192);
 
 		// Create output stream		
-		File cipherFile = new File(plainFile, ".ciphered"); 
+		File cipherFile = new File(plainFile + ".ciphered"); 
 		FileOutputStream fos = new FileOutputStream(cipherFile);
         FileChannel foc = fos.getChannel();
 		ByteBuffer bbo = ByteBuffer.allocate(8192);

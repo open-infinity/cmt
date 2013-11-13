@@ -10,6 +10,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  */
 public class InstanceRestoreJob extends InstanceJob {
 	public InstanceRestoreJob(ClassPathXmlApplicationContext context) throws BackupException {
+		assert context != null;
 		this.context = context;
 		
 		commands.add(new StorageCommand(this));
