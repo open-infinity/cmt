@@ -8,7 +8,6 @@
 		
 		<header-portlet-css>/css/health-monitoring.css</header-portlet-css>
 		
-		<header-portlet-javascript>/js/highcharts/highcharts.js</header-portlet-javascript>
 		<header-portlet-javascript>/js/jquery.form.js</header-portlet-javascript>
 		<header-portlet-javascript>/js/jquery-ui-timepicker-addon.js</header-portlet-javascript>
 		<header-portlet-javascript>/js/jquery.ui.notice.js</header-portlet-javascript>
