@@ -1,0 +1,43 @@
+#!/bin/sh
+
+#
+# This script is called by the cloud-backup application, which is
+# supposed to receive the streamed output.
+#
+
+BACKUP_DIR=/opt/openinfinity/3.0.0/backup
+EXCLUDES_FILE=/tmp/merged-exclude-rules
+BACKUP_LOG=/var/log/cloud-backup.log
+
+# Run scripts before making backup
+if [ "$(ls -A $BACKUP_DIR/before-backup.d)" ] ; then
+    run-parts $BACKUP_DIR/before-backup.d &>$BACKUP_LOG || exit 1
+fi
+
+# Combine include rules into one file
+if [ "$(ls -A $BACKUP_DIR/include-dirs.d)" ] ; then
+    INCLUDE_DIRS=`cat $BACKUP_DIR/include-dirs.d/* | tr '\n' ' '` || exit 1
+else
+    INCLUDE_DIRS=/opt
+fi    
+
+# Combine exclude rules into one file
+touch $EXCLUDES_FILE
+if [ "$(ls -A $BACKUP_DIR/exclude-rules.d)" ] ; then
+    cat $BACKUP_DIR/exclude-rules.d/* >$EXCLUDES_FILE || exit 1
+fi
+
+# Execute the backup command in root dir
+OLD_DIR=`pwd`
+cd /
+tar -cJ -X $EXCLUDES_FILE $INCLUDE_DIRS 2>$BACKUP_LOG || exit 1
+cd $OLD_DIR
+
+# Run scripts after backup
+if [ "$(ls -A $BACKUP_DIR/after-backup.d)" ] ; then
+    run-parts $BACKUP_DIR/after-backup.d &>$BACKUP_LOG || exit 1
+fi
+
+# Clean up
+rm -f $EXCLUDES_FILE
+
