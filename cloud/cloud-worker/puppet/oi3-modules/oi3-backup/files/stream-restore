@@ -1,0 +1,25 @@
+#!/bin/sh
+
+#
+# This script is called by the cloud-backup application, which is
+# supposed to send the tar archive in stream input.
+#
+
+BACKUP_DIR=/opt/openinfinity/3.0.0/backup
+RESTORE_LOG=/var/log/cloud-restore_`date +"%Y-%m-%d_%H%M"`.log
+
+# Run scripts before making backup
+if [ "$(ls -A $BACKUP_DIR/before-restore.d)" ] ; then
+    run-parts $BACKUP_DIR/before-restore.d &>$RESTORE_LOG || exit 1
+fi
+
+# Execute the backup command in root dir
+OLD_DIR=`pwd`
+cd /
+tar -xpJ &>$RESTORE_LOG || exit 1
+cd $OLD_DIR
+
+# Run scripts after backup
+if [ "$(ls -A $BACKUP_DIR/after-restore.d)" ] ; then
+    run-parts $BACKUP_DIR/after-restore.d &>$RESTORE_LOG || exit 1
+fi
