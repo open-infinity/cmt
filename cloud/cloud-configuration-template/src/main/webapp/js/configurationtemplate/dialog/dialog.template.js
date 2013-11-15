@@ -34,8 +34,10 @@
                                         <div class='name'></div>\
                                         <div class='version'></div>\
                                     </li>";
-                var listAvailable = $("#available-elements");
-                var listSelected = $("#selected-elements");
+
+                var listSelected = $("#selected-elements-container").find("ul");
+                var listAvailable = $("#available-elements-container").find("ul");
+
                 var selectedIndices = [];
                 $.each(data.selectedElements, function(index, value){
                     storeElementToDom(htmlTemplate, value, listSelected);
@@ -107,7 +109,8 @@
         width: 1000,
         height: 1000 ,
         buttons: {
-                "Submit changes": function() {
+            "Submit changes": function() {
+                submitTemplate();
                 cleanUpDialog();
                 $(this).dialog( "close" );
             },
@@ -135,6 +138,7 @@
     }
 
     function configureDragAndDrop(){
+        /*
         $("li", "#available-elements" ).draggable({
             revert: "invalid",
             containment: "document",
@@ -163,8 +167,43 @@
             cursor: "move",
             scroll:true
         });
+        */
+        $(".elements-container").droppable({
+            activeClass: "ui-state-highlight",
+            drop: function (event, ui) {
+                var list = $(this).find("ul");
+                var helper = ui.helper;
+                var selected = $(this).siblings(".elements-container").find("li.ui-state-highlight");
+                if (selected.length > 1) {
+                    moveMultipleElements(list, selected);
+                } else {
+                    moveSingleElement(ui.draggable, list);
+                }
+            },
+            tolerance: "touch"
+        });
+
+        $("li", ".elements-container").draggable({
+            revert: "invalid",
+            containment: "document",
+            helper: "clone",
+            cursor: "move",
+            scroll: true,
+            drag: function (event, ui) {
+                var helper = ui.helper;
+                var selected = $(this).parent().find("li.ui-state-highlight", "ul");
+                if (selected.length > 2) {
+                    $(helper).html(selected.length - 1 + " items");
+                }
+            }
+        });
+
+        $("#elements-selection-container").find("li", ".elements-list-container").click(function () {
+            $(this).toggleClass("ui-state-highlight");
+        });
     }
 
+    /*
     function select(item){
         var selected = $("#selected-elements");
         item.appendTo(selected).fadeIn();
@@ -174,10 +213,28 @@
         var available = $("#available-elements");
         item.appendTo(available).fadeIn();
     }
+    */
+
+    function moveMultipleElements(list, selected) {
+        $(selected).each(function () {
+            $(this).appendTo(list).removeClass("ui-state-highlight").fadeIn();
+        });
+    }
+
+    function moveSingleElement(elem, list) {
+        elem.appendTo(list).removeClass("ui-state-highlight").fadeIn();
+    }
 
     function cleanUpDialog(){
         $("#selected-elements").empty();
         $("#available-elements").empty();
+    }
+
+    function submitTemplate(){
+        var outData = {};
+        //outData["templateName"] = $item.attr('id').slice(8);
+        //outData["templateDescription"] = target.parentNode.getAttribute('data-pub-id');
+        $.post(portletURL.url.cluster.updatePublishedURL, outData);
     }
 
 })(jQuery);

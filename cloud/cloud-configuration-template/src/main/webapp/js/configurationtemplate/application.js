@@ -22,8 +22,6 @@ jQuery(function($){
 	var app = window.app || {};
 
     $.extend(app, {
-    //app = {
-
 
         init: function(){
             $.ajaxSetup({cache: false});
