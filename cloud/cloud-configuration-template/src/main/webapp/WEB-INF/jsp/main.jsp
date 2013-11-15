@@ -77,6 +77,8 @@
 	</div>
 
 	<div id="dialog-template-edit">
+
+        <%-- Template --%>
         <div id="edit-template-fields" class="template-edit-dialog-item">
             <p>
                 <div class="template-id">
@@ -89,8 +91,7 @@
         </div>
         <br>
 
-
-
+        <%-- Elements --%>
         <div id="elements-selection-container" class="template-edit-dialog-item">
             <div id="selected-elements-container" class="template-edit-dialog-item elements-container">
                 <div class="elements-container-title">Selected elements</div>
@@ -113,40 +114,34 @@
                 </div>
             </div>
          </div>
-
-
-        <%-- COMMENT
-        <div id="elements-selection-container" class="template-edit-dialog-item">
-            <div id="selected-elements-container" class="template-edit-dialog-item elements-container">
-                <div class = "elements-container-title">Selected elements</div>
-                <div class = "elements-container-columns">
-                    <div class="name">Platform</div><div class="version">Version</div></li>
-                </div>
-                <div class="elements-list-container">
-                    <ul id="selected-elements">
-
-                    </ul>
-                </div>
-            </div>
-            <div id="available-elements-container" class="template-edit-dialog-item elements-container">
-                <div class = "elements-container-title">Available elements</div>
-                <div class = "elements-container-columns">
-                    <div class="name">Platform</div><div class="version">Version</div></li>
-                </div>
-                <div class="elements-list-container">
-                    <ul id="available-elements">
-
-                    </ul>
-                </div>
-            </div>
-        </div>
-        END COMMENT--%>
-
         <br>
-        <%--
-        <table id="template-edit-organization-grid"></table>
-        <div id="template-edit-organization-grid-pager"></div>
-        --%>
+
+        <%-- Organizations --%>
+        <div id="organizations-selection-container" class="template-edit-dialog-item">
+            <div id="selected-organizations-container" class="template-edit-dialog-item elements-container">
+                <div class="elements-container-title">Selected elements</div>
+                <div class="elements-container-columns">
+                    <div class="id">Id</div>
+                    <div class="treePath">Tree path</div>
+                    <div class="name">Name</div>
+                </div>
+                <div class="elements-list-container">
+                    <ul></ul>
+                </div>
+            </div>
+            <div id="available-organizations-container" class="template-edit-dialog-item elements-container">
+                <div class="elements-container-title">All elements</div>
+                <div class="elements-container-columns">
+                    <div class="id">Id</div>
+                    <div class="treePath">Tree path</div>
+                    <div class="name">Name</div>
+                </div>
+                <div class="elements-list-container">
+                    <ul></ul>
+                </div>
+            </div>
+         </div>
+        <br>
 	</div>
 
 </body>

@@ -16,12 +16,15 @@
 
 package org.openinfinity.cloud.application.template.controller;
 
+import com.liferay.portal.model.Organization;
 import com.liferay.portal.model.User;
 import org.apache.log4j.Logger;
 import org.openinfinity.cloud.comon.web.LiferayService;
 import org.openinfinity.cloud.domain.configurationtemplate.ConfigurationElement;
 import org.openinfinity.cloud.domain.configurationtemplate.ConfigurationTemplate;
+import org.openinfinity.cloud.domain.configurationtemplate.ConfigurationTemplateOrganization;
 import org.openinfinity.cloud.service.configurationtemplate.ConfigurationElementService;
+import org.openinfinity.cloud.service.configurationtemplate.ConfigurationTemplateOrganizationService;
 import org.openinfinity.cloud.service.configurationtemplate.ConfigurationTemplateService;
 import org.openinfinity.cloud.util.collection.ListUtil;
 import org.openinfinity.cloud.util.http.HttpCodes;
@@ -82,7 +85,13 @@ public class TemplateController {
     private ConfigurationElementWrapper elementsWrapper;
 
     @Autowired
+    private OrganizationWrapper organizationWrapper;
+
+    @Autowired
 	private LiferayService liferayService;
+
+    @Autowired
+    private ConfigurationTemplateOrganizationService organizationService;
 	
 	@RenderMapping
     public String showView(RenderRequest request, RenderResponse response) {
@@ -158,15 +167,15 @@ public class TemplateController {
     @ResourceMapping(PATH_GET_ELEMENTS_FOR_TEMPLATE)
     public void getElementIdsForTemplate(ResourceRequest request, ResourceResponse response, @RequestParam("templateId") int templateId) throws Exception {
         try{
-            LOG.debug("ENTER getElementIdsForTemplate");
-            LOG.debug("templateId:" + templateId);
+            //LOG.debug("ENTER getElementIdsForTemplate");
+            //LOG.debug("templateId:" + templateId);
             Collection<ConfigurationElement> allElements = configurationElementService.loadAll();
             elementsWrapper.setAvailableElements(allElements);
-            LOG.debug(allElements);
+            //LOG.debug(allElements);
             Collection<ConfigurationElement> elementsForTemplate = configurationElementService.loadAllForTemplate(templateId);
             elementsWrapper.setSelectedElements(elementsForTemplate);
-            LOG.debug(elementsForTemplate);
-            LOG.debug(elementsWrapper);
+            //LOG.debug(elementsForTemplate);
+            //LOG.debug(elementsWrapper);
             SerializerUtil.jsonSerialize(response.getWriter(), elementsWrapper);
 
         } catch (Exception e){
@@ -175,19 +184,36 @@ public class TemplateController {
     }
 
     @ResourceMapping(PATH_GET_ORGANIZATIONS_FOR_TEMPLATE)
-    public void getOrganizationsForTemplate(ResourceRequest request, ResourceResponse response,
-                                       @RequestParam("page") int page, @RequestParam("rows") int rows)
-            throws Exception {
+    public void getOrganizationsForTemplateAndUser(ResourceRequest request, ResourceResponse response, @RequestParam("templateId") int templateId) throws Exception {
         try{
+            LOG.debug("ENTER getOrganizationsForTemplate");
+            LOG.debug("templateId:" + templateId);
 
-            // get all organizations
+            User user = liferayService.getUser(request, response);
+            List<Organization> organizations = liferayService.getOrganizations(user);
+            LOG.debug(organizations);
 
-            // get organizations for ConfigurationTemplate
+            Collection<ConfigurationTemplateOrganization> organizationsForTemplate = organizationService.loadAllForTemplate(templateId);
+            Collection<Organization> selectedOrganizations = new LinkedList<Organization>();
 
-            // wrap
+            for (ConfigurationTemplateOrganization cto : organizationsForTemplate){
+                for (Organization o : organizations){
+                    if (o.getOrganizationId() == cto.getOrganizationId()){
+                        selectedOrganizations.add(o);
+                    }
+                }
+            }
 
-            // serialize and return
+            organizationWrapper.construct(organizations, selectedOrganizations);
 
+            //LOG.debug(selectedOrganizations);
+            LOG.debug("----------------organizationWrapper");
+            LOG.debug("----------------organizationWrapper selected len =" + selectedOrganizations.size());
+            LOG.debug("----------------organizationWrapper all len =" + organizations.size());
+
+            LOG.debug(organizationWrapper);
+
+            SerializerUtil.jsonSerialize(response.getWriter(), organizationWrapper);
 
         } catch (Exception e){
             ExceptionUtil.throwSystemException(e);
@@ -205,7 +231,5 @@ public class TemplateController {
         List<T> onePage = ListUtil.sliceList(page, rows, itemsCopy);
         SerializerUtil.jsonSerialize(response.getWriter(),new JsonDataWrapper(page, totalPages, records, onePage));
     }
-
-
 
 }

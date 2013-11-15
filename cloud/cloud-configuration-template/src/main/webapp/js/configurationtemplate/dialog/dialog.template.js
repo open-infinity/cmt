@@ -26,10 +26,18 @@
             });
 
             // Show configuraiton elements
-            var jqxhrElement = $.ajax({
-                url: portletURL.url.template.getElementsForTemplateURL + "&templateId=" + id,
-                dataType: "json"
-            }).done(function(data) {
+            $.when(
+                $.ajax({
+                    url: portletURL.url.template.getElementsForTemplateURL + "&templateId=" + id,
+                    dataType: "json"}),
+
+                $.ajax({
+                    url: portletURL.url.template.getOrganizationsForTemplateURL + "&templateId=" + id,
+                    dataType: "json"})
+            ).done(function(dataElements, dataOrganizations) {
+                populateElements(dataElements);
+                populateLists(dataOrganizations, "organizations");
+                /*
                 var htmlTemplate = "<li class='ui-state-default'>\
                                         <div class='name'></div>\
                                         <div class='version'></div>\
@@ -48,6 +56,7 @@
                         storeElementToDom(htmlTemplate, value, listAvailable);
                     }
                 });
+                */
                 configureDragAndDrop();
 
             }).fail(function(jqXHR, textStatus, errorThrown) {
@@ -129,45 +138,7 @@
         height: 1000
     });
 
-    function storeElementToDom(htmlTemplate, value, list){
-        list.append(htmlTemplate);
-        var lastChild = list.find("li:last-child");
-        lastChild.find(".name").text(value.name);
-        lastChild.find(".version").text(value.version);
-        $.data(lastChild, "config", value);
-    }
-
     function configureDragAndDrop(){
-        /*
-        $("li", "#available-elements" ).draggable({
-            revert: "invalid",
-            containment: "document",
-            helper: "clone",
-            cursor: "move",
-            scroll:true
-        });
-        $("#available-elements-container").droppable({
-            accept: "#selected-elements > li",
-            activeClass: "ui-state-highlight",
-            drop: function(event, ui) {
-                unSelect(ui.draggable);
-            }
-        });
-        $("#selected-elements-container").droppable({
-            accept: "#available-elements > li",
-            activeClass: "ui-state-highlight",
-            drop: function(event, ui) {
-                select(ui.draggable);
-            }
-        });
-        $("li", "#selected-elements" ).draggable({
-            revert: "invalid",
-            containment: "document",
-            helper: "clone",
-            cursor: "move",
-            scroll:true
-        });
-        */
         $(".elements-container").droppable({
             activeClass: "ui-state-highlight",
             drop: function (event, ui) {
@@ -182,7 +153,6 @@
             },
             tolerance: "touch"
         });
-
         $("li", ".elements-container").draggable({
             revert: "invalid",
             containment: "document",
@@ -197,23 +167,87 @@
                 }
             }
         });
-
         $("#elements-selection-container").find("li", ".elements-list-container").click(function () {
             $(this).toggleClass("ui-state-highlight");
         });
     }
 
-    /*
-    function select(item){
-        var selected = $("#selected-elements");
-        item.appendTo(selected).fadeIn();
+    function populateElements(data){
+       var htmlTemplate = "<li class='ui-state-default'>\
+                               <div class='name'></div>\
+                               <div class='version'></div>\
+                           </li>";
+
+       var listSelected = $("#selected-elements-container").find("ul");
+       var listAvailable = $("#available-elements-container").find("ul");
+
+       var selectedIndices = [];
+       $.each(data.selectedElements, function(index, value){
+           storeElementToDom(htmlTemplate, value, listSelected);
+           selectedIndices.push(value.id);
+       });
+       $.each(data.availableElements, function(index, value){
+           if (selectedIndices.indexOf(value.id) == -1){
+               storeElementToDom(htmlTemplate, value, listAvailable);
+           }
+       });
     }
 
-    function unSelect(item){
-        var available = $("#available-elements");
-        item.appendTo(available).fadeIn();
+    function populateLists(data, type){
+        var htmlTemplate;
+
+        if (type == "organizations")  {
+            store = storeElementToDom;
+            htmlTemplate = "<li class='ui-state-default'>\
+                              <div class='id'></div>\
+                              <div class='treePath'></div>\
+                              <div class='name'></div>\
+                           </li>";
+        }
+        else if (type == "elements"){
+            store = storeOrganizationToDom;
+            htmlTemplate = "<li class='ui-state-default'>\
+                               <div class='name'></div>\
+                               <div class='version'></div>\
+                            </li>";
+        }
+        else {
+            console.log("Invalid type passed as argument");
+            return;
+        }
+
+        var listSelected = $("#selected-" + type + "-container").find("ul");
+        var listAvailable = $("#available-"+ type +"-container").find("ul");
+        var selectedIndices = [];
+
+        $.each(data.selectedElements, function(index, value){
+           store(htmlTemplate, value, listSelected);
+           selectedIndices.push(value.id);
+        });
+
+        $.each(data.availableElements, function(index, value){
+           if (selectedIndices.indexOf(value.id) == -1){
+               store(htmlTemplate, value, listAvailable);
+           }
+        });
     }
-    */
+
+    function storeElementToDom(htmlTemplate, value, list){
+            list.append(htmlTemplate);
+            var lastChild = list.find("li:last-child");
+            lastChild.find(".name").text(value.name);
+            lastChild.find(".version").text(value.version);
+            $.data(lastChild, "config", value);
+    }
+
+    function storeOrganizationToDom(htmlTemplate, value, list){
+            list.append(htmlTemplate);
+            var lastChild = list.find("li:last-child");
+            lastChild.find(".id").text(value.name);
+            lastChild.find(".treePath").text(value.version);
+            lastChild.find(".name").text(value.name);
+            $.data(lastChild, "config", value);
+     }
 
     function moveMultipleElements(list, selected) {
         $(selected).each(function () {
@@ -225,9 +259,10 @@
         elem.appendTo(list).removeClass("ui-state-highlight").fadeIn();
     }
 
+
     function cleanUpDialog(){
-        $("#selected-elements").empty();
-        $("#available-elements").empty();
+        $("#selected-elements-container").find("ul").empty();
+        $("#available-elements-container").find("ul").empty();
     }
 
     function submitTemplate(){

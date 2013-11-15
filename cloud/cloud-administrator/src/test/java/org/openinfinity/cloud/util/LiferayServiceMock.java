@@ -1,12 +1,11 @@
 package org.openinfinity.cloud.util;
 
+import com.liferay.portal.model.Organization;
 import com.liferay.portal.model.User;
+import org.openinfinity.cloud.comon.web.LiferayService;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.ResourceResponse;
-
-import org.openinfinity.cloud.comon.web.LiferayService;
-
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -52,6 +51,11 @@ public class LiferayServiceMock implements LiferayService {
     @Override
     public List<Long> getOrganizationIds(User user) {
         // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public List<Organization> getOrganizations(User user) {
         return null;
     }
 

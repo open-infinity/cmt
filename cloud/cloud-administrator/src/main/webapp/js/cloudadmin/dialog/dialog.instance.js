@@ -81,7 +81,7 @@
 					});
 					
 					cloudadmin.dialog.initAddServiceDialog();
-			});
+			    });
 		},
 		
 		// This function is called when dialog is already created. It is called from instances page, 

@@ -30,7 +30,7 @@ import lombok.RequiredArgsConstructor;
 @Data
 @NoArgsConstructor
 @RequiredArgsConstructor
-public class Organization {
+public class ConfigurationTemplateOrganization {
     
     @NonNull
     @NotScript

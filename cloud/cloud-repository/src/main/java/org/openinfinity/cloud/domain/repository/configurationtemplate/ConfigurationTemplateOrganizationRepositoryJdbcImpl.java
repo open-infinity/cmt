@@ -15,7 +15,7 @@
  */
 package org.openinfinity.cloud.domain.repository.configurationtemplate;
 
-import org.openinfinity.cloud.domain.configurationtemplate.Organization;
+import org.openinfinity.cloud.domain.configurationtemplate.ConfigurationTemplateOrganization;
 import org.openinfinity.core.annotation.AuditTrail;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -29,65 +29,63 @@ import javax.sql.DataSource;
 import java.math.BigInteger;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.List;
 
 /**
- * JDBC Repository implementation of the <code>org.openinfinity.core.cloud.deployer.repository.DeploymentRepository</code> interface.
- * 
  * @author Vedran Bartonicek
  * @version 1.3.0
  * @since 1.3.0
  */
 @Repository
-public class OrganizationRepositoryJdbcImpl implements OrganizationRepository {
-
-    /*
-    private static final String GET_ALL_FOR_ORGANIZATION_SQL =
-            "select configuration_template_tbl.id, configuration_template_tbl.name, " +
-                    "configuration_template_tbl.description from configuration_template_tbl " +
-                    "inner join configuration_template_organization_tbl on " +
-                    "configuration_template_tbl.id = configuration_template_organization_tbl.template_id " +
-                    "where organization_id = ?";
-    */
+public class ConfigurationTemplateOrganizationRepositoryJdbcImpl implements ConfigurationTemplateOrganizationRepository {
 
 	private JdbcTemplate jdbcTemplate;
 
-	private static final String LOAD_ALL_SQL = "SELECT * FROM CONFIGURATION_ELEMENT_TABLE";
+	private static final String LOAD_ALL_SQL = "select * from configuration_template_organization_tbl";
+
+    private static final String LOAD_ALL_FOR_TEMPLATE_SQL = "select * from configuration_template_organization_tbl where template_id = ?";
+
 
     @Autowired
-    public OrganizationRepositoryJdbcImpl(@Qualifier("cloudDataSource") DataSource dataSource) {
+    public ConfigurationTemplateOrganizationRepositoryJdbcImpl(@Qualifier("cloudDataSource") DataSource dataSource) {
         Assert.notNull(dataSource, "Please define datasource for scaling rule repository.");
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
     @Override
-    public Organization create(Organization product) {
+    public ConfigurationTemplateOrganization create(ConfigurationTemplateOrganization product) {
         return null;
     }
 
     @Override
-    public void update(Organization product) {
+    public void update(ConfigurationTemplateOrganization product) {
     }
 
     @AuditTrail
     @Transactional
-    public List<Organization> loadAll() {
+    public List<ConfigurationTemplateOrganization> loadAll() {
         return null;
     }
 
     @Override
-    public Organization load(BigInteger id) {
+    public ConfigurationTemplateOrganization load(BigInteger id) {
         return null;
     }
 
     @Override
-    public void delete(Organization product) {
+    public void delete(ConfigurationTemplateOrganization product) {
     }
 
-    private class OrganizationRowMapper implements RowMapper<Organization> {
+    @Override
+    public Collection<ConfigurationTemplateOrganization> loadAllForTemplate(int templateId){
+        return jdbcTemplate.query(LOAD_ALL_FOR_TEMPLATE_SQL, new Object[] {templateId}, new OrganizationRowMapper());
+    }
+
+    private class OrganizationRowMapper implements RowMapper<ConfigurationTemplateOrganization> {
 		
-		public Organization mapRow(ResultSet resultSet, int rowNum) throws SQLException {    
-		    return new Organization(resultSet.getLong("organization_id"), resultSet.getInt("template_id"));
+		public ConfigurationTemplateOrganization mapRow(ResultSet resultSet, int rowNum) throws SQLException {
+		    return new ConfigurationTemplateOrganization(resultSet.getLong("organization_id"), resultSet.getInt("template_id"));
 		}
 	}
 

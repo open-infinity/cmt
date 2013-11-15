@@ -15,9 +15,9 @@
  */
 package org.openinfinity.cloud.util.serialization;
 
-import java.io.Writer;
-
 import org.codehaus.jackson.map.ObjectMapper;
+
+import java.io.Writer;
 
 /**
  * Util for handling JSON serialization with writers.

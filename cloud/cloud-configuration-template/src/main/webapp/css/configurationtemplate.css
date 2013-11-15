@@ -51,13 +51,6 @@
     height: 230px;
 }
 
-#selected-elements-container {
-}
-
-#available-elements-container {
-    height: 280px;
-    float:right;
-}
 .version {
 }
 .name {

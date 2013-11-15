@@ -13,18 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.openinfinity.cloud.domain.repository.configurationtemplate;
+package org.openinfinity.cloud.service.configurationtemplate;
 
-import org.openinfinity.cloud.domain.configurationtemplate.Organization;
-import org.openinfinity.cloud.domain.repository.common.AbstractCrudRepositoryInterface;
+import org.openinfinity.cloud.domain.configurationtemplate.ConfigurationTemplateOrganization;
+import org.openinfinity.cloud.service.common.AbstractCrudServiceInterface;
+
+import java.util.Collection;
+
 
 /**
- * CRUD interface for storing <code>org.openinfinity.core.cloud.domain.template</code> objects.
+ * Interface for management of cloud configuration template organizations.
  * 
  * @author Vedran Bartonicek
  * @version 1.3.0
  * @since 1.3.0
  */
-public interface OrganizationRepository extends AbstractCrudRepositoryInterface<Organization> {
+public interface ConfigurationTemplateOrganizationService extends AbstractCrudServiceInterface<ConfigurationTemplateOrganization> {
+
+    Collection<ConfigurationTemplateOrganization> loadAllForTemplate(int templateId);
 
 }

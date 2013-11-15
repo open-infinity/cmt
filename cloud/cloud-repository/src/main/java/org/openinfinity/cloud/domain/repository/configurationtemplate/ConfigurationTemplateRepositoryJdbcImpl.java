@@ -33,8 +33,6 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * JDBC Repository implementation of the <code>org.openinfinity.core.cloud.deployer.repository.DeploymentRepository</code> interface.
- * 
  * @author Vedran Bartonicek
  * @version 1.3.0
  * @since 1.3.0
