@@ -119,11 +119,11 @@ public class RemoteMachineCommand implements Command {
 		File package_file = job.getLocalBackupFile();
 		
 		// The comand to be execute in the remote host
-		String package_command = "/opt/openinfinity/3.0.0/backup/stream-restore";
+		String restore_command = "/opt/openinfinity/3.0.0/backup/stream-restore";
 
 		// Stream the backup package to the remote host, where it's extracted
 		logger.info("Streaming the package file to remote host where it's extracted");
-		int remote_exit_status = runRemoteCommand(package_command,
+		int remote_exit_status = runRemoteCommand(restore_command,
 				package_file.getAbsolutePath(), null);
 		if (remote_exit_status > 0) {
 			throw new BackupException(
