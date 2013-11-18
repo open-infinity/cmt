@@ -43,18 +43,18 @@
                 console.log("Error fetching items for dialog");
                 });
 
-            $("#dlg-template-edit").dialog("open");
+            $("#dlg-edit-template").dialog("open");
         }
     });
 
     // Initialize the dialogs
 
-    $("#dlg-template-edit").dialog({
+    $("#dlg-edit-template").dialog({
         title: "Edit template",
         autoOpen: false,
         modal: true,
-        width: 1000,
-        height: 1000 ,
+        width: 600,
+        height: 840 ,
         buttons: {
             "Submit changes": function() {
                 submitTemplate();
@@ -69,12 +69,13 @@
     });
 
     function configureDragAndDrop(){
-        $(".list-container").droppable({
+        $(".dlg-edit-template-list-panel-container").droppable({
             activeClass: "ui-state-highlight",
             drop: function (event, ui) {
                 var list = $(this).find("ul");
                 var helper = ui.helper;
-                var selected = $(this).siblings(".list-container").find("li.ui-state-highlight");
+                //var selected = $(this).siblings(".list-container").find("li.ui-state-highlight");
+                var selected = $(this).siblings().find("li.ui-state-highlight");
                 if (selected.length > 1) {
                     moveMultipleElements(list, selected);
                 } else {
@@ -131,8 +132,8 @@
         var listSelected = panelSelected.find("ul");
         var listAvailable = panelAvailable.find("ul");
         var htmlTemplate = "<li class='ui-state-default'>\
-                              <div class='dlg-template-edit-organizationId'></div>\
-                              <div class='dlg-template-edit-organizationName'></div>\
+                              <div class='dlg-edit-template-organizationId'></div>\
+                              <div class='dlg-edit-template-organizationName'></div>\
                            </li>";
         var selectedIndices = [];
 
@@ -160,8 +161,8 @@
     function storeOrganizationToDom(htmlTemplate, value, list){
             list.append(htmlTemplate);
             var lastChild = list.find("li:last-child");
-            lastChild.find(".dlg-template-edit-organizationId").text(value.organizationId);
-            lastChild.find(".dlg-template-edit-organizationName").text(value.name);
+            lastChild.find(".dlg-edit-template-organizationId").text(value.organizationId);
+            lastChild.find(".dlg-edit-template-organizationName").text(value.name);
             $.data(lastChild, "config", value);
      }
 
