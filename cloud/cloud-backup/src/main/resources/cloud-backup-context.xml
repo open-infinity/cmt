@@ -32,12 +32,7 @@
 	</context:component-scan>
 
 	<bean id="cryptoSupport" class="org.openinfinity.core.crypto.CryptoSupport">
-		<constructor-arg name="rsaPublicKeyPath" value="${rsa.public.key.path}" />
-		<constructor-arg name="rsaPrivateKeyPath" value="${rsa.private.key.path}" />
-<!--
-		<constructor-arg name="rsaPublicKeyPath" value="/home/saarktim/shared/toas/keys/public" />
-		<constructor-arg name="rsaPrivateKeyPath" value="/home/saarktim/shared/toas/keys/private" />
--->
+		<constructor-arg name="symmetricKeyPath" value="${symmetric.key.path}" />
 	</bean>
 
 	<bean id="cloudDataSource" destroy-method="close"

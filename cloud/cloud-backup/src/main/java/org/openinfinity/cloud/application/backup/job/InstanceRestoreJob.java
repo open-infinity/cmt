@@ -14,7 +14,7 @@ public class InstanceRestoreJob extends InstanceJob {
 		this.context = context;
 		
 		commands.add(new StorageCommand(this));
-		commands.add(new CipherCommand2(this));
+		commands.add(new CipherCommand(this));
 		commands.add(new RemoteMachineCommand(this));
 	}
 }

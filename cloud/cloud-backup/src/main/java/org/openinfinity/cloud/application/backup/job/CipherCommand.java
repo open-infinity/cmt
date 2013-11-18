@@ -65,7 +65,7 @@ public class CipherCommand implements Command {
 		logger.trace("cipher");
 
 		// Get cipher
-		SecretKey secret_key = getInstanceSecretKey();
+		SecretKey secret_key = getSecretKey();
 		Cipher cipher = Cipher.getInstance(ALGORITHM);
 		cipher.init(Cipher.ENCRYPT_MODE, secret_key);
 
@@ -101,7 +101,7 @@ public class CipherCommand implements Command {
 		logger.trace("decipher");
 
 		// Get cipher
-		SecretKey secret_key = getInstanceSecretKey();
+		SecretKey secret_key = getSecretKey();
 		Cipher cipher = Cipher.getInstance(ALGORITHM);
 		cipher.init(Cipher.DECRYPT_MODE, secret_key);
 
@@ -128,19 +128,24 @@ public class CipherCommand implements Command {
 		cipherFile.delete();
 	}
 
-	private SecretKey getInstanceSecretKey() throws NoSuchAlgorithmException, BackupException, IOException {
+	/**
+	 * Read or create a new symmetric key to be used for encryption.
+	 * @return secret key, never null
+	 * @throws NoSuchAlgorithmException
+	 * @throws BackupException
+	 * @throws IOException
+	 */
+	private SecretKey getSecretKey() throws NoSuchAlgorithmException, BackupException, IOException {
+		//
+		// TODO: This method is not finished
+		//
+		
 		// Bouncy Castle provider is used to get better randomness for the keys
 		Security.addProvider(new BouncyCastleProvider());
 
-		File key_file = new File("/tmp/instance-" + job.getToasInstanceId() + "_secret.key");
+		File key_file = new File("/tmp/cloud_backup_secret.key"); // FIXME
 		if (key_file.exists()) {
 			// Load secret key from local file
-/* Works in Java 1.6			
-			RandomAccessFile f = new RandomAccessFile(key_file.toString(), "r");
-			byte[] bytes = new byte[(int)f.length()];
-			f.read(bytes);
-			f.close();
-*/			
 			byte[] bytes = Files.readAllBytes(Paths.get(key_file.toString()));
 
 			SecretKey secret_key = new SecretKeySpec(bytes, 0, bytes.length, ALGORITHM);
@@ -158,7 +163,7 @@ public class CipherCommand implements Command {
 		    	fos.flush();
 		    	fos.close();
 		    } else {
-		    	throw new BackupException("Can't encode the symmetric key!");
+		    	throw new BackupException("Couldn't encode the symmetric key!");
 		    }
 		    
 		    return secret_key;

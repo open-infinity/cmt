@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringWriter;
+import java.nio.ByteBuffer;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Level;
@@ -92,6 +93,16 @@ public class Tools {
 		int len;
 		while ((len = is.read(buffer)) != -1) {
 		    os.write(buffer, 0, len);
+		}
+	}
+	
+	/**
+	 * Copies content from ByteBuffer to another. The implementation is not efficient,
+	 * but meant for debugging only.  
+	 */
+	public static void copyByteBuffer(ByteBuffer b1, ByteBuffer b2) {
+		for (int i = b1.position(); i < b1.limit(); i++) {
+			b2.put(b1.get());
 		}
 	}
 }

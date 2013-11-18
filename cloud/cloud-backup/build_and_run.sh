@@ -1,6 +1,6 @@
 #!/bin/sh
 
-export JAVA_HOME=/opt/java6
+export JAVA_HOME=/opt/java
 export PATH=$JAVA_HOME/bin:$PATH
 
 CWD=`pwd`

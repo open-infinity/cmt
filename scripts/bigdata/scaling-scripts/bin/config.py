@@ -38,7 +38,8 @@ tmp_dir = "/opt/openinfinity/3.0.0/bigdata/tmp"
 
 hive_metastore_warehouse_dir = "/opt/openinfinity/3.0.0/bigdata/hive-warehouse"
 
-# Database users
+# Database users 
+# TODO: these should be generated per instance instead of using hard-coded ones here
 hive_database_root_password = 'bzzzzzzZ'
 hive_database_user          = 'hive'
 hive_database_user_password = 'bzzzzzzz'

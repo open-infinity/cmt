@@ -33,7 +33,7 @@ public class CipherCommandTest {
 	private long checksum;
 	private long read1Checksum;
 	private long read2Checksum;
-	private static final long FILE_SIZE = 50*1024*1024; // 50 MB
+	private static final long FILE_SIZE = 300; // 50 MB
 	
 	//@Autowired
 	private ClassPathXmlApplicationContext applicationContext;
@@ -43,8 +43,8 @@ public class CipherCommandTest {
 		assert applicationContext != null;
 		
 		// Decide temporary file names
-		pfile = File.createTempFile("plain", ".bin");
-		pfile.deleteOnExit();
+		pfile = File.createTempFile("data", ".bin");
+//		pfile.deleteOnExit();
 		
 		// Create 1GB nonsense file
 		logger.info("Creating file of size " + FILE_SIZE + " bytes to " + pfile);
@@ -68,8 +68,6 @@ public class CipherCommandTest {
 	public void testCipherCommand1() throws Exception {
 		// Cipher
 		{
-			logger.debug("Size of the original file is: " + Tools.readFileSize(pfile));
-			
 			// Create a job, which meets the basic requirements of the command
 			TestBackupInstanceJob job = new TestBackupInstanceJob();
 			job.setLocalBackupFile(pfile);
@@ -82,8 +80,7 @@ public class CipherCommandTest {
 			
 			// Get ciphered filename for cleanup
 			c1file = job.getLocalBackupFile();
-			c1file.deleteOnExit();
-			logger.debug("Size of the ciphered file is: " + Tools.readFileSize(c1file));
+//			c1file.deleteOnExit();
 		}
 
 		// Decipher
@@ -101,7 +98,7 @@ public class CipherCommandTest {
 			// Calculate check sum
 			logger.info("Checksum 1");
 			read1Checksum = countFileChecksum(job.getLocalBackupFile());
-			job.getLocalBackupFile().deleteOnExit();
+//			job.getLocalBackupFile().deleteOnExit();
 			Assert.assertTrue(checksum == read1Checksum);
 		}
 	}
@@ -115,7 +112,10 @@ public class CipherCommandTest {
 			TestBackupInstanceJob job = new TestBackupInstanceJob();
 			job.setLocalBackupFile(pfile);
 			job.setLocalPackageDirectory(pfile.getParent());
-			
+
+			logger.info("cp " + pfile + " " + pfile + ".orig");			
+			Runtime.getRuntime().exec("cp " + pfile + " " + pfile + ".orig").waitFor();			
+
 			// Execute the command
 			logger.info("Ciphering 2");
 			Command cmd = new CipherCommand2(job);
@@ -123,7 +123,7 @@ public class CipherCommandTest {
 			
 			// Get ciphered filename for cleanup
 			c2file = job.getLocalBackupFile();
-			c2file.deleteOnExit();
+//			c2file.deleteOnExit();
 		}
 
 		// Decipher
