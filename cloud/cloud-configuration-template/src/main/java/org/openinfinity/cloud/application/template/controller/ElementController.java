@@ -51,7 +51,7 @@ import java.util.Map;
 @RequestMapping("VIEW")
 public class ElementController {
 	
-	private static final String PATH_GET_ELEMENTS = "getAvailableElements";
+	private static final String PATH_GET_ELEMENTS = "getAvailable";
 	
 	@Autowired
 	private ConfigurationElementService configurationElementService;

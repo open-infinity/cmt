@@ -76,10 +76,10 @@
 		--%>
 	</div>
 
-	<div id="dialog-template-edit">
+	<div id="dlg-template-edit">
 
         <%-- Template --%>
-        <div id="edit-template-fields" class="template-edit-dialog-item">
+        <div id="edit-template-fields" class="dlg-template-edit-item">
             <p>
                 <div class="template-id">
                     <span>Template ID:</span>
@@ -92,24 +92,26 @@
         <br>
 
         <%-- Elements --%>
-        <div id="elements-selection-container" class="template-edit-dialog-item">
-            <div id="selected-elements-container" class="template-edit-dialog-item elements-container">
-                <div class="elements-container-title">Selected elements</div>
-                <div class="elements-container-columns">
-                    <div class="name">Platform</div>
-                    <div class="version">Version</div>
+        <div id ="elements-selection-container" class ="item-selection-container dlg-template-edit-item">
+            <div class="selected-list-panel-container dlg-template-edit-item">
+                <div class "dlg-template-edit-placeholder"> </div>
+                <div class="list-panel-container-title">Selected elements</div>
+                <div class="list-panel-container-columns">
+                    <div class="list-item-column">Platform</div>
+                    <div>Version</div>
                 </div>
-                <div class="elements-list-container">
+                <div class="list-container">
                     <ul></ul>
                 </div>
             </div>
-            <div id="available-elements-container" class="template-edit-dialog-item elements-container">
-                <div class="elements-container-title">All elements</div>
-                <div class="elements-container-columns">
-                    <div class="name">Platform</div>
-                    <div class="version">Version</div>
+            <div class="available-list-panel-container dlg-template-edit-item">
+                <div class "dlg-template-edit-placeholder"> </div>
+                <div class="list-panel-container-title">Available elements</div>
+                <div class="list-panel-container-columns">
+                    <div class="list-item-column">Platform</div>
+                    <div>Version</div>
                 </div>
-                <div class="elements-list-container">
+                <div class="list-container">
                     <ul></ul>
                 </div>
             </div>
@@ -117,26 +119,27 @@
         <br>
 
         <%-- Organizations --%>
-        <div id="organizations-selection-container" class="template-edit-dialog-item">
-            <div id="selected-organizations-container" class="template-edit-dialog-item elements-container">
-                <div class="elements-container-title">Selected elements</div>
-                <div class="elements-container-columns">
-                    <div class="id">Id</div>
-                    <div class="treePath">Tree path</div>
-                    <div class="name">Name</div>
+        <div id ="organizations-selection-container" class = "item-selection-container dlg-template-edit-item">
+            <div class="selected-list-panel-container dlg-template-edit-item">
+                <div class "dlg-template-edit-placeholder"> </div>
+                <div class="list-panel-container-title">Selected organizations</div>
+                <div class="list-panel-container-columns">
+                    <div class="list-item-column">Id</div>
+                    <div>Name</div>
                 </div>
-                <div class="elements-list-container">
+                <div class="list-container">
                     <ul></ul>
                 </div>
             </div>
-            <div id="available-organizations-container" class="template-edit-dialog-item elements-container">
-                <div class="elements-container-title">All elements</div>
-                <div class="elements-container-columns">
-                    <div class="id">Id</div>
-                    <div class="treePath">Tree path</div>
-                    <div class="name">Name</div>
+            <br>
+            <div class="available-list-panel-container dlg-template-edit-item">
+                <div class "dlg-template-edit-placeholder"> </div>
+                <div class="list-panel-container-title">Available organizations</div>
+                <div class="list-panel-container-columns">
+                    <div class="list-item-column">Id</div>
+                    <div>Name</div>
                 </div>
-                <div class="elements-list-container">
+                <div class="list-container">
                     <ul></ul>
                 </div>
             </div>

@@ -170,10 +170,10 @@ public class TemplateController {
             //LOG.debug("ENTER getElementIdsForTemplate");
             //LOG.debug("templateId:" + templateId);
             Collection<ConfigurationElement> allElements = configurationElementService.loadAll();
-            elementsWrapper.setAvailableElements(allElements);
+            elementsWrapper.setAvailable(allElements);
             //LOG.debug(allElements);
             Collection<ConfigurationElement> elementsForTemplate = configurationElementService.loadAllForTemplate(templateId);
-            elementsWrapper.setSelectedElements(elementsForTemplate);
+            elementsWrapper.setSelected(elementsForTemplate);
             //LOG.debug(elementsForTemplate);
             //LOG.debug(elementsWrapper);
             SerializerUtil.jsonSerialize(response.getWriter(), elementsWrapper);
@@ -206,7 +206,6 @@ public class TemplateController {
 
             organizationWrapper.construct(organizations, selectedOrganizations);
 
-            //LOG.debug(selectedOrganizations);
             LOG.debug("----------------organizationWrapper");
             LOG.debug("----------------organizationWrapper selected len =" + selectedOrganizations.size());
             LOG.debug("----------------organizationWrapper all len =" + organizations.size());

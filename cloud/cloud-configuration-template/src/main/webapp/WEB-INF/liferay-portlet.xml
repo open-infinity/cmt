@@ -11,7 +11,7 @@
 		<header-portlet-css>/css/plugins/ui.jqgrid.css</header-portlet-css>
 		-->
 		
-		<header-portlet-css>/css/configurationtemplate.css</header-portlet-css>
+		<header-portlet-css>/css/edit-template-dialog.css</header-portlet-css>
         <header-portlet-css>/css/plugins/ui.jqgrid.css</header-portlet-css>
         
 		<header-portlet-javascript>/js/plugins/jquery.metadata.js</header-portlet-javascript>

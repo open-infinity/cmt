@@ -8,31 +8,31 @@ import java.util.Collection;
 @Component
 public class ConfigurationElementWrapper{
 
-    private Collection<ConfigurationElement> availableElements;
+    private Collection<ConfigurationElement> available;
 
-    private Collection<ConfigurationElement> selectedElements;
+    private Collection<ConfigurationElement> selected;
 
     public ConfigurationElementWrapper() {
     }
 
-    public ConfigurationElementWrapper(Collection<ConfigurationElement> availableElements, Collection<ConfigurationElement> selectedElements) {
-        this.availableElements = availableElements;
-        this.selectedElements = selectedElements;
+    public ConfigurationElementWrapper(Collection<ConfigurationElement> available, Collection<ConfigurationElement> selectedElements) {
+        this.available = available;
+        this.selected = selectedElements;
     }
 
-    public Collection<ConfigurationElement> getAvailableElements() {
-        return availableElements;
+    public Collection<ConfigurationElement> getAvailable() {
+        return available;
     }
 
-    public void setAvailableElements(Collection<ConfigurationElement> availableElements) {
-        this.availableElements = availableElements;
+    public void setAvailable(Collection<ConfigurationElement> available) {
+        this.available = available;
     }
 
-    public Collection<ConfigurationElement> getSelectedElements() {
-        return selectedElements;
+    public Collection<ConfigurationElement> getSelected() {
+        return selected;
     }
 
-    public void setSelectedElements(Collection<ConfigurationElement> selectedElements) {
-        this.selectedElements = selectedElements;
+    public void setSelected(Collection<ConfigurationElement> selected) {
+        this.selected = selected;
     }
 }

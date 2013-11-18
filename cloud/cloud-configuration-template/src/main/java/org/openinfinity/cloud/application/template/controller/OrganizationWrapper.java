@@ -9,21 +9,21 @@ import java.util.LinkedList;
 @Component
 public class OrganizationWrapper {
 
-    private Collection<OrganizationInfo> availableOrganizations;
+    private Collection<OrganizationInfo> available;
 
-    private Collection<OrganizationInfo> selectedOrganizations;
+    private Collection<OrganizationInfo> selected;
 
     public OrganizationWrapper() {
     }
 
     public OrganizationWrapper(Collection<OrganizationInfo> availableOrganizations, Collection<OrganizationInfo> selectedOrganizations) {
-        this.availableOrganizations = availableOrganizations;
-        this.selectedOrganizations = selectedOrganizations;
+        this.available = availableOrganizations;
+        this.selected = selectedOrganizations;
     }
 
     public void construct(Collection<Organization> available, Collection<Organization> selected){
-        this.availableOrganizations = createfromOrganizations(available);
-        this.selectedOrganizations = createfromOrganizations(selected);
+        this.available = createfromOrganizations(available);
+        this.selected = createfromOrganizations(selected);
     }
 
     private Collection<OrganizationInfo> createfromOrganizations(Collection<Organization> organizations){
@@ -34,20 +34,20 @@ public class OrganizationWrapper {
         return organizationInfos;
     }
 
-    public Collection<OrganizationInfo> getAvailableOrganizations() {
-        return availableOrganizations;
+    public Collection<OrganizationInfo> getAvailable() {
+        return available;
     }
 
-    public void setAvailableOrganizations(Collection<OrganizationInfo> availableOrganizations) {
-        this.availableOrganizations = availableOrganizations;
+    public void setAvailable(Collection<OrganizationInfo> available) {
+        this.available = available;
     }
 
-    public Collection<OrganizationInfo> getSelectedOrganizations() {
-        return selectedOrganizations;
+    public Collection<OrganizationInfo> getSelected() {
+        return selected;
     }
 
-    public void setSelectedOrganizations(Collection<OrganizationInfo> selectedOrganizations) {
-        this.selectedOrganizations = selectedOrganizations;
+    public void setSelected(Collection<OrganizationInfo> selected) {
+        this.selected = selected;
     }
 
 }
