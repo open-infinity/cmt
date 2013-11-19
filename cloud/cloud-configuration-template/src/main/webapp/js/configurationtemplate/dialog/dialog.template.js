@@ -53,8 +53,8 @@
         title: "Edit template",
         autoOpen: false,
         modal: true,
-        width: 600,
-        height: 840 ,
+        width: 650,
+        height: 980 ,
         buttons: {
             "Submit changes": function() {
                 submitTemplate();
@@ -132,8 +132,8 @@
         var listSelected = panelSelected.find("ul");
         var listAvailable = panelAvailable.find("ul");
         var htmlTemplate = "<li class='ui-state-default'>\
-                              <div class='dlg-edit-template-organizationId'></div>\
-                              <div class='dlg-edit-template-organizationName'></div>\
+                              <div class='dlg-edit-template-organization-id'></div>\
+                              <div class='dlg-edit-template-organization-name'></div>\
                            </li>";
         var selectedIndices = [];
 
@@ -161,8 +161,8 @@
     function storeOrganizationToDom(htmlTemplate, value, list){
             list.append(htmlTemplate);
             var lastChild = list.find("li:last-child");
-            lastChild.find(".dlg-edit-template-organizationId").text(value.organizationId);
-            lastChild.find(".dlg-edit-template-organizationName").text(value.name);
+            lastChild.find(".dlg-edit-template-organization-id").text(value.organizationId);
+            lastChild.find(".dlg-edit-template-organization-name").text(value.name);
             $.data(lastChild, "config", value);
      }
 
