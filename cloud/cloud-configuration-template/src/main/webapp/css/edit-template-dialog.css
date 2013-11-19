@@ -1,7 +1,20 @@
-.dlg-template-edit-item{border-style:solid; border-width:1px; border-color:#C4C4C4; border-radius:5px; font-family: Verdana, Arial, sans-serif; font-size: 12px; font-style: normal; width: 560px;}
-.dlg-template-edit-placeholder{width: 15px; float:left;}
-.template-id{font-size: 14px; font-style: bold;}
-.item-selection-container {top:10px; width: 900px; height: 300px; float:left;}
+.dlg-edit-template-item{
+    border-style:solid;
+    border-width:1px;
+    border-color:#C4C4C4;
+    border-radius:5px;
+    margin-bottom: 15px;
+    padding:10px;
+    font-family: Verdana, Arial, sans-serif;
+    font-size: 12px;
+    font-style: normal;
+    width: 560px;}
+.dlg-edit-template-list-panel-container-columns{margin-left:10px}
+.dlg-edit-template-list-panel-container-title{margin-left:10px}
+.dlg-edit-template-template-id{font-size: 14px; font-style: bold;}
+.dlg-edit-template-item-selection-container {top:10px; height: 300px;}
+.dlg-edit-template-item-title {font-weight: bold}
+#dlg-edit-template-description{width:97%}
 .selected-list-panel-container{width: 200px; float:left; margin:10px;}
 .available-list-panel-container{width: 200px; float:right; margin:10px;}
 .list-panel-title {margin:5px 5px 15px 10px; font-weight:bold;}
@@ -10,4 +23,4 @@
 .list-container li {margin: 5px 5px 5px 10px; padding: 5px; width: 155px; border-radius:2px;}
 .list-container {overflow-y:auto; height: 230px;}
 .list-item-column {float:left; width:120px;}
-.dlg-template-edit-organizationId{float:left; width:40px;}
+.dlg-edit-template-organizationId{float:left; width:40px;}
