@@ -27,3 +27,5 @@
 .dlg-edit-template-organization-name{text-align:right;}
 #dlg-edit-template-description{width:97%}
 #edit-template-fields input{padding:1px;}
+#dlg-item-table th{border:1px solid #C4C4C4; padding: 5px; text-align:center}
+#dlg-item-table td{border:1px solid #C4C4C4; padding: 5px;}

@@ -48,8 +48,9 @@
     });
 
     // Initialize the dialogs
-
-    $("#dlg-edit-template").dialog({
+    var € = {};
+    €.editTemplate = $("#dlg-edit-template");
+    €.editTemplate.dialog({
         title: "Edit template",
         autoOpen: false,
         modal: true,
@@ -58,11 +59,25 @@
         buttons: {
             "Submit changes": function() {
                 submitTemplate();
-                cleanUpDialog();
-                $(this).dialog( "close" );
+                cleanUpDialog($(this));
+                //$(this).dialog( "close" );
             },
             Cancel: function() {
-                cleanUpDialog();
+                cleanUpDialog($(this));
+                $(this).dialog( "close" );
+            }
+        }
+    });
+
+    $("#dlg-info").dialog({
+        title: "Detailed information",
+        autoOpen: false,
+        modal: true,
+        width: 1000,
+        height: 200 ,
+        buttons: {
+            Ok: function() {
+                cleanUpTable($(this));
                 $(this).dialog( "close" );
             }
         }
@@ -98,9 +113,15 @@
                 }
             }
         });
-        $(".list-container").find("li").click(function(){
-            $(this).toggleClass("ui-state-highlight");
-        });
+        $(".list-container").find("li").
+            click(function(){
+                $(this).toggleClass("ui-state-highlight");
+            }).
+            dblclick(function () {
+                $("#dlg-info").dialog("open");
+                var configData = $(this).data("config");
+                storeToTable(configData, $("#dlg-item-table"));
+            });
     }
     function populateElements(data){
         var cnt = $("#elements-selection-container");
@@ -151,19 +172,28 @@
 
 
     function storeElementToDom(htmlTemplate, value, list){
-            list.append(htmlTemplate);
-            var lastChild = list.find("li:last-child");
-            lastChild.find(".name").text(value.name);
-            lastChild.find(".version").text(value.version);
-            $.data(lastChild, "config", value);
+        list.append(htmlTemplate);
+        var lastChild = list.find("li:last-child");
+        lastChild.find(".name").text(value.name);
+        lastChild.find(".version").text(value.version);
+        lastChild.data("config", value);
+    }
+
+    function storeToTable(configData, table){
+        var htmlTableRows = "<tr></tr><tr></tr>";
+        table.append(htmlTableRows);
+        for (var key in configData) {
+            table.find("tr:first-child").append('<th>' + key + '</th>');
+            table.find("tr:last-child").append('<td>' + configData[key] + '</td>');
+        }
     }
 
     function storeOrganizationToDom(htmlTemplate, value, list){
-            list.append(htmlTemplate);
-            var lastChild = list.find("li:last-child");
-            lastChild.find(".dlg-edit-template-organization-id").text(value.organizationId);
-            lastChild.find(".dlg-edit-template-organization-name").text(value.name);
-            $.data(lastChild, "config", value);
+        list.append(htmlTemplate);
+        var lastChild = list.find("li:last-child");
+        lastChild.find(".dlg-edit-template-organization-id").text(value.organizationId);
+        lastChild.find(".dlg-edit-template-organization-name").text(value.name);
+        lastChild.data("config", value);
      }
 
     function moveMultipleElements(list, selected) {
@@ -176,9 +206,12 @@
         elem.appendTo(list).removeClass("ui-state-highlight").fadeIn();
     }
 
+    function cleanUpDialog(that){
+        that.find(".list-container").find("ul").empty();
+    }
 
-    function cleanUpDialog(){
-        $(".list-container").find("ul").empty();
+    function cleanUpTable(that){
+        that.find("tr").remove();
     }
 
     function submitTemplate(){

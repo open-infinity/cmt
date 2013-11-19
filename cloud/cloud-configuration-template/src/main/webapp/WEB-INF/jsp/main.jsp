@@ -142,6 +142,11 @@
             </div>
 	</div>
 
+	<%-- Item info dialog --%>
+    <div id="dlg-info">
+        <table id="dlg-item-table"></table>
+    </div>
+
 </body>
 </html>
 
