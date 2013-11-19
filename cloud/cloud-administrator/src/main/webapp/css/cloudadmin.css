@@ -726,7 +726,7 @@ col.data {
 
 #configureClusterDialog .protocolSelect{width:5em; margin-left:1em;} 
 
-#configureClusterDialog .addConnectionButton{margin-left:1em;}
+#configureClusterDialog .addConnectionButton{margin-left:1.5em;}
 
 /*Open connection entries from DB*/
 
