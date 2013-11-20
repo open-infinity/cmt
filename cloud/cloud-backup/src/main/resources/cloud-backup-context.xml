@@ -31,9 +31,11 @@
         <context:exclude-filter type="regex" expression=".*ssp.*"/>
 	</context:component-scan>
 
+<!-- 
 	<bean id="cryptoSupport" class="org.openinfinity.core.crypto.CryptoSupport">
 		<constructor-arg name="symmetricKeyPath" value="${symmetric.key.path}" />
 	</bean>
+-->	
 
 	<bean id="cloudDataSource" destroy-method="close"
 		class="org.apache.commons.dbcp.BasicDataSource">
