@@ -17,6 +17,15 @@ class oi3-backup::config {
 		mode => 0755,
     }
 
+    # Temporary directory for backups
+	file {"/opt/openinfinity/3.0.0/backup/tmp":
+        ensure => "directory",
+		owner => 'oiuser',
+		group => 'oiuser',
+		mode => 0700,
+		require => File['/opt/openinfinity/3.0.0/backup'],
+	}
+
     # Stream backup
 	file {"/opt/openinfinity/3.0.0/backup/stream-backup":
 		ensure => present,
@@ -34,6 +43,16 @@ class oi3-backup::config {
 		group => 'oiuser',
 		mode => 0755,
 		source => "puppet:///modules/oi3-backup/stream-restore",
+		require => File['/opt/openinfinity/3.0.0/backup'],
+	}
+	
+    # README
+	file {"/opt/openinfinity/3.0.0/backup/README":
+		ensure => present,
+		owner => 'oiuser',
+		group => 'oiuser',
+		mode => 0444,
+		source => "puppet:///modules/oi3-backup/README",
 		require => File['/opt/openinfinity/3.0.0/backup'],
 	}
 	
