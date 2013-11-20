@@ -1,7 +1,6 @@
 (function($) {
-    var template = window.app.dialog.template || {};
-    template.elementsTable = $("edit-template-elements-grid");
-    $.extend(template, {
+    var dlg = window.app.dialog.template || {};
+    $.extend(dlg, {
 
         create: function () {
         },
@@ -44,25 +43,49 @@
                 });
 
             $("#dlg-edit-template").dialog("open");
-        }
+        },
+
+        self: $("#dlg-edit-template"),
+
+        infoDialog: $("#dlg-info"),
+
+        selectedElementsList: $("#dlg-edit-template-selected-elements"),
+
+        selectedOrganizationsList: $("#dlg-edit-template-selected-organizations")
+
     });
 
     // Initialize the dialogs
-
-    $("#dlg-edit-template").dialog({
+    //var € = {};
+    //€.editTemplate = $("#dlg-edit-template");
+    dlg.self.dialog({
         title: "Edit template",
         autoOpen: false,
         modal: true,
-        width: 600,
-        height: 840 ,
+        width: 650,
+        height: 980 ,
         buttons: {
             "Submit changes": function() {
                 submitTemplate();
-                cleanUpDialog();
+                cleanUpDialog($(this));
                 $(this).dialog( "close" );
             },
             Cancel: function() {
-                cleanUpDialog();
+                cleanUpDialog($(this));
+                $(this).dialog( "close" );
+            }
+        }
+    });
+
+    dlg.infoDialog.dialog({
+        title: "Detailed information",
+        autoOpen: false,
+        modal: true,
+        width: 1000,
+        height: 200 ,
+        buttons: {
+            Ok: function() {
+                cleanUpTable($(this));
                 $(this).dialog( "close" );
             }
         }
@@ -98,9 +121,15 @@
                 }
             }
         });
-        $(".list-container").find("li").click(function(){
-            $(this).toggleClass("ui-state-highlight");
-        });
+        $(".list-container").find("li").
+            click(function(){
+                $(this).toggleClass("ui-state-highlight");
+            }).
+            dblclick(function () {
+                $("#dlg-info").dialog("open");
+                var configData = $(this).data("config");
+                storeToTable(configData, $("#dlg-item-table"));
+            });
     }
     function populateElements(data){
         var cnt = $("#elements-selection-container");
@@ -132,8 +161,8 @@
         var listSelected = panelSelected.find("ul");
         var listAvailable = panelAvailable.find("ul");
         var htmlTemplate = "<li class='ui-state-default'>\
-                              <div class='dlg-edit-template-organizationId'></div>\
-                              <div class='dlg-edit-template-organizationName'></div>\
+                              <div class='dlg-edit-template-organization-id'></div>\
+                              <div class='dlg-edit-template-organization-name'></div>\
                            </li>";
         var selectedIndices = [];
 
@@ -151,19 +180,28 @@
 
 
     function storeElementToDom(htmlTemplate, value, list){
-            list.append(htmlTemplate);
-            var lastChild = list.find("li:last-child");
-            lastChild.find(".name").text(value.name);
-            lastChild.find(".version").text(value.version);
-            $.data(lastChild, "config", value);
+        list.append(htmlTemplate);
+        var lastChild = list.find("li:last-child");
+        lastChild.find(".name").text(value.name);
+        lastChild.find(".version").text(value.version);
+        lastChild.data("config", value);
+    }
+
+    function storeToTable(configData, table){
+        var htmlTableRows = "<tr></tr><tr></tr>";
+        table.append(htmlTableRows);
+        for (var key in configData) {
+            table.find("tr:first-child").append('<th>' + key + '</th>');
+            table.find("tr:last-child").append('<td>' + configData[key] + '</td>');
+        }
     }
 
     function storeOrganizationToDom(htmlTemplate, value, list){
-            list.append(htmlTemplate);
-            var lastChild = list.find("li:last-child");
-            lastChild.find(".dlg-edit-template-organizationId").text(value.organizationId);
-            lastChild.find(".dlg-edit-template-organizationName").text(value.name);
-            $.data(lastChild, "config", value);
+        list.append(htmlTemplate);
+        var lastChild = list.find("li:last-child");
+        lastChild.find(".dlg-edit-template-organization-id").text(value.organizationId);
+        lastChild.find(".dlg-edit-template-organization-name").text(value.name);
+        lastChild.data("config", value);
      }
 
     function moveMultipleElements(list, selected) {
@@ -176,14 +214,41 @@
         elem.appendTo(list).removeClass("ui-state-highlight").fadeIn();
     }
 
+    function cleanUpDialog(that){
+        that.find(".list-container").find("ul").empty();
+    }
 
-    function cleanUpDialog(){
-        $(".list-container").find("ul").empty();
+    function cleanUpTable(that){
+        that.find("tr").remove();
     }
 
     function submitTemplate(){
         var outData = {};
-        $.post(portletURL.url.cluster.updatePublishedURL, outData);
+        outData["templateId"] = parseInt($("#template-id-value").text());
+        outData["templateName"] = $("#template-name + input").val();
+        outData["templateDescription"] = $("#dlg-edit-template-description").val();
+        outData["elementsSelected"] = JSON.stringify(getSelectedElements());
+        outData["organizationsSelected"] = JSON.stringify(getSelectedOrganizations());
+
+        $.post(portletURL.url.template.editTemplateURL, outData);
+    }
+
+    function getSelectedElements(){
+        var selectedItems = [];
+            var arrayOfLis = dlg.selectedElementsList.find("li");
+        for (var i = 0; i < arrayOfLis.length; i++){
+            selectedItems.push($(arrayOfLis[i]).data("config").id);
+        }
+        return selectedItems;
+    }
+
+    function getSelectedOrganizations(){
+        var selectedItems = [];
+        var arrayOfLis = dlg.selectedOrganizationsList.find("li");
+        for (var i = 0; i < arrayOfLis.length; i++){
+            selectedItems.push($(arrayOfLis[i]).data("config").organizationId);
+        }
+        return selectedItems;
     }
 
 })(jQuery);

@@ -15,22 +15,22 @@
  */
 package org.openinfinity.cloud.service.configurationtemplate;
 
-import org.openinfinity.cloud.domain.configurationtemplate.ConfigurationTemplateOrganization;
+import org.openinfinity.cloud.domain.configurationtemplate.ConfigurationTemplateElement;
 
 import java.util.Collection;
 
 
 /**
- * Interface for management of cloud configuration template organizations.
+ * Interface for management of cloud configuration template elements.
  * 
  * @author Vedran Bartonicek
  * @version 1.3.0
  * @since 1.3.0
  */
-public interface ConfigurationTemplateOrganizationService{
+public interface ConfigurationTemplateElementService{
 
-    void create(int organizationId, int templateId);
+    void create(int templateId, int elementId);
 
-    Collection<ConfigurationTemplateOrganization> loadAllForTemplate(int templateId);
+    Collection<ConfigurationTemplateElement> loadAllForTemplate(int templateId);
 
 }

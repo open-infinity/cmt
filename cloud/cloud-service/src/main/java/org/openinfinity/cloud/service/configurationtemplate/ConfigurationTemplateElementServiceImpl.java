@@ -16,13 +16,12 @@
 package org.openinfinity.cloud.service.configurationtemplate;
 
 import org.apache.log4j.Logger;
-import org.openinfinity.cloud.domain.configurationtemplate.ConfigurationTemplateOrganization;
-import org.openinfinity.cloud.domain.repository.configurationtemplate.ConfigurationTemplateOrganizationRepository;
+import org.openinfinity.cloud.domain.configurationtemplate.ConfigurationTemplateElement;
+import org.openinfinity.cloud.domain.repository.configurationtemplate.ConfigurationTemplateElementRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
-
 
 
 /**
@@ -32,20 +31,20 @@ import java.util.Collection;
  */
 
 @Service
-public class ConfigurationTemplateOrganizationServiceImpl implements ConfigurationTemplateOrganizationService {
-	private static final Logger LOGGER = Logger.getLogger(ConfigurationTemplateOrganizationServiceImpl.class.getName());
+public class ConfigurationTemplateElementServiceImpl implements ConfigurationTemplateElementService {
+	private static final Logger LOGGER = Logger.getLogger(ConfigurationTemplateElementServiceImpl.class.getName());
 
 	@Autowired
-	private ConfigurationTemplateOrganizationRepository configurationTemplateOrganizationRepository;
+	private ConfigurationTemplateElementRepository configurationTemplateElementRepository;
 
     @Override
-    public void create(int organizationId, int templateId) {
-        configurationTemplateOrganizationRepository.create(organizationId, templateId);
+    public void create(int templateId, int elementId) {
+        configurationTemplateElementRepository.create(templateId, elementId);
     }
 
     @Override
-    public Collection<ConfigurationTemplateOrganization> loadAllForTemplate(int templateId){
-       return configurationTemplateOrganizationRepository.loadAllForTemplate(templateId);
+    public Collection<ConfigurationTemplateElement> loadAllForTemplate(int templateId){
+       return configurationTemplateElementRepository.loadAllForTemplate(templateId);
     }
 
 }

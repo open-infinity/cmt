@@ -26,7 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import javax.sql.DataSource;
-import java.math.BigInteger;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
@@ -42,9 +41,16 @@ public class ConfigurationTemplateOrganizationRepositoryJdbcImpl implements Conf
 
 	private JdbcTemplate jdbcTemplate;
 
-	private static final String LOAD_ALL_SQL = "select * from configuration_template_organization_tbl";
+    private static final String CREATE_SQL = "insert into configuration_template_organization_tbl values(?, ?)";
+
+    private static final String LOAD_ALL_SQL = "select * from configuration_template_organization_tbl";
 
     private static final String LOAD_ALL_FOR_TEMPLATE_SQL = "select * from configuration_template_organization_tbl where template_id = ?";
+
+    private static final String DELETE_BY_ORGANIZATION_ID_SQL = "delete from configuration_template_organization_tbl where organization_id = ?";
+
+    private static final String DELETE_BY_TEMPLATE_ID_SQL = "delete from configuration_template_organization_tbl where template_id = ?";
+
 
 
     @Autowired
@@ -54,12 +60,8 @@ public class ConfigurationTemplateOrganizationRepositoryJdbcImpl implements Conf
     }
 
     @Override
-    public ConfigurationTemplateOrganization create(ConfigurationTemplateOrganization product) {
-        return null;
-    }
-
-    @Override
-    public void update(ConfigurationTemplateOrganization product) {
+    public void create(int templateId, int organizationId) {
+        jdbcTemplate.update(CREATE_SQL, templateId, organizationId);
     }
 
     @AuditTrail
@@ -69,17 +71,19 @@ public class ConfigurationTemplateOrganizationRepositoryJdbcImpl implements Conf
     }
 
     @Override
-    public ConfigurationTemplateOrganization load(BigInteger id) {
-        return null;
-    }
-
-    @Override
-    public void delete(ConfigurationTemplateOrganization product) {
-    }
-
-    @Override
     public Collection<ConfigurationTemplateOrganization> loadAllForTemplate(int templateId){
         return jdbcTemplate.query(LOAD_ALL_FOR_TEMPLATE_SQL, new Object[] {templateId}, new OrganizationRowMapper());
+    }
+
+    @Override
+    public void deleteByOrganization(int organizationId) {
+        jdbcTemplate.update(DELETE_BY_ORGANIZATION_ID_SQL, organizationId);
+
+    }
+
+    @Override
+    public void deleteByTemplate(int templateId) {
+        jdbcTemplate.update(DELETE_BY_TEMPLATE_ID_SQL, templateId);
     }
 
     private class OrganizationRowMapper implements RowMapper<ConfigurationTemplateOrganization> {
