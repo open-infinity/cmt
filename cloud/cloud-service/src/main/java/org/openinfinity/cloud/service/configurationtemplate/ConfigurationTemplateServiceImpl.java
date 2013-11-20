@@ -16,6 +16,8 @@
 package org.openinfinity.cloud.service.configurationtemplate;
 
 import org.openinfinity.cloud.domain.configurationtemplate.ConfigurationTemplate;
+import org.openinfinity.cloud.domain.repository.configurationtemplate.ConfigurationTemplateElementRepository;
+import org.openinfinity.cloud.domain.repository.configurationtemplate.ConfigurationTemplateOrganizationRepository;
 import org.openinfinity.cloud.domain.repository.configurationtemplate.ConfigurationTemplateRepository;
 import org.openinfinity.core.annotation.Log;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +39,13 @@ import java.util.Set;
 public class ConfigurationTemplateServiceImpl implements ConfigurationTemplateService {
 	@Autowired
 	private ConfigurationTemplateRepository configurationTemplateRepository;
-	
+
+    @Autowired
+    private ConfigurationTemplateOrganizationRepository configurationTemplateOrganizationRepository;
+
+    @Autowired
+    private ConfigurationTemplateElementRepository configurationTemplateElementRepository;
+
     @Override
     public ConfigurationTemplate create(ConfigurationTemplate configurationTemplate) {
         return null;
@@ -45,6 +53,7 @@ public class ConfigurationTemplateServiceImpl implements ConfigurationTemplateSe
 
     @Override
     public void update(ConfigurationTemplate configurationTemplate) {
+        configurationTemplateRepository.update(configurationTemplate);
     }
 
     @Override
@@ -69,5 +78,21 @@ public class ConfigurationTemplateServiceImpl implements ConfigurationTemplateSe
             templates.addAll(configurationTemplateRepository.getTemplates(oid));
         }
         return templates;
+    }
+
+    @Override
+    public void update(ConfigurationTemplate ct, List<String> elements, List<String> organizations) {
+        configurationTemplateRepository.update(ct);
+
+        configurationTemplateOrganizationRepository.deleteByTemplate(ct.getId());
+        for(String o : organizations){
+            configurationTemplateOrganizationRepository.create(ct.getId(), Integer.parseInt(o));
+        }
+
+        configurationTemplateElementRepository.deleteByTemplate(ct.getId());
+        for(String e : elements){
+            configurationTemplateElementRepository.create(ct.getId(), Integer.parseInt(e));
+        }
+
     }
 }

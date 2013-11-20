@@ -6,16 +6,16 @@ import org.springframework.stereotype.Component;
 import java.util.Collection;
 
 @Component
-public class ConfigurationElementWrapper{
+public class ConfigurationElementContainer {
 
     private Collection<ConfigurationElement> available;
 
     private Collection<ConfigurationElement> selected;
 
-    public ConfigurationElementWrapper() {
+    public ConfigurationElementContainer() {
     }
 
-    public ConfigurationElementWrapper(Collection<ConfigurationElement> available, Collection<ConfigurationElement> selectedElements) {
+    public ConfigurationElementContainer(Collection<ConfigurationElement> available, Collection<ConfigurationElement> selectedElements) {
         this.available = available;
         this.selected = selectedElements;
     }

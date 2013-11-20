@@ -1,7 +1,6 @@
 (function($) {
-    var template = window.app.dialog.template || {};
-    template.elementsTable = $("edit-template-elements-grid");
-    $.extend(template, {
+    var dlg = window.app.dialog.template || {};
+    $.extend(dlg, {
 
         create: function () {
         },
@@ -44,13 +43,22 @@
                 });
 
             $("#dlg-edit-template").dialog("open");
-        }
+        },
+
+        self: $("#dlg-edit-template"),
+
+        infoDialog: $("#dlg-info"),
+
+        selectedElementsList: $("#dlg-edit-template-selected-elements"),
+
+        selectedOrganizationsList: $("#dlg-edit-template-selected-organizations")
+
     });
 
     // Initialize the dialogs
-    var € = {};
-    €.editTemplate = $("#dlg-edit-template");
-    €.editTemplate.dialog({
+    //var € = {};
+    //€.editTemplate = $("#dlg-edit-template");
+    dlg.self.dialog({
         title: "Edit template",
         autoOpen: false,
         modal: true,
@@ -60,7 +68,7 @@
             "Submit changes": function() {
                 submitTemplate();
                 cleanUpDialog($(this));
-                //$(this).dialog( "close" );
+                $(this).dialog( "close" );
             },
             Cancel: function() {
                 cleanUpDialog($(this));
@@ -69,7 +77,7 @@
         }
     });
 
-    $("#dlg-info").dialog({
+    dlg.infoDialog.dialog({
         title: "Detailed information",
         autoOpen: false,
         modal: true,
@@ -216,7 +224,31 @@
 
     function submitTemplate(){
         var outData = {};
-        $.post(portletURL.url.cluster.updatePublishedURL, outData);
+        outData["templateId"] = parseInt($("#template-id-value").text());
+        outData["templateName"] = $("#template-name + input").val();
+        outData["templateDescription"] = $("#dlg-edit-template-description").val();
+        outData["elementsSelected"] = JSON.stringify(getSelectedElements());
+        outData["organizationsSelected"] = JSON.stringify(getSelectedOrganizations());
+
+        $.post(portletURL.url.template.editTemplateURL, outData);
+    }
+
+    function getSelectedElements(){
+        var selectedItems = [];
+            var arrayOfLis = dlg.selectedElementsList.find("li");
+        for (var i = 0; i < arrayOfLis.length; i++){
+            selectedItems.push($(arrayOfLis[i]).data("config").id);
+        }
+        return selectedItems;
+    }
+
+    function getSelectedOrganizations(){
+        var selectedItems = [];
+        var arrayOfLis = dlg.selectedOrganizationsList.find("li");
+        for (var i = 0; i < arrayOfLis.length; i++){
+            selectedItems.push($(arrayOfLis[i]).data("config").organizationId);
+        }
+        return selectedItems;
     }
 
 })(jQuery);

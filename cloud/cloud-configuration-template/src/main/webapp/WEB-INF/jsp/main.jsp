@@ -38,14 +38,15 @@
     <META http-equiv="Content-Type" content="text/html;charset=UTF-8">
     <title>Cloud Template</title>
 </head>
-<body>	
-    <div>Templates available for  
+<body>
+    <%--
+    <div>Templates available for
         <div id="user-name">Vedran</div> 
     </div>
     
     <div id="tab_title">TAB TITLE</div>
     <div id="tab_content">TAB CONTENT</div>
-
+    --%>
     <div id="tabs">
         <ul>
 			<li><a href="#tabs-1">Templates</a></li>
@@ -99,7 +100,7 @@
                     <div class="list-item-column">Platform</div>
                     <div>Version</div>
                 </div>
-                <div class="list-container">
+                <div id="dlg-edit-template-selected-elements" class="list-container">
                     <ul></ul>
                 </div>
             </div>
@@ -125,7 +126,7 @@
                         <div class="list-item-column">Id</div>
                         <div>Name</div>
                     </div>
-                    <div class="list-container">
+                    <div id="dlg-edit-template-selected-organizations" class="list-container">
                         <ul></ul>
                     </div>
                 </div>

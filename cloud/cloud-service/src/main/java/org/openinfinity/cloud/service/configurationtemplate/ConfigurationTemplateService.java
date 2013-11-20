@@ -32,5 +32,6 @@ import java.util.Set;
 public interface ConfigurationTemplateService extends AbstractCrudServiceInterface<ConfigurationTemplate> {
 	
     Set<ConfigurationTemplate> getTemplates(List<Long> organizationIds);
-	
+
+    void update(ConfigurationTemplate ct, List<String> elements, List<String> organizations);
 }

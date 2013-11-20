@@ -16,7 +16,6 @@
 package org.openinfinity.cloud.domain.repository.configurationtemplate;
 
 import org.openinfinity.cloud.domain.configurationtemplate.ConfigurationTemplateOrganization;
-import org.openinfinity.cloud.domain.repository.common.AbstractCrudRepositoryInterface;
 
 import java.util.Collection;
 
@@ -27,8 +26,13 @@ import java.util.Collection;
  * @version 1.3.0
  * @since 1.3.0
  */
-public interface ConfigurationTemplateOrganizationRepository extends AbstractCrudRepositoryInterface<ConfigurationTemplateOrganization> {
+public interface ConfigurationTemplateOrganizationRepository{
 
     Collection<ConfigurationTemplateOrganization> loadAllForTemplate(int templateId);
 
+    void create(int templateId, int organization);
+
+    void deleteByOrganization(int organizationId);
+
+    void deleteByTemplate(int templateId);
 }

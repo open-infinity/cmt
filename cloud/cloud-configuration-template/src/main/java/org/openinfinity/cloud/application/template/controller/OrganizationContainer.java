@@ -7,16 +7,16 @@ import java.util.Collection;
 import java.util.LinkedList;
 
 @Component
-public class OrganizationWrapper {
+public class OrganizationContainer {
 
     private Collection<OrganizationInfo> available;
 
     private Collection<OrganizationInfo> selected;
 
-    public OrganizationWrapper() {
+    public OrganizationContainer() {
     }
 
-    public OrganizationWrapper(Collection<OrganizationInfo> availableOrganizations, Collection<OrganizationInfo> selectedOrganizations) {
+    public OrganizationContainer(Collection<OrganizationInfo> availableOrganizations, Collection<OrganizationInfo> selectedOrganizations) {
         this.available = availableOrganizations;
         this.selected = selectedOrganizations;
     }

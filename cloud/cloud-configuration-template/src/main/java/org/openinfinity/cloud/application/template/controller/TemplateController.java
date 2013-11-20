@@ -19,6 +19,7 @@ package org.openinfinity.cloud.application.template.controller;
 import com.liferay.portal.model.Organization;
 import com.liferay.portal.model.User;
 import org.apache.log4j.Logger;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.openinfinity.cloud.comon.web.LiferayService;
 import org.openinfinity.cloud.domain.configurationtemplate.ConfigurationElement;
 import org.openinfinity.cloud.domain.configurationtemplate.ConfigurationTemplate;
@@ -52,7 +53,7 @@ import java.util.*;
 
 /**
  * Spring portlet controller for handling templates.
- * 
+ *
  * @author Vedran Bartonicek
  * @version 1.3.0
  * @since 1.3.0
@@ -62,7 +63,7 @@ import java.util.*;
 
 @RequestMapping("VIEW")
 public class TemplateController {
-	
+
 	private static final String PATH_GET_TEMPLATES_FOR_USER = "getTemplatesForUser";
     private static final String PATH_GET_ELEMENTS_FOR_TEMPLATE = "getElementsForTemplate";
     private static final String PATH_GET_ORGANIZATIONS_FOR_TEMPLATE = "getOrganizationsForTemplate";
@@ -82,17 +83,17 @@ public class TemplateController {
     private ConfigurationElementService configurationElementService;
 
     @Autowired
-    private ConfigurationElementWrapper elementsWrapper;
+    private ConfigurationElementContainer elementsContainer;
 
     @Autowired
-    private OrganizationWrapper organizationWrapper;
+    private OrganizationContainer organizationContainer;
 
     @Autowired
 	private LiferayService liferayService;
 
     @Autowired
     private ConfigurationTemplateOrganizationService organizationService;
-	
+
 	@RenderMapping
     public String showView(RenderRequest request, RenderResponse response) {
         User user = liferayService.getUser(request);
@@ -100,38 +101,38 @@ public class TemplateController {
             LOG.debug("User = null");
             response.setProperty(ResourceResponse.HTTP_STATUS_CODE, HttpCodes.HTTP_ERROR_CODE_USER_NOT_LOGGED_IN);
             return "notlogged";
-        }   
+        }
         return "main";
     }
-	
+
 	// TODO -> to some util class? :vbartoni
 	@ExceptionHandler({ApplicationException.class, BusinessViolationException.class, SystemException.class})
     public ModelAndView handleException(RenderRequest renderRequest, RenderResponse renderResponse, AbstractCoreException abstractCoreException) {
 		ModelAndView modelAndView = new ModelAndView("error");
-		if (abstractCoreException.isErrorLevelExceptionMessagesIncluded()) 
+		if (abstractCoreException.isErrorLevelExceptionMessagesIncluded())
 			modelAndView.addObject("errorLevelExceptions", abstractCoreException.getErrorLevelExceptionIds());
-		if (abstractCoreException.isWarningLevelExceptionMessagesIncluded()) 
+		if (abstractCoreException.isWarningLevelExceptionMessagesIncluded())
 			modelAndView.addObject("warningLevelExceptions", abstractCoreException.getWarningLevelExceptionIds());
-		if (abstractCoreException.isInformativeLevelExceptionMessagesIncluded()) 
+		if (abstractCoreException.isInformativeLevelExceptionMessagesIncluded())
 			modelAndView.addObject("informativeLevelExceptions", abstractCoreException.getInformativeLevelExceptionIds());
-		
+
 		// TODO, what's this stuff? :vbartoni
 		@SuppressWarnings("unchecked")
-        Map<String, Object> userInfo = 
+        Map<String, Object> userInfo =
             (Map<String, Object>) renderRequest.getAttribute(ActionRequest.USER_INFO);
-		if (userInfo == null) 
+		if (userInfo == null)
 		    return new ModelAndView("home");
 
 		return modelAndView;
     }
-	
+
     @ResourceMapping(PATH_GET_TEMPLATES_FOR_USER)
     public void getTemplatesForUser(ResourceRequest request, ResourceResponse response,
-                                    @RequestParam("page") int page, @RequestParam("rows") int rows) 
+                                    @RequestParam("page") int page, @RequestParam("rows") int rows)
                                     throws Exception {
         try{
-            User user = liferayService.getUser(request, response);           
-            List<Long> organizationIds = liferayService.getOrganizationIds(user);     
+            User user = liferayService.getUser(request, response);
+            List<Long> organizationIds = liferayService.getOrganizationIds(user);
             LOG.debug("organizationIds");
             LOG.debug(organizationIds);
             Set<ConfigurationTemplate> templates = configurationTemplateService.getTemplates(organizationIds);
@@ -148,10 +149,10 @@ public class TemplateController {
             List<ConfigurationTemplate> temp = new LinkedList<ConfigurationTemplate>();
             temp.addAll(templates);
             List<ConfigurationTemplate> onePage = ListUtil.sliceList(page, rows, temp);
-            
+
             SerializerUtil.jsonSerialize(response.getWriter(), new JsonDataWrapper(page, totalPages, records, onePage));
         } catch (Exception e){
-            ExceptionUtil.throwSystemException(e);  
+            ExceptionUtil.throwSystemException(e);
         }
     }
 
@@ -170,13 +171,13 @@ public class TemplateController {
             //LOG.debug("ENTER getElementIdsForTemplate");
             //LOG.debug("templateId:" + templateId);
             Collection<ConfigurationElement> allElements = configurationElementService.loadAll();
-            elementsWrapper.setAvailable(allElements);
+            elementsContainer.setAvailable(allElements);
             //LOG.debug(allElements);
             Collection<ConfigurationElement> elementsForTemplate = configurationElementService.loadAllForTemplate(templateId);
-            elementsWrapper.setSelected(elementsForTemplate);
+            elementsContainer.setSelected(elementsForTemplate);
             //LOG.debug(elementsForTemplate);
-            //LOG.debug(elementsWrapper);
-            SerializerUtil.jsonSerialize(response.getWriter(), elementsWrapper);
+            //LOG.debug(elementsContainer);
+            SerializerUtil.jsonSerialize(response.getWriter(), elementsContainer);
 
         } catch (Exception e){
             ExceptionUtil.throwSystemException(e);
@@ -204,18 +205,48 @@ public class TemplateController {
                 }
             }
 
-            organizationWrapper.construct(organizations, selectedOrganizations);
+            organizationContainer.construct(organizations, selectedOrganizations);
 
-            LOG.debug("----------------organizationWrapper");
-            LOG.debug("----------------organizationWrapper selected len =" + selectedOrganizations.size());
-            LOG.debug("----------------organizationWrapper all len =" + organizations.size());
+            //LOG.debug("----------------organizationContainer");
+            //LOG.debug("----------------organizationContainer selected len =" + selectedOrganizations.size());
+            //LOG.debug("----------------organizationContainer all len =" + organizations.size());
+            //LOG.debug(organizationContainer);
 
-            LOG.debug(organizationWrapper);
-
-            SerializerUtil.jsonSerialize(response.getWriter(), organizationWrapper);
+            SerializerUtil.jsonSerialize(response.getWriter(), organizationContainer);
 
         } catch (Exception e){
             ExceptionUtil.throwSystemException(e);
+        }
+    }
+
+    /*
+    Note 1: @RequestBody for parameter de-serialization would not work with portlets -vbartoni
+    Note 2: @RequestParam("elementsSelected") String[] elementsSelected does not work for some reason.
+    That's why the array was sent as json -vbartoni
+     */
+    @ResourceMapping(PATH_EDIT_TEMPLATE)
+    public void editTemplate(ResourceRequest request, ResourceResponse response,
+
+                                       @RequestParam("templateId") int templateId,
+                                       @RequestParam("templateName") String templateName,
+                                       @RequestParam("templateDescription") String templateDescription,
+                                       @RequestParam("elementsSelected") String elementsSelected,
+                                       @RequestParam("organizationsSelected") String organizationsSelected
+                                       ){
+        try{
+            LOG.debug("----------------editTemplate ENTER------------");
+            LOG.debug("template:" + templateId + ", " +  templateName + ", " +  templateDescription);
+            LOG.debug("organizationsSelected:" + elementsSelected + elementsSelected);
+
+            ObjectMapper mapper = new ObjectMapper();
+            List<String> elements = mapper.readValue(elementsSelected, List.class);
+            List<String> organizations = mapper.readValue(organizationsSelected, List.class);
+            ConfigurationTemplate ct = new ConfigurationTemplate(templateId, templateName, templateDescription);
+            configurationTemplateService.update(ct, elements, organizations);
+
+        } catch(Exception e){
+            e.printStackTrace();
+            response.setProperty(ResourceResponse.HTTP_STATUS_CODE, HttpCodes.HTTP_ERROR_CODE_SERVER_ERROR);
         }
     }
 
