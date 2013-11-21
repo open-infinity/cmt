@@ -297,8 +297,8 @@ CREATE TABLE `configuration_template_tbl` (
 DROP TABLE IF EXISTS `configuration_template_organization_tbl`;
 
 CREATE TABLE `configuration_template_organization_tbl` (
-  `organization_id`bigint(20) NOT NULL,
   `template_id` int(11) NOT NULL,
+  `organization_id`bigint(20) NOT NULL,
   PRIMARY KEY (`organization_id`),
   CONSTRAINT fk_configuration_template FOREIGN KEY (template_id) REFERENCES configuration_template_tbl(id)
 );

@@ -39,8 +39,8 @@ public class ConfigurationTemplateOrganizationServiceImpl implements Configurati
 	private ConfigurationTemplateOrganizationRepository configurationTemplateOrganizationRepository;
 
     @Override
-    public void create(int organizationId, int templateId) {
-        configurationTemplateOrganizationRepository.create(organizationId, templateId);
+    public void create(int templateId, int organizationId) {
+        configurationTemplateOrganizationRepository.create(templateId, organizationId);
     }
 
     @Override

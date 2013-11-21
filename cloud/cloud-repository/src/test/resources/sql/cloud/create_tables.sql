@@ -297,20 +297,13 @@ CREATE TABLE `properties_tbl` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `configuration_template_tbl`;
-
-CREATE TABLE `configuration_template_tbl` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(30) NOT NULL,
-  `description` varchar(256),
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+SET foreign_key_checks = 0;
 
 DROP TABLE IF EXISTS `configuration_template_organization_tbl`;
 
 CREATE TABLE `configuration_template_organization_tbl` (
-  `organization_id` bigint(20) NOT NULL,
   `template_id` int(11) NOT NULL,
+  `organization_id` bigint(20) NOT NULL,
   CONSTRAINT fk_configuration_template FOREIGN KEY (template_id) REFERENCES configuration_template_tbl(id)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
@@ -339,3 +332,14 @@ CREATE TABLE `configuration_template_element_tbl` (
   CONSTRAINT fk_configuration_element FOREIGN KEY (element_id) REFERENCES configuration_element_tbl(id)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
+
+DROP TABLE IF EXISTS `configuration_template_tbl`;
+
+CREATE TABLE `configuration_template_tbl` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(30) NOT NULL,
+  `description` varchar(256),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+SET foreign_key_checks = 1;

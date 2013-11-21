@@ -41,15 +41,23 @@ import java.util.List;
 public class ConfigurationTemplateRepositoryJdbcImpl implements ConfigurationTemplateRepository {
 
 	private JdbcTemplate jdbcTemplate;
-	
-    private static final String GET_ALL_FOR_ORGANIZATION_SQL = 
+
+    private static final String CREATE_SQL = "insert into configuration_template_tbl values(?, ?)";
+
+    private static final String DELETE_SQL = "delete from configuration_template_tbl where id = ?";
+
+    private static final String UPDATE_SQL = "update configuration_template_tbl set name = ?, description = ? where id = ?";
+
+    private static final String GET_ALL_SQL = "select * from configuration_template_tbl where id = ?";
+
+    private static final String GET_ALL_FOR_ORGANIZATION_SQL =
         "select configuration_template_tbl.id, configuration_template_tbl.name, " + 
         "configuration_template_tbl.description from configuration_template_tbl " +
         "inner join configuration_template_organization_tbl on " +
         "configuration_template_tbl.id = configuration_template_organization_tbl.template_id " +
         "where organization_id = ?";
 
-    private static final String GET_BY_ID = "select * from configuration_template_tbl where id = ?";
+    private static final String GET_BY_ID_SQL = "select * from configuration_template_tbl where id = ?";
 
     @Autowired
     public ConfigurationTemplateRepositoryJdbcImpl(@Qualifier("cloudDataSource") DataSource dataSource) {
@@ -67,29 +75,29 @@ public class ConfigurationTemplateRepositoryJdbcImpl implements ConfigurationTem
 
     @Override
     public ConfigurationTemplate create(ConfigurationTemplate configurationTemplate) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        int id = jdbcTemplate.update(CREATE_SQL, configurationTemplate.getName(), configurationTemplate.getDescription());
+        configurationTemplate.setId(id);
+        return configurationTemplate;
     }
 
     @Override
     public void update(ConfigurationTemplate configurationTemplate) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        jdbcTemplate.update(UPDATE_SQL, configurationTemplate.getName(), configurationTemplate.getDescription(), configurationTemplate.getId());
     }
 
     @Override
     public Collection<ConfigurationTemplate> loadAll() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return jdbcTemplate.query(GET_ALL_SQL, new TemplateRowMapper());
     }
 
     @Override
     public ConfigurationTemplate load(BigInteger id) {
-        return jdbcTemplate.queryForObject(GET_BY_ID,
-                new Object[] {id},
-                new TemplateRowMapper());
+        return jdbcTemplate.queryForObject(GET_BY_ID_SQL, new Object[] {id}, new TemplateRowMapper());
     }
 
     @Override
     public void delete(ConfigurationTemplate configurationTemplate) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        jdbcTemplate.update(DELETE_SQL, configurationTemplate.getId());
     }
 
     private class TemplateRowMapper implements RowMapper<ConfigurationTemplate> {

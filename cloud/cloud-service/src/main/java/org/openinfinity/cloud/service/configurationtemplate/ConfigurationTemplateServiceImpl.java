@@ -81,18 +81,16 @@ public class ConfigurationTemplateServiceImpl implements ConfigurationTemplateSe
     }
 
     @Override
-    public void update(ConfigurationTemplate ct, List<String> elements, List<String> organizations) {
+    public void update(ConfigurationTemplate ct, List<Integer> elements, List<Integer> organizations) {
         configurationTemplateRepository.update(ct);
-
         configurationTemplateOrganizationRepository.deleteByTemplate(ct.getId());
-        for(String o : organizations){
-            configurationTemplateOrganizationRepository.create(ct.getId(), Integer.parseInt(o));
+        for(Integer o : organizations){
+            configurationTemplateOrganizationRepository.create(ct.getId(), o.intValue());
         }
 
         configurationTemplateElementRepository.deleteByTemplate(ct.getId());
-        for(String e : elements){
-            configurationTemplateElementRepository.create(ct.getId(), Integer.parseInt(e));
+        for(Integer e : elements){
+            configurationTemplateElementRepository.create(ct.getId(), e.intValue());
         }
-
     }
 }

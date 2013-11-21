@@ -59,12 +59,12 @@ import java.util.*;
  * @since 1.3.0
  */
 
-@Controller(value="templateController")
+@Controller(value = "templateController")
 
 @RequestMapping("VIEW")
 public class TemplateController {
 
-	private static final String PATH_GET_TEMPLATES_FOR_USER = "getTemplatesForUser";
+    private static final String PATH_GET_TEMPLATES_FOR_USER = "getTemplatesForUser";
     private static final String PATH_GET_ELEMENTS_FOR_TEMPLATE = "getElementsForTemplate";
     private static final String PATH_GET_ORGANIZATIONS_FOR_TEMPLATE = "getOrganizationsForTemplate";
 
@@ -76,8 +76,8 @@ public class TemplateController {
 
     private static final Logger LOG = Logger.getLogger(TemplateController.class.getName());
 
-	@Autowired
-	private ConfigurationTemplateService configurationTemplateService;
+    @Autowired
+    private ConfigurationTemplateService configurationTemplateService;
 
     @Autowired
     private ConfigurationElementService configurationElementService;
@@ -89,15 +89,15 @@ public class TemplateController {
     private OrganizationContainer organizationContainer;
 
     @Autowired
-	private LiferayService liferayService;
+    private LiferayService liferayService;
 
     @Autowired
     private ConfigurationTemplateOrganizationService organizationService;
 
-	@RenderMapping
+    @RenderMapping
     public String showView(RenderRequest request, RenderResponse response) {
         User user = liferayService.getUser(request);
-        if(user == null) {
+        if (user == null) {
             LOG.debug("User = null");
             response.setProperty(ResourceResponse.HTTP_STATUS_CODE, HttpCodes.HTTP_ERROR_CODE_USER_NOT_LOGGED_IN);
             return "notlogged";
@@ -105,32 +105,32 @@ public class TemplateController {
         return "main";
     }
 
-	// TODO -> to some util class? :vbartoni
-	@ExceptionHandler({ApplicationException.class, BusinessViolationException.class, SystemException.class})
+    // TODO -> to some util class? :vbartoni
+    @ExceptionHandler({ApplicationException.class, BusinessViolationException.class, SystemException.class})
     public ModelAndView handleException(RenderRequest renderRequest, RenderResponse renderResponse, AbstractCoreException abstractCoreException) {
-		ModelAndView modelAndView = new ModelAndView("error");
-		if (abstractCoreException.isErrorLevelExceptionMessagesIncluded())
-			modelAndView.addObject("errorLevelExceptions", abstractCoreException.getErrorLevelExceptionIds());
-		if (abstractCoreException.isWarningLevelExceptionMessagesIncluded())
-			modelAndView.addObject("warningLevelExceptions", abstractCoreException.getWarningLevelExceptionIds());
-		if (abstractCoreException.isInformativeLevelExceptionMessagesIncluded())
-			modelAndView.addObject("informativeLevelExceptions", abstractCoreException.getInformativeLevelExceptionIds());
+        ModelAndView modelAndView = new ModelAndView("error");
+        if (abstractCoreException.isErrorLevelExceptionMessagesIncluded())
+            modelAndView.addObject("errorLevelExceptions", abstractCoreException.getErrorLevelExceptionIds());
+        if (abstractCoreException.isWarningLevelExceptionMessagesIncluded())
+            modelAndView.addObject("warningLevelExceptions", abstractCoreException.getWarningLevelExceptionIds());
+        if (abstractCoreException.isInformativeLevelExceptionMessagesIncluded())
+            modelAndView.addObject("informativeLevelExceptions", abstractCoreException.getInformativeLevelExceptionIds());
 
-		// TODO, what's this stuff? :vbartoni
-		@SuppressWarnings("unchecked")
+        // TODO, what's this stuff? :vbartoni
+        @SuppressWarnings("unchecked")
         Map<String, Object> userInfo =
-            (Map<String, Object>) renderRequest.getAttribute(ActionRequest.USER_INFO);
-		if (userInfo == null)
-		    return new ModelAndView("home");
+                (Map<String, Object>) renderRequest.getAttribute(ActionRequest.USER_INFO);
+        if (userInfo == null)
+            return new ModelAndView("home");
 
-		return modelAndView;
+        return modelAndView;
     }
 
     @ResourceMapping(PATH_GET_TEMPLATES_FOR_USER)
     public void getTemplatesForUser(ResourceRequest request, ResourceResponse response,
                                     @RequestParam("page") int page, @RequestParam("rows") int rows)
-                                    throws Exception {
-        try{
+            throws Exception {
+        try {
             User user = liferayService.getUser(request, response);
             List<Long> organizationIds = liferayService.getOrganizationIds(user);
             LOG.debug("organizationIds");
@@ -142,8 +142,8 @@ public class TemplateController {
 
             int records = templates.size();
             int mod = records % rows;
-            int totalPages = records/rows;
-            if(mod > 0) totalPages++;
+            int totalPages = records / rows;
+            if (mod > 0) totalPages++;
 
             // Slice a subset from list, the result fits into one jqGgrid page
             List<ConfigurationTemplate> temp = new LinkedList<ConfigurationTemplate>();
@@ -151,70 +151,51 @@ public class TemplateController {
             List<ConfigurationTemplate> onePage = ListUtil.sliceList(page, rows, temp);
 
             SerializerUtil.jsonSerialize(response.getWriter(), new JsonDataWrapper(page, totalPages, records, onePage));
-        } catch (Exception e){
+        } catch (Exception e) {
             ExceptionUtil.throwSystemException(e);
         }
     }
 
     @ResourceMapping(PATH_GET_TEMPLATE)
     public void getTemplate(ResourceRequest request, ResourceResponse response, @RequestParam("templateId") int templateId) throws Exception {
-        try{
+        try {
             SerializerUtil.jsonSerialize(response.getWriter(), configurationTemplateService.load(BigInteger.valueOf(templateId)));
-        } catch (Exception e){
+        } catch (Exception e) {
             ExceptionUtil.throwSystemException(e);
         }
     }
 
     @ResourceMapping(PATH_GET_ELEMENTS_FOR_TEMPLATE)
     public void getElementIdsForTemplate(ResourceRequest request, ResourceResponse response, @RequestParam("templateId") int templateId) throws Exception {
-        try{
-            //LOG.debug("ENTER getElementIdsForTemplate");
-            //LOG.debug("templateId:" + templateId);
+        try {
             Collection<ConfigurationElement> allElements = configurationElementService.loadAll();
             elementsContainer.setAvailable(allElements);
-            //LOG.debug(allElements);
             Collection<ConfigurationElement> elementsForTemplate = configurationElementService.loadAllForTemplate(templateId);
             elementsContainer.setSelected(elementsForTemplate);
-            //LOG.debug(elementsForTemplate);
-            //LOG.debug(elementsContainer);
             SerializerUtil.jsonSerialize(response.getWriter(), elementsContainer);
 
-        } catch (Exception e){
+        } catch (Exception e) {
             ExceptionUtil.throwSystemException(e);
         }
     }
 
     @ResourceMapping(PATH_GET_ORGANIZATIONS_FOR_TEMPLATE)
     public void getOrganizationsForTemplateAndUser(ResourceRequest request, ResourceResponse response, @RequestParam("templateId") int templateId) throws Exception {
-        try{
-            LOG.debug("ENTER getOrganizationsForTemplate");
-            LOG.debug("templateId:" + templateId);
-
+        try {
             User user = liferayService.getUser(request, response);
             List<Organization> organizations = liferayService.getOrganizations(user);
-            LOG.debug(organizations);
-
-            Collection<ConfigurationTemplateOrganization> organizationsForTemplate = organizationService.loadAllForTemplate(templateId);
             Collection<Organization> selectedOrganizations = new LinkedList<Organization>();
 
-            for (ConfigurationTemplateOrganization cto : organizationsForTemplate){
-                for (Organization o : organizations){
-                    if (o.getOrganizationId() == cto.getOrganizationId()){
+            for (ConfigurationTemplateOrganization cto : organizationService.loadAllForTemplate(templateId)) {
+                for (Organization o : organizations) {
+                    if (o.getOrganizationId() == cto.getOrganizationId()) {
                         selectedOrganizations.add(o);
                     }
                 }
             }
+            SerializerUtil.jsonSerialize(response.getWriter(), organizationContainer.construct(organizations, selectedOrganizations));
 
-            organizationContainer.construct(organizations, selectedOrganizations);
-
-            //LOG.debug("----------------organizationContainer");
-            //LOG.debug("----------------organizationContainer selected len =" + selectedOrganizations.size());
-            //LOG.debug("----------------organizationContainer all len =" + organizations.size());
-            //LOG.debug(organizationContainer);
-
-            SerializerUtil.jsonSerialize(response.getWriter(), organizationContainer);
-
-        } catch (Exception e){
+        } catch (Exception e) {
             ExceptionUtil.throwSystemException(e);
         }
     }
@@ -226,25 +207,17 @@ public class TemplateController {
      */
     @ResourceMapping(PATH_EDIT_TEMPLATE)
     public void editTemplate(ResourceRequest request, ResourceResponse response,
-
-                                       @RequestParam("templateId") int templateId,
-                                       @RequestParam("templateName") String templateName,
-                                       @RequestParam("templateDescription") String templateDescription,
-                                       @RequestParam("elementsSelected") String elementsSelected,
-                                       @RequestParam("organizationsSelected") String organizationsSelected
-                                       ){
-        try{
-            LOG.debug("----------------editTemplate ENTER------------");
-            LOG.debug("template:" + templateId + ", " +  templateName + ", " +  templateDescription);
-            LOG.debug("organizationsSelected:" + elementsSelected + elementsSelected);
-
+                             @RequestParam("templateId") int templateId,
+                             @RequestParam("templateName") String templateName,
+                             @RequestParam("templateDescription") String templateDescription,
+                             @RequestParam("elementsSelected") String elementsSelected,
+                             @RequestParam("organizationsSelected") String organizationsSelected
+    ) {
+        try {
             ObjectMapper mapper = new ObjectMapper();
-            List<String> elements = mapper.readValue(elementsSelected, List.class);
-            List<String> organizations = mapper.readValue(organizationsSelected, List.class);
-            ConfigurationTemplate ct = new ConfigurationTemplate(templateId, templateName, templateDescription);
-            configurationTemplateService.update(ct, elements, organizations);
+            configurationTemplateService.update(new ConfigurationTemplate(templateId, templateName, templateDescription), mapper.readValue(elementsSelected, List.class), mapper.readValue(organizationsSelected, List.class));
 
-        } catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             response.setProperty(ResourceResponse.HTTP_STATUS_CODE, HttpCodes.HTTP_ERROR_CODE_SERVER_ERROR);
         }
@@ -254,12 +227,12 @@ public class TemplateController {
     private <T> void sliceAndSerialize(ResourceResponse response, List<T> items, int page, int rows) throws IOException {
         int records = items.size();
         int mod = records % rows;
-        int totalPages = records/rows;
-        if(mod > 0) totalPages++;
+        int totalPages = records / rows;
+        if (mod > 0) totalPages++;
         List<T> itemsCopy = new LinkedList<T>();
         itemsCopy.addAll(items);
         List<T> onePage = ListUtil.sliceList(page, rows, itemsCopy);
-        SerializerUtil.jsonSerialize(response.getWriter(),new JsonDataWrapper(page, totalPages, records, onePage));
+        SerializerUtil.jsonSerialize(response.getWriter(), new JsonDataWrapper(page, totalPages, records, onePage));
     }
 
 }

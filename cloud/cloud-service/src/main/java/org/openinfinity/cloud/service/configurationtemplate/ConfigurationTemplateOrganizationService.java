@@ -29,7 +29,7 @@ import java.util.Collection;
  */
 public interface ConfigurationTemplateOrganizationService{
 
-    void create(int organizationId, int templateId);
+    void create(int templateId, int organizationId);
 
     Collection<ConfigurationTemplateOrganization> loadAllForTemplate(int templateId);
 

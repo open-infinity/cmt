@@ -34,9 +34,9 @@ public class ConfigurationTemplateOrganization {
     
     @NonNull
     @NotScript
-    private long organizationId;
+    private long templateId;
     
     @NonNull
     @NotScript
-    private int templateId; 
+    private int organizationId ;
 }

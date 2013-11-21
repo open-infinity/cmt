@@ -77,9 +77,9 @@ insert into configuration_template_tbl values (1, 'TEMPLATE_WEB_SIMPLE', 'Platfo
 insert into configuration_template_tbl values (2, 'TEMPLATE_WEB_IG', 'Platforms suitable for web services with authentication support');
 
 insert into configuration_template_organization_tbl values (1, 1);
-insert into configuration_template_organization_tbl values (2, 1);
-insert into configuration_template_organization_tbl values (3, 2);
-insert into configuration_template_organization_tbl values (4, 2);
+insert into configuration_template_organization_tbl values (1, 2);
+insert into configuration_template_organization_tbl values (1, 3);
+insert into configuration_template_organization_tbl values (1, 4);
 
 -- SSP billing test data
 insert into usage_hours_tbl values(1, 10687, 1513, 5, 3532, 1, '2013-10-17 10:30:01');

@@ -51,15 +51,15 @@ insert into acl_cluster_type_tbl select 'Tieto Finland', id from cluster_type_tb
 insert into acl_machine_type_tbl select 'TOAS', id from machine_type_tbl;
 insert into acl_machine_type_tbl select 'Tieto Finland', id from machine_type_tbl;
 
-insert into configuration_template_tbl values (1, 'TEMPLATE_uno', 'Blablablabla, wooosh! aksjdhc');
-insert into configuration_template_tbl values (2, 'TEMPLATE_zwei', 'blablablabla saoieufölkj');
-insert into configuration_template_tbl values (3, 'TEMPLATE_tre', 'oink! asöclkaöslk');
-insert into configuration_template_tbl values (4, 'TEMPLATE_four', 'dsföaslkfdölskfölsakdfölas');
+insert into configuration_template_tbl values (1, 'Bonorum iudicabit duo ne', 'Lorem ipsum dolor sit amet, decore commodo albucius in est, an feugait fabellas vivendum est. Cum ei atqui falli utamur. Pri ex suas probo, te mea modo doming singulis. Splendide dissentias est in, agam aeterno impedit ei mel. Sea hinc sanctus id, vis ne liber temporibus.');
+insert into configuration_template_tbl values (2, 'Mel in nihil euismod detracto', 'Ea eum quaeque electram erroribus, veniam legendos delicatissimi at eam, te per etiam labores convenire. Qui an nemore scaevola expetendis, pri brute novum mucius cum.');
+insert into configuration_template_tbl values (3, 'An vis eligendi similique', 'Nisl definitionem cu pro, quo ei odio utamur. Ne qui omnis graeco, possim nominati et sed.');
+insert into configuration_template_tbl values (4, 'Mel id malis mediocritatem, his an equidem accusamus reprehendunt', 'Offendit gubergren in quo, at paulo lucilius qui, an tale ornatus nam.');
 
-insert into configuration_template_organization_tbl values (10687, 1);
-insert into configuration_template_organization_tbl values (10687, 2);
-insert into configuration_template_organization_tbl values (10687, 3);
-insert into configuration_template_organization_tbl values (10687, 4);
+insert into configuration_template_organization_tbl values (1, 10687);
+insert into configuration_template_organization_tbl values (2, 10687);
+insert into configuration_template_organization_tbl values (3, 10687);
+insert into configuration_template_organization_tbl values (4, 10687);
 
 insert into configuration_element_tbl values (1, 1, 'ig', '1.2.2', 'Identity Gateway', 0, 1, 20, 0, NULL, NULL);
 insert into configuration_element_tbl values (2, 2, 'bas', '1.2.2', 'BAS Platform', 0, 1, 20, 0, NULL, NULL);

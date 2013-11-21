@@ -89,7 +89,7 @@ public class ConfigurationTemplateOrganizationRepositoryJdbcImpl implements Conf
     private class OrganizationRowMapper implements RowMapper<ConfigurationTemplateOrganization> {
 		
 		public ConfigurationTemplateOrganization mapRow(ResultSet resultSet, int rowNum) throws SQLException {
-		    return new ConfigurationTemplateOrganization(resultSet.getLong("organization_id"), resultSet.getInt("template_id"));
+		    return new ConfigurationTemplateOrganization(resultSet.getLong("template_id"), resultSet.getInt("organization_id"));
 		}
 	}
 

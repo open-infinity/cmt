@@ -21,9 +21,10 @@ public class OrganizationContainer {
         this.selected = selectedOrganizations;
     }
 
-    public void construct(Collection<Organization> available, Collection<Organization> selected){
+    public OrganizationContainer construct(Collection<Organization> available, Collection<Organization> selected){
         this.available = createfromOrganizations(available);
         this.selected = createfromOrganizations(selected);
+        return this;
     }
 
     private Collection<OrganizationInfo> createfromOrganizations(Collection<Organization> organizations){

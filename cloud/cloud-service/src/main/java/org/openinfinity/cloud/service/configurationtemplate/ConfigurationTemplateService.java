@@ -33,5 +33,5 @@ public interface ConfigurationTemplateService extends AbstractCrudServiceInterfa
 	
     Set<ConfigurationTemplate> getTemplates(List<Long> organizationIds);
 
-    void update(ConfigurationTemplate ct, List<String> elements, List<String> organizations);
+    void update(ConfigurationTemplate ct, List<Integer> elements, List<Integer> organizations);
 }
