@@ -100,6 +100,11 @@ public class ConfigurationTemplateRepositoryJdbcImpl implements ConfigurationTem
         jdbcTemplate.update(DELETE_SQL, configurationTemplate.getId());
     }
 
+    @Override
+    public void delete(int templateId) {
+        jdbcTemplate.update(DELETE_SQL, templateId);
+    }
+
     private class TemplateRowMapper implements RowMapper<ConfigurationTemplate> {
 		public ConfigurationTemplate mapRow(ResultSet resultSet, int rowNum) throws SQLException {    
 		    return new ConfigurationTemplate(resultSet.getInt("id"),

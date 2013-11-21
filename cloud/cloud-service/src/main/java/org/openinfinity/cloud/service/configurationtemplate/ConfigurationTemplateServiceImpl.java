@@ -24,10 +24,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * @author Vedran Bartonicek
@@ -70,10 +69,17 @@ public class ConfigurationTemplateServiceImpl implements ConfigurationTemplateSe
     public void delete(ConfigurationTemplate configurationTemplate) {
     }
 
+    @Override
+    public void delete(int templateId) {
+        configurationTemplateElementRepository.deleteByTemplate(templateId);
+        configurationTemplateOrganizationRepository.deleteByTemplate(templateId);
+        configurationTemplateRepository.delete(templateId);
+    }
+
     @Log
     @Override
-    public Set<ConfigurationTemplate> getTemplates(List<Long> organizationIds) {
-        Set<ConfigurationTemplate> templates = new HashSet<ConfigurationTemplate>();
+    public List<ConfigurationTemplate> getTemplates(List<Long> organizationIds) {
+        List<ConfigurationTemplate> templates = new ArrayList<ConfigurationTemplate>();
         for(Long oid : organizationIds){
             templates.addAll(configurationTemplateRepository.getTemplates(oid));
         }

@@ -38,7 +38,6 @@ import org.openinfinity.core.exception.SystemException;
 import org.openinfinity.core.util.ExceptionUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -133,22 +132,17 @@ public class TemplateController {
         try {
             User user = liferayService.getUser(request, response);
             List<Long> organizationIds = liferayService.getOrganizationIds(user);
-            LOG.debug("organizationIds");
-            LOG.debug(organizationIds);
-            Set<ConfigurationTemplate> templates = configurationTemplateService.getTemplates(organizationIds);
-            LOG.debug("templates received");
-            Assert.notNull(templates);
-            LOG.debug("Jsonization start");
+            List<ConfigurationTemplate> templates = configurationTemplateService.getTemplates(organizationIds);
 
             int records = templates.size();
             int mod = records % rows;
             int totalPages = records / rows;
             if (mod > 0) totalPages++;
+            //List<ConfigurationTemplate> ctl = new LinkedList<ConfigurationTemplate>(templates);
+            //ctl.addAll(templates);
 
             // Slice a subset from list, the result fits into one jqGgrid page
-            List<ConfigurationTemplate> temp = new LinkedList<ConfigurationTemplate>();
-            temp.addAll(templates);
-            List<ConfigurationTemplate> onePage = ListUtil.sliceList(page, rows, temp);
+            List<ConfigurationTemplate> onePage = ListUtil.sliceList(page, rows, new LinkedList<ConfigurationTemplate>(templates));
 
             SerializerUtil.jsonSerialize(response.getWriter(), new JsonDataWrapper(page, totalPages, records, onePage));
         } catch (Exception e) {
@@ -160,6 +154,15 @@ public class TemplateController {
     public void getTemplate(ResourceRequest request, ResourceResponse response, @RequestParam("templateId") int templateId) throws Exception {
         try {
             SerializerUtil.jsonSerialize(response.getWriter(), configurationTemplateService.load(BigInteger.valueOf(templateId)));
+        } catch (Exception e) {
+            ExceptionUtil.throwSystemException(e);
+        }
+    }
+
+    @ResourceMapping(PATH_DELETE_TEMPLATE)
+    public void deleteTemplate(ResourceRequest request, ResourceResponse response, @RequestParam("templateId") int templateId) throws Exception {
+        try {
+            configurationTemplateService.delete(templateId);
         } catch (Exception e) {
             ExceptionUtil.throwSystemException(e);
         }

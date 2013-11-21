@@ -26,6 +26,10 @@ jQuery(function($){
         init: function(){
             $.ajaxSetup({cache: false});
             app.templatesTable = $("#templates-grid");
+            app.editTemplateButton = $("#edit-template");
+            app.newTemplateButton = $("#new-template");
+            app.deleteTemplateButton = $("#delete-template");
+            app.tabsContainer = $( "#tabs" );
         },
 
         setupTemplatesTable: function(){
@@ -42,40 +46,47 @@ jQuery(function($){
                     },
                 colNames:['Id', 'Name', 'Description'],
                 colModel:[
-                          {name:'id', index:'id', width:50, align:"center"},
-                          {name:'name', index:'name', width:150, align:"left"},
-                          // 545
-                          {name:'description', index:'description', width:535, align:"left"}
+                          {name:'id', index:'id', width:50, align:"center", sortable:true, sorttype:"int",searchoptions:{sopt:['eq','ne','le','lt','gt','ge']}},
+                          {name:'name', index:'name', width:150, align:"left", searchoptions:{sopt:['eq','ne','le','lt','gt','ge']}},
+                          {name:'description', index:'description', width:535, align:"left", searchoptions:{sopt:['eq','ne','le','lt','gt','ge']}}
                           ],
                 rowNum: 10,
                 width: 750,
-                height: 300,
+                height: "auto",
                 pager: '#template-grid-pager',
                 sortname: 'id',
                 viewrecords: true,
                 shrinkToFit: false,
-                sortorder: 'id',
-                ondblClickRow: app.editTemplate
-            })
+                sortorder: "asc",
+                ondblClickRow: app.editTemplate,
+                loadonce: true,
+                gridComplete: function(){
+                    $("#templates-grid").setGridParam({datatype: 'local'});
+                }
+            });
+            app.templatesTable.jqGrid('filterToolbar',{searchOperators : true});
+        },
+
+        reloadTemplatesTable: function(){
+            app.templatesTable.setGridParam({datatype:'json', page:1}).trigger('reloadGrid');
         },
 
         setupTabs: function(){
-            $( "#tabs" ).tabs();
+            app.tabsContainer.tabs();
         },
 
         bindEventHandlers: function(){
-            $("#edit-template").bind( "click", app.editTemplate);
-            $("#new-template").bind( "click", app.createNewTemplate);
-            $("#delete-template").bind( "click", app.deleteTemplate);
+            app.editTemplateButton.bind( "click", app.editTemplate);
+            app.newTemplateButton.bind( "click", app.createTemplate);
+            app.deleteTemplateButton.bind( "click", app.deleteTemplate);
         },
 
-        createNewTemplate: function(){
+        createTemplate: function(){
             alert( "User clicked on 'New '" );
             var label = tabTitle.val() || "Tab " + tabCounter,
                 id = "tabs-" + tabCounter,
                 li = $(tabTemplate.replace( /#\{href\}/g, "#" + id ).replace( /#\{label\}/g, label ) ),
                 tabContentHtml = tabContent.val() || "Tab " + tabCounter + " content.";
-
             tabs.find( ".ui-tabs-nav" ).append( li );
             tabs.append( "<div id='" + id + "'><p>" + tabContentHtml + "</p></div>" );
             tabs.tabs( "refresh" );
@@ -83,15 +94,19 @@ jQuery(function($){
         },
 
         deleteTemplate: function(){
-            alert( "User clicked on 'Delete '" );
-            app.dialog.template.remove(1);
+            var id = app.templatesTable.jqGrid('getGridParam','selrow');
+            if (id == null) {
+                alert( "Please select a row for deletion");
+                return;
+            }
+            var ret = app.templatesTable.jqGrid('getRowData', id);
             $.ajax({
-              url: portletURL.url.template.getElementsForTemplateURL + "&page=1" + "&rows=5" +"&templateId=2",
+              url: portletURL.url.template.deleteTemplateURL + "&templateId=" + ret.id,
               cache: false
             })
-              .done(function( res ) {
-                console.log(res);
-              });
+            .done(function() {
+                app.reloadTemplatesTable();
+            });
 
         },
 
@@ -101,7 +116,7 @@ jQuery(function($){
                 var ret = app.templatesTable.jqGrid('getRowData',id);
                 app.dialog.template.edit(ret.id);
             } else {
-                alert("Please select row");
+                alert("Please select a row for editing");
             }
         },
 

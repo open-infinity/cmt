@@ -1,5 +1,8 @@
 (function($) {
+
+    var app = window.app || {};
     var dlg = window.app.dialog.template || {};
+
     $.extend(dlg, {
 
         create: function () {
@@ -56,8 +59,6 @@
     });
 
     // Initialize the dialogs
-    //var € = {};
-    //€.editTemplate = $("#dlg-edit-template");
     dlg.self.dialog({
         title: "Edit template",
         autoOpen: false,
@@ -147,7 +148,6 @@
             selectedIndices.push(value.id);
         });
         $.each(data.available, function(index, value){
-            console.log("found? =" + selectedIndices.indexOf(value.id));
             if (selectedIndices.indexOf(value.id) == -1){
                 storeElementToDom(htmlTemplate, value, listAvailable);
             }
@@ -177,7 +177,6 @@
            }
         });
     }
-
 
     function storeElementToDom(htmlTemplate, value, list){
         list.append(htmlTemplate);
@@ -230,7 +229,9 @@
         outData["elementsSelected"] = JSON.stringify(getSelectedElements());
         outData["organizationsSelected"] = JSON.stringify(getSelectedOrganizations());
 
-        $.post(portletURL.url.template.editTemplateURL, outData);
+        $.post(portletURL.url.template.editTemplateURL, outData).done(function(){
+            app.reloadTemplatesTable();
+        });
     }
 
     function getSelectedElements(){

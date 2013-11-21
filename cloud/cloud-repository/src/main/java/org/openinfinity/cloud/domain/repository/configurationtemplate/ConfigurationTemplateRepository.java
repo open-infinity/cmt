@@ -31,4 +31,6 @@ public interface ConfigurationTemplateRepository extends AbstractCrudRepositoryI
 	
     List<ConfigurationTemplate> getTemplates(Long oid);
 
+    void delete(int templateId);
+
 }
