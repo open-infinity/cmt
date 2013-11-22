@@ -138,10 +138,6 @@ public class TemplateController {
             int mod = records % rows;
             int totalPages = records / rows;
             if (mod > 0) totalPages++;
-            //List<ConfigurationTemplate> ctl = new LinkedList<ConfigurationTemplate>(templates);
-            //ctl.addAll(templates);
-
-            // Slice a subset from list, the result fits into one jqGgrid page
             List<ConfigurationTemplate> onePage = ListUtil.sliceList(page, rows, new LinkedList<ConfigurationTemplate>(templates));
 
             SerializerUtil.jsonSerialize(response.getWriter(), new JsonDataWrapper(page, totalPages, records, onePage));

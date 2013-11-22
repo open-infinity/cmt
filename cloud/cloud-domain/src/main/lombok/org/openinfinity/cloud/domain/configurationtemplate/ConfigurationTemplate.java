@@ -17,11 +17,14 @@ package org.openinfinity.cloud.domain.configurationtemplate;
 
 import org.openinfinity.core.annotation.NotScript;
 
-import lombok.Data;
+import lombok.ToString;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
+import java.lang.Override;
 import java.math.BigInteger;
 
 /**
@@ -29,7 +32,10 @@ import java.math.BigInteger;
  * @version 1.3.0
  * @since 1.3.0
  */
-@Data
+
+@ToString
+@Getter
+@Setter
 @NoArgsConstructor
 @RequiredArgsConstructor
 public class ConfigurationTemplate implements Comparable{
@@ -48,7 +54,16 @@ public class ConfigurationTemplate implements Comparable{
 
     @Override
     public int compareTo(Object o) {
-        // TODO Auto-generated method stub
         return this.id - ((ConfigurationTemplate)o).getId();
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ConfigurationTemplate)) return false;
+        ConfigurationTemplate that = (ConfigurationTemplate) o;
+        if (id != that.id) return false;
+        return true;
+    }
+
 }

@@ -74,7 +74,6 @@
                 });
 
             dlg.tabs.tabs();
-
             dlg.self.dialog("open");
         }
     });
@@ -177,7 +176,7 @@
 
     function populateOrganizations(data){
         var listSelected = dlg.selectedOrganizationsPanel.find("ul");
-        var listAvailable = dlg.selectedOrganizationsPanel.find("ul");
+        var listAvailable = dlg.availableOrganizationsPanel.find("ul");
         var htmlTemplate = "<li class='ui-state-default'>\
                               <div class='dlg-edit-template-organization-id'></div>\
                               <div class='dlg-edit-template-organization-name'></div>\

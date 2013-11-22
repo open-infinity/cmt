@@ -15,5 +15,5 @@
 .dlg-edit-template-organization-id{float:left;width:40px;}
 .dlg-edit-template-organization-name{text-align:right;}
 #edit-template-fields textarea, input{padding:1px;}
-#dlg-item-table th{border:1px solid #C4C4C4;padding:5px text-align:center}
+#dlg-item-table th{border:1px solid #C4C4C4;padding:5px;text-align:center}
 #dlg-item-table td{border:1px solid #C4C4C4;padding:5px;}

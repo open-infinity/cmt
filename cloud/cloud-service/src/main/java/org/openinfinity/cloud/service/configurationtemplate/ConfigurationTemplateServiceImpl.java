@@ -15,6 +15,7 @@
  */
 package org.openinfinity.cloud.service.configurationtemplate;
 
+import org.apache.log4j.Logger;
 import org.openinfinity.cloud.domain.configurationtemplate.ConfigurationTemplate;
 import org.openinfinity.cloud.domain.repository.configurationtemplate.ConfigurationTemplateElementRepository;
 import org.openinfinity.cloud.domain.repository.configurationtemplate.ConfigurationTemplateOrganizationRepository;
@@ -24,9 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author Vedran Bartonicek
@@ -36,7 +35,10 @@ import java.util.List;
 
 @Service
 public class ConfigurationTemplateServiceImpl implements ConfigurationTemplateService {
-	@Autowired
+
+    private static final Logger LOG = Logger.getLogger(ConfigurationTemplateServiceImpl.class.getName());
+
+    @Autowired
 	private ConfigurationTemplateRepository configurationTemplateRepository;
 
     @Autowired
@@ -81,7 +83,12 @@ public class ConfigurationTemplateServiceImpl implements ConfigurationTemplateSe
     public List<ConfigurationTemplate> getTemplates(List<Long> organizationIds) {
         List<ConfigurationTemplate> templates = new ArrayList<ConfigurationTemplate>();
         for(Long oid : organizationIds){
-            templates.addAll(configurationTemplateRepository.getTemplates(oid));
+            List<ConfigurationTemplate> templatesForOrganizations = configurationTemplateRepository.getTemplates(oid);
+            for (ConfigurationTemplate ct : templatesForOrganizations){
+                if (!templates.contains(ct)) {
+                    templates.add(ct);
+                }
+            }
         }
         return templates;
     }
