@@ -29,7 +29,7 @@ jQuery(function($){
             app.editTemplateButton = $("#edit-template");
             app.newTemplateButton = $("#new-template");
             app.deleteTemplateButton = $("#delete-template");
-            app.tabsContainer = $( "#tabs" );
+            app.tabsContainer = $("#tabs");
         },
 
         setupTemplatesTable: function(){
@@ -46,9 +46,9 @@ jQuery(function($){
                     },
                 colNames:['Id', 'Name', 'Description'],
                 colModel:[
-                          {name:'id', index:'id', width:50, align:"center", sortable:true, sorttype:"int",searchoptions:{sopt:['eq','ne','le','lt','gt','ge']}},
-                          {name:'name', index:'name', width:150, align:"left", searchoptions:{sopt:['eq','ne','le','lt','gt','ge']}},
-                          {name:'description', index:'description', width:535, align:"left", searchoptions:{sopt:['eq','ne','le','lt','gt','ge']}}
+                          {name:'id', index:'id', width:50, align:"center", sortable:true, sorttype:"int"},
+                          {name:'name', index:'name', width:150, align:"left"},
+                          {name:'description', index:'description', width:535, align:"left"}
                           ],
                 rowNum: 10,
                 width: 750,
@@ -64,7 +64,18 @@ jQuery(function($){
                     $("#templates-grid").setGridParam({datatype: 'local'});
                 }
             });
-            app.templatesTable.jqGrid('filterToolbar',{searchOperators : true});
+            //app.templatesTable.jqGrid('filterToolbar',{searchOperators : true});
+            app.templatesTable.jqGrid(
+                'navGrid',
+                '#template-grid-pager',
+                {add:false, del:false, search:true, refresh:false, edit:false},
+                {}, //  default settings for edit
+                {}, //  default settings for add
+                {}, //  default settings for delete
+                {odata : ['equal', 'not equal', 'less', 'less or equal','greater','greater or equal', 'begins with','does not begin with','is in','is not in','ends with','does not end with','contains','does not contain']}, // search options
+                {} /* view parameters*/
+            );
+
         },
 
         reloadTemplatesTable: function(){

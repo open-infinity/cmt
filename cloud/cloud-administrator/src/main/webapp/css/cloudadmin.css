@@ -271,7 +271,7 @@
 }
 
 
-/* Cluster infodialog */
+/* Cluster info dialog */
 
 .odd {
 	background: #caf2fe;
@@ -405,7 +405,6 @@ col.data {
 /* Pimpping the query range slider */
 /* Clear unwanted inherited styles */
 
-/*//#addInstanceDialog  .jq_slider_wrapper{*/
 .jq_slider_wrapper{
 	border: none;
 	border-radius:5px;
@@ -415,7 +414,6 @@ col.data {
 	background-color: #EDEDED;
 	width: 19.9em;
 }
-
 
 #addInstanceDialog .ui-slider-handle,
 #addServicesDialog .ui-slider-handle {
@@ -434,7 +432,6 @@ col.data {
 
 #addInstanceDialog div.ui-slider,
 #addServicesDialog div.ui-slider {
-
 	border: none;
 	display: inline-block;
 	float: left;
@@ -526,8 +523,6 @@ col.data {
 
 #addInstanceDialog .ebsSizeLabel{margin-top:.3em;float:left;}
 #addServicesDialog .ebsSizeLabel{margin-top:.3em;float:left;}
-
-
 
 #addInstanceDialog  .sliderMask,
 #addServicesDialog  .sliderMask{

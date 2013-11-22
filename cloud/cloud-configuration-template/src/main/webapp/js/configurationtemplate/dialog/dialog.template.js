@@ -5,6 +5,38 @@
 
     $.extend(dlg, {
 
+        // jQuery objects from DOM elements
+
+        // General
+        self: $("#dlg-edit-template"),
+
+        tabs : $("#dlg-edit-template-tabs"),
+
+        infoDialog : $("#dlg-info"),
+
+        // Template
+        templateId : $("#dlg-edit-template-id-value"),
+
+        templateName : $("#template-name + input"),
+
+        templateDescription : $("#template-description + textarea"),
+
+        // Elements
+        selectedElementsPanel : $("#elements-selection-container").find(".dlg-edit-template-list-panel-container").first(),
+
+        selectedElementsList : $("#dlg-edit-template-selected-elements"),
+
+        availableElementsPanel : $("#elements-selection-container").find(".dlg-edit-template-list-panel-container").last(),
+
+        // Organizations
+        selectedOrganizationsPanel : $("#organizations-selection-container").find(".dlg-edit-template-list-panel-container").first(),
+
+        availableOrganizationsPanel : $("#organizations-selection-container").find(".dlg-edit-template-list-panel-container").last(),
+
+        selectedOrganizationsList : $("#dlg-edit-template-selected-organizations"),
+
+        // Dialog functions
+
         create: function () {
         },
 
@@ -13,20 +45,16 @@
         },
 
         edit: function (id) {
-
-            // Show configuration Template data
             var jqxhrTemplate = $.ajax({
                 url: portletURL.url.template.getTemplateURL + "&templateId=" + id,
                 dataType: "json"
                 }).done(function(data) {
-                    console.log(data);
-                    $("#template-id-value").text(data.id);
-                    $("#template-name + input").val(data.name);
-                    $("#template-description + input").val(data.description);
+                    dlg.templateId.text(data.id);
+                    dlg.templateName.val(data.name);
+                    dlg.templateDescription.val(data.description);
                 }).fail(function(jqXHR, textStatus, errorThrown) {
                     console.log("Error fetching template");
             });
-
             $.when(
                 $.ajax({
                     url: portletURL.url.template.getElementsForTemplateURL + "&templateId=" + id,
@@ -45,26 +73,20 @@
                 console.log("Error fetching items for dialog");
                 });
 
-            $("#dlg-edit-template").dialog("open");
-        },
+            dlg.tabs.tabs();
 
-        self: $("#dlg-edit-template"),
-
-        infoDialog: $("#dlg-info"),
-
-        selectedElementsList: $("#dlg-edit-template-selected-elements"),
-
-        selectedOrganizationsList: $("#dlg-edit-template-selected-organizations")
-
+            dlg.self.dialog("open");
+        }
     });
 
-    // Initialize the dialogs
+    // Initialize dialogs
+
     dlg.self.dialog({
         title: "Edit template",
         autoOpen: false,
         modal: true,
         width: 650,
-        height: 980 ,
+        height: 510 ,
         buttons: {
             "Submit changes": function() {
                 submitTemplate();
@@ -92,13 +114,14 @@
         }
     });
 
+    // Helper functions
+
     function configureDragAndDrop(){
         $(".dlg-edit-template-list-panel-container").droppable({
             activeClass: "ui-state-highlight",
             drop: function (event, ui) {
                 var list = $(this).find("ul");
                 var helper = ui.helper;
-                //var selected = $(this).siblings(".list-container").find("li.ui-state-highlight");
                 var selected = $(this).siblings().find("li.ui-state-highlight");
                 if (selected.length > 1) {
                     moveMultipleElements(list, selected);
@@ -127,17 +150,15 @@
                 $(this).toggleClass("ui-state-highlight");
             }).
             dblclick(function () {
-                $("#dlg-info").dialog("open");
+                dlg.infoDialog.dialog("open");
                 var configData = $(this).data("config");
                 storeToTable(configData, $("#dlg-item-table"));
             });
     }
+
     function populateElements(data){
-        var cnt = $("#elements-selection-container");
-        var panelSelected =  cnt.find(".selected-list-panel-container");
-        var panelAvailable =  cnt.find(".available-list-panel-container");
-        var listSelected = panelSelected.find("ul");
-        var listAvailable = panelAvailable.find("ul");
+        var listSelected = dlg.selectedElementsPanel.find("ul");
+        var listAvailable = dlg.availableElementsPanel.find("ul");
         htmlTemplate = "<li class='ui-state-default'>\
                             <div class='name list-item-column'></div>\
                             <div class='version'></div>\
@@ -155,11 +176,8 @@
     }
 
     function populateOrganizations(data){
-        var cnt = $("#organizations-selection-container");
-        var panelSelected =  cnt.find(".selected-list-panel-container");
-        var panelAvailable =  cnt.find(".available-list-panel-container");
-        var listSelected = panelSelected.find("ul");
-        var listAvailable = panelAvailable.find("ul");
+        var listSelected = dlg.selectedOrganizationsPanel.find("ul");
+        var listAvailable = dlg.selectedOrganizationsPanel.find("ul");
         var htmlTemplate = "<li class='ui-state-default'>\
                               <div class='dlg-edit-template-organization-id'></div>\
                               <div class='dlg-edit-template-organization-name'></div>\
@@ -223,9 +241,9 @@
 
     function submitTemplate(){
         var outData = {};
-        outData["templateId"] = parseInt($("#template-id-value").text());
-        outData["templateName"] = $("#template-name + input").val();
-        outData["templateDescription"] = $("#dlg-edit-template-description").val();
+        outData["templateId"] = parseInt(dlg.templateId.text());
+        outData["templateName"] = dlg.templateName.val();
+        outData["templateDescription"] = dlg.templateDescription.val();
         outData["elementsSelected"] = JSON.stringify(getSelectedElements());
         outData["organizationsSelected"] = JSON.stringify(getSelectedOrganizations());
 
