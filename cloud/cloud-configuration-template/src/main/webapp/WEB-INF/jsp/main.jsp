@@ -47,13 +47,10 @@
     <div id="tab_title">TAB TITLE</div>
     <div id="tab_content">TAB CONTENT</div>
     --%>
+
     <div id="tabs">
-        <ul>
+        <ul id ="tabsReferenceList" >
 			<li><a href="#tabs-1">Templates</a></li>
-			<!--
-			<li><a href="#tabs-2">Template 1</a></li>
-			<li><a href="#tabs-3">Template 2</a></li>
-			-->
         </ul>
 
 		<div id="tabs-1">
@@ -66,15 +63,6 @@
             </div>
     	</div>
 
-		<%--
-		<div id="tabs-2">
-		  Template slkdhf 2
-		</div>
-
-		<div id="tabs-3">
-		  Template lkjh 3
-		</div>
-		--%>
 	</div>
 
 	<div id="dlg-edit-template">
@@ -105,58 +93,55 @@
             </div>
         </div>
 
-            <%-- Elements --%>
-            <div id = "dlg-edit-template-elements-tab">
-                <div id="elements-selection-container" class ="dlg-edit-template-item-container">
-                    <div>
-                        <div class="dlg-edit-template-list-panel-container dlg-edit-template-item">
-                            <div class="dlg-edit-template-list-panel-container-title">Selected elements</div>
-                            <div class="dlg-edit-template-list-panel-container-columns">
-                                <div class="list-item-column">Platform</div>
-                                <div>Version</div>
-                            </div>
-                            <div id="dlg-edit-template-selected-elements" class="list-container">
-                                <ul></ul>
-                            </div>
-                        </div>
-                        <div class="dlg-edit-template-arrows-img dlg-edit-template-item"></div>
-                        <div class="dlg-edit-template-list-panel-container dlg-edit-template-item">
-                            <div class="dlg-edit-template-list-panel-container-title">Available elements</div>
-                            <div class="dlg-edit-template-list-panel-container-columns">
-                                <div class="list-item-column">Platform</div>
-                                <div>Version</div>
-                            </div>
-                            <div class="list-container">
-                                <ul></ul>
-                            </div>
-                        </div>
+        <%-- Elements --%>
+        <div id = "dlg-edit-template-elements-tab">
+            <div id="elements-selection-container" class ="dlg-edit-template-item-container">
+                <div class="dlg-edit-template-list-panel-container dlg-edit-template-item">
+                    <div class="dlg-edit-template-list-panel-container-title">Selected elements</div>
+                    <div class="dlg-edit-template-list-panel-container-columns">
+                        <div class="list-item-column">Platform</div>
+                        <div>Version</div>
+                    </div>
+                    <div id="dlg-edit-template-selected-elements" class="list-container">
+                        <ul></ul>
+                    </div>
+                </div>
+                <div class="dlg-edit-template-arrows-img dlg-edit-template-item"></div>
+                <div class="dlg-edit-template-list-panel-container dlg-edit-template-item">
+                    <div class="dlg-edit-template-list-panel-container-title">Available elements</div>
+                    <div class="dlg-edit-template-list-panel-container-columns">
+                        <div class="list-item-column">Platform</div>
+                        <div>Version</div>
+                    </div>
+                    <div class="list-container">
+                        <ul></ul>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <%-- Organizations --%>
-            <div id="dlg-edit-template-organizations-tab">
-                <div id="organizations-selection-container" class="dlg-edit-template-item-container">
-                    <div class="dlg-edit-template-list-panel-container dlg-edit-template-item">
-                        <div class="dlg-edit-template-list-panel-container-title">Selected organizations</div>
-                        <div class="dlg-edit-template-list-panel-container-columns">
-                            <div class="list-item-column">Id</div>
-                            <div>Name</div>
-                        </div>
-                        <div id="dlg-edit-template-selected-organizations" class="list-container">
-                            <ul></ul>
-                        </div>
+        <%-- Organizations --%>
+        <div id="dlg-edit-template-organizations-tab">
+            <div id="organizations-selection-container" class="dlg-edit-template-item-container">
+                <div class="dlg-edit-template-list-panel-container dlg-edit-template-item">
+                    <div class="dlg-edit-template-list-panel-container-title">Selected organizations</div>
+                    <div class="dlg-edit-template-list-panel-container-columns">
+                        <div class="list-item-column">Id</div>
+                        <div>Name</div>
                     </div>
-                    <div class="dlg-edit-template-arrows-img dlg-edit-template-item"></div>
-                    <div class="dlg-edit-template-list-panel-container dlg-edit-template-item">
-                        <div class="dlg-edit-template-list-panel-container-title">Available organizations</div>
-                        <div class="dlg-edit-template-list-panel-container-columns">
-                            <div class="list-item-column">Id</div>
-                            <div>Name</div>
-                        </div>
-                        <div class="list-container">
-                            <ul></ul>
-                        </div>
+                    <div id="dlg-edit-template-selected-organizations" class="list-container">
+                        <ul></ul>
+                    </div>
+                </div>
+                <div class="dlg-edit-template-arrows-img dlg-edit-template-item"></div>
+                <div class="dlg-edit-template-list-panel-container dlg-edit-template-item">
+                    <div class="dlg-edit-template-list-panel-container-title">Available organizations</div>
+                    <div class="dlg-edit-template-list-panel-container-columns">
+                        <div class="list-item-column">Id</div>
+                        <div>Name</div>
+                    </div>
+                    <div class="list-container">
+                        <ul></ul>
                     </div>
                 </div>
             </div>

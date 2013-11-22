@@ -25,11 +25,13 @@ jQuery(function($){
 
         init: function(){
             $.ajaxSetup({cache: false});
+            app.tabCounter = 1;
             app.templatesTable = $("#templates-grid");
             app.editTemplateButton = $("#edit-template");
             app.newTemplateButton = $("#new-template");
             app.deleteTemplateButton = $("#delete-template");
             app.tabsContainer = $("#tabs");
+            app.tabsReferenceList = $("#tabsReferenceList");
         },
 
         setupTemplatesTable: function(){
@@ -64,7 +66,6 @@ jQuery(function($){
                     $("#templates-grid").setGridParam({datatype: 'local'});
                 }
             });
-            //app.templatesTable.jqGrid('filterToolbar',{searchOperators : true});
             app.templatesTable.jqGrid(
                 'navGrid',
                 '#template-grid-pager',
@@ -93,15 +94,19 @@ jQuery(function($){
         },
 
         createTemplate: function(){
-            alert( "User clicked on 'New '" );
-            var label = tabTitle.val() || "Tab " + tabCounter,
-                id = "tabs-" + tabCounter,
-                li = $(tabTemplate.replace( /#\{href\}/g, "#" + id ).replace( /#\{label\}/g, label ) ),
-                tabContentHtml = tabContent.val() || "Tab " + tabCounter + " content.";
-            tabs.find( ".ui-tabs-nav" ).append( li );
-            tabs.append( "<div id='" + id + "'><p>" + tabContentHtml + "</p></div>" );
-            tabs.tabs( "refresh" );
-            tabCounter++;
+        //"<span class='ui-icon ui-icon-close' role='presentation'>Remove Tab</span>"
+            var tabTemplate = "<li><a href='#{href}'>#{label}</a><span class='ui-icon ui-icon-close' role='presentation'>Remove Tab</span></li>";
+            var tabLabel = "New template";
+            var tabId = "tabs-" + ++app.tabCounter;
+            var li = $(tabTemplate.replace(/#\{href\}/g, "#" + tabId ).replace( /#\{label\}/g, tabLabel ));
+
+            //app.tabsReferenceList.append(li);
+            //app.tabsContainer.append("<div id='" + tabId + "'><p>blah</p></div>");
+            //<li><a href="#tabs-1">Templates</a></li>
+            app.tabsReferenceList.append("<li><a href='#tabs-2'>Templates</a></li>");
+            //app.tabsContainer.append("<div id='" + tabId + "'><p>blah</p></div>");
+            app.tabsContainer.append("<div id='tabs-2'><p>blah</p></div>");
+            app.tabsContainer.tabs("refresh");
         },
 
         deleteTemplate: function(){
@@ -130,38 +135,7 @@ jQuery(function($){
                 alert("Please select a row for editing");
             }
         },
-
-        addTab: function(){
-              var label = tabTitle.val() || "Tab " + tabCounter,
-                id = "tabs-" + tabCounter,
-                li = $( tabTemplate.replace( /#\{href\}/g, "#" + id ).replace( /#\{label\}/g, label ) ),
-                tabContentHtml = tabContent.val() || "Tab " + tabCounter + " content.";
-
-              tabs.find( ".ui-tabs-nav" ).append( li );
-              tabs.append( "<div id='" + id + "'><p>" + tabContentHtml + "</p></div>" );
-              tabs.tabs( "refresh" );
-              tabCounter++;
-            }
     });
-
-    function addOneTab() {
-          var label = tabTitle.val() || "Tab " + tabCounter,
-            id = "tabs-" + tabCounter,
-            li = $( tabTemplate.replace( /#\{href\}/g, "#" + id ).replace( /#\{label\}/g, label ) ),
-            tabContentHtml = tabContent.val() || "Tab " + tabCounter + " content.";
-
-          tabs.find( ".ui-tabs-nav" ).append( li );
-          tabs.append( "<div id='" + id + "'><p>" + tabContentHtml + "</p></div>" );
-          tabs.tabs( "refresh" );
-          tabCounter++;
-        }
-	var tabTitle = $("#tab_title" ),
-    tabContent = $( "#tab_content" ),
-    tabTemplate = "<li><a href='#{href}'>#{label}</a> " +
-    		          "<span class='ui-icon ui-icon-close' role='presentation'>Remove Tab</span>" +
-    		      "</li>",
-    tabCounter = 2;
-	var tabs = $( "#tabs" ).tabs();
 
 	app.init();
 	app.setupTemplatesTable();
