@@ -24,14 +24,25 @@ jQuery(function($){
     $.extend(app, {
 
         init: function(){
+            // General
             $.ajaxSetup({cache: false});
+
+            // Tabs
             app.tabCounter = 1;
+            app.tabsContainer = $("#tabsContainer");
+            app.tabsReferenceList = $("#tabsReferenceList");
+
+            // Templates tab
             app.templatesTable = $("#templates-grid");
             app.editTemplateButton = $("#edit-template");
             app.newTemplateButton = $("#new-template");
             app.deleteTemplateButton = $("#delete-template");
-            app.tabsContainer = $("#tabsContainer");
-            app.tabsReferenceList = $("#tabsReferenceList");
+
+            // Elements tab
+            app.elementsTable = $("#elements-grid");
+            app.editElementsButton = $("#edit-element");
+            app.newElementsButton = $("#new-element");
+            app.deleteElementsButton = $("#delete-element");
         },
 
         setupTemplatesTable: function(){
@@ -78,9 +89,63 @@ jQuery(function($){
             );
 
         },
+        setupElementsTable: function(){
+            app.elementsTable.jqGrid({
+                url: portletURL.url.element.getElementsURL,
+                datatype: "json",
+                jsonReader : {
+                    repeatitems : false,
+                    id: "Id",
+                    root : function(obj) { return obj.rows;},
+                    page : function(obj) {return obj.page;},
+                    total : function(obj) {return obj.total;},
+                    records : function(obj) {return obj.records;}
+                    },
+                colNames:['Id', 'Type', 'Name', 'Version', 'Description', 'MinMachines', 'MaxMachines', 'Replicated', 'MinReplicationMachines', 'MaxReplicationMachines'],
+                colModel:[
+                          {name:'id', index:'id', width:50, align:"center", sortable:true, sorttype:"int"},
+                          {name:'type', index:'type', width:70, align:"left"},
+                          {name:'name', index:'name', width:150, align:"left"},
+                          {name:'version', index:'version', width:50, align:"left"},
+                          {name:'description', index:'description', width:50, align:"left"},
+                          {name:'minMachines', index:'minMachines', width:100, align:"left"},
+                          {name:'maxMachines', index:'maxMachines', width:100, align:"left"},
+                          {name:'replicated', index:'replicated', width:100, align:"left"},
+                          {name:'minReplicationMachines', index:'minReplicationMachines', width:100, align:"left"},
+                          {name:'maxReplicationMachines', index:'maxReplicationMachines', width:100, align:"left"},
+                          ],
+                rowNum: 20,
+                height: "auto",
+                pager: '#elemement-grid-pager',
+                sortname: 'id',
+                viewrecords: true,
+                shrinkToFit: false,
+                sortorder: "asc",
+                ondblClickRow: app.editElement,
+                loadonce: true,
+                gridComplete: function(){
+                    $("#elemements-grid").setGridParam({datatype: 'local'});
+                }
+            });
+            app.elementsTable.jqGrid(
+                'navGrid',
+                '#element-grid-pager',
+                {add:false, del:false, search:true, refresh:false, edit:false},
+                {}, //  default settings for edit
+                {}, //  default settings for add
+                {}, //  default settings for delete
+                {odata : ['equal', 'not equal', 'less', 'less or equal','greater','greater or equal', 'begins with','does not begin with','is in','is not in','ends with','does not end with','contains','does not contain']}, // search options
+                {} /* view parameters*/
+            );
+
+        },
 
         reloadTemplatesTable: function(){
             app.templatesTable.setGridParam({datatype:'json', page:1}).trigger('reloadGrid');
+        },
+
+        reloadElementsTable: function(){
+            app.elementsTable.setGridParam({datatype:'json', page:1}).trigger('reloadGrid');
         },
 
         setupTabs: function(){
@@ -88,9 +153,15 @@ jQuery(function($){
         },
 
         bindEventHandlers: function(){
+            // Templates
             app.editTemplateButton.bind( "click", app.editTemplate);
             app.newTemplateButton.bind( "click", app.createTemplate);
             app.deleteTemplateButton.bind( "click", app.deleteTemplate);
+
+            // Elements
+             app.editElementButton.bind( "click", app.editElement);
+             app.newElementButton.bind( "click", app.createElement);
+             app.deleteElementButton.bind( "click", app.deleteElement);
         },
 
         createTemplate: function(){
@@ -143,6 +214,7 @@ jQuery(function($){
 
 	app.init();
 	app.setupTemplatesTable();
+	app.setupElementsTable();
 	app.setupTabs();
 	app.bindEventHandlers();
 });

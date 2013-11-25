@@ -53,6 +53,7 @@
 			<li><a href="#templatesTab">Templates</a></li>
 			<li><a href="#elementsTab">Elements</a></li>
         </ul>
+
 		<div id="templatesTab">
 			<table id="templates-grid"> </table>
 			<div id="template-grid-pager"> </div>
@@ -62,15 +63,18 @@
 		        <button id="delete-template">Delete</button>
             </div>
     	</div>
-        <div id="elementsTab">
-			<table id="elements-grid"> </table>
-			<div id="elements-grid-pager"> </div>
-		    <div class="ui-button-bar">
-		        <button id="edit-elements">Edit</button>
-		        <button id="new-elements">New</button>
-		        <button id="delete-elements">Delete</button>
+
+
+    	<div id="elementsTab">
+            <table id="elements-grid"> </table>
+            <div id="element-grid-pager"> </div>
+            <div class="ui-button-bar">
+                <button id="edit-element">Edit</button>
+                <button id="new-element">New</button>
+                <button id="delete-element">Delete</button>
             </div>
-    	</div>
+        </div>
+
 	</div>
 
 	<div id="dlg-edit-template">

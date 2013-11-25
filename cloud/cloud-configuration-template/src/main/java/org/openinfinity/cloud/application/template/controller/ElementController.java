@@ -16,20 +16,30 @@
 
 package org.openinfinity.cloud.application.template.controller;
 
+import com.liferay.portal.model.User;
 import org.openinfinity.cloud.comon.web.LiferayService;
+import org.openinfinity.cloud.domain.configurationtemplate.ConfigurationElement;
 import org.openinfinity.cloud.service.configurationtemplate.ConfigurationElementService;
+import org.openinfinity.cloud.util.collection.ListUtil;
+import org.openinfinity.cloud.util.serialization.JsonDataWrapper;
+import org.openinfinity.cloud.util.serialization.SerializerUtil;
 import org.openinfinity.core.exception.AbstractCoreException;
 import org.openinfinity.core.exception.ApplicationException;
 import org.openinfinity.core.exception.BusinessViolationException;
 import org.openinfinity.core.exception.SystemException;
+import org.openinfinity.core.util.ExceptionUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.portlet.ModelAndView;
 import org.springframework.web.portlet.bind.annotation.ResourceMapping;
 
 import javax.portlet.*;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -43,7 +53,7 @@ import java.util.Map;
 @RequestMapping("VIEW")
 public class ElementController {
 	
-	private static final String GET_ALL_ELEMENTS = "getAllElements";
+	private static final String GET_ELEMENTS = "getElements";
 	
 	@Autowired
 	private ConfigurationElementService configurationElementService;
@@ -75,17 +85,22 @@ public class ElementController {
 		return modelAndView;
     }
 
-    @ResourceMapping(GET_ALL_ELEMENTS)
-    public void getAllElementIds(ResourceRequest request, ResourceResponse response) throws Exception {
-        /*try {
+    @ResourceMapping(GET_ELEMENTS)
+    public void getAllElementIds(ResourceRequest request, ResourceResponse response, @RequestParam("page") int page, @RequestParam("rows") int rows) throws Exception {
+        try {
             User user = liferayService.getUser(request, response);
             if (user == null) return;
-
-            SerializerUtil.jsonSerialize(response.getWriter(), new ConfigurationElementContainer(configurationElementService.loadAll(), null));
+            Collection<ConfigurationElement> templates = configurationElementService.loadAll();
+            int records = templates.size();
+            int mod = records % rows;
+            int totalPages = records / rows;
+            if (mod > 0) totalPages++;
+            List<ConfigurationElement> onePage = ListUtil.sliceList(page, rows, new LinkedList<ConfigurationElement>(templates));
+            SerializerUtil.jsonSerialize(response.getWriter(), new JsonDataWrapper(page, totalPages, records, onePage));
         } catch (Exception e) {
             ExceptionUtil.throwSystemException(e);
         }
-        */
+
     }
 		
 }
