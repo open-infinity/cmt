@@ -48,12 +48,12 @@
     <div id="tab_content">TAB CONTENT</div>
     --%>
 
-    <div id="tabs">
+    <div id="tabsContainer">
         <ul id ="tabsReferenceList" >
-			<li><a href="#tabs-1">Templates</a></li>
+			<li><a href="#templatesTab">Templates</a></li>
+			<li><a href="#elementsTab">Elements</a></li>
         </ul>
-
-		<div id="tabs-1">
+		<div id="templatesTab">
 			<table id="templates-grid"> </table>
 			<div id="template-grid-pager"> </div>
 		    <div class="ui-button-bar">
@@ -62,7 +62,15 @@
 		        <button id="delete-template">Delete</button>
             </div>
     	</div>
-
+        <div id="elementsTab">
+			<table id="elements-grid"> </table>
+			<div id="elements-grid-pager"> </div>
+		    <div class="ui-button-bar">
+		        <button id="edit-elements">Edit</button>
+		        <button id="new-elements">New</button>
+		        <button id="delete-elements">Delete</button>
+            </div>
+    	</div>
 	</div>
 
 	<div id="dlg-edit-template">
@@ -83,7 +91,7 @@
                     <span id="dlg-edit-template-id-value"></span>
                 </div>
                 <div class="dlg-edit-template-template-label-container">
-                    <div id="template-name">Template name</div>
+                    <div id="dlg-edit-template-name">Template name</div>
                     <input type='text' value=''>
                 </div>
                 <div class="dlg-edit-template-template-label-container">

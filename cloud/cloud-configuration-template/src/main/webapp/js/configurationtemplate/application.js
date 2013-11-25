@@ -30,7 +30,7 @@ jQuery(function($){
             app.editTemplateButton = $("#edit-template");
             app.newTemplateButton = $("#new-template");
             app.deleteTemplateButton = $("#delete-template");
-            app.tabsContainer = $("#tabs");
+            app.tabsContainer = $("#tabsContainer");
             app.tabsReferenceList = $("#tabsReferenceList");
         },
 
@@ -94,6 +94,7 @@ jQuery(function($){
         },
 
         createTemplate: function(){
+        /*
         //"<span class='ui-icon ui-icon-close' role='presentation'>Remove Tab</span>"
             var tabTemplate = "<li><a href='#{href}'>#{label}</a><span class='ui-icon ui-icon-close' role='presentation'>Remove Tab</span></li>";
             var tabLabel = "New template";
@@ -107,6 +108,9 @@ jQuery(function($){
             //app.tabsContainer.append("<div id='" + tabId + "'><p>blah</p></div>");
             app.tabsContainer.append("<div id='tabs-2'><p>blah</p></div>");
             app.tabsContainer.tabs("refresh");
+            */
+            app.dialog.template.create();
+            //alert("Created new template with id: " + id);
         },
 
         deleteTemplate: function(){

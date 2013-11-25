@@ -19,7 +19,6 @@ import org.openinfinity.cloud.domain.configurationtemplate.ConfigurationTemplate
 import org.openinfinity.cloud.service.common.AbstractCrudServiceInterface;
 
 import java.util.List;
-import java.util.Set;
 
 
 /**
@@ -33,8 +32,11 @@ public interface ConfigurationTemplateService extends AbstractCrudServiceInterfa
 	
     List<ConfigurationTemplate> getTemplates(List<Long> organizationIds);
 
-    void update(ConfigurationTemplate ct, List<Integer> elements, List<Integer> organizations);
+    void create(ConfigurationTemplate ct, List<Integer> elements, List<Integer> organizations);
 
     void delete(int templateId);
+
+    void update(ConfigurationTemplate ct, List<Integer> elements, List<Integer> organizations);
+
 
 }

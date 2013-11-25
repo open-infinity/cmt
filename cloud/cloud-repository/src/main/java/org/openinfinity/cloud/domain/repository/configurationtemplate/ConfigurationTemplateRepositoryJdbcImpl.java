@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -30,7 +31,9 @@ import java.math.BigInteger;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Vedran Bartonicek
@@ -42,13 +45,13 @@ public class ConfigurationTemplateRepositoryJdbcImpl implements ConfigurationTem
 
 	private JdbcTemplate jdbcTemplate;
 
-    private static final String CREATE_SQL = "insert into configuration_template_tbl values(?, ?)";
+    private static final String CREATE_SQL = "insert into configuration_template_tbl (name, description) values(?, ?)";
 
     private static final String DELETE_SQL = "delete from configuration_template_tbl where id = ?";
 
     private static final String UPDATE_SQL = "update configuration_template_tbl set name = ?, description = ? where id = ?";
 
-    private static final String GET_ALL_SQL = "select * from configuration_template_tbl where id = ?";
+    private static final String GET_ALL_SQL = "select * from configuration_template_tbl";
 
     private static final String GET_ALL_FOR_ORGANIZATION_SQL =
         "select configuration_template_tbl.id, configuration_template_tbl.name, " + 
@@ -59,10 +62,13 @@ public class ConfigurationTemplateRepositoryJdbcImpl implements ConfigurationTem
 
     private static final String GET_BY_ID_SQL = "select * from configuration_template_tbl where id = ?";
 
+    private DataSource dataSource;
+
     @Autowired
     public ConfigurationTemplateRepositoryJdbcImpl(@Qualifier("cloudDataSource") DataSource dataSource) {
         Assert.notNull(dataSource, "Please define datasource for scaling rule repository.");
         this.jdbcTemplate = new JdbcTemplate(dataSource);
+        this.dataSource = dataSource;
     }
     
     @AuditTrail
@@ -75,8 +81,12 @@ public class ConfigurationTemplateRepositoryJdbcImpl implements ConfigurationTem
 
     @Override
     public ConfigurationTemplate create(ConfigurationTemplate configurationTemplate) {
-        int id = jdbcTemplate.update(CREATE_SQL, configurationTemplate.getName(), configurationTemplate.getDescription());
-        configurationTemplate.setId(id);
+        SimpleJdbcInsert insert = new SimpleJdbcInsert(dataSource).withTableName("configuration_template_tbl").usingGeneratedKeyColumns("id");
+        Map<String,Object> parameters = new HashMap<String,Object>();
+        parameters.put("name", configurationTemplate.getName());
+        parameters.put("description", configurationTemplate.getDescription());
+        Number newId = insert.executeAndReturnKey(parameters);
+        configurationTemplate.setId(newId.intValue());
         return configurationTemplate;
     }
 

@@ -25,7 +25,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * @author Vedran Bartonicek
@@ -48,8 +51,31 @@ public class ConfigurationTemplateServiceImpl implements ConfigurationTemplateSe
     private ConfigurationTemplateElementRepository configurationTemplateElementRepository;
 
     @Override
-    public ConfigurationTemplate create(ConfigurationTemplate configurationTemplate) {
+    public void create(ConfigurationTemplate ct, List<Integer> elements, List<Integer> organizations) {
+        ConfigurationTemplate ct0 = configurationTemplateRepository.create(ct);
+        LOG.debug("new id = " + ct.getId() + " " + ct0.getId());
+        for(Integer o : organizations){
+            configurationTemplateOrganizationRepository.create(ct.getId(), o.intValue());
+        }
+        for(Integer e : elements){
+            configurationTemplateElementRepository.create(ct.getId(), e.intValue());
+        }
+    }
+
+    @Override
+    public ConfigurationTemplate create(ConfigurationTemplate obj) {
         return null;
+    }
+
+    @Override
+    public void delete(int templateId) {
+        configurationTemplateElementRepository.deleteByTemplate(templateId);
+        configurationTemplateOrganizationRepository.deleteByTemplate(templateId);
+        configurationTemplateRepository.delete(templateId);
+    }
+
+    @Override
+    public void delete(ConfigurationTemplate configurationTemplate) {
     }
 
     @Override
@@ -67,30 +93,33 @@ public class ConfigurationTemplateServiceImpl implements ConfigurationTemplateSe
         return configurationTemplateRepository.load(id);
     }
 
-    @Override
-    public void delete(ConfigurationTemplate configurationTemplate) {
-    }
-
-    @Override
-    public void delete(int templateId) {
-        configurationTemplateElementRepository.deleteByTemplate(templateId);
-        configurationTemplateOrganizationRepository.deleteByTemplate(templateId);
-        configurationTemplateRepository.delete(templateId);
-    }
-
+    // TODO: probably this function can be oprtimized
     @Log
     @Override
     public List<ConfigurationTemplate> getTemplates(List<Long> organizationIds) {
-        List<ConfigurationTemplate> templates = new ArrayList<ConfigurationTemplate>();
+        List<ConfigurationTemplate> aggregatedTemplates = new ArrayList<ConfigurationTemplate>();
+
+        // Search for templates that are mapped to organizations that the user is member of
         for(Long oid : organizationIds){
             List<ConfigurationTemplate> templatesForOrganizations = configurationTemplateRepository.getTemplates(oid);
             for (ConfigurationTemplate ct : templatesForOrganizations){
-                if (!templates.contains(ct)) {
-                    templates.add(ct);
+                if (!aggregatedTemplates.contains(ct)) {
+                    aggregatedTemplates.add(ct);
                 }
             }
         }
-        return templates;
+
+        // Search for templates without assigned organization
+        Collection<ConfigurationTemplate> templatesWithoutOrganization = new LinkedList<ConfigurationTemplate>();
+        Collection<ConfigurationTemplate> allTemplates = configurationTemplateRepository.loadAll();
+        for (ConfigurationTemplate ct : allTemplates){
+            if (configurationTemplateOrganizationRepository.loadAllForTemplate(ct.getId()).size() == 0) {
+                templatesWithoutOrganization.add(ct);
+            }
+        }
+
+        aggregatedTemplates.addAll(templatesWithoutOrganization);
+        return aggregatedTemplates;
     }
 
     @Override

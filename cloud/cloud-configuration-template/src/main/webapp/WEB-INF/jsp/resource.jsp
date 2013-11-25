@@ -21,13 +21,15 @@ portletURL.initialize({
         getTemplateURL :   '<portlet:resourceURL id="getTemplate"/>',
     	getTemplatesForUserURL :   '<portlet:resourceURL id="getTemplatesForUser"/>',
     	getElementsForTemplateURL :   '<portlet:resourceURL id="getElementsForTemplate"/>',
+    	getAllAvailableElementsURL :               '<portlet:resourceURL id="getAllAvailableElements"/>',
     	getOrganizationsForTemplateURL :   '<portlet:resourceURL id="getOrganizationsForTemplate"/>',
+    	getAllOrganizationsURL :   '<portlet:resourceURL id="getAllOrganizations"/>',
     },
     organization: {
     	availableClustersURL :     '<portlet:resourceURL id="availableClusters"/>',    	
     },
     element: {
-    	getAllElementsURL :               '<portlet:resourceURL id="getAllElements"/>',
+    	getElementsURL :               '<portlet:resourceURL id="getElements"/>',
     }
 });
 console.log("portletURL.url=", portletURL.url);

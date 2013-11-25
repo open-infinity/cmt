@@ -52,6 +52,11 @@ public class ConfigurationTemplate implements Comparable{
     @NotScript
     private String description;
 
+    public ConfigurationTemplate(String name, String description) {
+        this.name = name;
+        this.description = description;
+    }
+
     @Override
     public int compareTo(Object o) {
         return this.id - ((ConfigurationTemplate)o).getId();

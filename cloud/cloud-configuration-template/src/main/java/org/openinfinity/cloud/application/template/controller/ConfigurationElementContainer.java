@@ -1,11 +1,9 @@
 package org.openinfinity.cloud.application.template.controller;
 
 import org.openinfinity.cloud.domain.configurationtemplate.ConfigurationElement;
-import org.springframework.stereotype.Component;
 
 import java.util.Collection;
 
-@Component
 public class ConfigurationElementContainer {
 
     private Collection<ConfigurationElement> available;

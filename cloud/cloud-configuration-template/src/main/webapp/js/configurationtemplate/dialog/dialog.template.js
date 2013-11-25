@@ -8,16 +8,20 @@
         // jQuery objects from DOM elements
 
         // General
-        self: $("#dlg-edit-template"),
+        self : $("#dlg-edit-template"),
+
+        mode : null,
 
         tabs : $("#dlg-edit-template-tabs"),
 
         infoDialog : $("#dlg-info"),
 
         // Template
+        templateIdContainer : $(".dlg-edit-template-template-label-container").first(),
+
         templateId : $("#dlg-edit-template-id-value"),
 
-        templateName : $("#template-name + input"),
+        templateName : $("#dlg-edit-template-name + input"),
 
         templateDescription : $("#template-description + textarea"),
 
@@ -37,14 +41,33 @@
 
         // Dialog functions
 
-        create: function () {
+        create: function(){
+            $.when(
+                $.ajax({
+                    url: portletURL.url.template.getAllAvailableElementsURL,
+                    dataType: "json"
+                }),
+                $.ajax({
+                    url: portletURL.url.template.getAllOrganizationsURL,
+                    dataType: "json"
+                }))
+            .done(function(dataElements, dataOrganizations){
+                populateElements(dataElements[0]);
+                populateOrganizations(dataOrganizations[0]);
+                configureDragAndDrop();
+                })
+            .fail(function(jqXHR, textStatus, errorThrown) {
+                console.log("Error fetching items for dialog");
+            });
+
+            dlg.open("create");
         },
 
-        remove: function (id) {
+        remove: function(id){
             console.log("remove with argument id:" + id);
         },
 
-        edit: function (id) {
+        edit: function(id){
             var jqxhrTemplate = $.ajax({
                 url: portletURL.url.template.getTemplateURL + "&templateId=" + id,
                 dataType: "json"
@@ -73,6 +96,24 @@
                 console.log("Error fetching items for dialog");
                 });
 
+            dlg.open("edit");
+        },
+
+        open : function(mode){
+            dlg.mode = mode;
+            var title;
+            if (mode == "edit"){
+                dlg.templateIdContainer.show();
+                title = "Edit template";
+            }
+            else if (mode == "create"){
+                dlg.templateIdContainer.hide();
+                title = "Create new template";
+            }
+            else{
+                console.log("Unexpected mode for dialog.");
+            }
+            dlg.self.dialog("option", "title", title);
             dlg.tabs.tabs();
             dlg.self.dialog("open");
         }
@@ -88,7 +129,7 @@
         height: 510 ,
         buttons: {
             "Submit changes": function() {
-                submitTemplate();
+                submitTemplate(dlg.mode);
                 cleanUpDialog($(this));
                 $(this).dialog( "close" );
             },
@@ -156,43 +197,53 @@
     }
 
     function populateElements(data){
-        var listSelected = dlg.selectedElementsPanel.find("ul");
-        var listAvailable = dlg.availableElementsPanel.find("ul");
-        htmlTemplate = "<li class='ui-state-default'>\
-                            <div class='name list-item-column'></div>\
-                            <div class='version'></div>\
-                        </li>";
-        var selectedIndices = [];
-        $.each(data.selected, function(index, value){
-            storeElementToDom(htmlTemplate, value, listSelected);
-            selectedIndices.push(value.id);
-        });
-        $.each(data.available, function(index, value){
-            if (selectedIndices.indexOf(value.id) == -1){
-                storeElementToDom(htmlTemplate, value, listAvailable);
-            }
-        });
+        try{
+            var listSelected = dlg.selectedElementsPanel.find("ul");
+            var listAvailable = dlg.availableElementsPanel.find("ul");
+            htmlTemplate = "<li class='ui-state-default'>\
+                                <div class='name list-item-column'></div>\
+                                <div class='version'></div>\
+                            </li>";
+            var selectedIndices = [];
+            $.each(data.selected, function(index, value){
+                storeElementToDom(htmlTemplate, value, listSelected);
+                selectedIndices.push(value.id);
+            });
+            $.each(data.available, function(index, value){
+                if (selectedIndices.indexOf(value.id) == -1){
+                    storeElementToDom(htmlTemplate, value, listAvailable);
+                }
+            });
+        }
+        catch(err){
+            console.log(err.message);
+        }
     }
 
     function populateOrganizations(data){
-        var listSelected = dlg.selectedOrganizationsPanel.find("ul");
-        var listAvailable = dlg.availableOrganizationsPanel.find("ul");
-        var htmlTemplate = "<li class='ui-state-default'>\
-                              <div class='dlg-edit-template-organization-id'></div>\
-                              <div class='dlg-edit-template-organization-name'></div>\
-                           </li>";
-        var selectedIndices = [];
+        try{
+            var listSelected = dlg.selectedOrganizationsPanel.find("ul");
+            var listAvailable = dlg.availableOrganizationsPanel.find("ul");
+            var htmlTemplate = "<li class='ui-state-default'>\
+                                  <div class='dlg-edit-template-organization-id'></div>\
+                                  <div class='dlg-edit-template-organization-name'></div>\
+                               </li>";
+            var selectedIndices = [];
 
-        $.each(data.selected, function(index, value){
-           storeOrganizationToDom(htmlTemplate, value, listSelected);
-           selectedIndices.push(value.organizationId);
-        });
+            $.each(data.selected, function(index, value){
+               storeOrganizationToDom(htmlTemplate, value, listSelected);
+               selectedIndices.push(value.organizationId);
+            });
 
-        $.each(data.available, function(index, value){
-           if (selectedIndices.indexOf(value.organizationId) == -1){
-               storeOrganizationToDom(htmlTemplate, value, listAvailable);
-           }
-        });
+            $.each(data.available, function(index, value){
+               if (selectedIndices.indexOf(value.organizationId) == -1){
+                   storeOrganizationToDom(htmlTemplate, value, listAvailable);
+               }
+            });
+        }
+        catch(err){
+            console.log(err.message);
+        }
     }
 
     function storeElementToDom(htmlTemplate, value, list){
@@ -232,13 +283,16 @@
 
     function cleanUpDialog(that){
         that.find(".list-container").find("ul").empty();
+        dlg.templateId.text("");
+        dlg.templateName.val("");
+        dlg.templateDescription.val("");
     }
 
     function cleanUpTable(that){
         that.find("tr").remove();
     }
 
-    function submitTemplate(){
+    function submitTemplate(mode){
         var outData = {};
         outData["templateId"] = parseInt(dlg.templateId.text());
         outData["templateName"] = dlg.templateName.val();
@@ -246,8 +300,12 @@
         outData["elementsSelected"] = JSON.stringify(getSelectedElements());
         outData["organizationsSelected"] = JSON.stringify(getSelectedOrganizations());
 
-        $.post(portletURL.url.template.editTemplateURL, outData).done(function(){
+        $.post((mode == "edit") ? portletURL.url.template.editTemplateURL : portletURL.url.template.createTemplateURL, outData)
+        .done(function(){
             app.reloadTemplatesTable();
+        })
+        .fail(function(jqXHR, textStatus, errorThrown) {
+            alertPostFailure(dlg.mode, textStatus, errorThrown);
         });
     }
 
@@ -267,6 +325,10 @@
             selectedItems.push($(arrayOfLis[i]).data("config").organizationId);
         }
         return selectedItems;
+    }
+
+    function alertPostFailure(mode, textStatus, errorThrown){
+        alert("Server error at template" + mode + ", text status:" + textStatus + " " + "errorThrown:" + errorThrown);
     }
 
 })(jQuery);

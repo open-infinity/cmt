@@ -63,15 +63,17 @@ import java.util.*;
 @RequestMapping("VIEW")
 public class TemplateController {
 
-    private static final String PATH_GET_TEMPLATES_FOR_USER = "getTemplatesForUser";
-    private static final String PATH_GET_ELEMENTS_FOR_TEMPLATE = "getElementsForTemplate";
-    private static final String PATH_GET_ORGANIZATIONS_FOR_TEMPLATE = "getOrganizationsForTemplate";
+    private static final String GET_TEMPLATES_FOR_USER = "getTemplatesForUser";
+    private static final String GET_ELEMENTS_FOR_TEMPLATE = "getElementsForTemplate";
+    private static final String GET_ORGANIZATIONS_FOR_TEMPLATE = "getOrganizationsForTemplate";
+    private static final String GET_ALL_ELEMENTS = "getAllAvailableElements";
+    private static final String GET_ALL_ORGANIZATIONS = "getAllOrganizations";
 
-    private static final String PATH_EDIT_TEMPLATE = "editTemplate";
-    private static final String PATH_GET_TEMPLATE = "getTemplate";
+    private static final String EDIT_TEMPLATE = "editTemplate";
+    private static final String GET_TEMPLATE = "getTemplate";
 
-    private static final String PATH_CREATE_TEMPLATE = "createTemplate";
-    private static final String PATH_DELETE_TEMPLATE = "deleteTemplate";
+    private static final String CREATE_TEMPLATE = "createTemplate";
+    private static final String DELETE_TEMPLATE = "deleteTemplate";
 
     private static final Logger LOG = Logger.getLogger(TemplateController.class.getName());
 
@@ -80,9 +82,6 @@ public class TemplateController {
 
     @Autowired
     private ConfigurationElementService configurationElementService;
-
-    @Autowired
-    private ConfigurationElementContainer elementsContainer;
 
     @Autowired
     private OrganizationContainer organizationContainer;
@@ -125,12 +124,14 @@ public class TemplateController {
         return modelAndView;
     }
 
-    @ResourceMapping(PATH_GET_TEMPLATES_FOR_USER)
+    @ResourceMapping(GET_TEMPLATES_FOR_USER)
     public void getTemplatesForUser(ResourceRequest request, ResourceResponse response,
                                     @RequestParam("page") int page, @RequestParam("rows") int rows)
             throws Exception {
         try {
             User user = liferayService.getUser(request, response);
+            if (user == null) return;
+
             List<Long> organizationIds = liferayService.getOrganizationIds(user);
             List<ConfigurationTemplate> templates = configurationTemplateService.getTemplates(organizationIds);
 
@@ -146,42 +147,61 @@ public class TemplateController {
         }
     }
 
-    @ResourceMapping(PATH_GET_TEMPLATE)
+    @ResourceMapping(GET_TEMPLATE)
     public void getTemplate(ResourceRequest request, ResourceResponse response, @RequestParam("templateId") int templateId) throws Exception {
         try {
+            User user = liferayService.getUser(request, response);
+            if (user == null) return;
+
             SerializerUtil.jsonSerialize(response.getWriter(), configurationTemplateService.load(BigInteger.valueOf(templateId)));
         } catch (Exception e) {
             ExceptionUtil.throwSystemException(e);
         }
     }
 
-    @ResourceMapping(PATH_DELETE_TEMPLATE)
+    @ResourceMapping(DELETE_TEMPLATE)
     public void deleteTemplate(ResourceRequest request, ResourceResponse response, @RequestParam("templateId") int templateId) throws Exception {
         try {
+            User user = liferayService.getUser(request, response);
+            if (user == null) return;
+
             configurationTemplateService.delete(templateId);
         } catch (Exception e) {
             ExceptionUtil.throwSystemException(e);
         }
     }
 
-    @ResourceMapping(PATH_GET_ELEMENTS_FOR_TEMPLATE)
-    public void getElementIdsForTemplate(ResourceRequest request, ResourceResponse response, @RequestParam("templateId") int templateId) throws Exception {
+    @ResourceMapping(GET_ELEMENTS_FOR_TEMPLATE)
+    public void getElementsForTemplate(ResourceRequest request, ResourceResponse response, @RequestParam("templateId") int templateId) throws Exception {
         try {
-            Collection<ConfigurationElement> allElements = configurationElementService.loadAll();
-            elementsContainer.setAvailable(allElements);
-            Collection<ConfigurationElement> elementsForTemplate = configurationElementService.loadAllForTemplate(templateId);
-            elementsContainer.setSelected(elementsForTemplate);
-            SerializerUtil.jsonSerialize(response.getWriter(), elementsContainer);
+            User user = liferayService.getUser(request, response);
+            if (user == null) return;
+
+            SerializerUtil.jsonSerialize(response.getWriter(), new ConfigurationElementContainer(configurationElementService.loadAll(), configurationElementService.loadAllForTemplate(templateId)));
 
         } catch (Exception e) {
             ExceptionUtil.throwSystemException(e);
         }
     }
 
-    @ResourceMapping(PATH_GET_ORGANIZATIONS_FOR_TEMPLATE)
-    public void getOrganizationsForTemplateAndUser(ResourceRequest request, ResourceResponse response, @RequestParam("templateId") int templateId) throws Exception {
+    @ResourceMapping(GET_ALL_ELEMENTS)
+    public void getAllAvailableElements(ResourceRequest request, ResourceResponse response) throws Exception {
+        try {
+            LOG.debug("ENTER getAllAvailableElements");
+            User user = liferayService.getUser(request, response);
+            if (user == null) return;
+            SerializerUtil.jsonSerialize(response.getWriter(), new ConfigurationElementContainer(configurationElementService.loadAll(), new ArrayList<ConfigurationElement>()));
+        } catch (Exception e) {
+            ExceptionUtil.throwSystemException(e);
+        }
+    }
+
+    @ResourceMapping(GET_ORGANIZATIONS_FOR_TEMPLATE)
+    public void getOrganizationsForTemplate(ResourceRequest request, ResourceResponse response, @RequestParam("templateId") int templateId) throws Exception {
         try {
             User user = liferayService.getUser(request, response);
+            if (user == null) return;
+
             List<Organization> organizations = liferayService.getOrganizations(user);
             Collection<Organization> selectedOrganizations = new LinkedList<Organization>();
 
@@ -199,12 +219,26 @@ public class TemplateController {
         }
     }
 
+    @ResourceMapping(GET_ALL_ORGANIZATIONS)
+    public void getAllOrganizations(ResourceRequest request, ResourceResponse response) throws Exception {
+        try {
+            User user = liferayService.getUser(request, response);
+            if (user == null) return;
+
+            List<Organization> organizations = liferayService.getOrganizations(user);
+            SerializerUtil.jsonSerialize(response.getWriter(), organizationContainer.construct(organizations, new ArrayList<Organization>()));
+
+        } catch (Exception e) {
+            ExceptionUtil.throwSystemException(e);
+        }
+    }
+
     /*
     Note 1: @RequestBody for parameter de-serialization would not work with portlets -vbartoni
     Note 2: @RequestParam("elementsSelected") String[] elementsSelected does not work for some reason.
     That's why the array was sent as json -vbartoni
      */
-    @ResourceMapping(PATH_EDIT_TEMPLATE)
+    @ResourceMapping(EDIT_TEMPLATE)
     public void editTemplate(ResourceRequest request, ResourceResponse response,
                              @RequestParam("templateId") int templateId,
                              @RequestParam("templateName") String templateName,
@@ -213,9 +247,30 @@ public class TemplateController {
                              @RequestParam("organizationsSelected") String organizationsSelected
     ) {
         try {
+            User user = liferayService.getUser(request, response);
+            if (user == null) return;
+
             ObjectMapper mapper = new ObjectMapper();
             configurationTemplateService.update(new ConfigurationTemplate(templateId, templateName, templateDescription), mapper.readValue(elementsSelected, List.class), mapper.readValue(organizationsSelected, List.class));
 
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.setProperty(ResourceResponse.HTTP_STATUS_CODE, HttpCodes.HTTP_ERROR_CODE_SERVER_ERROR);
+        }
+    }
+
+    @ResourceMapping(CREATE_TEMPLATE)
+    public void createTemplate(ResourceRequest request, ResourceResponse response,
+                             @RequestParam("templateName") String templateName,
+                             @RequestParam("templateDescription") String templateDescription,
+                             @RequestParam("elementsSelected") String elementsSelected,
+                             @RequestParam("organizationsSelected") String organizationsSelected
+    ) {
+        try {
+            User user = liferayService.getUser(request, response);
+            if (user == null) return;
+            ObjectMapper mapper = new ObjectMapper();
+            configurationTemplateService.create(new ConfigurationTemplate(templateName, templateDescription), mapper.readValue(elementsSelected, List.class), mapper.readValue(organizationsSelected, List.class));
         } catch (Exception e) {
             e.printStackTrace();
             response.setProperty(ResourceResponse.HTTP_STATUS_CODE, HttpCodes.HTTP_ERROR_CODE_SERVER_ERROR);

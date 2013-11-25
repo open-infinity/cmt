@@ -16,28 +16,20 @@
 
 package org.openinfinity.cloud.application.template.controller;
 
-import org.openinfinity.cloud.domain.configurationtemplate.ConfigurationElement;
+import org.openinfinity.cloud.comon.web.LiferayService;
 import org.openinfinity.cloud.service.configurationtemplate.ConfigurationElementService;
-import org.openinfinity.cloud.util.serialization.SerializerUtil;
-import org.openinfinity.core.annotation.AuditTrail;
-import org.openinfinity.core.annotation.Log;
 import org.openinfinity.core.exception.AbstractCoreException;
 import org.openinfinity.core.exception.ApplicationException;
 import org.openinfinity.core.exception.BusinessViolationException;
 import org.openinfinity.core.exception.SystemException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.portlet.ModelAndView;
 import org.springframework.web.portlet.bind.annotation.ResourceMapping;
 
-import javax.portlet.ActionRequest;
-import javax.portlet.RenderRequest;
-import javax.portlet.RenderResponse;
-import javax.portlet.ResourceResponse;
-import java.util.Collection;
+import javax.portlet.*;
 import java.util.Map;
 
 /**
@@ -51,10 +43,13 @@ import java.util.Map;
 @RequestMapping("VIEW")
 public class ElementController {
 	
-	private static final String PATH_GET_ELEMENTS = "getAvailable";
+	private static final String GET_ALL_ELEMENTS = "getAllElements";
 	
 	@Autowired
 	private ConfigurationElementService configurationElementService;
+
+    @Autowired
+    private LiferayService liferayService;
 	
 	@ExceptionHandler({ApplicationException.class, BusinessViolationException.class,
 	                   SystemException.class})
@@ -80,14 +75,17 @@ public class ElementController {
 		return modelAndView;
     }
 
-    @Log
-    @AuditTrail
-    @Transactional
-    @ResourceMapping(PATH_GET_ELEMENTS)
-    public void getAllElements(ResourceResponse response) throws Exception {
-        Collection<ConfigurationElement> elements = configurationElementService.loadAll();
-        if (elements !=  null) SerializerUtil.jsonSerialize(response.getWriter(), elements);
-        else return;
-    } 
+    @ResourceMapping(GET_ALL_ELEMENTS)
+    public void getAllElementIds(ResourceRequest request, ResourceResponse response) throws Exception {
+        /*try {
+            User user = liferayService.getUser(request, response);
+            if (user == null) return;
+
+            SerializerUtil.jsonSerialize(response.getWriter(), new ConfigurationElementContainer(configurationElementService.loadAll(), null));
+        } catch (Exception e) {
+            ExceptionUtil.throwSystemException(e);
+        }
+        */
+    }
 		
 }
