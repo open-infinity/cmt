@@ -40,9 +40,9 @@ jQuery(function($){
 
             // Elements tab
             app.elementsTable = $("#elements-grid");
-            app.editElementsButton = $("#edit-element");
-            app.newElementsButton = $("#new-element");
-            app.deleteElementsButton = $("#delete-element");
+            app.editElementButton = $("#edit-element");
+            app.newElementButton = $("#new-element");
+            app.deleteElementButton = $("#delete-element");
         },
 
         setupTemplatesTable: function(){
@@ -71,7 +71,7 @@ jQuery(function($){
                 viewrecords: true,
                 shrinkToFit: false,
                 sortorder: "asc",
-                ondblClickRow: app.editTemplate,
+                ondblClickRow: app.editTableRow(app.templatesTable, app.dialog.template),
                 loadonce: true,
                 gridComplete: function(){
                     $("#templates-grid").setGridParam({datatype: 'local'});
@@ -101,27 +101,28 @@ jQuery(function($){
                     total : function(obj) {return obj.total;},
                     records : function(obj) {return obj.records;}
                     },
-                colNames:['Id', 'Type', 'Name', 'Version', 'Description', 'MinMachines', 'MaxMachines', 'Replicated', 'MinReplicationMachines', 'MaxReplicationMachines'],
+                colNames:['Id', 'Type', 'Name', 'Version', 'Description', 'MinMachines', 'MaxMachines', 'Repl', 'MinReplMachines', 'MaxReplMachines'],
                 colModel:[
-                          {name:'id', index:'id', width:50, align:"center", sortable:true, sorttype:"int"},
-                          {name:'type', index:'type', width:70, align:"left"},
-                          {name:'name', index:'name', width:150, align:"left"},
-                          {name:'version', index:'version', width:50, align:"left"},
-                          {name:'description', index:'description', width:50, align:"left"},
-                          {name:'minMachines', index:'minMachines', width:100, align:"left"},
-                          {name:'maxMachines', index:'maxMachines', width:100, align:"left"},
-                          {name:'replicated', index:'replicated', width:100, align:"left"},
-                          {name:'minReplicationMachines', index:'minReplicationMachines', width:100, align:"left"},
-                          {name:'maxReplicationMachines', index:'maxReplicationMachines', width:100, align:"left"},
+                          {name:'id', index:'id', width:35, align:"center", sortable:true, sorttype:"int"},
+                          {name:'type', index:'type', width:35, align:"center",sortable:true},
+                          {name:'name', index:'name', width:67, align:"left",sortable:true},
+                          {name:'version', index:'version', width:35, align:"center", sortable:true},
+                          {name:'description', index:'description', width:200, align:"left", sortable:true},
+                          {name:'minMachines', index:'minMachines', width:50, align:"center", sortable:true},
+                          {name:'maxMachines', index:'maxMachines', width:50, align:"center", sortable:true},
+                          {name:'replicated', index:'replicated', width:30, align:"center", sortable:true},
+                          {name:'minReplicationMachines', index:'minReplicationMachines', width:100, align:"center", sortable:true},
+                          {name:'maxReplicationMachines', index:'maxReplicationMachines', width:100, align:"center", sortable:true},
                           ],
                 rowNum: 20,
                 height: "auto",
-                pager: '#elemement-grid-pager',
+                width: 750,
+                pager: '#element-grid-pager',
                 sortname: 'id',
                 viewrecords: true,
                 shrinkToFit: false,
                 sortorder: "asc",
-                ondblClickRow: app.editElement,
+                ondblClickRow: app.editTableRow(app.elementsTable, app.dialog.element),
                 loadonce: true,
                 gridComplete: function(){
                     $("#elemements-grid").setGridParam({datatype: 'local'});
@@ -135,7 +136,7 @@ jQuery(function($){
                 {}, //  default settings for add
                 {}, //  default settings for delete
                 {odata : ['equal', 'not equal', 'less', 'less or equal','greater','greater or equal', 'begins with','does not begin with','is in','is not in','ends with','does not end with','contains','does not contain']}, // search options
-                {} /* view parameters*/
+                {}  //  view parameters
             );
 
         },
@@ -149,7 +150,7 @@ jQuery(function($){
         },
 
         setupTabs: function(){
-            app.tabsContainer.tabs();
+            app.tabsContainer.tabs({active: 1});
         },
 
         bindEventHandlers: function(){
@@ -159,7 +160,7 @@ jQuery(function($){
             app.deleteTemplateButton.bind( "click", app.deleteTemplate);
 
             // Elements
-             app.editElementButton.bind( "click", app.editElement);
+             app.editElementButton.bind( "click", app.editTableRow(app.elementsTable, app.dialog.element));
              app.newElementButton.bind( "click", app.createElement);
              app.deleteElementButton.bind( "click", app.deleteElement);
         },
@@ -198,7 +199,22 @@ jQuery(function($){
             .done(function() {
                 app.reloadTemplatesTable();
             });
+        },
 
+        deleteElement: function(){
+            var id = app.templatesTable.jqGrid('getGridParam','selrow');
+            if (id == null) {
+                alert( "Please select a row for deletion");
+                return;
+            }
+            var ret = app.templatesTable.jqGrid('getRowData', id);
+            $.ajax({
+              url: portletURL.url.template.deleteElementURL + "&elementId=" + ret.id,
+              cache: false
+            })
+            .done(function() {
+                app.reloadTemplatesTable();
+            });
         },
 
         editTemplate: function(){
@@ -210,6 +226,34 @@ jQuery(function($){
                 alert("Please select a row for editing");
             }
         },
+
+        deleteTemplate: function(){
+            var id = app.elementsTable.jqGrid('getGridParam','selrow');
+            if (id)	{
+                var ret = app.elementsTable.jqGrid('getRowData',id);
+                app.dialog.element.edit(ret.id);
+            } else {
+                alert("Please select a row for editing");
+            }
+        },
+        /* TODO: generic delete row fucntion           */
+        editTableRow: function(argTable, argDialog){
+            return (function(){
+                var table = argTable;
+                var dialog = argDialog;
+
+                console.log("Editing row");
+                var id = table.jqGrid('getGridParam','selrow');
+                if (id)	{
+                    var ret = table.jqGrid('getRowData',id);
+                    dialog.edit(ret.id);
+                } else {
+                    alert("Please select a row for editing");
+                }
+            });
+        },
+
+
     });
 
 	app.init();

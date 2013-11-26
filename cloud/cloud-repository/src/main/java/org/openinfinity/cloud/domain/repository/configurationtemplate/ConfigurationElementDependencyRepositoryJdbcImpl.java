@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -36,7 +37,8 @@ import java.util.List;
 public class ConfigurationElementDependencyRepositoryJdbcImpl implements ConfigurationElementDependencyRepository {
 
 	private JdbcTemplate jdbcTemplate;
-	private static final String GET_ALL_SQL = "SELECT * FROM CONFIGURATION_ELEMENT_TABLE";
+
+    private static final String LOAD_DEPENDEES_SQL = "select * from configuration_element_dependency_tbl where element_from = ?";
 
     @AuditTrail
     @Transactional
@@ -44,14 +46,16 @@ public class ConfigurationElementDependencyRepositoryJdbcImpl implements Configu
         // TODO Auto-generated method stub
         return null;
     }
-    
-  	private class ElementDependencyRowMapper implements RowMapper<ConfigurationElementDependency> {
-		
-		public ConfigurationElementDependency mapRow(ResultSet resultSet, int rowNum) throws SQLException {    
-		    return new ConfigurationElementDependency(resultSet.getInt("id"),
-		                       resultSet.getInt("element_from"),
-		                       resultSet.getInt("element_to"));
-		}
-	}
+
+    @Override
+    public Collection<ConfigurationElementDependency> loadDependeesForElement(int id) {
+        return jdbcTemplate.query(LOAD_DEPENDEES_SQL, new Object[] {id}, new DependencyRowMapper());
+    }
+
+    private class DependencyRowMapper implements RowMapper<ConfigurationElementDependency> {
+        public ConfigurationElementDependency mapRow(ResultSet resultSet, int rowNum) throws SQLException {
+            return new ConfigurationElementDependency(resultSet.getInt("id"), resultSet.getInt("element_from"), resultSet.getInt("element_to"));
+        }
+    }
 
 }

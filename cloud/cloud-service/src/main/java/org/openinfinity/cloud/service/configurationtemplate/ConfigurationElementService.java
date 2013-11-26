@@ -30,6 +30,8 @@ import java.util.Collection;
  */
 public interface ConfigurationElementService extends AbstractCrudServiceInterface<ConfigurationElement> {
 
+    ConfigurationElement load(int id);
+
     Collection<ConfigurationElement> loadAllForTemplate(int templateId);
 
 }

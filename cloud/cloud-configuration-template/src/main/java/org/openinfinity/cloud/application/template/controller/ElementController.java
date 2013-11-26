@@ -19,6 +19,7 @@ package org.openinfinity.cloud.application.template.controller;
 import com.liferay.portal.model.User;
 import org.openinfinity.cloud.comon.web.LiferayService;
 import org.openinfinity.cloud.domain.configurationtemplate.ConfigurationElement;
+import org.openinfinity.cloud.service.configurationtemplate.ConfigurationElementDependencyService;
 import org.openinfinity.cloud.service.configurationtemplate.ConfigurationElementService;
 import org.openinfinity.cloud.util.collection.ListUtil;
 import org.openinfinity.cloud.util.serialization.JsonDataWrapper;
@@ -44,7 +45,7 @@ import java.util.Map;
 
 /**
  * Spring portlet controller for handling templates.
- * 
+ *
  * @author Vedran Bartonicek
  * @version 1.3.0
  * @since 1.3.0
@@ -52,33 +53,39 @@ import java.util.Map;
 @Controller
 @RequestMapping("VIEW")
 public class ElementController {
-	
+
 	private static final String GET_ELEMENTS = "getElements";
-	
+	private static final String GET_ELEMENT = "getElement";
+	private static final String GET_DEPENDENCIES = "getDependencies";
+
+
 	@Autowired
-	private ConfigurationElementService configurationElementService;
+	private ConfigurationElementService elementService;
+
+    @Autowired
+    private ConfigurationElementDependencyService dependencyService;
 
     @Autowired
     private LiferayService liferayService;
-	
+
 	@ExceptionHandler({ApplicationException.class, BusinessViolationException.class,
 	                   SystemException.class})
     public ModelAndView handleException(RenderRequest renderRequest, RenderResponse renderResponse,
                                         AbstractCoreException abstractCoreException) {
 		ModelAndView modelAndView = new ModelAndView("error");
-		if (abstractCoreException.isErrorLevelExceptionMessagesIncluded()) 
-			modelAndView.addObject("errorLevelExceptions", 
+		if (abstractCoreException.isErrorLevelExceptionMessagesIncluded())
+			modelAndView.addObject("errorLevelExceptions",
 			                        abstractCoreException.getErrorLevelExceptionIds());
-		if (abstractCoreException.isWarningLevelExceptionMessagesIncluded()) 
-			modelAndView.addObject("warningLevelExceptions", 
+		if (abstractCoreException.isWarningLevelExceptionMessagesIncluded())
+			modelAndView.addObject("warningLevelExceptions",
 			                        abstractCoreException.getWarningLevelExceptionIds());
-		if (abstractCoreException.isInformativeLevelExceptionMessagesIncluded()) 
-			modelAndView.addObject("informativeLevelExceptions", 
+		if (abstractCoreException.isInformativeLevelExceptionMessagesIncluded())
+			modelAndView.addObject("informativeLevelExceptions",
 			                        abstractCoreException.getInformativeLevelExceptionIds());
-		
+
 		// TODO
 		@SuppressWarnings("unchecked")
-        Map<String, Object> userInfo = (Map<String, Object>) 
+        Map<String, Object> userInfo = (Map<String, Object>)
 		                                renderRequest.getAttribute(ActionRequest.USER_INFO);
 		if (userInfo == null) return new ModelAndView("home");
 
@@ -86,11 +93,11 @@ public class ElementController {
     }
 
     @ResourceMapping(GET_ELEMENTS)
-    public void getAllElementIds(ResourceRequest request, ResourceResponse response, @RequestParam("page") int page, @RequestParam("rows") int rows) throws Exception {
+    public void getElements(ResourceRequest request, ResourceResponse response, @RequestParam("page") int page, @RequestParam("rows") int rows) throws Exception {
         try {
             User user = liferayService.getUser(request, response);
             if (user == null) return;
-            Collection<ConfigurationElement> templates = configurationElementService.loadAll();
+            Collection<ConfigurationElement> templates = elementService.loadAll();
             int records = templates.size();
             int mod = records % rows;
             int totalPages = records / rows;
@@ -102,5 +109,28 @@ public class ElementController {
         }
 
     }
-		
+
+    @ResourceMapping(GET_ELEMENT)
+    public void getElement(ResourceRequest request, ResourceResponse response, @RequestParam("elementId") int elementId) throws Exception {
+        try {
+            User user = liferayService.getUser(request, response);
+            if (user == null) return;
+            SerializerUtil.jsonSerialize(response.getWriter(), elementService.load(elementId));
+        } catch (Exception e) {
+            ExceptionUtil.throwSystemException(e);
+        }
+    }
+
+    @ResourceMapping(GET_DEPENDENCIES)
+    public void getDependencies(ResourceRequest request, ResourceResponse response, @RequestParam("elementId") int elementId) throws Exception {
+        try {
+            User user = liferayService.getUser(request, response);
+            if (user == null) return;
+             // TODO: make a template class for wrapping.
+            //SerializerUtil.jsonSerialize(response.getWriter(), new ConfigurationElementContainer(dependencyService.loadAll(), dependencyService.loadDependeesForElement(elementId)));
+        } catch (Exception e) {
+            ExceptionUtil.throwSystemException(e);
+        }
+    }
+
 }

@@ -6,49 +6,15 @@
 		<portlet-name>configurationtemplate</portlet-name>
 		<icon>/icon.png</icon>
 		<instanceable>true</instanceable>
-		<!-- 
-		<header-portlet-css>/css/cloudadmin.css</header-portlet-css
-		<header-portlet-css>/css/plugins/ui.jqgrid.css</header-portlet-css>
-		-->
-		
-		<header-portlet-css>/css/edit-template-dialog.css</header-portlet-css>
+		<header-portlet-css>/css/oi.configurationtemplate.css</header-portlet-css>
         <header-portlet-css>/css/plugins/ui.jqgrid.css</header-portlet-css>
-        
 		<header-portlet-javascript>/js/plugins/jquery.metadata.js</header-portlet-javascript>
 		<header-portlet-javascript>/js/plugins/i18n/grid.locale-en.js</header-portlet-javascript>
 		<header-portlet-javascript>/js/plugins/jquery.jqGrid.min.js</header-portlet-javascript>
-		<header-portlet-javascript>/js/plugins/mustache.js</header-portlet-javascript>
-		<!--
-		<header-portlet-javascript>/js/plugins/jquery.mb.slider.js</header-portlet-javascript>
-		-->		
-		
-		<!-- import modules -->
         <header-portlet-javascript>/js/configurationtemplate/init.js</header-portlet-javascript>
-
-        <!--
-        <header-portlet-javascript>/js/configurationtemplate/init.js</header-portlet-javascript>
-        <header-portlet-javascript>/js/configurationtemplate/widgets/platformselect.js</header-portlet-javascript>
-        <header-portlet-javascript>/js/configurationtemplate/resource/resource.js</header-portlet-javascript>
-
-        -->
 		<header-portlet-javascript>/js/configurationtemplate/application.js</header-portlet-javascript>
-
-		<!--
-		<header-portlet-javascript>/js/configurationtemplate/util/util.js</header-portlet-javascript>
-		<header-portlet-javascript>/js/cloudadmin/poller/datapoller.js</header-portlet-javascript>
-		-->
-
-		<!-- dialog -->
         <footer-portlet-javascript>/js/configurationtemplate/dialog/dialog.template.js</footer-portlet-javascript>
-
-        <!--
-        <footer-portlet-javascript>/js/cloudadmin/dialog/dialog.instance.js</footer-portlet-javascript>
-        <footer-portlet-javascript>/js/cloudadmin/dialog/dialog.cluster.js</footer-portlet-javascript>
-        <footer-portlet-javascript>/js/cloudadmin/dialog/dialog.machine.js</footer-portlet-javascript>
-        <footer-portlet-javascript>/js/cloudadmin/dialog/dialog.service.js</footer-portlet-javascript>
-        -->
-        
-		<!-- main app -->
+        <footer-portlet-javascript>/js/configurationtemplate/dialog/dialog.element.js</footer-portlet-javascript>
 	</portlet>
 	<role-mapper>
 		<role-name>administrator</role-name>

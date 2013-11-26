@@ -114,7 +114,7 @@
                 console.log("Unexpected mode for dialog.");
             }
             dlg.self.dialog("option", "title", title);
-            dlg.tabs.tabs();
+            dlg.tabs.tabs({active: 1});
             dlg.self.dialog("open");
         }
     });

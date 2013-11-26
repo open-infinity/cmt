@@ -41,6 +41,8 @@ public class ConfigurationElementRepositoryJdbcImpl implements ConfigurationElem
 
 	private static final String GET_ALL_SQL = "select * from configuration_element_tbl";
 
+	private static final String GET_BY_ID_SQL = "select * from configuration_element_tbl where id = ?";
+
     private static final String GET_ALL_FOR_TEMPLATE_SQL =
             "select configuration_element_tbl.* from configuration_element_tbl " +
             "inner join configuration_template_element_tbl on " +
@@ -78,6 +80,12 @@ public class ConfigurationElementRepositoryJdbcImpl implements ConfigurationElem
     @Override
     public ConfigurationElement load(BigInteger id) {
         return null;
+    }
+
+    @AuditTrail
+    @Transactional
+    public ConfigurationElement load(int templateId) {
+        return jdbcTemplate.queryForObject(GET_BY_ID_SQL, new Object[] {templateId}, new ConfigurationElementRowMapper());
     }
 
     @Override

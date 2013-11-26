@@ -22,5 +22,6 @@
  app.templatesTable = new Object();
  app.dialog = new Object();
  app.dialog.template = new Object();
+ app.dialog.element = new Object();
 
 

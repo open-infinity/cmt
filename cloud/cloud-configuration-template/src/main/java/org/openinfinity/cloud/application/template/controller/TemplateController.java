@@ -131,16 +131,13 @@ public class TemplateController {
         try {
             User user = liferayService.getUser(request, response);
             if (user == null) return;
-
             List<Long> organizationIds = liferayService.getOrganizationIds(user);
             List<ConfigurationTemplate> templates = configurationTemplateService.getTemplates(organizationIds);
-
             int records = templates.size();
             int mod = records % rows;
             int totalPages = records / rows;
             if (mod > 0) totalPages++;
             List<ConfigurationTemplate> onePage = ListUtil.sliceList(page, rows, new LinkedList<ConfigurationTemplate>(templates));
-
             SerializerUtil.jsonSerialize(response.getWriter(), new JsonDataWrapper(page, totalPages, records, onePage));
         } catch (Exception e) {
             ExceptionUtil.throwSystemException(e);
@@ -152,7 +149,6 @@ public class TemplateController {
         try {
             User user = liferayService.getUser(request, response);
             if (user == null) return;
-
             SerializerUtil.jsonSerialize(response.getWriter(), configurationTemplateService.load(BigInteger.valueOf(templateId)));
         } catch (Exception e) {
             ExceptionUtil.throwSystemException(e);
@@ -164,7 +160,6 @@ public class TemplateController {
         try {
             User user = liferayService.getUser(request, response);
             if (user == null) return;
-
             configurationTemplateService.delete(templateId);
         } catch (Exception e) {
             ExceptionUtil.throwSystemException(e);
@@ -176,7 +171,6 @@ public class TemplateController {
         try {
             User user = liferayService.getUser(request, response);
             if (user == null) return;
-
             SerializerUtil.jsonSerialize(response.getWriter(), new ConfigurationElementContainer(configurationElementService.loadAll(), configurationElementService.loadAllForTemplate(templateId)));
 
         } catch (Exception e) {
@@ -201,7 +195,6 @@ public class TemplateController {
         try {
             User user = liferayService.getUser(request, response);
             if (user == null) return;
-
             List<Organization> organizations = liferayService.getOrganizations(user);
             Collection<Organization> selectedOrganizations = new LinkedList<Organization>();
 
@@ -224,10 +217,8 @@ public class TemplateController {
         try {
             User user = liferayService.getUser(request, response);
             if (user == null) return;
-
             List<Organization> organizations = liferayService.getOrganizations(user);
             SerializerUtil.jsonSerialize(response.getWriter(), organizationContainer.construct(organizations, new ArrayList<Organization>()));
-
         } catch (Exception e) {
             ExceptionUtil.throwSystemException(e);
         }

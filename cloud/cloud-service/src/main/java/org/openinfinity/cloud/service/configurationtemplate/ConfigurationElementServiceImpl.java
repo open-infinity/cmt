@@ -61,6 +61,11 @@ public class ConfigurationElementServiceImpl implements ConfigurationElementServ
     }
 
     @Override
+    public ConfigurationElement load(int id) {
+        return configurationElementRepository.load(id);
+    }
+
+    @Override
     public void delete(ConfigurationElement ConfigurationElement) {
         configurationElementRepository.delete(ConfigurationElement);
     }

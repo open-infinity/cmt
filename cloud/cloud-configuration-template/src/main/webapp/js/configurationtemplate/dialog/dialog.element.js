@@ -1,26 +1,42 @@
 (function($) {
 
     var app = window.app || {};
-    var dlg = window.app.dialog.template || {};
+    var dlg = window.app.dialog.element || {};
+
+    dlg.mode =  null;
+
+    dlg.value = {};
+    dlg.value.id = $("#dlg-element-value-id");
+    dlg.value.type = $("#dlg-element-value-type");
+    dlg.value.name = $("#dlg-element-value-name");
+    dlg.value.description = $("#dlg-element-value-description");
+    dlg.value.minMachines = $("#dlg-element-value-minMachines");
+    dlg.value.maxMachines = $("#dlg-element-value-maxMachines");
+    dlg.value.replicated = $("#dlg-element-value-replicated");
+    dlg.value.minReplicationMachines = $("#dlg-element-value-minReplicationMachines");
+    dlg.value.maxReplicationMachines = $("#dlg-element-value-maxReplicationMachines");
+
+    dlg.html = {};
+    dlg.html.idContainer = $($("#dlg-element-general-tab").find(".dlg-element-container").first());
+    dlg.html.self = $("#dlg-element");
+    dlg.html.tabs = $("#dlg-element-tabs");
 
     $.extend(dlg, {
 
         // jQuery objects from DOM elements
 
         // General
-        self : $("#dlg-element"),
+        //self : $("#dlg-element"),
 
-        mode : null,
+        //mode : null,
 
-        tabs : $("#dlg-element-tabs"),
+        //tabs : $("#dlg-element-tabs"),
 
+        //infoDialog : $("#dlg-info"),
+
+        // General
         /*
-        infoDialog : $("#dlg-info"),
-
-        // Template
-        templateIdContainer : $(".dlg-element-template-label-container").first(),
-
-        templateId : $("#dlg-element-id-value"),
+        name : $("#dlg-element-id-value"),
 
         templateName : $("#dlg-element-name + input"),
 
@@ -42,7 +58,8 @@
         */
         // Dialog functions
 
-        create: function(){
+        create : function(){
+            /*
             $.when(
                 $.ajax({
                     url: portletURL.url.template.getAllAvailableElementsURL,
@@ -62,23 +79,31 @@
             });
 
             dlg.open("create");
+            */
         },
 
-        remove: function(id){
+        remove : function(id){
             console.log("remove with argument id:" + id);
         },
 
-        edit: function(id){
+        edit : function(id){
             var jqxhrTemplate = $.ajax({
-                url: portletURL.url.template.getTemplateURL + "&templateId=" + id,
+                url: portletURL.url.element.getElementURL + "&elementId=" + id,
                 dataType: "json"
                 }).done(function(data) {
-                    dlg.templateId.text(data.id);
-                    dlg.templateName.val(data.name);
-                    dlg.templateDescription.val(data.description);
+                    dlg.value.id.text(data.id);
+                    dlg.value.type.val(data.type);
+                    dlg.value.name.val(data.name);
+                    dlg.value.description.val(data.description);
+                    dlg.value.minMachines.val(data.minMachines);
+                    dlg.value.maxMachines.val(data.maxMachines);
+                    dlg.value.replicated.val(data.replicated);
+                    dlg.value.minReplicationMachines.val(data.minReplicationMachines);
+                    dlg.value.maxReplicationMachines.val(data.maxReplicationMachines);
                 }).fail(function(jqXHR, textStatus, errorThrown) {
-                    console.log("Error fetching template");
+                    console.log("Error fetching element");
             });
+            /*
             $.when(
                 $.ajax({
                     url: portletURL.url.template.getElementsForTemplateURL + "&templateId=" + id,
@@ -96,7 +121,7 @@
             .fail(function(jqXHR, textStatus, errorThrown) {
                 console.log("Error fetching items for dialog");
                 });
-
+            */
             dlg.open("edit");
         },
 
@@ -104,33 +129,33 @@
             dlg.mode = mode;
             var title;
             if (mode == "edit"){
-                dlg.templateIdContainer.show();
-                title = "Edit template";
-            }                                 dlg-edit-template
+                dlg.html.idContainer.show();
+                title = "Edit element";
+            }
             else if (mode == "create"){
-                dlg.templateIdContainer.hide();
-                title = "Create new template";
+                dlg.html.idContainer.hide();
+                title = "Create new element";
             }
             else{
                 console.log("Unexpected mode for dialog.");
             }
-            dlg.self.dialog("option", "title", title);
-            dlg.tabs.tabs();
-            dlg.self.dialog("open");
+            dlg.html.self.dialog("option", "title", title);
+            dlg.html.tabs.tabs();
+            dlg.html.self.dialog("open");
         }
     });
 
     // Initialize dialogs
 
-    dlg.self.dialog({
-        title: "Edit template",
+    dlg.html.self.dialog({
+        title: "Edit element",
         autoOpen: false,
         modal: true,
         width: 650,
-        height: 510 ,
+        height: 750 ,
         buttons: {
             "Submit changes": function() {
-                submitTemplate(dlg.mode);
+                submitElement(dlg.mode);
                 cleanUpDialog($(this));
                 $(this).dialog( "close" );
             },
@@ -141,6 +166,7 @@
         }
     });
 
+/*
     dlg.infoDialog.dialog({
         title: "Detailed information",
         autoOpen: false,
@@ -154,7 +180,7 @@
             }
         }
     });
-
+  */
     // Helper functions
 
     function configureDragAndDrop(){
@@ -283,25 +309,49 @@
     }
 
     function cleanUpDialog(that){
-        that.find(".list-container").find("ul").empty();
-        dlg.templateId.text("");
-        dlg.templateName.val("");
-        dlg.templateDescription.val("");
+        that.find(".dlg-item-list-container").find("ul").empty();
+        dlg.value.id.text("");
+        dlg.value.type.val("");
+        dlg.value.name.val("");
+        dlg.value.description.val("");
+        dlg.value.minMachines.val("");
+        dlg.value.maxMachines.val("");
+        dlg.value.replicated.val("");
+        dlg.value.minReplicationMachines.val("");
+        dlg.value.maxReplicationMachines.val("");
     }
 
     function cleanUpTable(that){
         that.find("tr").remove();
     }
 
-    function submitTemplate(mode){
+    function submitElement(mode){
         var outData = {};
-        outData["templateId"] = parseInt(dlg.templateId.text());
-        outData["templateName"] = dlg.templateName.val();
-        outData["templateDescription"] = dlg.templateDescription.val();
-        outData["elementsSelected"] = JSON.stringify(getSelectedElements());
-        outData["organizationsSelected"] = JSON.stringify(getSelectedOrganizations());
 
-        $.post((mode == "edit") ? portletURL.url.template.editTemplateURL : portletURL.url.template.createTemplateURL, outData)
+        dlg.value.id.text(data.id);
+        dlg.value.type.val(data.type);
+        dlg.value.name.val(data.name);
+        dlg.value.description.val(data.description);
+        dlg.value.minMachines.val(data.minMachines);
+        dlg.value.maxMachines.val(data.maxMachines);
+        dlg.value.replicated.val(data.replicated);
+        dlg.value.minReplicationMachines.val(data.minReplicationMachines);
+        dlg.value.maxReplicationMachines.val(data.maxReplicationMachines);
+
+        outData["id"] = parseInt(dlg.value.id.text());
+        outData["type"] = dlg.value.type.val();
+        outData["name"] = dlg.value.name.val();
+        outData["description"] = dlg.value.description.val();
+        outData["minMachines"] = dlg.value.minMachines.val();
+        outData["maxMachines"] = dlg.value.maxMachines.val();
+        outData["replicated"] = dlg.value.replicated.val();
+        outData["minReplicationMachines"] = dlg.value.minReplicationMachines.val();
+        outData["maxReplicationMachines"] = dlg.value.maxReplicationMachines.val();
+
+        //outData["elementsSelected"] = JSON.stringify(getSelectedElements());
+        //outData["organizationsSelected"] = JSON.stringify(getSelectedOrganizations());
+
+        $.post((mode == "edit") ? portletURL.url.element.editElementURL : portletURL.url.element.createElementURL, outData)
         .done(function(){
             app.reloadTemplatesTable();
         })

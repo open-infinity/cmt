@@ -29,6 +29,8 @@ import java.util.Collection;
  */
 public interface ConfigurationElementRepository extends AbstractCrudRepositoryInterface<ConfigurationElement> {
 
+    ConfigurationElement load(int id);
+
     Collection<ConfigurationElement> loadAllForTemplate(int templateId);
 
 }

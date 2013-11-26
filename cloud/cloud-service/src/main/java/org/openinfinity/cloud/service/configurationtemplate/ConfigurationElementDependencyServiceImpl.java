@@ -22,6 +22,8 @@ import org.openinfinity.core.annotation.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigInteger;
+import java.util.Collection;
 import java.util.List;
 
 
@@ -36,12 +38,41 @@ import java.util.List;
 public class ConfigurationElementDependencyServiceImpl implements ConfigurationElementDependencyService {
 	private static final Logger LOGGER = Logger.getLogger(ConfigurationElementDependencyServiceImpl.class.getName());
 
-	@Autowired
+    @Autowired
 	private ConfigurationElementDependencyRepository configurationElementDependencyRepository;
 	
 	@Log
     public List<ConfigurationElementDependency> getAll() {
         return configurationElementDependencyRepository.getAll();
     }
-	
+
+
+    @Override
+    public Collection<ConfigurationElementDependency> loadDependeesForElement(int id) {
+        return configurationElementDependencyRepository.loadDependeesForElement(id);
+    }
+
+    @Override
+    public ConfigurationElementDependency create(ConfigurationElementDependency obj) {
+        return null;
+    }
+
+    @Override
+    public void update(ConfigurationElementDependency obj) {
+    }
+
+    @Override
+    public Collection<ConfigurationElementDependency> loadAll() {
+        return null;
+    }
+
+    @Override
+    public ConfigurationElementDependency load(BigInteger id) {
+        return null;
+    }
+
+    @Override
+    public void delete(ConfigurationElementDependency obj) {
+    }
+
 }
