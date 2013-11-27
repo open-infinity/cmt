@@ -15,9 +15,10 @@
  */
 package org.openinfinity.cloud.domain.repository.configurationtemplate;
 
-import java.util.List;
-
 import org.openinfinity.cloud.domain.configurationtemplate.ParameterValue;
+import org.openinfinity.cloud.domain.repository.common.AbstractCrudRepositoryInterface;
+
+import java.util.Collection;
 
 /**
  * CRUD interface for storing <code>org.openinfinity.core.cloud.domain.template</code> objects.
@@ -26,8 +27,8 @@ import org.openinfinity.cloud.domain.configurationtemplate.ParameterValue;
  * @version 1.3.0
  * @since 1.3.0
  */
-public interface ParameterValueRepository {
-	
-    List<ParameterValue> getAll();
+public interface ParameterValueRepository extends AbstractCrudRepositoryInterface<ParameterValue> {
+
+    Collection<ParameterValue> loadAll(int parameterKeyId);
 
 }

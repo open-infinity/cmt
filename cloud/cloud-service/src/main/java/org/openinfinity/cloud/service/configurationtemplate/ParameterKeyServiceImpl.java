@@ -15,14 +15,14 @@
  */
 package org.openinfinity.cloud.service.configurationtemplate;
 
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.openinfinity.cloud.domain.configurationtemplate.ParameterKey;
 import org.openinfinity.cloud.domain.repository.configurationtemplate.ParameterKeyRepository;
-import org.openinfinity.core.annotation.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.math.BigInteger;
+import java.util.Collection;
 
 /**
  * @author Vedran Bartonicek
@@ -36,10 +36,33 @@ public class ParameterKeyServiceImpl implements ParameterKeyService {
 
 	@Autowired
 	private ParameterKeyRepository parameterKeyRepository;
-	
-	@Log
-    public List<ParameterKey> getAll() {
-        return parameterKeyRepository.getAll();
+
+
+    @Override
+    public ParameterKey create(ParameterKey obj) {
+        return null;
     }
-	
+
+    @Override
+    public void update(ParameterKey obj) {
+    }
+
+    @Override
+    public Collection<ParameterKey> loadAll() {
+        return null;
+    }
+
+    @Override
+    public Collection<ParameterKey> loadAll(int elementId) {
+        return parameterKeyRepository.loadAll(elementId);
+    }
+
+    @Override
+    public ParameterKey load(BigInteger id) {
+        return null;
+    }
+
+    @Override
+    public void delete(ParameterKey obj) {
+    }
 }

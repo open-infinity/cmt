@@ -20,8 +20,12 @@ import com.liferay.portal.model.User;
 import org.apache.log4j.Logger;
 import org.openinfinity.cloud.comon.web.LiferayService;
 import org.openinfinity.cloud.domain.configurationtemplate.ConfigurationElement;
+import org.openinfinity.cloud.domain.configurationtemplate.ParameterKey;
+import org.openinfinity.cloud.domain.configurationtemplate.ParameterValue;
 import org.openinfinity.cloud.service.configurationtemplate.ConfigurationElementDependencyService;
 import org.openinfinity.cloud.service.configurationtemplate.ConfigurationElementService;
+import org.openinfinity.cloud.service.configurationtemplate.ParameterKeyService;
+import org.openinfinity.cloud.service.configurationtemplate.ParameterValueService;
 import org.openinfinity.cloud.util.collection.ListUtil;
 import org.openinfinity.cloud.util.serialization.JsonDataWrapper;
 import org.openinfinity.cloud.util.serialization.SerializerUtil;
@@ -58,6 +62,7 @@ public class ElementController {
     private static final String GET_ELEMENTS = "getElements";
 	private static final String GET_ELEMENT = "getElement";
 	private static final String GET_DEPENDENCIES = "getDependencies";
+	private static final String GET_PARAMETER_KEYS_AND_VALUES = "getParameterKeysAndValues";
 
     private static final Logger LOG = Logger.getLogger(ElementController.class.getName());
 
@@ -66,6 +71,12 @@ public class ElementController {
 
     @Autowired
     private ConfigurationElementDependencyService dependencyService;
+
+    @Autowired
+    private ParameterKeyService parameterKeyService;
+
+    @Autowired
+    private ParameterValueService parameterValueService;
 
     @Autowired
     private LiferayService liferayService;
@@ -132,6 +143,20 @@ public class ElementController {
             Collection<ConfigurationElement> availableItems = elementService.loadAll();
             Collection<ConfigurationElement> selectedItems = elementService.loadDependees(elementId);
             SerializerUtil.jsonSerialize(response.getWriter(), new ConfigurationElementContainer(availableItems, selectedItems));
+        } catch (Exception e) {
+            ExceptionUtil.throwSystemException(e);
+        }
+    }
+
+    @ResourceMapping(GET_PARAMETER_KEYS_AND_VALUES)
+    public void getParameterKeysAndValues(ResourceRequest request, ResourceResponse response, @RequestParam("elementId") int elementId) throws Exception {
+        try {
+            User user = liferayService.getUser(request, response);
+            if (user == null) return;
+            Collection<ParameterKey> keys = parameterKeyService.loadAll(elementId);
+            Collection<ParameterValue> values = parameterValueService.loadAll();
+            KeyValueContainer kvc = new KeyValueContainer(keys, values);
+            SerializerUtil.jsonSerialize(response.getWriter(), kvc);
         } catch (Exception e) {
             ExceptionUtil.throwSystemException(e);
         }

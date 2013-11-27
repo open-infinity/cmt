@@ -133,15 +133,14 @@
                 $.ajax({
                     url: portletURL.url.element.getDependenciesURL + "&elementId=" + id,
                     dataType: "json"
-                })
-                //$.ajax({
-                //))    url: portletURL.url.template.getOrganizationsForTemplateURL + "&templateId=" + id,
-                //    dataType: "json"
-                //})
-             )
-            .done(function(dataDependencies){
-                populateDependencies(dataDependencies);
-                //populateOrganizations(dataOrganizations[0]);
+                }),
+                $.ajax({
+                ))    url: portletURL.url.template.getParameterKeysAndValuesURL + "&elementId=" + id,
+                    dataType: "json"
+                }))
+            .done(function(dataDependencies, dataKeyValues){
+                populateDependencies(dataDependencies[0]);
+                populateKeyValues(dataKeyValues[0]);
                 configureDragAndDrop();
                 })
             .fail(function(jqXHR, textStatus, errorThrown) {
@@ -277,12 +276,58 @@
         }
     }
 
+    function populateKeyValues(data){
+        try{
+            var htmlTemplateKeys = "<li class='ui-state-default'>\
+                                        <div class='dlg-element-parameter-key-name'></div>\
+                                    </li>";
+            var htmlTemplateValues = "<li class='ui-state-default'>\
+                                        <div class='dlg-element-parameter-value-type'></div>\
+                                        <div class='dlg-element-parameter-value-value'></div>\
+                                    </li>";
+
+            $.each(data.keys, function(index, value){
+                storeKeyToDom(htmlTemplateKeys, value, dlg.html.parameterKeysList);
+                for (parameterValue in data.values){
+                   if (parameterValue.parameterKeyId == value.id){
+                    storeValuesToDom(htmlTemplateValues, value, dlg.html.parameterKeysValues);
+                   }
+                }
+
+            });
+
+            $.each(data.values, function(index, value){
+               if (selectedIndices.indexOf(value.id) == -1){
+                   storeValuesToDom(htmlTemplate, value, dlg.html.parameterKeysValues);
+               }
+            });
+        }
+        catch(err){
+            console.log(err.message);
+        }
+    }
+
     function storeDependeesToDom(htmlTemplate, value, list){
         list.append(htmlTemplate);
         var lastChild = list.find("li:last-child");
         lastChild.find(".dlg-element-dependee-name").text(value.name);
         lastChild.find(".dlg-element-dependee-version").text(value.version);
         lastChild.data("config", value);
+    }
+
+    function storeKeyToDom(htmlTemplate, value, list){
+            list.append(htmlTemplate);
+            var lastChild = list.find("li:last-child");
+            lastChild.find(".dlg-element-parameter-key-name").text(value.name);
+            lastChild.data("config", value);
+    }
+
+    function storeValueToDom(htmlTemplate, value, list){
+            list.append(htmlTemplate);
+            var lastChild = list.find("li:last-child");
+            lastChild.find(".dlg-element-parameter-value-type").text(value.type);
+            lastChild.find(".dlg-element-parameter-value-value").text(value.value);
+            lastChild.data("config", value);
     }
 
     function storeToTable(configData, table){

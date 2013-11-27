@@ -252,34 +252,29 @@
 
         <%-- Keys for element  --%>
         <div id="dlg-element-keys-tab">
-
-        <%--
-            <div id="organizations-selection-container" class="dlg-tab-items-container">
+            <div id="dlg-keys-values-container" class ="dlg-tab-items-container">
                 <div class="dlg-list-panel-container dlg-tab-item">
-                    <div class="dlg-list-panel-container-title">Selected organizations</div>
+                    <div class="dlg-list-panel-container-title">Keys</div>
                     <div class="dlg-list-panel-container-columns">
-                        <div class="list-item-column">Id</div>
-                        <div>Name</div>
+                        <div class="list-item-column">Name</div>
                     </div>
-                    <div id="dlg-element-selected-organizations" class="dlg-item-list-container">
+                    <div id="dlg-keys" class="dlg-item-list-container">
                         <ul></ul>
                     </div>
                 </div>
                 <div class="dlg-arrows-img dlg-tab-item"></div>
                 <div class="dlg-list-panel-container dlg-tab-item">
-                    <div class="dlg-list-panel-container-title">Available organizations</div>
+                    <div class="dlg-list-panel-container-title">Values</div>
                     <div class="dlg-list-panel-container-columns">
-                        <div class="list-item-column">Id</div>
-                        <div>Name</div>
+                        <div class="list-item-column">Type</div>
+                        <div>Value</div>
                     </div>
-                    <div class="dlg-item-list-container">
+                    <div id="dlg-values" class="dlg-item-list-container">
                         <ul></ul>
                     </div>
                 </div>
             </div>
         </div>
-        --%>
-
     </div>
 
 </body>

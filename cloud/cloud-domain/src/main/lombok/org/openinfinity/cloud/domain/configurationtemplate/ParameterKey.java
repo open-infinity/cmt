@@ -35,6 +35,10 @@ public class ParameterKey {
     @NonNull
     @NotScript
     private int id;
+
+    @NonNull
+    @NotScript
+    private int elementId;
     
     @NonNull
     @NotScript

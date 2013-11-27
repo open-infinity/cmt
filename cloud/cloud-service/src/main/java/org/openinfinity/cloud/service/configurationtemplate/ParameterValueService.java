@@ -15,9 +15,10 @@
  */
 package org.openinfinity.cloud.service.configurationtemplate;
 
-import java.util.List;
-
 import org.openinfinity.cloud.domain.configurationtemplate.ParameterValue;
+import org.openinfinity.cloud.service.common.AbstractCrudServiceInterface;
+
+import java.util.Collection;
 
 
 /**
@@ -27,8 +28,8 @@ import org.openinfinity.cloud.domain.configurationtemplate.ParameterValue;
  * @version 1.3.0
  * @since 1.3.0
  */
-public interface ParameterValueService {
-	
-    List<ParameterValue> getAll();
-	
+public interface ParameterValueService extends AbstractCrudServiceInterface<ParameterValue> {
+
+    Collection<ParameterValue> loadAll(int parameterKeyId);
+
 }

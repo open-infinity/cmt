@@ -34,6 +34,7 @@ portletURL.initialize({
     	editElementURL : '<portlet:resourceURL id="editElement"/>',
     	createElementURL : '<portlet:resourceURL id="createElement"/>',
     	getDependenciesURL : '<portlet:resourceURL id="getDependencies"/>',
+    	getParameterKeysAndValuesURL : '<portlet:resourceURL id="getParameterKeysAndValues"/>',
     }
 });
 

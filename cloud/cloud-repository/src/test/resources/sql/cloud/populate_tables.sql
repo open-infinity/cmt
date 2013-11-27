@@ -86,10 +86,22 @@ insert into configuration_template_element_tbl values (2, 2);
 insert into configuration_element_dependency_tbl values (3, 5);
 insert into configuration_element_dependency_tbl values (4, 5);
 
+insert into configuration_template_parameter_key_tbl values (1, 1, "test_1");
+insert into configuration_template_parameter_key_tbl values (2, 2, "test_2");
+insert into configuration_template_parameter_key_tbl values (3, 2, "test_3");
+insert into configuration_template_parameter_key_tbl values (4, 3, "test_4");
+insert into configuration_template_parameter_key_tbl values (5, 3, "test_5");
 
-
-
-
+insert into configuration_template_parameter_value_tbl values (1, 1, 5, "value_1");
+insert into configuration_template_parameter_value_tbl values (2, 2, 5, "value_12");
+insert into configuration_template_parameter_value_tbl values (3, 2, 6, "value_13");
+insert into configuration_template_parameter_value_tbl values (4, 3, 5, "value_14");
+insert into configuration_template_parameter_value_tbl values (5, 3, 7, "value_15");
+insert into configuration_template_parameter_value_tbl values (6, 3, 7, "value_16");
+insert into configuration_template_parameter_value_tbl values (7, 4, 7, "value_177");
+insert into configuration_template_parameter_value_tbl values (8, 4, 9, "value_1888");
+insert into configuration_template_parameter_value_tbl values (9, 4, 99, "value_19999");
+insert into configuration_template_parameter_value_tbl values (10, 4, 99, "value_1999999");
 
 
 

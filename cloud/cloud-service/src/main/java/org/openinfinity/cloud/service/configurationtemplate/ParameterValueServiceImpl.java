@@ -15,14 +15,14 @@
  */
 package org.openinfinity.cloud.service.configurationtemplate;
 
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.openinfinity.cloud.domain.configurationtemplate.ParameterValue;
 import org.openinfinity.cloud.domain.repository.configurationtemplate.ParameterValueRepository;
-import org.openinfinity.core.annotation.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.math.BigInteger;
+import java.util.Collection;
 
 
 
@@ -39,9 +39,31 @@ public class ParameterValueServiceImpl implements ParameterValueService {
 	@Autowired
 	private ParameterValueRepository parameterValueRepository;
 	
-	@Log
-    public List<ParameterValue> getAll() {
-        return parameterValueRepository.getAll();
+    @Override
+    public ParameterValue create(ParameterValue obj) {
+        return null;
     }
-	
+
+    @Override
+    public void update(ParameterValue obj) {
+    }
+
+    @Override
+    public Collection<ParameterValue> loadAll() {
+        return null;
+    }
+
+    @Override
+    public ParameterValue load(BigInteger id) {
+        return null;
+    }
+
+    @Override
+    public void delete(ParameterValue obj) {
+    }
+
+    @Override
+    public Collection<ParameterValue> loadAll(int parameterKeyId) {
+        return parameterValueRepository.loadAll(parameterKeyId);
+    }
 }

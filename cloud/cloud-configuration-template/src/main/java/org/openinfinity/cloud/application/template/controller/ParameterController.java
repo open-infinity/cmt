@@ -16,17 +16,7 @@
 
 package org.openinfinity.cloud.application.template.controller;
 
-import java.util.List;
-import java.util.Map;
-
-import javax.portlet.ActionRequest;
-import javax.portlet.RenderRequest;
-import javax.portlet.RenderResponse;
-import javax.portlet.ResourceResponse;
-
-import org.openinfinity.cloud.domain.configurationtemplate.ParameterKey;
 import org.openinfinity.cloud.service.configurationtemplate.ParameterKeyService;
-import org.openinfinity.cloud.util.serialization.SerializerUtil;
 import org.openinfinity.core.annotation.AuditTrail;
 import org.openinfinity.core.annotation.Log;
 import org.openinfinity.core.exception.AbstractCoreException;
@@ -36,12 +26,17 @@ import org.openinfinity.core.exception.SystemException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.portlet.ModelAndView;
 import org.springframework.web.portlet.bind.annotation.ResourceMapping;
+
+import javax.portlet.ActionRequest;
+import javax.portlet.RenderRequest;
+import javax.portlet.RenderResponse;
+import javax.portlet.ResourceResponse;
+import java.util.Map;
 
 /**
  * Spring portlet controller for handling templates.
@@ -93,9 +88,9 @@ public class ParameterController {
                              @RequestParam("organizationId") int organizationId)
                              throws Exception {    
         
-        List<ParameterKey> templatesList = parameterKeyService.getAll();
-        Assert.notNull(templatesList);
-        SerializerUtil.jsonSerialize(response.getWriter(), templatesList);    
+        //List<ParameterKey> templatesList = parameterKeyService.getAll();
+        //Assert.notNull(templatesList);
+        //SerializerUtil.jsonSerialize(response.getWriter(), templatesList);
     } 		
     
 }
