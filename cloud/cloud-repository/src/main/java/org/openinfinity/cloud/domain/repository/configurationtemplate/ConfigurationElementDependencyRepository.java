@@ -17,7 +17,6 @@ package org.openinfinity.cloud.domain.repository.configurationtemplate;
 
 import org.openinfinity.cloud.domain.configurationtemplate.ConfigurationElementDependency;
 
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -30,7 +29,5 @@ import java.util.List;
 public interface ConfigurationElementDependencyRepository {
 	
     List<ConfigurationElementDependency> getAll();
-
-    Collection<ConfigurationElementDependency> loadDependeesForElement(int id);
 
 }

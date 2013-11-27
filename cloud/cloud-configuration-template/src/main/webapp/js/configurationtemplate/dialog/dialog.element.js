@@ -9,17 +9,23 @@
     dlg.value.id = $("#dlg-element-value-id");
     dlg.value.type = $("#dlg-element-value-type");
     dlg.value.name = $("#dlg-element-value-name");
+    dlg.value.version = $("#dlg-element-value-version");
     dlg.value.description = $("#dlg-element-value-description");
-    dlg.value.minMachines = $("#dlg-element-value-minMachines");
-    dlg.value.maxMachines = $("#dlg-element-value-maxMachines");
+    dlg.value.minMachines = $("#dlg-element-value-min-machines");
+    dlg.value.maxMachines = $("#dlg-element-value-max-machines");
     dlg.value.replicated = $("#dlg-element-value-replicated");
-    dlg.value.minReplicationMachines = $("#dlg-element-value-minReplicationMachines");
-    dlg.value.maxReplicationMachines = $("#dlg-element-value-maxReplicationMachines");
+    dlg.value.minReplicationMachines = $("#dlg-element-value-min-repl-machines");
+    dlg.value.maxReplicationMachines = $("#dlg-element-value-max-repl-machines");
 
     dlg.html = {};
     dlg.html.idContainer = $($("#dlg-element-general-tab").find(".dlg-element-container").first());
     dlg.html.self = $("#dlg-element");
     dlg.html.tabs = $("#dlg-element-tabs");
+    dlg.html.selectedDependedeesList = $("#dlg-element-selected-dependees").find("ul");
+    dlg.html.availableDependedeesList = $("#dlg-element-available-dependees").find("ul");
+
+    dlg.template = {};
+    dlg.template.dependee = "<li class='ui-state-default'><div class='dlg-element-dependee-name'></div><div class='dlg-element-dependee-version'></div></li>";
 
     $.extend(dlg, {
 
@@ -43,16 +49,16 @@
         templateDescription : $("#template-description + textarea"),
 
         // Elements
-        selectedElementsPanel : $("#elements-selection-container").find(".dlg-element-list-panel-container").first(),
+        selectedElementsPanel : $("#elements-selection-container").find(".dlg-list-panel-container").first(),
 
         selectedElementsList : $("#dlg-element-selected-elements"),
 
-        availableElementsPanel : $("#elements-selection-container").find(".dlg-element-list-panel-container").last(),
+        availableElementsPanel : $("#elements-selection-container").find(".dlg-list-panel-container").last(),
 
         // Organizations
-        selectedOrganizationsPanel : $("#organizations-selection-container").find(".dlg-element-list-panel-container").first(),
+        selectedOrganizationsPanel : $("#organizations-selection-container").find(".dlg-list-panel-container").first(),
 
-        availableOrganizationsPanel : $("#organizations-selection-container").find(".dlg-element-list-panel-container").last(),
+        availableOrganizationsPanel : $("#organizations-selection-container").find(".dlg-list-panel-container").last(),
 
         selectedOrganizationsList : $("#dlg-element-selected-organizations"),
         */
@@ -94,6 +100,7 @@
                     dlg.value.id.text(data.id);
                     dlg.value.type.val(data.type);
                     dlg.value.name.val(data.name);
+                    dlg.value.version.val(data.version);
                     dlg.value.description.val(data.description);
                     dlg.value.minMachines.val(data.minMachines);
                     dlg.value.maxMachines.val(data.maxMachines);
@@ -122,6 +129,25 @@
                 console.log("Error fetching items for dialog");
                 });
             */
+            $.when(
+                $.ajax({
+                    url: portletURL.url.element.getDependenciesURL + "&elementId=" + id,
+                    dataType: "json"
+                })
+                //$.ajax({
+                //))    url: portletURL.url.template.getOrganizationsForTemplateURL + "&templateId=" + id,
+                //    dataType: "json"
+                //})
+             )
+            .done(function(dataDependencies){
+                populateDependencies(dataDependencies);
+                //populateOrganizations(dataOrganizations[0]);
+                configureDragAndDrop();
+                })
+            .fail(function(jqXHR, textStatus, errorThrown) {
+                console.log("Error fetching items for dialog");
+                });
+
             dlg.open("edit");
         },
 
@@ -141,6 +167,7 @@
             }
             dlg.html.self.dialog("option", "title", title);
             dlg.html.tabs.tabs();
+            dlg.html.self.show();
             dlg.html.self.dialog("open");
         }
     });
@@ -157,10 +184,12 @@
             "Submit changes": function() {
                 submitElement(dlg.mode);
                 cleanUpDialog($(this));
+                $(this).hide();
                 $(this).dialog( "close" );
             },
             Cancel: function() {
                 cleanUpDialog($(this));
+                $(this).hide();
                 $(this).dialog( "close" );
             }
         }
@@ -180,11 +209,10 @@
             }
         }
     });
-  */
+    */
     // Helper functions
-
     function configureDragAndDrop(){
-        $(".dlg-element-list-panel-container").droppable({
+        $(".dlg-list-panel-container").droppable({
             activeClass: "ui-state-highlight",
             drop: function (event, ui) {
                 var list = $(this).find("ul");
@@ -198,7 +226,7 @@
             },
             tolerance: "touch"
         });
-        $("li", ".list-container").draggable({
+        $("li", ".dlg-item-list-container").draggable({
             revert: "invalid",
             containment: "document",
             helper: "clone",
@@ -212,7 +240,7 @@
                 }
             }
         });
-        $(".list-container").find("li").
+        $(".dlg-item-list-container").find("li").
             click(function(){
                 $(this).toggleClass("ui-state-highlight");
             }).
@@ -223,48 +251,24 @@
             });
     }
 
-    function populateElements(data){
-        try{
-            var listSelected = dlg.selectedElementsPanel.find("ul");
-            var listAvailable = dlg.availableElementsPanel.find("ul");
-            htmlTemplate = "<li class='ui-state-default'>\
-                                <div class='name list-item-column'></div>\
-                                <div class='version'></div>\
-                            </li>";
-            var selectedIndices = [];
-            $.each(data.selected, function(index, value){
-                storeElementToDom(htmlTemplate, value, listSelected);
-                selectedIndices.push(value.id);
-            });
-            $.each(data.available, function(index, value){
-                if (selectedIndices.indexOf(value.id) == -1){
-                    storeElementToDom(htmlTemplate, value, listAvailable);
-                }
-            });
-        }
-        catch(err){
-            console.log(err.message);
-        }
-    }
 
-    function populateOrganizations(data){
+
+    function populateDependencies(data){
         try{
-            var listSelected = dlg.selectedOrganizationsPanel.find("ul");
-            var listAvailable = dlg.availableOrganizationsPanel.find("ul");
             var htmlTemplate = "<li class='ui-state-default'>\
-                                  <div class='dlg-element-organization-id'></div>\
-                                  <div class='dlg-element-organization-name'></div>\
+                                  <div class='dlg-element-dependee-name'></div>\
+                                  <div class='dlg-element-dependee-version'></div>\
                                </li>";
             var selectedIndices = [];
 
             $.each(data.selected, function(index, value){
-               storeOrganizationToDom(htmlTemplate, value, listSelected);
+               storeDependeesToDom(htmlTemplate, value, dlg.html.selectedDependedeesList);
                selectedIndices.push(value.organizationId);
             });
 
             $.each(data.available, function(index, value){
-               if (selectedIndices.indexOf(value.organizationId) == -1){
-                   storeOrganizationToDom(htmlTemplate, value, listAvailable);
+               if (selectedIndices.indexOf(value.id) == -1){
+                   storeDependeesToDom(htmlTemplate, value, dlg.html.availableDependedeesList);
                }
             });
         }
@@ -273,11 +277,11 @@
         }
     }
 
-    function storeElementToDom(htmlTemplate, value, list){
+    function storeDependeesToDom(htmlTemplate, value, list){
         list.append(htmlTemplate);
         var lastChild = list.find("li:last-child");
-        lastChild.find(".name").text(value.name);
-        lastChild.find(".version").text(value.version);
+        lastChild.find(".dlg-element-dependee-name").text(value.name);
+        lastChild.find(".dlg-element-dependee-version").text(value.version);
         lastChild.data("config", value);
     }
 
@@ -290,6 +294,7 @@
         }
     }
 
+    // TODO: make it generic
     function storeOrganizationToDom(htmlTemplate, value, list){
         list.append(htmlTemplate);
         var lastChild = list.find("li:last-child");

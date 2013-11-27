@@ -33,4 +33,6 @@ public interface ConfigurationElementRepository extends AbstractCrudRepositoryIn
 
     Collection<ConfigurationElement> loadAllForTemplate(int templateId);
 
+    Collection<ConfigurationElement> loadDependees(int elementId);
+
 }

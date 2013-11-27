@@ -55,6 +55,11 @@ public class ConfigurationElementServiceImpl implements ConfigurationElementServ
         return configurationElementRepository.loadAll();
     }
 
+    @Log
+    public Collection<ConfigurationElement> loadDependees(int elementId) {
+        return configurationElementRepository.loadDependees(elementId);
+    }
+
     @Override
     public ConfigurationElement load(BigInteger id) {
         return configurationElementRepository.load(id);

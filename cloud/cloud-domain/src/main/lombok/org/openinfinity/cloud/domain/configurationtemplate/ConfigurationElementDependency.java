@@ -34,10 +34,6 @@ public class ConfigurationElementDependency {
     
     @NonNull
     @NotScript
-    private int id;
-    
-    @NonNull
-    @NotScript
     private int elementFrom;
     
     @NonNull

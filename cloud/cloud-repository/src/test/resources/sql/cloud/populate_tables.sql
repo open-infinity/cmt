@@ -83,6 +83,13 @@ insert into configuration_template_element_tbl values (1, 9);
 insert into configuration_template_element_tbl values (2, 1);
 insert into configuration_template_element_tbl values (2, 2);
 
+insert into configuration_element_dependency_tbl values (3, 5);
+insert into configuration_element_dependency_tbl values (4, 5);
+
+
+
+
+
 
 
 

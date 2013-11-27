@@ -34,4 +34,6 @@ public interface ConfigurationElementService extends AbstractCrudServiceInterfac
 
     Collection<ConfigurationElement> loadAllForTemplate(int templateId);
 
+    Collection<ConfigurationElement> loadDependees(int elementId);
+
 }

@@ -198,6 +198,7 @@ public class TemplateController {
             List<Organization> organizations = liferayService.getOrganizations(user);
             Collection<Organization> selectedOrganizations = new LinkedList<Organization>();
 
+            // Note: the code below was needed to avoid duplicates in selectedOrganizations.
             for (ConfigurationTemplateOrganization cto : organizationService.loadAllForTemplate(templateId)) {
                 for (Organization o : organizations) {
                     if (o.getOrganizationId() == cto.getOrganizationId()) {

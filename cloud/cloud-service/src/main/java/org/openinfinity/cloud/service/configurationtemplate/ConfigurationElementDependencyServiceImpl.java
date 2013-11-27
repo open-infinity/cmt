@@ -16,6 +16,7 @@
 package org.openinfinity.cloud.service.configurationtemplate;
 
 import org.apache.log4j.Logger;
+import org.openinfinity.cloud.domain.configurationtemplate.ConfigurationElement;
 import org.openinfinity.cloud.domain.configurationtemplate.ConfigurationElementDependency;
 import org.openinfinity.cloud.domain.repository.configurationtemplate.ConfigurationElementDependencyRepository;
 import org.openinfinity.core.annotation.Log;
@@ -44,12 +45,6 @@ public class ConfigurationElementDependencyServiceImpl implements ConfigurationE
 	@Log
     public List<ConfigurationElementDependency> getAll() {
         return configurationElementDependencyRepository.getAll();
-    }
-
-
-    @Override
-    public Collection<ConfigurationElementDependency> loadDependeesForElement(int id) {
-        return configurationElementDependencyRepository.loadDependeesForElement(id);
     }
 
     @Override

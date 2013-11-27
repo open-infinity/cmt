@@ -24,7 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -38,8 +37,6 @@ public class ConfigurationElementDependencyRepositoryJdbcImpl implements Configu
 
 	private JdbcTemplate jdbcTemplate;
 
-    private static final String LOAD_DEPENDEES_SQL = "select * from configuration_element_dependency_tbl where element_from = ?";
-
     @AuditTrail
     @Transactional
     public List<ConfigurationElementDependency> getAll() {
@@ -47,14 +44,9 @@ public class ConfigurationElementDependencyRepositoryJdbcImpl implements Configu
         return null;
     }
 
-    @Override
-    public Collection<ConfigurationElementDependency> loadDependeesForElement(int id) {
-        return jdbcTemplate.query(LOAD_DEPENDEES_SQL, new Object[] {id}, new DependencyRowMapper());
-    }
-
     private class DependencyRowMapper implements RowMapper<ConfigurationElementDependency> {
         public ConfigurationElementDependency mapRow(ResultSet resultSet, int rowNum) throws SQLException {
-            return new ConfigurationElementDependency(resultSet.getInt("id"), resultSet.getInt("element_from"), resultSet.getInt("element_to"));
+            return new ConfigurationElementDependency(resultSet.getInt("element_from"), resultSet.getInt("element_to"));
         }
     }
 

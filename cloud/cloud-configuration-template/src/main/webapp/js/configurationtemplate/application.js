@@ -105,14 +105,14 @@ jQuery(function($){
                 colModel:[
                           {name:'id', index:'id', width:35, align:"center", sortable:true, sorttype:"int"},
                           {name:'type', index:'type', width:35, align:"center",sortable:true},
-                          {name:'name', index:'name', width:67, align:"left",sortable:true},
+                          {name:'name', index:'name', width:75, align:"left",sortable:true}, //70
                           {name:'version', index:'version', width:35, align:"center", sortable:true},
                           {name:'description', index:'description', width:200, align:"left", sortable:true},
-                          {name:'minMachines', index:'minMachines', width:50, align:"center", sortable:true},
-                          {name:'maxMachines', index:'maxMachines', width:50, align:"center", sortable:true},
+                          {name:'minMachines', index:'minMachines', width:60, align:"center", sortable:true},
+                          {name:'maxMachines', index:'maxMachines', width:60, align:"center", sortable:true},
                           {name:'replicated', index:'replicated', width:30, align:"center", sortable:true},
-                          {name:'minReplicationMachines', index:'minReplicationMachines', width:100, align:"center", sortable:true},
-                          {name:'maxReplicationMachines', index:'maxReplicationMachines', width:100, align:"center", sortable:true},
+                          {name:'minReplicationMachines', index:'minReplicationMachines', width:86, align:"center", sortable:true},
+                          {name:'maxReplicationMachines', index:'maxReplicationMachines', width:86, align:"center", sortable:true},
                           ],
                 rowNum: 20,
                 height: "auto",
@@ -166,23 +166,7 @@ jQuery(function($){
         },
 
         createTemplate: function(){
-        /*
-        //"<span class='ui-icon ui-icon-close' role='presentation'>Remove Tab</span>"
-            var tabTemplate = "<li><a href='#{href}'>#{label}</a><span class='ui-icon ui-icon-close' role='presentation'>Remove Tab</span></li>";
-            var tabLabel = "New template";
-            var tabId = "tabs-" + ++app.tabCounter;
-            var li = $(tabTemplate.replace(/#\{href\}/g, "#" + tabId ).replace( /#\{label\}/g, tabLabel ));
-
-            //app.tabsReferenceList.append(li);
-            //app.tabsContainer.append("<div id='" + tabId + "'><p>blah</p></div>");
-            //<li><a href="#tabs-1">Templates</a></li>
-            app.tabsReferenceList.append("<li><a href='#tabs-2'>Templates</a></li>");
-            //app.tabsContainer.append("<div id='" + tabId + "'><p>blah</p></div>");
-            app.tabsContainer.append("<div id='tabs-2'><p>blah</p></div>");
-            app.tabsContainer.tabs("refresh");
-            */
             app.dialog.template.create();
-            //alert("Created new template with id: " + id);
         },
 
         deleteTemplate: function(){
@@ -227,16 +211,6 @@ jQuery(function($){
             }
         },
 
-        deleteTemplate: function(){
-            var id = app.elementsTable.jqGrid('getGridParam','selrow');
-            if (id)	{
-                var ret = app.elementsTable.jqGrid('getRowData',id);
-                app.dialog.element.edit(ret.id);
-            } else {
-                alert("Please select a row for editing");
-            }
-        },
-        /* TODO: generic delete row fucntion           */
         editTableRow: function(argTable, argDialog){
             return (function(){
                 var table = argTable;

@@ -115,6 +115,7 @@
             }
             dlg.self.dialog("option", "title", title);
             dlg.tabs.tabs({active: 1});
+            dlg.self.show();
             dlg.self.dialog("open");
         }
     });
@@ -131,10 +132,12 @@
             "Submit changes": function() {
                 submitTemplate(dlg.mode);
                 cleanUpDialog($(this));
+                $(this).hide();
                 $(this).dialog( "close" );
             },
             Cancel: function() {
                 cleanUpDialog($(this));
+                $(this).hide();
                 $(this).dialog( "close" );
             }
         }

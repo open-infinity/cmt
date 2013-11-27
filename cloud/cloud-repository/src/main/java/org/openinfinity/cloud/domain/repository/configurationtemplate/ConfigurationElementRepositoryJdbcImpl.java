@@ -22,7 +22,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import javax.sql.DataSource;
@@ -49,6 +48,12 @@ public class ConfigurationElementRepositoryJdbcImpl implements ConfigurationElem
             "configuration_element_tbl.id = configuration_template_element_tbl.element_id " +
             "where configuration_template_element_tbl.template_id = ?";
 
+    private static final String GET_DEPENDEES_SQL =
+            "select configuration_element_tbl.* from configuration_element_tbl " +
+            "inner join configuration_element_dependency_tbl on " +
+            "configuration_element_tbl.id = configuration_element_dependency_tbl.element_to " +
+            "where configuration_element_dependency_tbl.element_from = ?";
+
     private JdbcTemplate jdbcTemplate;
 
     @Autowired
@@ -57,38 +62,48 @@ public class ConfigurationElementRepositoryJdbcImpl implements ConfigurationElem
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
     @Override
+    @AuditTrail
     public ConfigurationElement create(ConfigurationElement configurationElement) {
         return null;
     }
 
     @Override
+    @AuditTrail
     public void update(ConfigurationElement configurationElement) {
     }
 
+    @Override
     @AuditTrail
-    @Transactional
     public Collection<ConfigurationElement> loadAll() {
         return jdbcTemplate.query(GET_ALL_SQL, new ConfigurationElementRowMapper());
     }
 
+    @Override
     @AuditTrail
-    @Transactional
     public Collection<ConfigurationElement> loadAllForTemplate(int templateId) {
         return jdbcTemplate.query(GET_ALL_FOR_TEMPLATE_SQL, new Object[] {templateId}, new ConfigurationElementRowMapper());
     }
 
     @Override
+    @AuditTrail
+    public Collection<ConfigurationElement> loadDependees(int elementId) {
+        return jdbcTemplate.query(GET_DEPENDEES_SQL, new Object[] {elementId}, new ConfigurationElementRowMapper());
+    }
+
+    @Override
+    @AuditTrail
     public ConfigurationElement load(BigInteger id) {
         return null;
     }
 
+    @Override
     @AuditTrail
-    @Transactional
     public ConfigurationElement load(int templateId) {
         return jdbcTemplate.queryForObject(GET_BY_ID_SQL, new Object[] {templateId}, new ConfigurationElementRowMapper());
     }
 
     @Override
+    @AuditTrail
     public void delete(ConfigurationElement configurationElement) {
     }
 

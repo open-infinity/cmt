@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.List;
 
 @Component
 public class OrganizationContainer {
@@ -25,6 +26,11 @@ public class OrganizationContainer {
         this.available = createfromOrganizations(available);
         this.selected = createfromOrganizations(selected);
         return this;
+    }
+
+    public OrganizationContainer(List<Organization> available, List<Organization> selected){
+        this.available = createfromOrganizations(available);
+        this.selected = createfromOrganizations(selected);
     }
 
     private Collection<OrganizationInfo> createfromOrganizations(Collection<Organization> organizations){

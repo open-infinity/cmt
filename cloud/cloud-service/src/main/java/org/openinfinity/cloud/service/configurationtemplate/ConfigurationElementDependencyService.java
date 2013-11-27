@@ -18,7 +18,6 @@ package org.openinfinity.cloud.service.configurationtemplate;
 import org.openinfinity.cloud.domain.configurationtemplate.ConfigurationElementDependency;
 import org.openinfinity.cloud.service.common.AbstractCrudServiceInterface;
 
-import java.util.Collection;
 import java.util.List;
 
 
@@ -33,6 +32,4 @@ public interface ConfigurationElementDependencyService extends AbstractCrudServi
 	
     List<ConfigurationElementDependency> getAll();
 
-    Collection<ConfigurationElementDependency> loadDependeesForElement(int id);
-	
 }

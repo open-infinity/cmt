@@ -332,6 +332,13 @@ CREATE TABLE `configuration_template_element_tbl` (
   CONSTRAINT fk_configuration_element FOREIGN KEY (element_id) REFERENCES configuration_element_tbl(id)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `configuration_element_dependency_tbl`;
+
+CREATE TABLE `configuration_element_dependency_tbl` (
+  `element_from` int(11) NOT NULL,
+  `element_to` int(11) NOT NULL,
+  CONSTRAINT fk_configuration_element_dependency FOREIGN KEY (element_from) REFERENCES configuration_element_tbl(id)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `configuration_template_tbl`;
 

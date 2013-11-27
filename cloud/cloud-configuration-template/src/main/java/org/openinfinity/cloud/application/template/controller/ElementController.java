@@ -17,6 +17,7 @@
 package org.openinfinity.cloud.application.template.controller;
 
 import com.liferay.portal.model.User;
+import org.apache.log4j.Logger;
 import org.openinfinity.cloud.comon.web.LiferayService;
 import org.openinfinity.cloud.domain.configurationtemplate.ConfigurationElement;
 import org.openinfinity.cloud.service.configurationtemplate.ConfigurationElementDependencyService;
@@ -54,12 +55,13 @@ import java.util.Map;
 @RequestMapping("VIEW")
 public class ElementController {
 
-	private static final String GET_ELEMENTS = "getElements";
+    private static final String GET_ELEMENTS = "getElements";
 	private static final String GET_ELEMENT = "getElement";
 	private static final String GET_DEPENDENCIES = "getDependencies";
 
+    private static final Logger LOG = Logger.getLogger(ElementController.class.getName());
 
-	@Autowired
+    @Autowired
 	private ConfigurationElementService elementService;
 
     @Autowired
@@ -121,13 +123,15 @@ public class ElementController {
         }
     }
 
+    // TODO: testme!
     @ResourceMapping(GET_DEPENDENCIES)
     public void getDependencies(ResourceRequest request, ResourceResponse response, @RequestParam("elementId") int elementId) throws Exception {
         try {
             User user = liferayService.getUser(request, response);
             if (user == null) return;
-             // TODO: make a template class for wrapping.
-            //SerializerUtil.jsonSerialize(response.getWriter(), new ConfigurationElementContainer(dependencyService.loadAll(), dependencyService.loadDependeesForElement(elementId)));
+            Collection<ConfigurationElement> availableItems = elementService.loadAll();
+            Collection<ConfigurationElement> selectedItems = elementService.loadDependees(elementId);
+            SerializerUtil.jsonSerialize(response.getWriter(), new ConfigurationElementContainer(availableItems, selectedItems));
         } catch (Exception e) {
             ExceptionUtil.throwSystemException(e);
         }
