@@ -2,9 +2,40 @@ hibernate.cache.provider_class=com.liferay.portal.dao.orm.hibernate.EhCacheProvi
 net.sf.ehcache.configurationResourceName=/ehcache/hibernate-clustered.xml
 ehcache.multi.vm.config.location=/ehcache/liferay-multi-vm-clustered.xml
 
-lucene.store.type=jdbc
-lucene.store.jdbc.auto.clean.up.enabled=true
-lucene.store.jdbc.auto.clean.up.interval=1440
+
+cluster.link.enabled=true
+lucene.replicate.write=true
+
+multicast.group.address["cluster-link-control"]=<%= multicastaddress %>
+multicast.group.port["cluster-link-control"]=54221
+#
+# See the properties "cluster.link.channel.properties.transport.0" and
+# "cluster.link.channel.system.properties".
+#
+multicast.group.address["cluster-link-udp"]=<%= multicastaddress %>
+multicast.group.port["cluster-link-udp"]=54222
+#
+# See the property "cluster.link.channel.system.properties".
+#
+multicast.group.address["cluster-link-mping"]=<%= multicastaddress %>
+multicast.group.port["cluster-link-mping"]=54223
+#
+# See the properties "net.sf.ehcache.configurationResourceName" and
+# "net.sf.ehcache.configurationResourceName.peerProviderProperties".
+#
+multicast.group.address["hibernate"]=<%= multicastaddress %>
+multicast.group.port["hibernate"]=54224
+#
+# See the properties "ehcache.multi.vm.config.location" and
+# "ehcache.multi.vm.config.location.peerProviderProperties".
+#
+multicast.group.address["multi-vm"]=<%= multicastaddress %>
+multicast.group.port["multi-vm"]=54225
+
+
+#lucene.store.type=jdbc
+#lucene.store.jdbc.auto.clean.up.enabled=true
+#lucene.store.jdbc.auto.clean.up.interval=1440
 
 
 #default.regular.theme.id=tap

@@ -1,4 +1,5 @@
 class oi3-basic::config {
+	require oi3-ebs
         file {"/etc/logrotate.d/oi-tomcat":
 		ensure => present,
 		source => "puppet:///modules/oi3-basic/oi-tomcat.logrotate",

@@ -39,7 +39,7 @@ class oi3-portal::config {
 		mode => 0644,
 		content => template("oi3-portal/portal-ext.properties.erb"),
 		require => Class["oi3-portal::install"],
-		notify => Service["oi3-tomcat"],
+		notify => Service["oi-tomcat"],
 	}
 
 	file {"/opt/openinfinity/3.0.0/tomcat/conf/catalina.properties":
@@ -65,7 +65,7 @@ class oi3-portal::config {
 		owner => 'oiuser',
 		group => 'oiuser',
 		mode => 0600,
-		source => "puppet:///oi3-modules/oi3-portal/ROOT.xml",
+		source => "puppet:///modules/oi3-portal/ROOT.xml",
 		require => File["/opt/openinfinity/3.0.0/tomcat/conf/Catalina/localhost"],
 	}
 
@@ -90,7 +90,7 @@ class oi3-portal::config {
                 owner => 'oiuser',
                 group => 'oiuser',
                 mode => 0600,
-                source => "puppet:///oi3-modules/oi3-portal/server.xml",
+                source => "puppet:///modules/oi3-portal/server.xml",
                 require => Class["oi3-portal::install"],
         }
 
@@ -99,7 +99,7 @@ class oi3-portal::config {
                 owner => 'oiuser',
                 group => 'oiuser',
                 mode => 0600,
-                source => "puppet:///oi3-modules/oi3-portal/context.xml",
+                source => "puppet:///modules/oi3-portal/context.xml",
                 require => Class["oi3-portal::install"],
         }
 
@@ -117,16 +117,16 @@ class oi3-portal::config {
                 owner => 'oiuser',
                 group => 'oiuser',
                 mode => 0644,
-                source => "puppet:///oi3-modules/oi3-portal/jmxremote.access",
+                source => "puppet:///modules/oi3-portal/jmxremote.access",
                 require => Class["oi3-portal::install"],
         }
 
-        file {"/etc/init.d/oi3-tomcat":
+        file {"/etc/init.d/oi-tomcat":
                 ensure => present,
                 owner => 'root',
                 group => 'root',
                 mode => 0755,
-                source => "puppet:///oi3-modules/oi3-portal/oi3-tomcat",
+                source => "puppet:///modules/oi3-portal/oi-tomcat",
                 require => Class["oi3-portal::install"],
         }
 	
@@ -135,9 +135,13 @@ class oi3-portal::config {
 		owner => 'oiuser',
 		group => 'oiuser',
 		mode => 0644,
-		source => "puppet:///oi3-modules/oi3-portal/portal-setup-wizard.properties",
+		source => "puppet:///modules/oi3-portal/portal-setup-wizard.properties",
 		require => Class["oi3-portal::install"],
 	}
+#  file { "/opt/openinfinity/3.0.0/oi-core-libs/deps/ehcache-core-2.6.6.jar":
+#    ensure  => absent,
+#                require => Class["oi3-portal::install"],
+#  }
 }
 
 class oi3-portal::service {
@@ -156,3 +160,4 @@ class oi3-portal {
 	include oi3-portal::config
 	include oi3-portal::service
 }
+

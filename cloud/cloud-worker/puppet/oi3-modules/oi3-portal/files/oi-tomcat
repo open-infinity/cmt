@@ -17,7 +17,7 @@
 
 CATALINA_HOME=/opt/openinfinity/3.0.0/tomcat; export CATALINA_HOME
 JAVA_HOME=/etc/alternatives/jre/; export JAVA_HOME
-TOMCAT_OWNER=toas; export TOMCAT_OWNER
+TOMCAT_OWNER=oiuser; export TOMCAT_OWNER
 
 # See how we were called.
   case "$1" in
