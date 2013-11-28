@@ -88,7 +88,7 @@ public class ParameterValueRepositoryJdbcImpl implements ParameterValueRepositor
 		    return new ParameterValue(resultSet.getInt("id"),
 		                       resultSet.getInt("parameter_key_id"),
 		                       resultSet.getInt("type"),
-		                       resultSet.getString("value"));
+		                       resultSet.getString("parameter_value"));
 		}
 	}
 

@@ -43,10 +43,7 @@ import org.springframework.web.portlet.ModelAndView;
 import org.springframework.web.portlet.bind.annotation.ResourceMapping;
 
 import javax.portlet.*;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Spring portlet controller for handling templates.
@@ -153,10 +150,20 @@ public class ElementController {
         try {
             User user = liferayService.getUser(request, response);
             if (user == null) return;
+            Map<String, Collection<ParameterValue>> parameters = new LinkedHashMap<String, Collection<ParameterValue>>();
             Collection<ParameterKey> keys = parameterKeyService.loadAll(elementId);
-            Collection<ParameterValue> values = parameterValueService.loadAll();
-            KeyValueContainer kvc = new KeyValueContainer(keys, values);
-            SerializerUtil.jsonSerialize(response.getWriter(), kvc);
+            LOG.debug("---------------------------");
+            LOG.debug("elementId:" + elementId);
+            LOG.debug("keys:" + keys);
+            for (ParameterKey key : keys){
+                Collection<ParameterValue> values = parameterValueService.loadAll(key.getId());
+                LOG.debug("values:" + values);
+                parameters.put(key.getName(), values);
+            }
+
+            LOG.debug("parameters:" + parameters);
+
+            SerializerUtil.jsonSerialize(response.getWriter(), parameters);
         } catch (Exception e) {
             ExceptionUtil.throwSystemException(e);
         }

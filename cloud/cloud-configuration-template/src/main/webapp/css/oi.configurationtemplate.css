@@ -28,10 +28,13 @@
 #dlg-element-value-id{padding-top:5px;}
 .dlg-element-dependee-name{float:left;width:125px;}
 #dlg-dependency-selection-container{height:300px;}
-.dlg-item-list-container ul{list-style-type:none;margin:0;padding:0;margin-bottom:10px;}
+.dlg-item-list-container ul{float:left;list-style-type:none;margin:0;padding:0;margin-bottom:10px;}
 .dlg-item-list-container li{margin:0px 0px 3px 10px;padding:2px;width:160px;}
 #dlg-element-general-tab{height:380px;}
-.dlg-element-parameter-value-type{float:left;width:125px;}
+.dlg-element-parameter-key-name{width:123px;}
+.dlg-element-parameter-value-type{float:left;width:70px;}
+.dlg-element-parameter-value-value{display: inline-block;padding-left: 15px; width:70px;}
+input[type="text"].dlg-key-name, input[type="text"].dlg-value-type, input[type="text"].dlg-value-value{width:100%; padding:2px}
 
 /* Helper dialog for showing item information */
 #dlg-item-table th{border:1px solid #C4C4C4;padding:5px;text-align:center}
