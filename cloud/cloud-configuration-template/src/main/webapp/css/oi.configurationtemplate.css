@@ -37,7 +37,7 @@
 #dlg-list-keys-container{width:200px}
 #dlg-list-keys-container li{width:152px}
 .dlg-element-parameter-key-name{width:110px;float:left}
-.dlg-element-list-item-button{width:20px;margin-left:20px;display:inline-block;border-style:solid;border-width:1px;border-color:#c4c4c4;text-align:center;border-radius:15px;background-color:#EEEEEE;font-weight:bold;}
+.dlg-element-list-item-button{width:18px;margin-left:20px;display:inline-block;border-style:solid;border-width:1px;border-color:#c4c4c4;text-align:center;border-radius:15px;background-color:#EEEEEE;font-weight:bold;}
 .dlg-key-value-space-filler{width:20px;border-width:0px}
 
 #dlg-list-values-container{width:325px;margin-left:25px;}
