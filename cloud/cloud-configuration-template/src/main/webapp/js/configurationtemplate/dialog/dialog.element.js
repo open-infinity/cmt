@@ -5,6 +5,9 @@
 
     dlg.mode =  null;
 
+    dlg.state = {};
+    dlg.state.selectedKey = null;
+
     dlg.data = {};
     dlg.data.parameters = {};
     dlg.data.element = {};
@@ -19,6 +22,15 @@
     dlg.data.element.minReplicationMachines = $("#dlg-element-value-min-repl-machines");
     dlg.data.element.maxReplicationMachines = $("#dlg-element-value-max-repl-machines");
 
+    dlg.txt = {};
+    dlg.txt.addNewKey = "Add new key";
+    dlg.txt.addNewValue = "Add new value";
+    dlg.txt.addNewType = "Add new type";
+    dlg.txt.alertNewKey = "New key name must not be empty";
+    dlg.txt.alertNewValue = "New value name must not be empty";
+    dlg.txt.alertNewType = "New type name must not be empty";
+    dlg.txt.alertKeyAlreadyExists = "Key name already exists";
+
     dlg.html = {};
     dlg.html.idContainer = $($(".dlg-element-container", "#dlg-element-general-tab").first());
     dlg.html.self = $("#dlg-element");
@@ -30,9 +42,8 @@
 
     dlg.html.template = {};
     dlg.html.template.dependee = "<li class='ui-state-default'><div class='dlg-element-dependee-name'></div><div class='dlg-element-dependee-version'></div></li>";
-    dlg.html.template.key = "<li class='ui-state-default key'><div class='dlg-element-parameter-key-name'><input class='dlg-key-name' type='text'/></div><div class='dlg-element-parameter-delete'>-</div></li>";
-    dlg.html.template.value = "<li class='ui-state-default'><div><div class='dlg-element-parameter-value-type'><input class='dlg-value-type' type='text'/></div><div class='dlg-element-parameter-value-value'><input class='dlg-value-value' type='text'/></div></div><div class='dlg-element-parameter-delete'>-</div></li>";
-    dlg.html.template.newItem = "<li class='ui-state-default new-item'></li>";
+    dlg.html.template.key = "<li class='ui-state-default key dlg-element-key-value-list-item'><div class='dlg-element-parameter-key-name'><input class='dlg-key-name' type='text'/></div><div class='dlg-element-list-item-button dlg-element-list-item-delete-button'>-</div></li>";
+    dlg.html.template.value = "<li class='ui-state-default dlg-element-key-value-list-item'><div><div class='dlg-element-parameter-value-type'><input class='dlg-value-type' type='text'/></div><div class='dlg-element-parameter-value-value'><input class='dlg-value-value' type='text'/></div></div><div class='dlg-element-list-item-button dlg-element-list-item-delete-button'>-</div></li>";
 
     $.extend(dlg, {
 
@@ -116,7 +127,7 @@
             "Submit changes": function() {
                 submitElement(dlg.mode);
                 cleanUpDialog($(this));
-                $(this).hide();
+                $(this).hidealertNewKey();
                 $(this).dialog( "close" );
             },
             Cancel: function() {
@@ -131,11 +142,16 @@
 
     function configureEventHandling(){
         configureDragAndDrop();
-        bindKeySelectHandler();
+        bindDependencyListItemClicks();
+        bindKeyListItemClicks();
+        bindNewItemInputClicks();
+        bindDeleteButtonsClick();
+        bindNewKeyButtonClick();
+        bindNewValueButtonClick();
     }
 
     function configureDragAndDrop(){
-        $(".dlg-list-panel-container").droppable({
+        $(".dlg-list-panel-container", "#dlg-dependency-selection-container").droppable({
             activeClass: "ui-state-highlight",
             drop: function (event, ui) {
                 var list = $(this).find("ul");
@@ -149,7 +165,7 @@
             },
             tolerance: "touch"
         });
-        $("li", ".dlg-item-list-container").draggable({
+        $("li", "#dlg-dependency-selection-container").draggable({
             revert: "invalid",
             containment: "document",
             helper: "clone",
@@ -163,48 +179,176 @@
                 }
             }
         });
-        $("li", ".dlg-item-list-container").
-        click(function(){
-            $(this).toggleClass("ui-state-highlight");
-        });
-
-        // disable d&d for key-value tab
-        $("#dlg-element-keys-tab").find(".dlg-list-panel-container").droppable("destroy");
-        $("#dlg-element-keys-tab").find(".dlg-item-list-container").draggable("destroy");
     }
 
-    function bindKeySelectHandler(){
-       $("key", "#dlg-keys").bind( "click", function(){
+    function bindDependencyListItemClicks(){
+         $("li", "#dlg-dependency-selection-container").
+            click(function(){
+                $(this).toggleClass("ui-state-highlight");
+         });
+    }
 
-            // deselect previously selected key
-            $(".ui-state-highlight", "#dlg-keys").toggleClass("ui-state-highlight");
+    function bindKeyListItemClicks(){
+        $("input", ".key", "#dlg-keys").bind( "click",  function(){
+            setKeySelected($(this).val());
+        });
+    }
+
+    function bindNewItemInputClicks(){
+        $(".dlg-element-new-key-button").parent().find("input").bind( "click", function(){
+            var val =  $(this).val();
+            if (val == "" || val == dlg.txt.addNewKey){
+                $(this).val("").css("color", "black");
+            }
+        });
+
+        $(".dlg-element-new-value-button").parent().find("input").bind( "click", function(){
+            var val =  $(this).val();
+            if (val == "" || val == dlg.txt.addNewType || val == dlg.txt.addNewValue){
+                $(this).val("").css("color", "black");
+            }
+        });
+    }
+
+    function bindDeleteButtonsClick(){
+        $(".dlg-element-list-item-delete-button").bind( "click", function(){
+            var button =  $(this);
+
+            // in case that currently selected key was deleted, select other key
+            var input = button.parent().find("input");
+            if (input.hasClass("dlg-key-name")){
+                var key = input.val();
+                if (dlg.state.selectedKey == key){
+                    var list = input.parents("ul");
+                    $(this).parent().remove();
+                    var newlySelectedInput = list.find("input").first();
+                    newlySelectedInput.focus();
+                    setKeySelected(newlySelectedInput.val());
+                }
+            }
+        });
+    }
+
+    function bindNewKeyButtonClick(){
+        $(".dlg-element-new-key-button").bind( "click", function(){
+            var keyInput = $(this).parent("li").find("input");
+            var key = keyInput.val();
+            if (key == "" || key == dlg.txt.addNewKey){
+                alertWrongInput(keyInput, dlg.txt.alertNewKey);
+                return;
+            }
+
+            // store locally the new key
+            var exists = false;
+            $.each(dlg.data.parameters, function(parameterKey, parameterValues){
+                if (parameterKey == key){
+                    alertWrongInput(keyInput, dlg.txt.alertKeyAlreadyExists);
+                    exists = true;
+                    return;
+                }
+                else{
+                    dlg.data.parameters[key] = [];
+                }
+            });
+
+            if (exists == true) return;
+
+            // create and remove items
+            $(this).parent("li").remove();
+            dlg.html.parameterValuesList.empty();
+            storeKeyToDom(dlg.html.template.key, key, dlg.html.parameterKeysList);
+            storeKeyToDom(dlg.html.template.key, null, dlg.html.parameterKeysList);
+            storeValueToDom(dlg.html.template.value, null, dlg.html.parameterValuesList);
+
+            // re-bind events
+            unbindKeyHandlers();
+            bindKeyListItemClicks();
+            bindNewItemInputClicks();
+            bindDeleteButtonsClick();
+            bindNewKeyButtonClick();
+        });
+    }
+
+    function bindNewValueButtonClick(){
+        $(".dlg-element-new-value-button", "#dlg-values").bind( "click", function(){
+            var valueInput = $(this).parent("li").find("input.dlg-value-value");
+            var paramVal = valueInput.val();
+                if (paramVal == "" || paramVal == dlg.txt.addNewValue){
+                    alertWrongInput(valueInput, dlg.txt.alertNewValue);
+                    return;
+                }
+            var typeInput = $(this).parent("li").find("input.dlg-value-type");
+            var paramType = typeInput.val();
+                if (paramType == "" || paramType == dlg.txt.addNewType){
+                    alertWrongInput(typeInput, dlg.txt.addNewType);
+                    return;
+                }
+            var value = {
+                type : paramType,
+                value : paramVal
+            }
+
+            // locally store new value and assign it to key
+            if (dlg.state.selectedKey == null){
+                alert("Internal error");
+                return;
+            }
+            else{
+                var values = dlg.data.parameters[dlg.state.selectedKey];
+                values.push(value);
+            }
+
+            // create and remove items
+            $(this).parent("li").remove();
+            storeValueToDom(dlg.html.template.value, value, dlg.html.parameterValuesList);
+            storeValueToDom(dlg.html.template.value, null, dlg.html.parameterValuesList);
+
+            // re-bind events
+            unbindValueHandlers();
+            bindNewItemInputClicks();
+            bindDeleteButtonsClick();
+            bindNewValueButtonClick();
+        });
+    }
+
+    function unbindKeyHandlers(){
+        $("input", ".key", "#dlg-keys").unbind();
+        $(".dlg-element-new-key-button").parent().find("input").unbind();
+        $(".dlg-element-new-value-button").parent().find("input").unbind();
+        $(".dlg-element-list-item-delete-button").unbind();
+        $(".dlg-element-new-key-button").unbind();
+    }
+
+    function unbindValueHandlers(){
+        $(".dlg-element-new-key-button").parent().find("input").unbind();
+        $(".dlg-element-new-value-button").parent().find("input").unbind();
+        $(".dlg-element-list-item-delete-button").unbind();
+        $(".dlg-element-new-value-button", "#dlg-values").unbind();
+    }
+
+    function handleKeySelected(){
+        setKeySelected($(this).val());
+    }
+
+    function setKeySelected(key){
 
             // clear values for previously selected key
             dlg.html.parameterValuesList.empty();
 
-            // get key name
-            var name = $(this).find("input").val();
-            var values;
             // find values for key and put them to dom
             $.each(dlg.data.parameters, function(parameterKey, parameterValues){
-                if (parameterKey == name){
+                if (parameterKey == key){
                     $.each(parameterValues, function(index, value){
-                        storeValuesToDom(dlg.html.template.value, value, dlg.html.parameterValuesList);
+                        storeValueToDom(dlg.html.template.value, value, dlg.html.parameterValuesList);
                     });
-                    storeNewItemToDom(dlg.html.template.newItem, "Add new value", dlg.html.parameterValuesList);
+                    storeValueToDom(dlg.html.template.value, null, dlg.html.parameterValuesList);
                 }
             });
-        });
 
-        $(".new-item", "#dlg-keys").bind( "click", function(){
-            alert("adding new key");
-        });
+            // store locally currently selected key
+            dlg.state.selectedKey = key;
+        }
 
-        $(".new-item", "#dlg-values").bind( "click", function(){
-                    alert("adding new value");
-        });
-
-    }
 
     function populateDependencies(data){
         try{
@@ -231,19 +375,27 @@
             var count = 0;
             $.each(data, function(parameterKey, parameterValues){
                 var htmlKey = storeKeyToDom(dlg.html.template.key, parameterKey, dlg.html.parameterKeysList);
+
                 // Show values only for key #1, which will be selected by default.
                 if (count++ == 0){
-                    htmlKey.toggleClass("ui-state-highlight");
-                    //dlg.data.parameter.key = parameterKey;
-                    //dlg.data.parameter.values = parameterValues;
-                    $.each(parameterValues, function(index, value){
-                        storeValuesToDom(dlg.html.template.value, value, dlg.html.parameterValuesList);
-                    });
-                    storeNewItemToDom(dlg.html.template.newItem, "Add new value", dlg.html.parameterValuesList);
 
+                    // find key in list and focus on it
+                    var inputs = dlg.html.parameterKeysList.find("input");
+                    $.each(inputs, function(index, input){
+                        if (input.val == parameterKey) {
+                            input.focus();
+                        }
+                    });
+
+                    // display values for key
+                    dlg.state.selectedKey = parameterKey;
+                    $.each(parameterValues, function(index, value){
+                        storeValueToDom(dlg.html.template.value, value, dlg.html.parameterValuesList);
+                    });
+                    storeValueToDom(dlg.html.template.value, null, dlg.html.parameterValuesList);
                 }
             });
-            storeNewItemToDom(dlg.html.template.newItem, "Add new key", dlg.html.parameterKeysList)
+            storeKeyToDom(dlg.html.template.key, null, dlg.html.parameterKeysList);
         }
         catch(err){
             console.log(err.message);
@@ -261,17 +413,34 @@
     function storeKeyToDom(htmlTemplate, value, list){
             list.append(htmlTemplate);
             var lastChild = list.find("li:last-child");
-            lastChild.find(".dlg-key-name").val(value);
-            lastChild.data("config", value);
+            if (value != null){
+                lastChild.find(".dlg-key-name").val(value);
+                lastChild.data("config", value);
+            }
+            else {
+                lastChild.find(".dlg-key-name").val(dlg.txt.addNewKey).css("color", "silver");
+                lastChild.find(".dlg-element-list-item-button").text("+").addClass("dlg-element-new-key-button").removeClass("dlg-element-list-item-delete-button").removeClass("key");
+            }
+            lastChild.toggleClass("ui-state-highlight");
             return lastChild;
     }
 
-    function storeValuesToDom(htmlTemplate, value, list){
+    function storeValueToDom(htmlTemplate, value, list){
             list.append(htmlTemplate);
             var lastChild = list.find("li:last-child");
-            lastChild.find(".dlg-value-type").val(value.type);
-            lastChild.find(".dlg-value-value").val(value.value);
-            lastChild.data("config", value);
+            if (value != null){
+                lastChild.find(".dlg-value-type").val(value.type);
+                lastChild.find(".dlg-value-value").val(value.value);
+                lastChild.data("config", value);
+
+            }
+            else{
+                // create a new value item
+                lastChild.find(".dlg-value-type").val(dlg.txt.addNewType).css("color", "silver");
+                lastChild.find(".dlg-value-value").val(dlg.txt.addNewValue).css("color", "silver");
+                lastChild.find(".dlg-element-list-item-button").text("+").addClass("dlg-element-new-value-button").removeClass("dlg-element-list-item-delete-button");
+            }
+            lastChild.toggleClass("ui-state-highlight");
     }
 
     function storeNewItemToDom(htmlTemplate, value, list){
@@ -378,6 +547,11 @@
 
     function alertPostFailure(mode, textStatus, errorThrown){
         alert("Server error at template" + mode + ", text status:" + textStatus + " " + "errorThrown:" + errorThrown);
+    }
+
+    function alertWrongInput(item, msg){
+        alert(msg);
+        item.css("border-color", "red");
     }
 
 })(jQuery);

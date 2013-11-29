@@ -254,7 +254,7 @@
         <div id="dlg-element-keys-tab">
             <div id="dlg-keys-values-container" class ="dlg-tab-items-container">
                 <div class="dlg-list-panel-container dlg-tab-item">
-                    <div class="dlg-list-panel-container-title">Keys</div>
+                    <div id="dlg-list-keys-container" class="dlg-list-panel-container-title">Keys</div>
                     <div class="dlg-list-panel-container-columns">
                         <div class="list-item-column">Name</div>
                     </div>
@@ -262,8 +262,7 @@
                         <ul></ul>
                     </div>
                 </div>
-                <div class="dlg-arrows-img dlg-tab-item"></div>
-                <div class="dlg-list-panel-container dlg-tab-item">
+                <div id="dlg-list-values-container" class="dlg-list-panel-container dlg-tab-item">
                     <div class="dlg-list-panel-container-title">Values</div>
                     <div class="dlg-list-panel-container-columns">
                         <div class="list-item-column">Type</div>
