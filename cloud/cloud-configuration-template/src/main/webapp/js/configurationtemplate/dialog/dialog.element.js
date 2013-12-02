@@ -45,8 +45,17 @@
     dlg.html.template = {};
     dlg.html.template.dependee = "<li class='ui-state-default'><div class='dlg-element-dependee-name'></div><div class='dlg-element-dependee-version'></div></li>";
     dlg.html.template.key = "<li class='ui-state-default key dlg-element-key-value-list-item'><div class='dlg-element-parameter-key-name'><input class='dlg-key-name' type='text'/></div><div class='dlg-element-list-item-button dlg-element-list-item-delete-button'>-</div></li>";
-    //dlg.html.template.keyFocused = "<li class='ui-state-default key dlg-element-key-value-list-item'><div class='dlg-element-parameter-key-name'><input class='focus dlg-key-name' type='text'/></div><div class='dlg-element-list-item-button dlg-element-list-item-delete-button'>-</div></li>";
-    dlg.html.template.value = "<li class='ui-state-default dlg-element-key-value-list-item'><div><div class='dlg-element-parameter-value-type'><input class='dlg-value-type' type='text'/></div><div class='dlg-element-parameter-value-value'><input class='dlg-value-value' type='text'/></div></div><div class='dlg-element-list-item-button dlg-element-list-item-delete-button'>-</div></li>";
+    dlg.html.template.value = "<li class='ui-state-default dlg-element-key-value-list-item'>\
+                                   <div>\
+                                       <div class='dlg-element-parameter-value-type'>\
+                                           <input class='dlg-value-type' type='text'/>\
+                                       </div>\
+                                       <div class='dlg-element-parameter-value-value'>\
+                                           <input class='dlg-value-value' type='text'/>\
+                                       </div>\
+                                   </div>\
+                                   <div class='dlg-element-list-item-button dlg-element-list-item-delete-button'>-</div>\
+                               </li>";
 
     $.extend(dlg, {
 
@@ -95,7 +104,6 @@
                 });
 
             dlg.open("edit");
-            //$(dlg.html.parameterKeysList.find("input").first()).focus();
         },
 
         open : function(mode){
@@ -149,9 +157,8 @@
         bindDependencyListItemClicks();
         bindKeyListItemClicks();
         bindNewItemInputClicks();
-        bindDeleteButtonsClick();
+        bindDeleteKeysButtonsClick($(".dlg-element-list-item-delete-button", "#dlg-keys"));
         bindNewKeyButtonClick();
-        bindNewValueButtonClick();
     }
 
     function configureDragAndDrop(){
@@ -194,33 +201,32 @@
 
     function bindKeyListItemClicks(){
         $("input", ".key", "#dlg-keys").bind( "click",  function(){
-            //clearInterval(timer);
             setKeySelected($(this).val());
         });
     }
 
     function bindNewItemInputClicks(){
-        $(".dlg-element-new-key-button").parent().find("input").bind( "click", function(){
-            var val =  $(this).val();
-            if (val == "" || val == dlg.txt.addNewKey){
-                $(this).val("").css("color", "black");
-            }
-        });
+        bindInputClicks($(".dlg-element-new-key-button").parent().find("input"));
+        bindInputClicks($(".dlg-element-new-value-button").parent().find("input"));
+    }
 
-        $(".dlg-element-new-value-button").parent().find("input").bind( "click", function(){
+    function bindInputClicks(items){
+        items.bind( "click", function(){
             var val =  $(this).val();
-            if (val == "" || val == dlg.txt.addNewType || val == dlg.txt.addNewValue){
+            if (val == "" || val == dlg.txt.addNewKey || val == dlg.txt.addNewValue || val == dlg.txt.addNewType){
                 $(this).val("").css("color", "black");
             }
         });
     }
 
-    function bindDeleteButtonsClick(){
-        $(".dlg-element-list-item-delete-button").bind( "click", function(){
-            var button =  $(this);
+    function bindDeleteButtonsClick(items){
+        bindDeleteKeysButtonsClick(items);
+        bindDeleteValuesButtonsClick(items);
+    }
 
-            // delete for keys
-            var input = button.parent().find("input");
+    function bindDeleteKeysButtonsClick(items){
+        items.bind( "click", function(){
+            var input = $(this).parent().find("input");
             if (input.hasClass("dlg-key-name")){
                 var list = input.parents("ul");
                 $(this).parent().remove();
@@ -228,12 +234,21 @@
                 newlySelectedInput.focus();
                 setKeySelected(newlySelectedInput.val());
             }
-            // delete for values
-            else{
-                $(this).parent().remove();
-            }
         });
     }
+
+    function bindDeleteValuesButtonsClick(items){
+            items.bind( "click", function(){
+                var values = dlg.data.parameters[dlg.state.selectedKey];
+                var index = $(this).parents("li").data("index");
+                if (index > -1) {
+                    values.splice(index, 1);
+                    }
+            $(this).parent().remove();
+            });
+        }
+
+
 
     function bindNewKeyButtonClick(){
         $(".dlg-element-new-key-button").bind( "click", function(){
@@ -243,6 +258,8 @@
                 alertWrongInput(keyInput, dlg.txt.alertNewKey);
                 return;
             }
+
+            dlg.state.selectedKey = key;
 
             // store locally the new key
             var exists = false;
@@ -260,23 +277,23 @@
             if (exists == true) return;
 
             // create and remove items
-            $(this).parent("li").remove();
+            $(this).parent().remove();
             dlg.html.parameterValuesList.empty();
-            storeKeyToDom(dlg.html.template.key, key, dlg.html.parameterKeysList);
+            storeKeyToDom(dlg.html.template.key, key, dlg.html.parameterKeysList).find("input").focus();
             storeKeyToDom(dlg.html.template.key, null, dlg.html.parameterKeysList);
-            storeValueToDom(dlg.html.template.value, null, dlg.html.parameterValuesList);
+            storeValueToDom(dlg.html.template.value, null, dlg.html.parameterValuesList, null);
 
             // re-bind events
             unbindKeyHandlers();
             bindKeyListItemClicks();
             bindNewItemInputClicks();
-            bindDeleteButtonsClick();
+            bindDeleteButtonsClick($(".dlg-element-list-item-delete-button"));
             bindNewKeyButtonClick();
         });
     }
 
-    function bindNewValueButtonClick(){
-        $(".dlg-element-new-value-button", "#dlg-values").bind( "click", function(){
+    function bindNewValueButtonClick(items){
+        items.bind( "click", function(){
             var valueInput = $(this).parent("li").find("input.dlg-value-value");
             var paramVal = valueInput.val();
                 if (paramVal == "" || paramVal == dlg.txt.addNewValue){
@@ -306,14 +323,14 @@
 
             // create and remove items
             $(this).parent("li").remove();
-            storeValueToDom(dlg.html.template.value, value, dlg.html.parameterValuesList);
-            storeValueToDom(dlg.html.template.value, null, dlg.html.parameterValuesList);
+            storeValueToDom(dlg.html.template.value, value, dlg.html.parameterValuesList, dlg.data.parameters[dlg.state.selectedKey].length -1);
+            storeValueToDom(dlg.html.template.value, null, dlg.html.parameterValuesList, null);
 
             // re-bind events
-            unbindValueHandlers();
-            bindNewItemInputClicks();
-            bindDeleteButtonsClick();
-            bindNewValueButtonClick();
+            //unbindValueHandlers();
+            //bindNewItemInputClicks();
+            //bindDeleteButtonsClick($(".dlg-element-list-item-delete-button"));
+            //bindNewValueButtonClick($(".dlg-element-new-value-button", "#dlg-values"));
         });
     }
 
@@ -341,9 +358,9 @@
             $.each(dlg.data.parameters, function(parameterKey, parameterValues){
                 if (parameterKey == key){
                     $.each(parameterValues, function(index, value){
-                        storeValueToDom(dlg.html.template.value, value, dlg.html.parameterValuesList);
+                        storeValueToDom(dlg.html.template.value, value, dlg.html.parameterValuesList, index);
                     });
-                    storeValueToDom(dlg.html.template.value, null, dlg.html.parameterValuesList);
+                    storeValueToDom(dlg.html.template.value, null, dlg.html.parameterValuesList, null);
                 }
             });
 
@@ -382,7 +399,6 @@
                     var htmlKey = storeKeyToDom(dlg.html.template.key, parameterKey, dlg.html.parameterKeysList);
 
                     // find key in list and focus on it
-                    //setTimeout(function(){htmlKey.find("input").focus()},2000);
                     timer = setInterval(function(){
                         var input = htmlKey.find("input");
                         input.focus();
@@ -394,9 +410,9 @@
                     // display values for key
                     dlg.state.selectedKey = parameterKey;
                     $.each(parameterValues, function(index, value){
-                        storeValueToDom(dlg.html.template.value, value, dlg.html.parameterValuesList);
+                        storeValueToDom(dlg.html.template.value, value, dlg.html.parameterValuesList, index);
                     });
-                    storeValueToDom(dlg.html.template.value, null, dlg.html.parameterValuesList);
+                    storeValueToDom(dlg.html.template.value, null, dlg.html.parameterValuesList, null);
                 }
                 else{
                     storeKeyToDom(dlg.html.template.key, parameterKey, dlg.html.parameterKeysList);
@@ -431,22 +447,31 @@
             return lastChild;
     }
 
-    function storeValueToDom(htmlTemplate, value, list){
+    function storeValueToDom(htmlTemplate, value, list, index){
             list.append(htmlTemplate);
             var lastChild = list.find("li:last-child");
-            if (value != null){
+            if (value != null && index!= null){
                 lastChild.find(".dlg-value-type").val(value.type);
                 lastChild.find(".dlg-value-value").val(value.value);
                 lastChild.data("config", value);
 
+                bindDeleteValuesButtonsClick(lastChild.find(".dlg-element-list-item-delete-button"));
+
+                lastChild.data("index", index);
             }
             else{
                 // create a new value item
                 lastChild.find(".dlg-value-type").val(dlg.txt.addNewType).css("color", "silver");
                 lastChild.find(".dlg-value-value").val(dlg.txt.addNewValue).css("color", "silver");
-                lastChild.find(".dlg-element-list-item-button").text("+").addClass("dlg-element-new-value-button").removeClass("dlg-element-list-item-delete-button");
+                var addButton = lastChild.find(".dlg-element-list-item-button");
+                addButton.text("+").addClass("dlg-element-new-value-button").removeClass("dlg-element-list-item-delete-button");
+
+                // bind events for new value item
+                bindInputClicks(lastChild.find("input"));
+                bindNewValueButtonClick(addButton);
+
+                lastChild.data("index", -1);
             }
-            lastChild.toggleClass("ui-state-highlight");
     }
 
     function storeNewItemToDom(htmlTemplate, value, list){
