@@ -114,7 +114,6 @@ public class ConfigurationElementRepositoryJdbcImpl implements ConfigurationElem
 		                       resultSet.getString("name"),
 		                       resultSet.getString("version"),
 		                       resultSet.getString("description"),
-		                       resultSet.getInt("parameterKey"),
 		                       resultSet.getInt("minMachines"),
 		                       resultSet.getInt("maxMachines"),
                                resultSet.getBoolean("replicated"),

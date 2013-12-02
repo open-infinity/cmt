@@ -16,9 +16,11 @@
 package org.openinfinity.cloud.service.configurationtemplate;
 
 import org.openinfinity.cloud.domain.configurationtemplate.ConfigurationElement;
+import org.openinfinity.cloud.domain.configurationtemplate.ParameterValue;
 import org.openinfinity.cloud.service.common.AbstractCrudServiceInterface;
 
 import java.util.Collection;
+import java.util.Map;
 
 
 /**
@@ -35,5 +37,7 @@ public interface ConfigurationElementService extends AbstractCrudServiceInterfac
     Collection<ConfigurationElement> loadAllForTemplate(int templateId);
 
     Collection<ConfigurationElement> loadDependees(int elementId);
+
+    void update(ConfigurationElement element, Collection<Integer> dependencies, Map<String, Collection<ParameterValue>> keyValues);
 
 }

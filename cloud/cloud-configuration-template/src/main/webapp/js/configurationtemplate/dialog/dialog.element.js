@@ -139,7 +139,6 @@
             "Submit changes": function() {
                 submitElement(dlg.mode);
                 cleanUpDialog($(this));
-                $(this).hidealertNewKey();
                 $(this).dialog( "close" );
             },
             Cancel: function() {
@@ -325,12 +324,6 @@
             $(this).parent("li").remove();
             storeValueToDom(dlg.html.template.value, value, dlg.html.parameterValuesList, dlg.data.parameters[dlg.state.selectedKey].length -1);
             storeValueToDom(dlg.html.template.value, null, dlg.html.parameterValuesList, null);
-
-            // re-bind events
-            //unbindValueHandlers();
-            //bindNewItemInputClicks();
-            //bindDeleteButtonsClick($(".dlg-element-list-item-delete-button"));
-            //bindNewValueButtonClick($(".dlg-element-new-value-button", "#dlg-values"));
         });
     }
 
@@ -524,54 +517,39 @@
     }
 
     function submitElement(mode){
+        var element = {};
+        element["id"] = parseInt(dlg.data.element.id.text());
+        element["type"] = dlg.data.element.type.val();
+        element["name"] = dlg.data.element.name.val();
+        element["version"] = dlg.data.element.version.val();
+        element["description"] = dlg.data.element.description.val();
+        element["minMachines"] = dlg.data.element.minMachines.val();
+        element["maxMachines"] = dlg.data.element.maxMachines.val();
+        element["replicated"] = dlg.data.element.replicated.val();
+        element["minReplicationMachines"] = dlg.data.element.minReplicationMachines.val();
+        element["maxReplicationMachines"] = dlg.data.element.maxReplicationMachines.val();
+
         var outData = {};
+        outData.element = JSON.stringify(element);
+        outData.dependencies = JSON.stringify(getDependencies());
+        outData.parameters = JSON.stringify(dlg.data.parameters);
 
-        dlg.data.element.id.text(data.id);
-        dlg.data.element.type.val(data.type);
-        dlg.data.element.name.val(data.name);
-        dlg.data.element.description.val(data.description);
-        dlg.data.element.minMachines.val(data.minMachines);
-        dlg.data.element.maxMachines.val(data.maxMachines);
-        dlg.data.element.replicated.val(data.replicated);
-        dlg.data.element.minReplicationMachines.val(data.minReplicationMachines);
-        dlg.data.element.maxReplicationMachines.val(data.maxReplicationMachines);
-
-        outData["id"] = parseInt(dlg.data.element.id.text());
-        outData["type"] = dlg.data.element.type.val();
-        outData["name"] = dlg.data.element.name.val();
-        outData["description"] = dlg.data.element.description.val();
-        outData["minMachines"] = dlg.data.element.minMachines.val();
-        outData["maxMachines"] = dlg.data.element.maxMachines.val();
-        outData["replicated"] = dlg.data.element.replicated.val();
-        outData["minReplicationMachines"] = dlg.data.element.minReplicationMachines.val();
-        outData["maxReplicationMachines"] = dlg.data.element.maxReplicationMachines.val();
-
-        //outData["elementsSelected"] = JSON.stringify(getSelectedElements());
-        //outData["organizationsSelected"] = JSON.stringify(getSelectedOrganizations());
+        console.log("posting element:" + outData);
 
         $.post((mode == "edit") ? portletURL.url.element.editElementURL : portletURL.url.element.createElementURL, outData)
         .done(function(){
-            app.reloadTemplatesTable();
+            app.reloadElementsTable();
         })
         .fail(function(jqXHR, textStatus, errorThrown) {
             alertPostFailure(dlg.mode, textStatus, errorThrown);
         });
     }
 
-    function getSelectedElements(){
+    function getDependencies(){
         var selectedItems = [];
-            var arrayOfLis = dlg.selectedElementsList.find("li");
+            var arrayOfLis = dlg.html.selectedDependeesList.find("li");
         for (var i = 0; i < arrayOfLis.length; i++){
             selectedItems.push($(arrayOfLis[i]).data("config").id);
-        }
-        return selectedItems;
-    }
-
-    function getSelectedOrganizations(){
-        var selectedItems = [];
-        var arrayOfLis = dlg.selectedOrganizationsList.find("li");
-        for (var i = 0; i < arrayOfLis.length; i++){
-            selectedItems.push($(arrayOfLis[i]).data("config").organizationId);
         }
         return selectedItems;
     }

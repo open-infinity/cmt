@@ -54,10 +54,6 @@ public class ConfigurationElement {
     
     @NonNull
     @NotScript
-    private int parameterKey; 
-    
-    @NonNull
-    @NotScript
     private int minMachines;
     
     @NonNull

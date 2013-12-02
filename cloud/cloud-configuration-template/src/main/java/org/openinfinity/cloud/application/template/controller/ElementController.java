@@ -18,6 +18,8 @@ package org.openinfinity.cloud.application.template.controller;
 
 import com.liferay.portal.model.User;
 import org.apache.log4j.Logger;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.type.TypeReference;
 import org.openinfinity.cloud.comon.web.LiferayService;
 import org.openinfinity.cloud.domain.configurationtemplate.ConfigurationElement;
 import org.openinfinity.cloud.domain.configurationtemplate.ParameterKey;
@@ -27,6 +29,7 @@ import org.openinfinity.cloud.service.configurationtemplate.ConfigurationElement
 import org.openinfinity.cloud.service.configurationtemplate.ParameterKeyService;
 import org.openinfinity.cloud.service.configurationtemplate.ParameterValueService;
 import org.openinfinity.cloud.util.collection.ListUtil;
+import org.openinfinity.cloud.util.http.HttpCodes;
 import org.openinfinity.cloud.util.serialization.JsonDataWrapper;
 import org.openinfinity.cloud.util.serialization.SerializerUtil;
 import org.openinfinity.core.exception.AbstractCoreException;
@@ -60,6 +63,7 @@ public class ElementController {
 	private static final String GET_ELEMENT = "getElement";
 	private static final String GET_DEPENDENCIES = "getDependencies";
 	private static final String GET_PARAMETER_KEYS_AND_VALUES = "getParameterKeysAndValues";
+	private static final String EDIT_ELEMENT = "editElement";
 
     private static final Logger LOG = Logger.getLogger(ElementController.class.getName());
 
@@ -152,20 +156,41 @@ public class ElementController {
             if (user == null) return;
             Map<String, Collection<ParameterValue>> parameters = new LinkedHashMap<String, Collection<ParameterValue>>();
             Collection<ParameterKey> keys = parameterKeyService.loadAll(elementId);
-            LOG.debug("---------------------------");
-            LOG.debug("elementId:" + elementId);
-            LOG.debug("keys:" + keys);
             for (ParameterKey key : keys){
                 Collection<ParameterValue> values = parameterValueService.loadAll(key.getId());
-                LOG.debug("values:" + values);
                 parameters.put(key.getName(), values);
             }
-
-            LOG.debug("parameters:" + parameters);
-
             SerializerUtil.jsonSerialize(response.getWriter(), parameters);
         } catch (Exception e) {
             ExceptionUtil.throwSystemException(e);
+        }
+    }
+
+    @ResourceMapping(EDIT_ELEMENT)
+    public void editTemplate(ResourceRequest request, ResourceResponse response,
+                             @RequestParam("element") String element,
+                             @RequestParam("dependencies") String dependencies,
+                             @RequestParam("parameters") String parameters
+    ) {
+        try {
+            User user = liferayService.getUser(request, response);
+            if (user == null) return;
+
+            ObjectMapper mapper = new ObjectMapper();
+            ConfigurationElement ce = mapper.readValue(element, ConfigurationElement.class);
+            Collection<Integer> dependenciesList = mapper.readValue(dependencies, Collection.class);
+            Map<String, Collection<ParameterValue>> keyValueMap = mapper.readValue(parameters, new TypeReference<Map<String, Collection<ParameterValue>>>(){});
+
+            LOG.debug("ConfigurationElement:" + ce);
+            LOG.debug("dependenciesList:" + dependenciesList);
+            LOG.debug("Map kv:" + keyValueMap);
+            //configurationTemplateService.update(new ConfigurationTemplate(templateId, templateName, templateDescription), mapper.readValue(elementsSelected, List.class), mapper.readValue(organizationsSelected, List.class));
+
+            elementService.update(ce, dependenciesList, keyValueMap);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.setProperty(ResourceResponse.HTTP_STATUS_CODE, HttpCodes.HTTP_ERROR_CODE_SERVER_ERROR);
         }
     }
 

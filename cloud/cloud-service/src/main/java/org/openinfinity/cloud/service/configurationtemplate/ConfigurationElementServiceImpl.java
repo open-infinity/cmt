@@ -17,6 +17,8 @@ package org.openinfinity.cloud.service.configurationtemplate;
 
 import org.apache.log4j.Logger;
 import org.openinfinity.cloud.domain.configurationtemplate.ConfigurationElement;
+import org.openinfinity.cloud.domain.configurationtemplate.ParameterValue;
+import org.openinfinity.cloud.domain.repository.configurationtemplate.ConfigurationElementDependencyRepository;
 import org.openinfinity.cloud.domain.repository.configurationtemplate.ConfigurationElementRepository;
 import org.openinfinity.core.annotation.Log;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +26,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
 import java.util.Collection;
-
+import java.util.Map;
 
 
 /**
@@ -38,45 +40,58 @@ public class ConfigurationElementServiceImpl implements ConfigurationElementServ
 	private static final Logger LOGGER = Logger.getLogger(ConfigurationElementServiceImpl.class.getName());
 
 	@Autowired
-	private ConfigurationElementRepository configurationElementRepository;
+	private ConfigurationElementRepository elementRepository;
+
+    @Autowired
+    ConfigurationElementDependencyRepository elementDependencyRepository;
 
     @Override
     public ConfigurationElement create(ConfigurationElement ConfigurationElement) {
-        return configurationElementRepository.create(ConfigurationElement);
+        return elementRepository.create(ConfigurationElement);
     }
 
     @Override
     public void update(ConfigurationElement ConfigurationElement) {
-        configurationElementRepository.delete(ConfigurationElement);
+        elementRepository.delete(ConfigurationElement);
     }
 
     @Log
     public Collection<ConfigurationElement> loadAll() {
-        return configurationElementRepository.loadAll();
+        return elementRepository.loadAll();
     }
 
     @Log
     public Collection<ConfigurationElement> loadDependees(int elementId) {
-        return configurationElementRepository.loadDependees(elementId);
+        return elementRepository.loadDependees(elementId);
     }
 
     @Override
     public ConfigurationElement load(BigInteger id) {
-        return configurationElementRepository.load(id);
+        return elementRepository.load(id);
     }
 
     @Override
     public ConfigurationElement load(int id) {
-        return configurationElementRepository.load(id);
+        return elementRepository.load(id);
     }
 
     @Override
     public void delete(ConfigurationElement ConfigurationElement) {
-        configurationElementRepository.delete(ConfigurationElement);
+        elementRepository.delete(ConfigurationElement);
     }
 
     @Override
     public Collection<ConfigurationElement> loadAllForTemplate(int templateId) {
-        return configurationElementRepository.loadAllForTemplate(templateId);
+        return elementRepository.loadAllForTemplate(templateId);
     }
+
+    @Override
+    public void update(ConfigurationElement element, Collection<Integer> dependencies, Map<String, Collection<ParameterValue>> keyValues){
+        elementRepository.update(element);
+        elementDependencyRepository.deleteByDepenent(element.getId());
+        for(Integer o : dependencies){
+            elementDependencyRepository.create(element.getId(), o.intValue());
+        }
+    }
+
 }

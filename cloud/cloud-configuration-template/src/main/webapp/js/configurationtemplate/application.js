@@ -197,7 +197,7 @@ jQuery(function($){
               cache: false
             })
             .done(function() {
-                app.reloadTemplatesTable();
+                app.reloadElementsTable();
             });
         },
 
