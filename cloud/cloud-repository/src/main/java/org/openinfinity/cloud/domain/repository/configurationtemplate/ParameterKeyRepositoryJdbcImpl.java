@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.Assert;
 
@@ -29,6 +30,8 @@ import java.math.BigInteger;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Vedran Bartonicek
@@ -40,12 +43,21 @@ public class ParameterKeyRepositoryJdbcImpl implements ParameterKeyRepository {
 
 	private static final String GET_ALL_FOR_ELEMENT_SQL = "select * from configuration_template_parameter_key_tbl where element_id = ?";
 
+    private static final String FIND_BY_NAME_SQL = "select * from configuration_template_parameter_key_tbl where name = ?";
+
+    private static final String DELETE_SQL = "delete from configuration_template_parameter_key_tbl where element_id = ?";
+
+    private static final String CREATE_SQL = "insert into configuration_template_parameter_key_tbl (name, description) values(?, ?)";
+
     private JdbcTemplate jdbcTemplate;
+
+    private DataSource dataSource;
 
     @Autowired
     public ParameterKeyRepositoryJdbcImpl(@Qualifier("cloudDataSource") DataSource dataSource) {
-        Assert.notNull(dataSource, "Please define datasource for scaling rule repository.");
+        Assert.notNull(dataSource, "Please define data source.");
         this.jdbcTemplate = new JdbcTemplate(dataSource);
+        this.dataSource = dataSource;
     }
 
     @Override
@@ -55,9 +67,14 @@ public class ParameterKeyRepositoryJdbcImpl implements ParameterKeyRepository {
     }
 
     @Override
-    @AuditTrail
-    public ParameterKey create(ParameterKey product) {
-        return null;
+    public ParameterKey create(ParameterKey key) {
+        SimpleJdbcInsert insert = new SimpleJdbcInsert(dataSource).withTableName("configuration_template_parameter_key_tbl").usingGeneratedKeyColumns("id");
+        Map<String,Object> parameters = new HashMap<String,Object>();
+        parameters.put("element_id", key.getElementId());
+        parameters.put("name", key.getName());
+        Number newId = insert.executeAndReturnKey(parameters);
+        key.setId(newId.intValue());
+        return key;
     }
 
     @Override
@@ -79,12 +96,23 @@ public class ParameterKeyRepositoryJdbcImpl implements ParameterKeyRepository {
 
     @Override
     @AuditTrail
+    public int findIdByName(String name){
+        return jdbcTemplate.queryForObject(FIND_BY_NAME_SQL, new Object[] {name}, new ParameterKeyMapper()).getId();
+    }
+
+    @Override
+    @AuditTrail
     public void delete(ParameterKey product) {
     }
 
+    @Override
+    @AuditTrail
+    public void deleteByElementId(int elementId){
+        jdbcTemplate.update(DELETE_SQL, elementId);
+    }
+
     private class ParameterKeyMapper implements RowMapper<ParameterKey> {
-		
-		public ParameterKey mapRow(ResultSet resultSet, int rowNum) throws SQLException {    
+		public ParameterKey mapRow(ResultSet resultSet, int rowNum) throws SQLException {
 		    return new ParameterKey(resultSet.getInt("id"), resultSet.getInt("element_id"), resultSet.getString("name"));
 		}
 	}

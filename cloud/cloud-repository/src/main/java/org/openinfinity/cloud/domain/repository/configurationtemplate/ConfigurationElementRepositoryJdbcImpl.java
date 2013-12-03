@@ -54,6 +54,9 @@ public class ConfigurationElementRepositoryJdbcImpl implements ConfigurationElem
             "configuration_element_tbl.id = configuration_element_dependency_tbl.element_to " +
             "where configuration_element_dependency_tbl.element_from = ?";
 
+    private static final String UPDATE_SQL = "update configuration_element_tbl set type = ?, name = ?,  version = ?, description = ?, " +
+            "minMachines = ?, maxMachines = ?, replicated = ?, minReplicationMachines = ?, maxReplicationMachines = ? where id = ?";
+
     private JdbcTemplate jdbcTemplate;
 
     @Autowired
@@ -61,6 +64,7 @@ public class ConfigurationElementRepositoryJdbcImpl implements ConfigurationElem
         Assert.notNull(dataSource, "Please define datasource for scaling rule repository.");
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
+
     @Override
     @AuditTrail
     public ConfigurationElement create(ConfigurationElement configurationElement) {
@@ -69,7 +73,9 @@ public class ConfigurationElementRepositoryJdbcImpl implements ConfigurationElem
 
     @Override
     @AuditTrail
-    public void update(ConfigurationElement configurationElement) {
+    public void update(ConfigurationElement e) {
+        jdbcTemplate.update(UPDATE_SQL, e.getType(), e.getName(), e.getVersion(), e.getDescription(), e.getMinMachines(), e.getMaxMachines(), e.isReplicated(),
+                e.getMinReplicationMachines(), e.getMaxReplicationMachines(), e.getId());
     }
 
     @Override

@@ -17,12 +17,16 @@ package org.openinfinity.cloud.service.configurationtemplate;
 
 import org.apache.log4j.Logger;
 import org.openinfinity.cloud.domain.configurationtemplate.ConfigurationElement;
+import org.openinfinity.cloud.domain.configurationtemplate.ParameterKey;
 import org.openinfinity.cloud.domain.configurationtemplate.ParameterValue;
 import org.openinfinity.cloud.domain.repository.configurationtemplate.ConfigurationElementDependencyRepository;
 import org.openinfinity.cloud.domain.repository.configurationtemplate.ConfigurationElementRepository;
+import org.openinfinity.cloud.domain.repository.configurationtemplate.ParameterKeyRepository;
+import org.openinfinity.cloud.domain.repository.configurationtemplate.ParameterValueRepository;
 import org.openinfinity.core.annotation.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigInteger;
 import java.util.Collection;
@@ -44,6 +48,12 @@ public class ConfigurationElementServiceImpl implements ConfigurationElementServ
 
     @Autowired
     ConfigurationElementDependencyRepository elementDependencyRepository;
+
+    @Autowired
+    ParameterKeyRepository keyRepository;
+
+    @Autowired
+    ParameterValueRepository valueRepository;
 
     @Override
     public ConfigurationElement create(ConfigurationElement ConfigurationElement) {
@@ -86,11 +96,30 @@ public class ConfigurationElementServiceImpl implements ConfigurationElementServ
     }
 
     @Override
-    public void update(ConfigurationElement element, Collection<Integer> dependencies, Map<String, Collection<ParameterValue>> keyValues){
+    @Transactional(rollbackFor=Exception.class)
+    public void update(ConfigurationElement element, Collection<Integer> dependencies, Map<String, Collection<ParameterValue>> parameters){
         elementRepository.update(element);
+
+        // Delete dependees, then put new dependees to database
         elementDependencyRepository.deleteByDepenent(element.getId());
         for(Integer o : dependencies){
             elementDependencyRepository.create(element.getId(), o.intValue());
+        }
+
+        // Delete values for each key, then delete keys
+        for (String name : parameters.keySet()){
+            valueRepository.deleteByKeyId(keyRepository.findIdByName(name));
+        }
+        keyRepository.deleteByElementId(element.getId());
+
+        // Create keys and create values
+        for (String name : parameters.keySet()){
+            ParameterKey key = new ParameterKey(element.getId(), name);
+            keyRepository.create(key);
+            for (ParameterValue value : parameters.get(name)){
+                value.setParameterKeyId(key.getId());
+                valueRepository.create(value);
+            }
         }
     }
 

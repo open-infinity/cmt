@@ -43,5 +43,9 @@ public class ParameterKey {
     @NonNull
     @NotScript
     private String name;
- 
+
+    public ParameterKey(int elementId, String name) {
+        this.elementId = elementId;
+        this.name = name;
+    }
 }

@@ -10,28 +10,30 @@
     dlg.state = {};
     dlg.state.selectedKey = null;
 
-    dlg.data = {};
-    dlg.data.parameters = {};
-    dlg.data.element = {};
-    dlg.data.element.id = $("#dlg-element-value-id");
-    dlg.data.element.type = $("#dlg-element-value-type");
-    dlg.data.element.name = $("#dlg-element-value-name");
-    dlg.data.element.version = $("#dlg-element-value-version");
-    dlg.data.element.description = $("#dlg-element-value-description");
-    dlg.data.element.minMachines = $("#dlg-element-value-min-machines");
-    dlg.data.element.maxMachines = $("#dlg-element-value-max-machines");
-    dlg.data.element.replicated = $("#dlg-element-value-replicated");
-    dlg.data.element.minReplicationMachines = $("#dlg-element-value-min-repl-machines");
-    dlg.data.element.maxReplicationMachines = $("#dlg-element-value-max-repl-machines");
+    dlg.model = {};
+    dlg.model.parameters = {};
+    dlg.model.element = {};
+    dlg.model.element.id = $("#dlg-element-value-id");
+    dlg.model.element.type = $("#dlg-element-value-type");
+    dlg.model.element.name = $("#dlg-element-value-name");
+    dlg.model.element.version = $("#dlg-element-value-version");
+    dlg.model.element.description = $("#dlg-element-value-description");
+    dlg.model.element.minMachines = $("#dlg-element-value-min-machines");
+    dlg.model.element.maxMachines = $("#dlg-element-value-max-machines");
+    dlg.model.element.replicated = $("#dlg-element-value-replicated");
+    dlg.model.element.minReplicationMachines = $("#dlg-element-value-min-repl-machines");
+    dlg.model.element.maxReplicationMachines = $("#dlg-element-value-max-repl-machines");
 
     dlg.txt = {};
     dlg.txt.addNewKey = "Add new key";
     dlg.txt.addNewValue = "Add new value";
     dlg.txt.addNewType = "Add new type";
-    dlg.txt.alertNewKey = "New key name must not be empty";
-    dlg.txt.alertNewValue = "New value name must not be empty";
-    dlg.txt.alertNewType = "New type name must not be empty";
-    dlg.txt.alertKeyAlreadyExists = "Key name already exists";
+    dlg.txt.alert = {};
+    dlg.txt.alert.emptyKey = "New key name must not be empty";
+    dlg.txt.alert.emptyValue = "New value name must not be empty";
+    dlg.txt.alert.emptyType = "New type name must not be empty";
+    dlg.txt.alert.keyAlreadyExists = "Key name already exists";
+    dlg.txt.alert.mustBeInteger = "Integer value expected";
 
     dlg.html = {};
     dlg.html.idContainer = $($(".dlg-element-container", "#dlg-element-general-tab").first());
@@ -71,16 +73,16 @@
                 url: portletURL.url.element.getElementURL + "&elementId=" + id,
                 dataType: "json"
                 }).done(function(data) {
-                    dlg.data.element.id.text(data.id);
-                    dlg.data.element.type.val(data.type);
-                    dlg.data.element.name.val(data.name);
-                    dlg.data.element.version.val(data.version);
-                    dlg.data.element.description.val(data.description);
-                    dlg.data.element.minMachines.val(data.minMachines);
-                    dlg.data.element.maxMachines.val(data.maxMachines);
-                    dlg.data.element.replicated.val(data.replicated);
-                    dlg.data.element.minReplicationMachines.val(data.minReplicationMachines);
-                    dlg.data.element.maxReplicationMachines.val(data.maxReplicationMachines);
+                    dlg.model.element.id.text(data.id);
+                    dlg.model.element.type.val(data.type);
+                    dlg.model.element.name.val(data.name);
+                    dlg.model.element.version.val(data.version);
+                    dlg.model.element.description.val(data.description);
+                    dlg.model.element.minMachines.val(data.minMachines);
+                    dlg.model.element.maxMachines.val(data.maxMachines);
+                    dlg.model.element.replicated.val(data.replicated);
+                    dlg.model.element.minReplicationMachines.val(data.minReplicationMachines);
+                    dlg.model.element.maxReplicationMachines.val(data.maxReplicationMachines);
                 }).fail(function(jqXHR, textStatus, errorThrown) {
                     console.log("Error fetching element");
             });
@@ -94,7 +96,8 @@
                     dataType: "json"
                 }))
             .done(function(dataDependencies, dataKeyValues){
-                dlg.data.parameters = dataKeyValues[0];
+                dlg.keyCount = 0;
+                dlg.model.parameters = dataKeyValues[0];
                 populateDependencies(dataDependencies[0]);
                 populateKeyValues(dataKeyValues[0]);
                 configureEventHandling();
@@ -200,7 +203,12 @@
 
     function bindKeyListItemClicks(){
         $("input", ".key", "#dlg-keys").bind( "click",  function(){
-            setKeySelected($(this).val());
+            if (updateModel() == 0){
+                setKeySelected($(this));
+            }
+            else{
+                updateModel
+            }
         });
     }
 
@@ -231,14 +239,14 @@
                 $(this).parent().remove();
                 var newlySelectedInput = list.find("input").first();
                 newlySelectedInput.focus();
-                setKeySelected(newlySelectedInput.val());
+                setKeySelected(newlySelectedInput);
             }
         });
     }
 
     function bindDeleteValuesButtonsClick(items){
             items.bind( "click", function(){
-                var values = dlg.data.parameters[dlg.state.selectedKey];
+                var values = dlg.model.parameters[dlg.state.selectedKey];
                 var index = $(this).parents("li").data("index");
                 if (index > -1) {
                     values.splice(index, 1);
@@ -254,7 +262,7 @@
             var keyInput = $(this).parent("li").find("input");
             var key = keyInput.val();
             if (key == "" || key == dlg.txt.addNewKey){
-                alertWrongInput(keyInput, dlg.txt.alertNewKey);
+                alertWrongInput(keyInput, dlg.txt.alert.emptyKey);
                 return;
             }
 
@@ -262,14 +270,14 @@
 
             // store locally the new key
             var exists = false;
-            $.each(dlg.data.parameters, function(parameterKey, parameterValues){
+            $.each(dlg.model.parameters, function(parameterKey, parameterValues){
                 if (parameterKey == key){
-                    alertWrongInput(keyInput, dlg.txt.alertKeyAlreadyExists);
+                    alertWrongInput(keyInput, dlg.txt.alert.keyAlreadyExists);
                     exists = true;
                     return;
                 }
                 else{
-                    dlg.data.parameters[key] = [];
+                    dlg.model.parameters[key] = [];
                 }
             });
 
@@ -293,21 +301,11 @@
 
     function bindNewValueButtonClick(items){
         items.bind( "click", function(){
-            var valueInput = $(this).parent("li").find("input.dlg-value-value");
-            var paramVal = valueInput.val();
-                if (paramVal == "" || paramVal == dlg.txt.addNewValue){
-                    alertWrongInput(valueInput, dlg.txt.alertNewValue);
-                    return;
-                }
-            var typeInput = $(this).parent("li").find("input.dlg-value-type");
-            var paramType = typeInput.val();
-                if (paramType == "" || paramType == dlg.txt.addNewType){
-                    alertWrongInput(typeInput, dlg.txt.addNewType);
-                    return;
-                }
-            var value = {
-                type : paramType,
-                value : paramVal
+
+            var value = getParameterValue($(this).parent("li"));
+            if (value == null) {
+                console.log("Error reading parameters");
+                return;
             }
 
             // locally store new value and assign it to key
@@ -316,13 +314,13 @@
                 return;
             }
             else{
-                var values = dlg.data.parameters[dlg.state.selectedKey];
+                var values = dlg.model.parameters[dlg.state.selectedKey];
                 values.push(value);
             }
 
             // create and remove items
             $(this).parent("li").remove();
-            storeValueToDom(dlg.html.template.value, value, dlg.html.parameterValuesList, dlg.data.parameters[dlg.state.selectedKey].length -1);
+            storeValueToDom(dlg.html.template.value, value, dlg.html.parameterValuesList, dlg.model.parameters[dlg.state.selectedKey].length -1);
             storeValueToDom(dlg.html.template.value, null, dlg.html.parameterValuesList, null);
         });
     }
@@ -344,23 +342,21 @@
 
     function setKeySelected(key){
 
-            // clear values for previously selected key
-            dlg.html.parameterValuesList.empty();
+        // clear values for previously selected key
+        dlg.html.parameterValuesList.empty();
 
-            // find values for key and put them to dom
-            $.each(dlg.data.parameters, function(parameterKey, parameterValues){
-                if (parameterKey == key){
-                    $.each(parameterValues, function(index, value){
-                        storeValueToDom(dlg.html.template.value, value, dlg.html.parameterValuesList, index);
-                    });
-                    storeValueToDom(dlg.html.template.value, null, dlg.html.parameterValuesList, null);
-                }
-            });
+        // find values for key and put them to dom
+        $.each(dlg.model.parameters, function(parameterKey, parameterValues){
+            if (parameterKey == key.val() && typeof parameterValues != 'undefined'){
+                $.each(parameterValues, function(index, value){
+                    storeValueToDom(dlg.html.template.value, value, dlg.html.parameterValuesList, index);
+                });
+            }
+        });
 
-            // store locally currently selected key
-            dlg.state.selectedKey = key;
-        }
-
+        storeValueToDom(dlg.html.template.value, null, dlg.html.parameterValuesList, null);
+        dlg.state.selectedKey = key.val();
+    }
 
     function populateDependencies(data){
         try{
@@ -501,15 +497,15 @@
 
     function cleanUpDialog(that){
         that.find(".dlg-item-list-container").find("ul").empty();
-        dlg.data.element.id.text("");
-        dlg.data.element.type.val("");
-        dlg.data.element.name.val("");
-        dlg.data.element.description.val("");
-        dlg.data.element.minMachines.val("");
-        dlg.data.element.maxMachines.val("");
-        dlg.data.element.replicated.val("");
-        dlg.data.element.minReplicationMachines.val("");
-        dlg.data.element.maxReplicationMachines.val("");
+        dlg.model.element.id.text("");
+        dlg.model.element.type.val("");
+        dlg.model.element.name.val("");
+        dlg.model.element.description.val("");
+        dlg.model.element.minMachines.val("");
+        dlg.model.element.maxMachines.val("");
+        dlg.model.element.replicated.val("");
+        dlg.model.element.minReplicationMachines.val("");
+        dlg.model.element.maxReplicationMachines.val("");
     }
 
     function cleanUpTable(that){
@@ -518,31 +514,70 @@
 
     function submitElement(mode){
         var element = {};
-        element["id"] = parseInt(dlg.data.element.id.text());
-        element["type"] = dlg.data.element.type.val();
-        element["name"] = dlg.data.element.name.val();
-        element["version"] = dlg.data.element.version.val();
-        element["description"] = dlg.data.element.description.val();
-        element["minMachines"] = dlg.data.element.minMachines.val();
-        element["maxMachines"] = dlg.data.element.maxMachines.val();
-        element["replicated"] = dlg.data.element.replicated.val();
-        element["minReplicationMachines"] = dlg.data.element.minReplicationMachines.val();
-        element["maxReplicationMachines"] = dlg.data.element.maxReplicationMachines.val();
+        element["id"] = parseInt(dlg.model.element.id.text());
+        element["type"] = dlg.model.element.type.val();
+        element["name"] = dlg.model.element.name.val();
+        element["version"] = dlg.model.element.version.val();
+        element["description"] = dlg.model.element.description.val();
+        element["minMachines"] = dlg.model.element.minMachines.val();
+        element["maxMachines"] = dlg.model.element.maxMachines.val();
+        element["replicated"] = dlg.model.element.replicated.val();
+        element["minReplicationMachines"] = dlg.model.element.minReplicationMachines.val();
+        element["maxReplicationMachines"] = dlg.model.element.maxReplicationMachines.val();
 
         var outData = {};
         outData.element = JSON.stringify(element);
         outData.dependencies = JSON.stringify(getDependencies());
-        outData.parameters = JSON.stringify(dlg.data.parameters);
 
-        console.log("posting element:" + outData);
+        if (updateModel() == 0){
+            outData.parameters = JSON.stringify(dlg.model.parameters);
+            console.log("posting element:" + outData);
+            $.post((mode == "edit") ? portletURL.url.element.editElementURL : portletURL.url.element.createElementURL, outData)
+            .done(function(){
+                app.reloadElementsTable();
+            })
+            .fail(function(jqXHR, textStatus, errorThrown) {
+                alertPostFailure(dlg.mode, textStatus, errorThrown);
+            });
+        }
+        else{
+            console.log("Invalid parameters, aborting submit");
+        }
+    }
 
-        $.post((mode == "edit") ? portletURL.url.element.editElementURL : portletURL.url.element.createElementURL, outData)
-        .done(function(){
-            app.reloadElementsTable();
-        })
-        .fail(function(jqXHR, textStatus, errorThrown) {
-            alertPostFailure(dlg.mode, textStatus, errorThrown);
-        });
+    function updateModel(){
+        var err = 1;
+        if( updateKeysModel() == 0 && updateValuesModel() == 0){
+            err = 0;
+        }
+        return err;
+    }
+
+    function updateKeysModel(){
+        var err = 0;
+        var arrayOfKeyLis = dlg.html.parameterKeysList.find(".dlg-element-key-value-list-item");
+        for (var i = 0; i < arrayOfKeyLis.length - 1; i++){
+            var li = $(arrayOfKeyLis[i]);
+            var keyName = li.data("config");
+            var newKeyName = li.find("input").val();
+            if (keyName != newKeyName){
+                dlg.model.parameters[newKeyName] = dlg.model.parameters[keyName];
+                delete dlg.model.parameters[keyName];
+                li.data("config", newKeyName);
+            }
+        }
+        return err;
+    }
+
+    function updateValuesModel(){
+        var err = 0;
+        var arrayOfValueLis = dlg.html.parameterValuesList.find(".dlg-element-key-value-list-item");
+        var values = [];
+        for (var i = 0; i < arrayOfValueLis.length - 1; i++){
+            values.push(getParameterValue($(arrayOfValueLis[i])));
+        }
+        dlg.model.parameters[dlg.state.selectedKey] =  values;
+        return err;
     }
 
     function getDependencies(){
@@ -561,6 +596,40 @@
     function alertWrongInput(item, msg){
         alert(msg);
         item.css("border-color", "red");
+    }
+
+    function getParameterValue(li){
+        var err = 0;
+        var value = null;
+
+        var valueInput = li.find("input.dlg-value-value");
+        var paramVal = valueInput.val();
+        if (paramVal == "" || paramVal == dlg.txt.addNewValue){
+            alertWrongInput(valueInput, dlg.txt.alert.emptyValue);
+            err = 1;
+        }
+
+        var typeInput = li.find("input.dlg-value-type");
+        var paramType = typeInput.val();
+        if (paramType == "" || paramType == dlg.txt.addNewType){
+            alertWrongInput(typeInput, dlg.txt.alert.emptyType);
+            err = 2;
+        }
+        else if (isNaN(paramType) || !(Math.round(paramType) == paramType)){
+            alertWrongInput(typeInput, dlg.txt.alert.mustBeInteger);
+            err = 3;
+        }
+
+        if (err == 0){
+            value = {
+                type : paramType,
+                value : paramVal
+            }
+        }
+        else {
+            console.log("Error in getParameterValue():" + err);
+        }
+        return value;
     }
 
 })(jQuery);

@@ -167,26 +167,27 @@ public class ElementController {
     }
 
     @ResourceMapping(EDIT_ELEMENT)
-    public void editTemplate(ResourceRequest request, ResourceResponse response,
-                             @RequestParam("element") String element,
-                             @RequestParam("dependencies") String dependencies,
-                             @RequestParam("parameters") String parameters
+    public void editElement(ResourceRequest request, ResourceResponse response,
+                             @RequestParam("element") String elementData,
+                             @RequestParam("dependencies") String dependenciesData,
+                             @RequestParam("parameters") String parametersData
     ) {
         try {
+            LOG.debug("---------ENTER editElement --------");
             User user = liferayService.getUser(request, response);
             if (user == null) return;
 
             ObjectMapper mapper = new ObjectMapper();
-            ConfigurationElement ce = mapper.readValue(element, ConfigurationElement.class);
-            Collection<Integer> dependenciesList = mapper.readValue(dependencies, Collection.class);
-            Map<String, Collection<ParameterValue>> keyValueMap = mapper.readValue(parameters, new TypeReference<Map<String, Collection<ParameterValue>>>(){});
+            ConfigurationElement element = mapper.readValue(elementData, ConfigurationElement.class);
+            Collection<Integer> dependenciesList = mapper.readValue(dependenciesData, Collection.class);
+            Map<String, Collection<ParameterValue>> keyValueMap = mapper.readValue(parametersData, new TypeReference<Map<String, Collection<ParameterValue>>>(){});
 
-            LOG.debug("ConfigurationElement:" + ce);
+            LOG.debug("ConfigurationElement:" + element);
             LOG.debug("dependenciesList:" + dependenciesList);
             LOG.debug("Map kv:" + keyValueMap);
             //configurationTemplateService.update(new ConfigurationTemplate(templateId, templateName, templateDescription), mapper.readValue(elementsSelected, List.class), mapper.readValue(organizationsSelected, List.class));
 
-            elementService.update(ce, dependenciesList, keyValueMap);
+            elementService.update(element, dependenciesList, keyValueMap);
 
         } catch (Exception e) {
             e.printStackTrace();
