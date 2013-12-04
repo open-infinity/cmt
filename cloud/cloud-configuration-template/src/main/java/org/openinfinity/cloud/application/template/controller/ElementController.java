@@ -152,12 +152,14 @@ public class ElementController {
     @ResourceMapping(GET_PARAMETER_KEYS_AND_VALUES)
     public void getParameterKeysAndValues(ResourceRequest request, ResourceResponse response, @RequestParam("elementId") int elementId) throws Exception {
         try {
+            LOG.debug("---------ENTER getParameterKeysAndValues() --------");
             User user = liferayService.getUser(request, response);
             if (user == null) return;
             Map<String, Collection<ParameterValue>> parameters = new LinkedHashMap<String, Collection<ParameterValue>>();
             Collection<ParameterKey> keys = parameterKeyService.loadAll(elementId);
             for (ParameterKey key : keys){
                 Collection<ParameterValue> values = parameterValueService.loadAll(key.getId());
+                LOG.debug("Key:" + key.getName() + "Value:" + values);
                 parameters.put(key.getName(), values);
             }
             SerializerUtil.jsonSerialize(response.getWriter(), parameters);
@@ -173,7 +175,7 @@ public class ElementController {
                              @RequestParam("parameters") String parametersData
     ) {
         try {
-            LOG.debug("---------ENTER editElement --------");
+            LOG.debug("---------ENTER editElement() --------");
             User user = liferayService.getUser(request, response);
             if (user == null) return;
 

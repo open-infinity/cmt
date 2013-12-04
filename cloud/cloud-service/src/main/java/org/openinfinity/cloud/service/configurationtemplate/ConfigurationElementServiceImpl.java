@@ -95,6 +95,8 @@ public class ConfigurationElementServiceImpl implements ConfigurationElementServ
         return elementRepository.loadAllForTemplate(templateId);
     }
 
+    // TODO: refactoring needed.
+    // Do really update instead delete + create
     @Override
     @Transactional(rollbackFor=Exception.class)
     public void update(ConfigurationElement element, Collection<Integer> dependencies, Map<String, Collection<ParameterValue>> parameters){
@@ -108,7 +110,10 @@ public class ConfigurationElementServiceImpl implements ConfigurationElementServ
 
         // Delete values for each key, then delete keys
         for (String name : parameters.keySet()){
-            valueRepository.deleteByKeyId(keyRepository.findIdByName(name));
+            int keyId = keyRepository.findIdByName(name);
+            if (keyId >= 0){
+                valueRepository.deleteByKeyId(keyRepository.findIdByName(name));
+            }
         }
         keyRepository.deleteByElementId(element.getId());
 

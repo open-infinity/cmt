@@ -32,7 +32,8 @@
 .dlg-element-dependee-name{float:left;width:125px;}
 #dlg-dependency-selection-container{height:300px;}
 .dlg-item-list-container ul{float:left;list-style-type:none;margin:0;padding:0;margin-bottom:10px;}
-.dlg-item-list-container li{margin:0px 0px 3px 10px;padding:2px;width:160px;}
+.dlg-item-list-container li{margin:0px 0px 3px 10px;padding:3px;width:160px;}
+#dlg-keys li {width:155px;margin:0 0 0 10px;padding:5px 0px 5px 5px;border-radius:5px;}
 
 #dlg-list-keys-container{width:200px}
 #dlg-list-keys-container li{width:152px}
@@ -41,7 +42,7 @@
 .dlg-key-value-space-filler{width:20px;border-width:0px}
 
 #dlg-list-values-container{width:325px;margin-left:25px;}
-#dlg-list-values-container li{width:282px}
+#dlg-list-values-container li{width:282px;padding: 5px 0 5px 5px}
 #dlg-list-values-container .list-item-column{width:135px}
 .dlg-element-parameter-value-type{float:left;width:110px;}
 .dlg-element-parameter-value-value{width:110px;padding-left:15px;display:inline-block;float:left}

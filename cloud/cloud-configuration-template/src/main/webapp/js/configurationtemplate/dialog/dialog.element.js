@@ -29,10 +29,10 @@
     dlg.txt.addNewValue = "Add new value";
     dlg.txt.addNewType = "Add new type";
     dlg.txt.alert = {};
-    dlg.txt.alert.emptyKey = "New key name must not be empty";
-    dlg.txt.alert.emptyValue = "New value name must not be empty";
-    dlg.txt.alert.emptyType = "New type name must not be empty";
-    dlg.txt.alert.keyAlreadyExists = "Key name already exists";
+    dlg.txt.alert.emptyKey = "Name must not be empty";
+    dlg.txt.alert.emptyValue = "Value name must not be empty";
+    dlg.txt.alert.emptyType = "Type name must not be empty";
+    dlg.txt.alert.keyAlreadyExists = "Name already exists";
     dlg.txt.alert.mustBeInteger = "Integer value expected";
 
     dlg.html = {};
@@ -98,6 +98,7 @@
             .done(function(dataDependencies, dataKeyValues){
                 dlg.keyCount = 0;
                 dlg.model.parameters = dataKeyValues[0];
+                console.log("received parameters:" + dlg.model.parameters);
                 populateDependencies(dataDependencies[0]);
                 populateKeyValues(dataKeyValues[0]);
                 configureEventHandling();
@@ -140,9 +141,10 @@
         height: 750 ,
         buttons: {
             "Submit changes": function() {
-                submitElement(dlg.mode);
-                cleanUpDialog($(this));
-                $(this).dialog( "close" );
+                if (submitElement(dlg.mode) == 0){
+                    cleanUpDialog($(this));
+                    $(this).dialog( "close" );
+                }
             },
             Cancel: function() {
                 cleanUpDialog($(this));
@@ -203,11 +205,21 @@
 
     function bindKeyListItemClicks(){
         $("input", ".key", "#dlg-keys").bind( "click",  function(){
-            if (updateModel() == 0){
-                setKeySelected($(this));
+
+            // Do nothing if selected key remains the same
+            if (dlg.state.selectedKey == $(this).parents("li").data("keyName")){
+                return;
             }
+
+            // If a different key was selected, update model and process key selection
             else{
-                updateModel
+                var err = updateModel();
+                if (err == 0){
+                    setKeySelected($(this));
+                }
+                else{
+                    console.log("Error updating model:" + err);
+                }
             }
         });
     }
@@ -356,6 +368,10 @@
 
         storeValueToDom(dlg.html.template.value, null, dlg.html.parameterValuesList, null);
         dlg.state.selectedKey = key.val();
+
+        // Toggle selected style for newly and previously selected keys
+        dlg.html.parameterKeysList.find(".dlg-element-key-selected").toggleClass("dlg-element-key-selected").css("background-color", "white");
+        key.parents("li").toggleClass("dlg-element-key-selected").css("background-color", "#b9e0f5");
     }
 
     function populateDependencies(data){
@@ -391,10 +407,11 @@
                     timer = setInterval(function(){
                         var input = htmlKey.find("input");
                         input.focus();
+                        input.parents("li").css("background-color", "#b9e0f5").toggleClass("dlg-element-key-selected");
                         if (input.hasClass("focus")){
                            clearInterval(timer);
                         }
-                    }, 300);
+                    }, 100);
 
                     // display values for key
                     dlg.state.selectedKey = parameterKey;
@@ -417,8 +434,8 @@
     function storeDependeesToDom(htmlTemplate, value, list){
         list.append(htmlTemplate);
         var lastChild = list.find("li:last-child");
-        lastChild.find(".dlg-element-dependee-name").text(value.name);
-        lastChild.find(".dlg-element-dependee-version").text(value.version);
+        lastChild.find(".dlg-element-dependee-name").text(value.name.substring(0, 17));
+        lastChild.find(".dlg-element-dependee-version").text(value.version.substring(0, 5));
         lastChild.data("config", value);
     }
 
@@ -427,7 +444,7 @@
             var lastChild = list.find("li:last-child");
             if (value != null){
                 lastChild.find(".dlg-key-name").val(value);
-                lastChild.data("config", value);
+                lastChild.data("keyName", value);
             }
             else {
                 lastChild.find(".dlg-key-name").val(dlg.txt.addNewKey).css("color", "silver");
@@ -513,36 +530,41 @@
     }
 
     function submitElement(mode){
-        var element = {};
-        element["id"] = parseInt(dlg.model.element.id.text());
-        element["type"] = dlg.model.element.type.val();
-        element["name"] = dlg.model.element.name.val();
-        element["version"] = dlg.model.element.version.val();
-        element["description"] = dlg.model.element.description.val();
-        element["minMachines"] = dlg.model.element.minMachines.val();
-        element["maxMachines"] = dlg.model.element.maxMachines.val();
-        element["replicated"] = dlg.model.element.replicated.val();
-        element["minReplicationMachines"] = dlg.model.element.minReplicationMachines.val();
-        element["maxReplicationMachines"] = dlg.model.element.maxReplicationMachines.val();
-
-        var outData = {};
-        outData.element = JSON.stringify(element);
-        outData.dependencies = JSON.stringify(getDependencies());
-
+        var err = 0;
         if (updateModel() == 0){
+            var element = {};
+            element["id"] = parseInt(dlg.model.element.id.text());
+            element["type"] = dlg.model.element.type.val();
+            element["name"] = dlg.model.element.name.val();
+            element["version"] = dlg.model.element.version.val();
+            element["description"] = dlg.model.element.description.val();
+            element["minMachines"] = dlg.model.element.minMachines.val();
+            element["maxMachines"] = dlg.model.element.maxMachines.val();
+            element["replicated"] = dlg.model.element.replicated.val();
+            element["minReplicationMachines"] = dlg.model.element.minReplicationMachines.val();
+            element["maxReplicationMachines"] = dlg.model.element.maxReplicationMachines.val();
+
+            var outData = {};
+            outData.element = JSON.stringify(element);
+            outData.dependencies = JSON.stringify(getDependencies());
             outData.parameters = JSON.stringify(dlg.model.parameters);
-            console.log("posting element:" + outData);
+
+            console.log("Posting element parameters:" + outData.parameters);
+
             $.post((mode == "edit") ? portletURL.url.element.editElementURL : portletURL.url.element.createElementURL, outData)
             .done(function(){
                 app.reloadElementsTable();
             })
             .fail(function(jqXHR, textStatus, errorThrown) {
                 alertPostFailure(dlg.mode, textStatus, errorThrown);
+                err = 2;
             });
         }
         else{
             console.log("Invalid parameters, aborting submit");
+            err = 1;
         }
+        return err;
     }
 
     function updateModel(){
@@ -553,31 +575,48 @@
         return err;
     }
 
+    // For each key, check if possibly edited key name is matching with the value stored in model.
     function updateKeysModel(){
         var err = 0;
         var arrayOfKeyLis = dlg.html.parameterKeysList.find(".dlg-element-key-value-list-item");
         for (var i = 0; i < arrayOfKeyLis.length - 1; i++){
             var li = $(arrayOfKeyLis[i]);
-            var keyName = li.data("config");
+            var keyName = li.data("keyName");
             var newKeyName = li.find("input").val();
             if (keyName != newKeyName){
                 dlg.model.parameters[newKeyName] = dlg.model.parameters[keyName];
                 delete dlg.model.parameters[keyName];
-                li.data("config", newKeyName);
+                li.data("keyName", newKeyName);
             }
         }
         return err;
     }
 
+    // For each value displayed for currently selected key, store the value to model
     function updateValuesModel(){
         var err = 0;
-        var arrayOfValueLis = dlg.html.parameterValuesList.find(".dlg-element-key-value-list-item");
-        var values = [];
-        for (var i = 0; i < arrayOfValueLis.length - 1; i++){
-            values.push(getParameterValue($(arrayOfValueLis[i])));
+        if (isSelectedKeyInModel()){
+            var arrayOfValueLis = dlg.html.parameterValuesList.find(".dlg-element-key-value-list-item");
+            var values = [];
+            for (var i = 0; i < arrayOfValueLis.length - 1; i++){
+                var value = getParameterValue($(arrayOfValueLis[i]));
+                if (value != null){
+                    values.push(value);
+                }
+                else{
+                    err = 1;
+                }
+            }
+            dlg.model.parameters[dlg.state.selectedKey] =  values;
         }
-        dlg.model.parameters[dlg.state.selectedKey] =  values;
         return err;
+    }
+
+    function isSelectedKeyInModel(){
+        for(var key in dlg.model.parameters){
+            if (key === dlg.state.selectedKey) return true;
+        }
+        return false;
     }
 
     function getDependencies(){

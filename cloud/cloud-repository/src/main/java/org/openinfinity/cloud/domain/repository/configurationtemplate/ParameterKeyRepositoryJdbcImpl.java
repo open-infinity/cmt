@@ -97,7 +97,14 @@ public class ParameterKeyRepositoryJdbcImpl implements ParameterKeyRepository {
     @Override
     @AuditTrail
     public int findIdByName(String name){
-        return jdbcTemplate.queryForObject(FIND_BY_NAME_SQL, new Object[] {name}, new ParameterKeyMapper()).getId();
+        int res  = -1;
+        try {
+            res = jdbcTemplate.queryForObject(FIND_BY_NAME_SQL, new Object[] {name}, new ParameterKeyMapper()).getId();
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
+        return res;
     }
 
     @Override
