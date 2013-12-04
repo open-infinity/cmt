@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.Assert;
 
@@ -29,6 +30,8 @@ import java.math.BigInteger;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Vedran Bartonicek
@@ -38,7 +41,12 @@ import java.util.Collection;
 @Repository
 public class ConfigurationElementRepositoryJdbcImpl implements ConfigurationElementRepository {
 
-	private static final String GET_ALL_SQL = "select * from configuration_element_tbl";
+    private static final String CREATE_SQL = "insert into configuration_element_tbl (type, name, version, description, minMachines, " +
+            "minMachines, maxMachines, replicated, minReplicationMachines, maxReplicationMachines) values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+    private static final String DELETE_SQL = "delete from configuration_element_tbl where id = ?";
+
+    private static final String GET_ALL_SQL = "select * from configuration_element_tbl";
 
 	private static final String GET_BY_ID_SQL = "select * from configuration_element_tbl where id = ?";
 
@@ -59,16 +67,31 @@ public class ConfigurationElementRepositoryJdbcImpl implements ConfigurationElem
 
     private JdbcTemplate jdbcTemplate;
 
+    private DataSource dataSource;
+
     @Autowired
     public ConfigurationElementRepositoryJdbcImpl(@Qualifier("cloudDataSource") DataSource dataSource) {
         Assert.notNull(dataSource, "Please define datasource for scaling rule repository.");
         this.jdbcTemplate = new JdbcTemplate(dataSource);
+        this.dataSource = dataSource;
     }
 
     @Override
-    @AuditTrail
-    public ConfigurationElement create(ConfigurationElement configurationElement) {
-        return null;
+    public ConfigurationElement create(ConfigurationElement element) {
+        SimpleJdbcInsert insert = new SimpleJdbcInsert(dataSource).withTableName("configuration_element_tbl").usingGeneratedKeyColumns("id");
+        Map<String,Object> parameters = new HashMap<String,Object>();
+        parameters.put("type", element.getName());
+        parameters.put("name", element.getDescription());
+        parameters.put("version", element.getVersion());
+        parameters.put("description", element.getDescription());
+        parameters.put("minMachines", element.getMinMachines());
+        parameters.put("maxMachines", element.getMaxMachines());
+        parameters.put("replicated", element.isReplicated());
+        parameters.put("minReplicationMachines", element.getMinReplicationMachines());
+        parameters.put("maxReplicationMachines", element.getMaxReplicationMachines());
+        Number newId = insert.executeAndReturnKey(parameters);
+        element.setId(newId.intValue());
+        return element;
     }
 
     @Override
@@ -111,6 +134,12 @@ public class ConfigurationElementRepositoryJdbcImpl implements ConfigurationElem
     @Override
     @AuditTrail
     public void delete(ConfigurationElement configurationElement) {
+    }
+
+    @Override
+    @AuditTrail
+    public void delete(int elementId) {
+        jdbcTemplate.update(DELETE_SQL, elementId);
     }
 
     private class ConfigurationElementRowMapper implements RowMapper<ConfigurationElement> {

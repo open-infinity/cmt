@@ -40,4 +40,6 @@ public interface ConfigurationElementService extends AbstractCrudServiceInterfac
 
     void update(ConfigurationElement element, Collection<Integer> dependencies, Map<String, Collection<ParameterValue>> keyValues);
 
+    void delete(int elementId);
+
 }

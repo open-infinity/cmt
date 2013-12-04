@@ -35,4 +35,6 @@ public interface ConfigurationElementRepository extends AbstractCrudRepositoryIn
 
     Collection<ConfigurationElement> loadDependees(int elementId);
 
+    void delete(int elementId);
+
 }

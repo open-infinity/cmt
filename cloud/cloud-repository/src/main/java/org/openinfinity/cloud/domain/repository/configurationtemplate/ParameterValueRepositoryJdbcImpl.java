@@ -43,7 +43,7 @@ public class ParameterValueRepositoryJdbcImpl implements ParameterValueRepositor
 
     private static final String GET_ALL_FOR_KEY_SQL = "select * from configuration_template_parameter_value_tbl where parameter_key_id = ?";
 
-    private static final String DELETE_SQL = "delete from configuration_template_parameter_value_tbl where parameter_key_id = ?";
+    private static final String DELETE_FOR_KEY_SQL = "delete from configuration_template_parameter_value_tbl where parameter_key_id = ?";
 
     private static final String CREATE_SQL = "insert into configuration_template_parameter_value_tbl (name, description) values(?, ?)";
 
@@ -101,7 +101,7 @@ public class ParameterValueRepositoryJdbcImpl implements ParameterValueRepositor
     @Override
     @AuditTrail
     public void deleteByKeyId(int keyId){
-        jdbcTemplate.update(DELETE_SQL, keyId);
+        jdbcTemplate.update(DELETE_FOR_KEY_SQL, keyId);
     }
 
     private class ParameterValueRowMapper implements RowMapper<ParameterValue> {

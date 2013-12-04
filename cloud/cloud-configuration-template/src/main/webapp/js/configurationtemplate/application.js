@@ -149,6 +149,13 @@ jQuery(function($){
             app.elementsTable.setGridParam({datatype:'json', page:1}).trigger('reloadGrid');
         },
 
+        reloadTable: function(argTable){
+            return (function(){
+                var table = argTable;
+                table.setGridParam({datatype:'json', page:1}).trigger('reloadGrid');
+            });
+        },
+
         setupTabs: function(){
             app.tabsContainer.tabs({active: 1});
         },
@@ -160,16 +167,16 @@ jQuery(function($){
             app.deleteTemplateButton.bind( "click", app.deleteTemplate);
 
             // Elements
-             app.editElementButton.bind( "click", app.editTableRow(app.elementsTable, app.dialog.element));
-             app.newElementButton.bind( "click", app.createElement);
-             app.deleteElementButton.bind( "click", app.deleteElement);
+            app.editElementButton.bind( "click", app.editTableRow(app.elementsTable, app.dialog.element));
+            app.newElementButton.bind( "click", app.createElement);
+            app.deleteElementButton.bind( "click", app.deleteElement);
         },
 
-        createTemplate: function(){
+        createTemplate : function(){
             app.dialog.template.create();
         },
 
-        deleteTemplate: function(){
+        deleteTemplate : function(){
             var id = app.templatesTable.jqGrid('getGridParam','selrow');
             if (id == null) {
                 alert( "Please select a row for deletion");
@@ -177,7 +184,7 @@ jQuery(function($){
             }
             var ret = app.templatesTable.jqGrid('getRowData', id);
             $.ajax({
-              url: portletURL.url.template.deleteTemplateURL + "&templateId=" + ret.id,
+              url: portletURL.url.template.deleteTemplateURL + "&id=" + ret.id,
               cache: false
             })
             .done(function() {
@@ -185,15 +192,15 @@ jQuery(function($){
             });
         },
 
-        deleteElement: function(){
-            var id = app.templatesTable.jqGrid('getGridParam','selrow');
+        deleteElement : function(){
+            var id = app.elementsTable.jqGrid('getGridParam','selrow');
             if (id == null) {
                 alert( "Please select a row for deletion");
                 return;
             }
-            var ret = app.templatesTable.jqGrid('getRowData', id);
+            var ret = app.elementsTable.jqGrid('getRowData', id);
             $.ajax({
-              url: portletURL.url.template.deleteElementURL + "&elementId=" + ret.id,
+              url: portletURL.url.element.deleteElementURL + "&id=" + ret.id,
               cache: false
             })
             .done(function() {
@@ -201,7 +208,27 @@ jQuery(function($){
             });
         },
 
-        editTemplate: function(){
+        deleteTableItem : function(argTable, argUrlPrefix){
+            return (function(){
+                var table = argTable;
+                var urlPrefix = argUrlPrefix;
+                var id = table.jqGrid('getGridParam','selrow');
+                    if (id == null) {
+                        alert( "Please select a row for deletion");
+                        return;
+                    }
+                    var ret = table.jqGrid('getRowData', id);
+                    $.ajax({
+                      url: urlPrefix + "&id=" + ret.id,
+                      cache: false
+                    })
+                    .done(function() {
+                        app.reloadTable(table);
+                    });
+            });
+        },
+
+        editTemplate : function(){
             var id = app.templatesTable.jqGrid('getGridParam','selrow');
             if (id)	{
                 var ret = app.templatesTable.jqGrid('getRowData',id);

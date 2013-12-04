@@ -66,6 +66,7 @@
 
         remove : function(id){
             console.log("remove with argument id:" + id);
+
         },
 
         edit : function(id){

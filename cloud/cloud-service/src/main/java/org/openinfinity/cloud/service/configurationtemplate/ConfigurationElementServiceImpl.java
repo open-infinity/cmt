@@ -19,10 +19,7 @@ import org.apache.log4j.Logger;
 import org.openinfinity.cloud.domain.configurationtemplate.ConfigurationElement;
 import org.openinfinity.cloud.domain.configurationtemplate.ParameterKey;
 import org.openinfinity.cloud.domain.configurationtemplate.ParameterValue;
-import org.openinfinity.cloud.domain.repository.configurationtemplate.ConfigurationElementDependencyRepository;
-import org.openinfinity.cloud.domain.repository.configurationtemplate.ConfigurationElementRepository;
-import org.openinfinity.cloud.domain.repository.configurationtemplate.ParameterKeyRepository;
-import org.openinfinity.cloud.domain.repository.configurationtemplate.ParameterValueRepository;
+import org.openinfinity.cloud.domain.repository.configurationtemplate.*;
 import org.openinfinity.core.annotation.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -41,13 +38,16 @@ import java.util.Map;
 
 @Service
 public class ConfigurationElementServiceImpl implements ConfigurationElementService {
-	private static final Logger LOGGER = Logger.getLogger(ConfigurationElementServiceImpl.class.getName());
+	private static final Logger LOG = Logger.getLogger(ConfigurationElementServiceImpl.class.getName());
 
 	@Autowired
 	private ConfigurationElementRepository elementRepository;
 
     @Autowired
     ConfigurationElementDependencyRepository elementDependencyRepository;
+
+    @Autowired
+    ConfigurationTemplateElementRepository templateElementRepository;
 
     @Autowired
     ParameterKeyRepository keyRepository;
@@ -91,12 +91,24 @@ public class ConfigurationElementServiceImpl implements ConfigurationElementServ
     }
 
     @Override
+    @Transactional(rollbackFor=Exception.class)
+    public void delete(int elementId) {
+        for (ParameterKey k : keyRepository.loadAll(elementId)){
+            valueRepository.deleteByKeyId(k.getId());
+        }
+        keyRepository.deleteByElementId(elementId);
+        elementDependencyRepository.deleteByDepenent(elementId);
+        templateElementRepository.deleteByElement(elementId);
+        elementRepository.delete(elementId);
+    }
+
+    @Override
     public Collection<ConfigurationElement> loadAllForTemplate(int templateId) {
         return elementRepository.loadAllForTemplate(templateId);
     }
 
     // TODO: refactoring needed.
-    // Do really update instead delete + create
+    // Do real update instead of delete + create
     @Override
     @Transactional(rollbackFor=Exception.class)
     public void update(ConfigurationElement element, Collection<Integer> dependencies, Map<String, Collection<ParameterValue>> parameters){

@@ -64,6 +64,8 @@ public class ElementController {
 	private static final String GET_DEPENDENCIES = "getDependencies";
 	private static final String GET_PARAMETER_KEYS_AND_VALUES = "getParameterKeysAndValues";
 	private static final String EDIT_ELEMENT = "editElement";
+    private static final String DELETE_ELEMENT = "deleteElement";
+    private static final String CREATE_ELEMENT = "createElement";
 
     private static final Logger LOG = Logger.getLogger(ElementController.class.getName());
 
@@ -197,4 +199,16 @@ public class ElementController {
         }
     }
 
+    @ResourceMapping(DELETE_ELEMENT)
+    public void deleteElement(ResourceRequest request, ResourceResponse response, @RequestParam("id") int elementId) throws Exception {
+        try {
+            LOG.debug("---------ENTER deleteElement() --------");
+            LOG.debug("id:" + elementId);
+            User user = liferayService.getUser(request, response);
+            if (user == null) return;
+            elementService.delete(elementId);
+        } catch (Exception e) {
+            ExceptionUtil.throwSystemException(e);
+        }
+    }
 }

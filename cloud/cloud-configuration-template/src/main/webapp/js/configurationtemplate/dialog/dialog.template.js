@@ -252,8 +252,8 @@
     function storeElementToDom(htmlTemplate, value, list){
         list.append(htmlTemplate);
         var lastChild = list.find("li:last-child");
-        lastChild.find(".name").text(value.name);
-        lastChild.find(".version").text(value.version);
+        lastChild.find(".name").text(value.name.substring(0, 17));
+        lastChild.find(".version").text(value.version.substring(0, 5));
         lastChild.data("config", value);
     }
 
@@ -269,8 +269,8 @@
     function storeOrganizationToDom(htmlTemplate, value, list){
         list.append(htmlTemplate);
         var lastChild = list.find("li:last-child");
-        lastChild.find(".dlg-edit-template-organization-id").text(value.organizationId);
-        lastChild.find(".dlg-edit-template-organization-name").text(value.name);
+        lastChild.find(".dlg-edit-template-organization-id").text(value.organizationId.substring(0, 7));
+        lastChild.find(".dlg-edit-template-organization-name").text(value.name.substring(0, 13));
         lastChild.data("config", value);
      }
 
