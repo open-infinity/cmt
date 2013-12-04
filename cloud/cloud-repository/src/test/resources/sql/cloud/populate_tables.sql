@@ -61,15 +61,15 @@ insert into configuration_template_organization_tbl values (2, 10687);
 insert into configuration_template_organization_tbl values (3, 10687);
 insert into configuration_template_organization_tbl values (4, 10687);
 
-insert into configuration_element_tbl values (1, 1, 'ig', '1.2.2', 'Identity Gateway', 0, 1, 20, 0, NULL, NULL);
-insert into configuration_element_tbl values (2, 2, 'bas', '1.2.2', 'BAS Platform', 0, 1, 20, 0, NULL, NULL);
-insert into configuration_element_tbl values (3, 3, 'portal', '1.2.2', 'Portal Platform', 0, 1, 20, 0, NULL, NULL);
-insert into configuration_element_tbl values (4, 4, 'mq', '1.2.2', 'Service Platform', 0, 1, 20, 0, NULL, NULL);
-insert into configuration_element_tbl values (5, 5, 'rdbms', '1.2.2', 'Relational Database Management', 0, 1, 1, 0, NULL, NULL);
-insert into configuration_element_tbl values (6, 6, 'nosql', '1.2.2', 'NoSQL Repository', 0, 6, 20, 1, 3, 10);
-insert into configuration_element_tbl values (7, 7, 'bigdata', '1.2.2', 'Big Data Repository', 0, 7, 20, 1, 3, 10);
-insert into configuration_element_tbl values (8, 8, 'ee', '1.2.2', 'EE Platform', 0, 1, 20, 0, NULL, NULL);
-insert into configuration_element_tbl values (9, 9, 'ecm', '1.2.2', 'Enterprise Content Management', 0, 1, 20, 0, NULL, NULL);
+insert into configuration_element_tbl values (1, 1, 'ig', '1.2.2', 'Identity Gateway',  1, 20, 0, NULL, NULL);
+insert into configuration_element_tbl values (2, 2, 'bas', '1.2.2', 'BAS Platform',  1, 20, 0, NULL, NULL);
+insert into configuration_element_tbl values (3, 3, 'portal', '1.2.2', 'Portal Platform', 1, 20, 0, NULL, NULL);
+insert into configuration_element_tbl values (4, 4, 'mq', '1.2.2', 'Service Platform', 1, 20, 0, NULL, NULL);
+insert into configuration_element_tbl values (5, 5, 'rdbms', '1.2.2', 'Relational Database Management', 1, 1, 0, NULL, NULL);
+insert into configuration_element_tbl values (6, 6, 'nosql', '1.2.2', 'NoSQL Repository', 6, 20, 1, 3, 10);
+insert into configuration_element_tbl values (7, 7, 'bigdata', '1.2.2', 'Big Data Repository', 7, 20, 1, 3, 10);
+insert into configuration_element_tbl values (8, 8, 'ee', '1.2.2', 'EE Platform', 1, 20, 0, NULL, NULL);
+insert into configuration_element_tbl values (9, 9, 'ecm', '1.2.2', 'Enterprise Content Management', 1, 20, 0, NULL, NULL);
 
 insert into configuration_template_element_tbl values (1, 1);
 insert into configuration_template_element_tbl values (1, 2);

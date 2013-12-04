@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.Assert;
 
@@ -29,6 +30,8 @@ import java.math.BigInteger;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Vedran Bartonicek
@@ -40,23 +43,36 @@ public class ParameterValueRepositoryJdbcImpl implements ParameterValueRepositor
 
     private static final String GET_ALL_FOR_KEY_SQL = "select * from configuration_template_parameter_value_tbl where parameter_key_id = ?";
 
+    private static final String DELETE_SQL = "delete from configuration_template_parameter_value_tbl where parameter_key_id = ?";
+
+    private static final String CREATE_SQL = "insert into configuration_template_parameter_value_tbl (name, description) values(?, ?)";
+
     private JdbcTemplate jdbcTemplate;
+
+    private DataSource dataSource;
 
     @Autowired
     public ParameterValueRepositoryJdbcImpl(@Qualifier("cloudDataSource") DataSource dataSource) {
-        Assert.notNull(dataSource, "Please define datasource for scaling rule repository.");
+        Assert.notNull(dataSource, "Please define data source");
         this.jdbcTemplate = new JdbcTemplate(dataSource);
+        this.dataSource = dataSource;
+    }
+
+    @Override
+    public ParameterValue create(ParameterValue value) {
+        SimpleJdbcInsert insert = new SimpleJdbcInsert(dataSource).withTableName("configuration_template_parameter_value_tbl").usingGeneratedKeyColumns("id");
+        Map<String,Object> parameters = new HashMap<String,Object>();
+        parameters.put("parameter_key_id", value.getParameterKeyId());
+        parameters.put("type", value.getType());
+        parameters.put("parameter_value", value.getValue());
+        Number newId = insert.executeAndReturnKey(parameters);
+        value.setId(newId.intValue());
+        return value;
     }
 
     @Override
     @AuditTrail
-    public ParameterValue create(ParameterValue product) {
-        return null;
-    }
-
-    @Override
-    @AuditTrail
-    public void update(ParameterValue product) {
+    public void update(ParameterValue value) {
     }
 
     @Override
@@ -79,7 +95,13 @@ public class ParameterValueRepositoryJdbcImpl implements ParameterValueRepositor
 
     @Override
     @AuditTrail
-    public void delete(ParameterValue product) {
+    public void delete(ParameterValue value) {
+    }
+
+    @Override
+    @AuditTrail
+    public void deleteByKeyId(int keyId){
+        jdbcTemplate.update(DELETE_SQL, keyId);
     }
 
     private class ParameterValueRowMapper implements RowMapper<ParameterValue> {
@@ -88,7 +110,7 @@ public class ParameterValueRepositoryJdbcImpl implements ParameterValueRepositor
 		    return new ParameterValue(resultSet.getInt("id"),
 		                       resultSet.getInt("parameter_key_id"),
 		                       resultSet.getInt("type"),
-		                       resultSet.getString("value"));
+		                       resultSet.getString("parameter_value"));
 		}
 	}
 

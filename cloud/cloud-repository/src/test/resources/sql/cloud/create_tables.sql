@@ -315,7 +315,6 @@ CREATE TABLE `configuration_element_tbl` (
   `name` varchar(30) NOT NULL,
   `version` varchar(30) NOT NULL,
   `description` varchar(30),
-  `parameterKey` int(11),
   `minMachines` int(11) NOT NULL,
   `maxMachines` int(11) NOT NULL,
   `replicated` boolean DEFAULT false,

@@ -20,9 +20,9 @@ import org.openinfinity.cloud.domain.configurationtemplate.ConfigurationTemplate
 import org.openinfinity.cloud.domain.repository.configurationtemplate.ConfigurationTemplateElementRepository;
 import org.openinfinity.cloud.domain.repository.configurationtemplate.ConfigurationTemplateOrganizationRepository;
 import org.openinfinity.cloud.domain.repository.configurationtemplate.ConfigurationTemplateRepository;
-import org.openinfinity.core.annotation.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -51,6 +51,7 @@ public class ConfigurationTemplateServiceImpl implements ConfigurationTemplateSe
     private ConfigurationTemplateElementRepository configurationTemplateElementRepository;
 
     @Override
+    @Transactional
     public void create(ConfigurationTemplate ct, List<Integer> elements, List<Integer> organizations) {
         ConfigurationTemplate ct0 = configurationTemplateRepository.create(ct);
         LOG.debug("new id = " + ct.getId() + " " + ct0.getId());
@@ -68,6 +69,7 @@ public class ConfigurationTemplateServiceImpl implements ConfigurationTemplateSe
     }
 
     @Override
+    @Transactional
     public void delete(int templateId) {
         configurationTemplateElementRepository.deleteByTemplate(templateId);
         configurationTemplateOrganizationRepository.deleteByTemplate(templateId);
@@ -94,8 +96,8 @@ public class ConfigurationTemplateServiceImpl implements ConfigurationTemplateSe
     }
 
     // TODO: probably this function can be oprtimized
-    @Log
     @Override
+    @Transactional
     public List<ConfigurationTemplate> getTemplates(List<Long> organizationIds) {
         List<ConfigurationTemplate> aggregatedTemplates = new ArrayList<ConfigurationTemplate>();
 
@@ -123,6 +125,7 @@ public class ConfigurationTemplateServiceImpl implements ConfigurationTemplateSe
     }
 
     @Override
+    @Transactional
     public void update(ConfigurationTemplate ct, List<Integer> elements, List<Integer> organizations) {
         configurationTemplateRepository.update(ct);
         configurationTemplateOrganizationRepository.deleteByTemplate(ct.getId());

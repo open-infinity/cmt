@@ -92,7 +92,7 @@
                 </div>
                 <div class="dlg-edit-template-template-label-container">
                     <div id="dlg-edit-template-name">Template name</div>
-                    <input type='text' value=''>
+                    <input type='text' value=''/>
                 </div>
                 <div class="dlg-edit-template-template-label-container">
                     <div id="template-description">Template description</div>
@@ -181,15 +181,15 @@
                 </div>
                 <div class="dlg-element-container">
                     <div class="dlg-element-value-label">Type</div>
-                    <input id="dlg-element-value-type" type='text' value=''>
+                    <input id="dlg-element-value-type" type='text' value=''/>
                 </div>
                 <div class="dlg-element-container">
                     <div class="dlg-element-value-label">Name</div>
-                    <input id="dlg-element-value-name" type='text' value=''>
+                    <input id="dlg-element-value-name" type='text' value=''/>
                 </div>
                  <div class="dlg-element-container">
                     <div class="dlg-element-value-label">Version</div>
-                    <input id="dlg-element-value-version" type='text' value=''>
+                    <input id="dlg-element-value-version" type='text' value=''/>
                 </div>
                 <div class="dlg-element-container">
                     <div class="dlg-element-value-label">Description</div>
@@ -197,23 +197,23 @@
                 </div>
                 <div class="dlg-element-container">
                     <div class="dlg-element-value-label">MinMachines</div>
-                    <input id="dlg-element-value-min-machines" type='text' value=''>
+                    <input id="dlg-element-value-min-machines" type='text' value=''/>
                 </div>
                 <div class="dlg-element-container">
                     <div class="dlg-element-value-label">MaxMachines</div>
-                    <input id="dlg-element-value-max-machines" type='text' value=''>
+                    <input id="dlg-element-value-max-machines" type='text' value=''/>
                 </div>
                 <div class="dlg-element-container">
                     <div class="dlg-element-value-label">Replicated</div>
-                    <input id="dlg-element-value-replicated" type='text' value=''>
+                    <input id="dlg-element-value-replicated" type='text' value=''/>
                 </div>
                 <div class="dlg-element-container">
                     <div class="dlg-element-value-label">MinReplMachines</div>
-                    <input id="dlg-element-value-min-repl-machines" type='text' value=''>
+                    <input id="dlg-element-value-min-repl-machines" type='text' value=''/>
                 </div>
                 <div class="dlg-element-container">
                     <div class="dlg-element-value-label">MaxReplMachines</div>
-                    <input id="dlg-element-value-max-repl-machines" type='text' value=''>
+                    <input id="dlg-element-value-max-repl-machines" type='text' value=''/>
                 </div>
             </div>
         </div>
@@ -254,7 +254,7 @@
         <div id="dlg-element-keys-tab">
             <div id="dlg-keys-values-container" class ="dlg-tab-items-container">
                 <div class="dlg-list-panel-container dlg-tab-item">
-                    <div class="dlg-list-panel-container-title">Keys</div>
+                    <div id="dlg-list-keys-container" class="dlg-list-panel-container-title">Keys</div>
                     <div class="dlg-list-panel-container-columns">
                         <div class="list-item-column">Name</div>
                     </div>
@@ -262,8 +262,7 @@
                         <ul></ul>
                     </div>
                 </div>
-                <div class="dlg-arrows-img dlg-tab-item"></div>
-                <div class="dlg-list-panel-container dlg-tab-item">
+                <div id="dlg-list-values-container" class="dlg-list-panel-container dlg-tab-item">
                     <div class="dlg-list-panel-container-title">Values</div>
                     <div class="dlg-list-panel-container-columns">
                         <div class="list-item-column">Type</div>

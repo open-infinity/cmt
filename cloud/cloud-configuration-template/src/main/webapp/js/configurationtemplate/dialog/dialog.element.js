@@ -3,89 +3,65 @@
     var app = window.app || {};
     var dlg = window.app.dialog.element || {};
 
+    var timer;
+
     dlg.mode =  null;
 
-    dlg.value = {};
-    dlg.value.id = $("#dlg-element-value-id");
-    dlg.value.type = $("#dlg-element-value-type");
-    dlg.value.name = $("#dlg-element-value-name");
-    dlg.value.version = $("#dlg-element-value-version");
-    dlg.value.description = $("#dlg-element-value-description");
-    dlg.value.minMachines = $("#dlg-element-value-min-machines");
-    dlg.value.maxMachines = $("#dlg-element-value-max-machines");
-    dlg.value.replicated = $("#dlg-element-value-replicated");
-    dlg.value.minReplicationMachines = $("#dlg-element-value-min-repl-machines");
-    dlg.value.maxReplicationMachines = $("#dlg-element-value-max-repl-machines");
+    dlg.state = {};
+    dlg.state.selectedKey = null;
+
+    dlg.model = {};
+    dlg.model.parameters = {};
+    dlg.model.element = {};
+    dlg.model.element.id = $("#dlg-element-value-id");
+    dlg.model.element.type = $("#dlg-element-value-type");
+    dlg.model.element.name = $("#dlg-element-value-name");
+    dlg.model.element.version = $("#dlg-element-value-version");
+    dlg.model.element.description = $("#dlg-element-value-description");
+    dlg.model.element.minMachines = $("#dlg-element-value-min-machines");
+    dlg.model.element.maxMachines = $("#dlg-element-value-max-machines");
+    dlg.model.element.replicated = $("#dlg-element-value-replicated");
+    dlg.model.element.minReplicationMachines = $("#dlg-element-value-min-repl-machines");
+    dlg.model.element.maxReplicationMachines = $("#dlg-element-value-max-repl-machines");
+
+    dlg.txt = {};
+    dlg.txt.addNewKey = "Add new key";
+    dlg.txt.addNewValue = "Add new value";
+    dlg.txt.addNewType = "Add new type";
+    dlg.txt.alert = {};
+    dlg.txt.alert.emptyKey = "New key name must not be empty";
+    dlg.txt.alert.emptyValue = "New value name must not be empty";
+    dlg.txt.alert.emptyType = "New type name must not be empty";
+    dlg.txt.alert.keyAlreadyExists = "Key name already exists";
+    dlg.txt.alert.mustBeInteger = "Integer value expected";
 
     dlg.html = {};
-    dlg.html.idContainer = $($("#dlg-element-general-tab").find(".dlg-element-container").first());
+    dlg.html.idContainer = $($(".dlg-element-container", "#dlg-element-general-tab").first());
     dlg.html.self = $("#dlg-element");
     dlg.html.tabs = $("#dlg-element-tabs");
-    dlg.html.selectedDependedeesList = $("#dlg-element-selected-dependees").find("ul");
-    dlg.html.availableDependedeesList = $("#dlg-element-available-dependees").find("ul");
+    dlg.html.selectedDependeesList = $("ul", "#dlg-element-selected-dependees");
+    dlg.html.availableDependeesList = $("ul", "#dlg-element-available-dependees");
+    dlg.html.parameterKeysList = $("ul", "#dlg-keys");
+    dlg.html.parameterValuesList = $("ul", "#dlg-values");
 
-    dlg.template = {};
-    dlg.template.dependee = "<li class='ui-state-default'><div class='dlg-element-dependee-name'></div><div class='dlg-element-dependee-version'></div></li>";
+    dlg.html.template = {};
+    dlg.html.template.dependee = "<li class='ui-state-default'><div class='dlg-element-dependee-name'></div><div class='dlg-element-dependee-version'></div></li>";
+    dlg.html.template.key = "<li class='ui-state-default key dlg-element-key-value-list-item'><div class='dlg-element-parameter-key-name'><input class='dlg-key-name' type='text'/></div><div class='dlg-element-list-item-button dlg-element-list-item-delete-button'>-</div></li>";
+    dlg.html.template.value = "<li class='ui-state-default dlg-element-key-value-list-item'>\
+                                   <div>\
+                                       <div class='dlg-element-parameter-value-type'>\
+                                           <input class='dlg-value-type' type='text'/>\
+                                       </div>\
+                                       <div class='dlg-element-parameter-value-value'>\
+                                           <input class='dlg-value-value' type='text'/>\
+                                       </div>\
+                                   </div>\
+                                   <div class='dlg-element-list-item-button dlg-element-list-item-delete-button'>-</div>\
+                               </li>";
 
     $.extend(dlg, {
 
-        // jQuery objects from DOM elements
-
-        // General
-        //self : $("#dlg-element"),
-
-        //mode : null,
-
-        //tabs : $("#dlg-element-tabs"),
-
-        //infoDialog : $("#dlg-info"),
-
-        // General
-        /*
-        name : $("#dlg-element-id-value"),
-
-        templateName : $("#dlg-element-name + input"),
-
-        templateDescription : $("#template-description + textarea"),
-
-        // Elements
-        selectedElementsPanel : $("#elements-selection-container").find(".dlg-list-panel-container").first(),
-
-        selectedElementsList : $("#dlg-element-selected-elements"),
-
-        availableElementsPanel : $("#elements-selection-container").find(".dlg-list-panel-container").last(),
-
-        // Organizations
-        selectedOrganizationsPanel : $("#organizations-selection-container").find(".dlg-list-panel-container").first(),
-
-        availableOrganizationsPanel : $("#organizations-selection-container").find(".dlg-list-panel-container").last(),
-
-        selectedOrganizationsList : $("#dlg-element-selected-organizations"),
-        */
-        // Dialog functions
-
         create : function(){
-            /*
-            $.when(
-                $.ajax({
-                    url: portletURL.url.template.getAllAvailableElementsURL,
-                    dataType: "json"
-                }),
-                $.ajax({
-                    url: portletURL.url.template.getAllOrganizationsURL,
-                    dataType: "json"
-                }))
-            .done(function(dataElements, dataOrganizations){
-                populateElements(dataElements[0]);
-                populateOrganizations(dataOrganizations[0]);
-                configureDragAndDrop();
-                })
-            .fail(function(jqXHR, textStatus, errorThrown) {
-                console.log("Error fetching items for dialog");
-            });
-
-            dlg.open("create");
-            */
         },
 
         remove : function(id){
@@ -97,51 +73,34 @@
                 url: portletURL.url.element.getElementURL + "&elementId=" + id,
                 dataType: "json"
                 }).done(function(data) {
-                    dlg.value.id.text(data.id);
-                    dlg.value.type.val(data.type);
-                    dlg.value.name.val(data.name);
-                    dlg.value.version.val(data.version);
-                    dlg.value.description.val(data.description);
-                    dlg.value.minMachines.val(data.minMachines);
-                    dlg.value.maxMachines.val(data.maxMachines);
-                    dlg.value.replicated.val(data.replicated);
-                    dlg.value.minReplicationMachines.val(data.minReplicationMachines);
-                    dlg.value.maxReplicationMachines.val(data.maxReplicationMachines);
+                    dlg.model.element.id.text(data.id);
+                    dlg.model.element.type.val(data.type);
+                    dlg.model.element.name.val(data.name);
+                    dlg.model.element.version.val(data.version);
+                    dlg.model.element.description.val(data.description);
+                    dlg.model.element.minMachines.val(data.minMachines);
+                    dlg.model.element.maxMachines.val(data.maxMachines);
+                    dlg.model.element.replicated.val(data.replicated);
+                    dlg.model.element.minReplicationMachines.val(data.minReplicationMachines);
+                    dlg.model.element.maxReplicationMachines.val(data.maxReplicationMachines);
                 }).fail(function(jqXHR, textStatus, errorThrown) {
                     console.log("Error fetching element");
             });
-            /*
-            $.when(
-                $.ajax({
-                    url: portletURL.url.template.getElementsForTemplateURL + "&templateId=" + id,
-                    dataType: "json"
-                }),
-                $.ajax({
-                    url: portletURL.url.template.getOrganizationsForTemplateURL + "&templateId=" + id,
-                    dataType: "json"
-                }))
-            .done(function(dataElements, dataOrganizations){
-                populateElements(dataElements[0]);
-                populateOrganizations(dataOrganizations[0]);
-                configureDragAndDrop();
-                })
-            .fail(function(jqXHR, textStatus, errorThrown) {
-                console.log("Error fetching items for dialog");
-                });
-            */
             $.when(
                 $.ajax({
                     url: portletURL.url.element.getDependenciesURL + "&elementId=" + id,
                     dataType: "json"
                 }),
                 $.ajax({
-                ))    url: portletURL.url.template.getParameterKeysAndValuesURL + "&elementId=" + id,
+                    url: portletURL.url.element.getParameterKeysAndValuesURL + "&elementId=" + id,
                     dataType: "json"
                 }))
             .done(function(dataDependencies, dataKeyValues){
+                dlg.keyCount = 0;
+                dlg.model.parameters = dataKeyValues[0];
                 populateDependencies(dataDependencies[0]);
                 populateKeyValues(dataKeyValues[0]);
-                configureDragAndDrop();
+                configureEventHandling();
                 })
             .fail(function(jqXHR, textStatus, errorThrown) {
                 console.log("Error fetching items for dialog");
@@ -183,7 +142,6 @@
             "Submit changes": function() {
                 submitElement(dlg.mode);
                 cleanUpDialog($(this));
-                $(this).hide();
                 $(this).dialog( "close" );
             },
             Cancel: function() {
@@ -194,24 +152,19 @@
         }
     });
 
-/*
-    dlg.infoDialog.dialog({
-        title: "Detailed information",
-        autoOpen: false,
-        modal: true,
-        width: 1000,
-        height: 200 ,
-        buttons: {
-            Ok: function() {
-                cleanUpTable($(this));
-                $(this).dialog( "close" );
-            }
-        }
-    });
-    */
     // Helper functions
+
+    function configureEventHandling(){
+        configureDragAndDrop();
+        bindDependencyListItemClicks();
+        bindKeyListItemClicks();
+        bindNewItemInputClicks();
+        bindDeleteKeysButtonsClick($(".dlg-element-list-item-delete-button", "#dlg-keys"));
+        bindNewKeyButtonClick();
+    }
+
     function configureDragAndDrop(){
-        $(".dlg-list-panel-container").droppable({
+        $(".dlg-list-panel-container", "#dlg-dependency-selection-container").droppable({
             activeClass: "ui-state-highlight",
             drop: function (event, ui) {
                 var list = $(this).find("ul");
@@ -225,7 +178,7 @@
             },
             tolerance: "touch"
         });
-        $("li", ".dlg-item-list-container").draggable({
+        $("li", "#dlg-dependency-selection-container").draggable({
             revert: "invalid",
             containment: "document",
             helper: "clone",
@@ -239,35 +192,184 @@
                 }
             }
         });
-        $(".dlg-item-list-container").find("li").
-            click(function(){
-                $(this).toggleClass("ui-state-highlight");
-            }).
-            dblclick(function () {
-                dlg.infoDialog.dialog("open");
-                var configData = $(this).data("config");
-                storeToTable(configData, $("#dlg-item-table"));
-            });
     }
 
+    function bindDependencyListItemClicks(){
+         $("li", "#dlg-dependency-selection-container").
+            click(function(){
+                $(this).toggleClass("ui-state-highlight");
+         });
+    }
 
+    function bindKeyListItemClicks(){
+        $("input", ".key", "#dlg-keys").bind( "click",  function(){
+            if (updateModel() == 0){
+                setKeySelected($(this));
+            }
+            else{
+                updateModel
+            }
+        });
+    }
+
+    function bindNewItemInputClicks(){
+        bindInputClicks($(".dlg-element-new-key-button").parent().find("input"));
+        bindInputClicks($(".dlg-element-new-value-button").parent().find("input"));
+    }
+
+    function bindInputClicks(items){
+        items.bind( "click", function(){
+            var val =  $(this).val();
+            if (val == "" || val == dlg.txt.addNewKey || val == dlg.txt.addNewValue || val == dlg.txt.addNewType){
+                $(this).val("").css("color", "black");
+            }
+        });
+    }
+
+    function bindDeleteButtonsClick(items){
+        bindDeleteKeysButtonsClick(items);
+        bindDeleteValuesButtonsClick(items);
+    }
+
+    function bindDeleteKeysButtonsClick(items){
+        items.bind( "click", function(){
+            var input = $(this).parent().find("input");
+            if (input.hasClass("dlg-key-name")){
+                var list = input.parents("ul");
+                $(this).parent().remove();
+                var newlySelectedInput = list.find("input").first();
+                newlySelectedInput.focus();
+                setKeySelected(newlySelectedInput);
+            }
+        });
+    }
+
+    function bindDeleteValuesButtonsClick(items){
+            items.bind( "click", function(){
+                var values = dlg.model.parameters[dlg.state.selectedKey];
+                var index = $(this).parents("li").data("index");
+                if (index > -1) {
+                    values.splice(index, 1);
+                    }
+            $(this).parent().remove();
+            });
+        }
+
+
+
+    function bindNewKeyButtonClick(){
+        $(".dlg-element-new-key-button").bind( "click", function(){
+            var keyInput = $(this).parent("li").find("input");
+            var key = keyInput.val();
+            if (key == "" || key == dlg.txt.addNewKey){
+                alertWrongInput(keyInput, dlg.txt.alert.emptyKey);
+                return;
+            }
+
+            dlg.state.selectedKey = key;
+
+            // store locally the new key
+            var exists = false;
+            $.each(dlg.model.parameters, function(parameterKey, parameterValues){
+                if (parameterKey == key){
+                    alertWrongInput(keyInput, dlg.txt.alert.keyAlreadyExists);
+                    exists = true;
+                    return;
+                }
+                else{
+                    dlg.model.parameters[key] = [];
+                }
+            });
+
+            if (exists == true) return;
+
+            // create and remove items
+            $(this).parent().remove();
+            dlg.html.parameterValuesList.empty();
+            storeKeyToDom(dlg.html.template.key, key, dlg.html.parameterKeysList).find("input").focus();
+            storeKeyToDom(dlg.html.template.key, null, dlg.html.parameterKeysList);
+            storeValueToDom(dlg.html.template.value, null, dlg.html.parameterValuesList, null);
+
+            // re-bind events
+            unbindKeyHandlers();
+            bindKeyListItemClicks();
+            bindNewItemInputClicks();
+            bindDeleteButtonsClick($(".dlg-element-list-item-delete-button"));
+            bindNewKeyButtonClick();
+        });
+    }
+
+    function bindNewValueButtonClick(items){
+        items.bind( "click", function(){
+
+            var value = getParameterValue($(this).parent("li"));
+            if (value == null) {
+                console.log("Error reading parameters");
+                return;
+            }
+
+            // locally store new value and assign it to key
+            if (dlg.state.selectedKey == null){
+                alert("Internal error");
+                return;
+            }
+            else{
+                var values = dlg.model.parameters[dlg.state.selectedKey];
+                values.push(value);
+            }
+
+            // create and remove items
+            $(this).parent("li").remove();
+            storeValueToDom(dlg.html.template.value, value, dlg.html.parameterValuesList, dlg.model.parameters[dlg.state.selectedKey].length -1);
+            storeValueToDom(dlg.html.template.value, null, dlg.html.parameterValuesList, null);
+        });
+    }
+
+    function unbindKeyHandlers(){
+        $("input", ".key", "#dlg-keys").unbind();
+        $(".dlg-element-new-key-button").parent().find("input").unbind();
+        $(".dlg-element-new-value-button").parent().find("input").unbind();
+        $(".dlg-element-list-item-delete-button").unbind();
+        $(".dlg-element-new-key-button").unbind();
+    }
+
+    function unbindValueHandlers(){
+        $(".dlg-element-new-key-button").parent().find("input").unbind();
+        $(".dlg-element-new-value-button").parent().find("input").unbind();
+        $(".dlg-element-list-item-delete-button").unbind();
+        $(".dlg-element-new-value-button", "#dlg-values").unbind();
+    }
+
+    function setKeySelected(key){
+
+        // clear values for previously selected key
+        dlg.html.parameterValuesList.empty();
+
+        // find values for key and put them to dom
+        $.each(dlg.model.parameters, function(parameterKey, parameterValues){
+            if (parameterKey == key.val() && typeof parameterValues != 'undefined'){
+                $.each(parameterValues, function(index, value){
+                    storeValueToDom(dlg.html.template.value, value, dlg.html.parameterValuesList, index);
+                });
+            }
+        });
+
+        storeValueToDom(dlg.html.template.value, null, dlg.html.parameterValuesList, null);
+        dlg.state.selectedKey = key.val();
+    }
 
     function populateDependencies(data){
         try{
-            var htmlTemplate = "<li class='ui-state-default'>\
-                                  <div class='dlg-element-dependee-name'></div>\
-                                  <div class='dlg-element-dependee-version'></div>\
-                               </li>";
             var selectedIndices = [];
 
             $.each(data.selected, function(index, value){
-               storeDependeesToDom(htmlTemplate, value, dlg.html.selectedDependedeesList);
+               storeDependeesToDom(dlg.html.template.dependee, value, dlg.html.selectedDependeesList);
                selectedIndices.push(value.organizationId);
             });
 
             $.each(data.available, function(index, value){
                if (selectedIndices.indexOf(value.id) == -1){
-                   storeDependeesToDom(htmlTemplate, value, dlg.html.availableDependedeesList);
+                   storeDependeesToDom(dlg.html.template.dependee, value, dlg.html.availableDependeesList);
                }
             });
         }
@@ -278,29 +380,34 @@
 
     function populateKeyValues(data){
         try{
-            var htmlTemplateKeys = "<li class='ui-state-default'>\
-                                        <div class='dlg-element-parameter-key-name'></div>\
-                                    </li>";
-            var htmlTemplateValues = "<li class='ui-state-default'>\
-                                        <div class='dlg-element-parameter-value-type'></div>\
-                                        <div class='dlg-element-parameter-value-value'></div>\
-                                    </li>";
+            var count = 0;
+            $.each(data, function(parameterKey, parameterValues){
 
-            $.each(data.keys, function(index, value){
-                storeKeyToDom(htmlTemplateKeys, value, dlg.html.parameterKeysList);
-                for (parameterValue in data.values){
-                   if (parameterValue.parameterKeyId == value.id){
-                    storeValuesToDom(htmlTemplateValues, value, dlg.html.parameterKeysValues);
-                   }
+                // Show values only for key #1, which will be selected by default.
+                if (count++ == 0){
+                    var htmlKey = storeKeyToDom(dlg.html.template.key, parameterKey, dlg.html.parameterKeysList);
+
+                    // find key in list and focus on it
+                    timer = setInterval(function(){
+                        var input = htmlKey.find("input");
+                        input.focus();
+                        if (input.hasClass("focus")){
+                           clearInterval(timer);
+                        }
+                    }, 300);
+
+                    // display values for key
+                    dlg.state.selectedKey = parameterKey;
+                    $.each(parameterValues, function(index, value){
+                        storeValueToDom(dlg.html.template.value, value, dlg.html.parameterValuesList, index);
+                    });
+                    storeValueToDom(dlg.html.template.value, null, dlg.html.parameterValuesList, null);
                 }
-
+                else{
+                    storeKeyToDom(dlg.html.template.key, parameterKey, dlg.html.parameterKeysList);
+                }
             });
-
-            $.each(data.values, function(index, value){
-               if (selectedIndices.indexOf(value.id) == -1){
-                   storeValuesToDom(htmlTemplate, value, dlg.html.parameterKeysValues);
-               }
-            });
+            storeKeyToDom(dlg.html.template.key, null, dlg.html.parameterKeysList);
         }
         catch(err){
             console.log(err.message);
@@ -318,16 +425,47 @@
     function storeKeyToDom(htmlTemplate, value, list){
             list.append(htmlTemplate);
             var lastChild = list.find("li:last-child");
-            lastChild.find(".dlg-element-parameter-key-name").text(value.name);
-            lastChild.data("config", value);
+            if (value != null){
+                lastChild.find(".dlg-key-name").val(value);
+                lastChild.data("config", value);
+            }
+            else {
+                lastChild.find(".dlg-key-name").val(dlg.txt.addNewKey).css("color", "silver");
+                lastChild.find(".dlg-element-list-item-button").text("+").addClass("dlg-element-new-key-button").removeClass("dlg-element-list-item-delete-button").removeClass("key");
+            }
+            return lastChild;
     }
 
-    function storeValueToDom(htmlTemplate, value, list){
+    function storeValueToDom(htmlTemplate, value, list, index){
             list.append(htmlTemplate);
             var lastChild = list.find("li:last-child");
-            lastChild.find(".dlg-element-parameter-value-type").text(value.type);
-            lastChild.find(".dlg-element-parameter-value-value").text(value.value);
-            lastChild.data("config", value);
+            if (value != null && index!= null){
+                lastChild.find(".dlg-value-type").val(value.type);
+                lastChild.find(".dlg-value-value").val(value.value);
+                lastChild.data("config", value);
+
+                bindDeleteValuesButtonsClick(lastChild.find(".dlg-element-list-item-delete-button"));
+
+                lastChild.data("index", index);
+            }
+            else{
+                // create a new value item
+                lastChild.find(".dlg-value-type").val(dlg.txt.addNewType).css("color", "silver");
+                lastChild.find(".dlg-value-value").val(dlg.txt.addNewValue).css("color", "silver");
+                var addButton = lastChild.find(".dlg-element-list-item-button");
+                addButton.text("+").addClass("dlg-element-new-value-button").removeClass("dlg-element-list-item-delete-button");
+
+                // bind events for new value item
+                bindInputClicks(lastChild.find("input"));
+                bindNewValueButtonClick(addButton);
+
+                lastChild.data("index", -1);
+            }
+    }
+
+    function storeNewItemToDom(htmlTemplate, value, list){
+        list.append(htmlTemplate);
+        list.find("li:last-child").text(value);
     }
 
     function storeToTable(configData, table){
@@ -339,7 +477,6 @@
         }
     }
 
-    // TODO: make it generic
     function storeOrganizationToDom(htmlTemplate, value, list){
         list.append(htmlTemplate);
         var lastChild = list.find("li:last-child");
@@ -360,15 +497,15 @@
 
     function cleanUpDialog(that){
         that.find(".dlg-item-list-container").find("ul").empty();
-        dlg.value.id.text("");
-        dlg.value.type.val("");
-        dlg.value.name.val("");
-        dlg.value.description.val("");
-        dlg.value.minMachines.val("");
-        dlg.value.maxMachines.val("");
-        dlg.value.replicated.val("");
-        dlg.value.minReplicationMachines.val("");
-        dlg.value.maxReplicationMachines.val("");
+        dlg.model.element.id.text("");
+        dlg.model.element.type.val("");
+        dlg.model.element.name.val("");
+        dlg.model.element.description.val("");
+        dlg.model.element.minMachines.val("");
+        dlg.model.element.maxMachines.val("");
+        dlg.model.element.replicated.val("");
+        dlg.model.element.minReplicationMachines.val("");
+        dlg.model.element.maxReplicationMachines.val("");
     }
 
     function cleanUpTable(that){
@@ -376,60 +513,123 @@
     }
 
     function submitElement(mode){
+        var element = {};
+        element["id"] = parseInt(dlg.model.element.id.text());
+        element["type"] = dlg.model.element.type.val();
+        element["name"] = dlg.model.element.name.val();
+        element["version"] = dlg.model.element.version.val();
+        element["description"] = dlg.model.element.description.val();
+        element["minMachines"] = dlg.model.element.minMachines.val();
+        element["maxMachines"] = dlg.model.element.maxMachines.val();
+        element["replicated"] = dlg.model.element.replicated.val();
+        element["minReplicationMachines"] = dlg.model.element.minReplicationMachines.val();
+        element["maxReplicationMachines"] = dlg.model.element.maxReplicationMachines.val();
+
         var outData = {};
+        outData.element = JSON.stringify(element);
+        outData.dependencies = JSON.stringify(getDependencies());
 
-        dlg.value.id.text(data.id);
-        dlg.value.type.val(data.type);
-        dlg.value.name.val(data.name);
-        dlg.value.description.val(data.description);
-        dlg.value.minMachines.val(data.minMachines);
-        dlg.value.maxMachines.val(data.maxMachines);
-        dlg.value.replicated.val(data.replicated);
-        dlg.value.minReplicationMachines.val(data.minReplicationMachines);
-        dlg.value.maxReplicationMachines.val(data.maxReplicationMachines);
-
-        outData["id"] = parseInt(dlg.value.id.text());
-        outData["type"] = dlg.value.type.val();
-        outData["name"] = dlg.value.name.val();
-        outData["description"] = dlg.value.description.val();
-        outData["minMachines"] = dlg.value.minMachines.val();
-        outData["maxMachines"] = dlg.value.maxMachines.val();
-        outData["replicated"] = dlg.value.replicated.val();
-        outData["minReplicationMachines"] = dlg.value.minReplicationMachines.val();
-        outData["maxReplicationMachines"] = dlg.value.maxReplicationMachines.val();
-
-        //outData["elementsSelected"] = JSON.stringify(getSelectedElements());
-        //outData["organizationsSelected"] = JSON.stringify(getSelectedOrganizations());
-
-        $.post((mode == "edit") ? portletURL.url.element.editElementURL : portletURL.url.element.createElementURL, outData)
-        .done(function(){
-            app.reloadTemplatesTable();
-        })
-        .fail(function(jqXHR, textStatus, errorThrown) {
-            alertPostFailure(dlg.mode, textStatus, errorThrown);
-        });
+        if (updateModel() == 0){
+            outData.parameters = JSON.stringify(dlg.model.parameters);
+            console.log("posting element:" + outData);
+            $.post((mode == "edit") ? portletURL.url.element.editElementURL : portletURL.url.element.createElementURL, outData)
+            .done(function(){
+                app.reloadElementsTable();
+            })
+            .fail(function(jqXHR, textStatus, errorThrown) {
+                alertPostFailure(dlg.mode, textStatus, errorThrown);
+            });
+        }
+        else{
+            console.log("Invalid parameters, aborting submit");
+        }
     }
 
-    function getSelectedElements(){
+    function updateModel(){
+        var err = 1;
+        if( updateKeysModel() == 0 && updateValuesModel() == 0){
+            err = 0;
+        }
+        return err;
+    }
+
+    function updateKeysModel(){
+        var err = 0;
+        var arrayOfKeyLis = dlg.html.parameterKeysList.find(".dlg-element-key-value-list-item");
+        for (var i = 0; i < arrayOfKeyLis.length - 1; i++){
+            var li = $(arrayOfKeyLis[i]);
+            var keyName = li.data("config");
+            var newKeyName = li.find("input").val();
+            if (keyName != newKeyName){
+                dlg.model.parameters[newKeyName] = dlg.model.parameters[keyName];
+                delete dlg.model.parameters[keyName];
+                li.data("config", newKeyName);
+            }
+        }
+        return err;
+    }
+
+    function updateValuesModel(){
+        var err = 0;
+        var arrayOfValueLis = dlg.html.parameterValuesList.find(".dlg-element-key-value-list-item");
+        var values = [];
+        for (var i = 0; i < arrayOfValueLis.length - 1; i++){
+            values.push(getParameterValue($(arrayOfValueLis[i])));
+        }
+        dlg.model.parameters[dlg.state.selectedKey] =  values;
+        return err;
+    }
+
+    function getDependencies(){
         var selectedItems = [];
-            var arrayOfLis = dlg.selectedElementsList.find("li");
+            var arrayOfLis = dlg.html.selectedDependeesList.find("li");
         for (var i = 0; i < arrayOfLis.length; i++){
             selectedItems.push($(arrayOfLis[i]).data("config").id);
         }
         return selectedItems;
     }
 
-    function getSelectedOrganizations(){
-        var selectedItems = [];
-        var arrayOfLis = dlg.selectedOrganizationsList.find("li");
-        for (var i = 0; i < arrayOfLis.length; i++){
-            selectedItems.push($(arrayOfLis[i]).data("config").organizationId);
-        }
-        return selectedItems;
-    }
-
     function alertPostFailure(mode, textStatus, errorThrown){
         alert("Server error at template" + mode + ", text status:" + textStatus + " " + "errorThrown:" + errorThrown);
+    }
+
+    function alertWrongInput(item, msg){
+        alert(msg);
+        item.css("border-color", "red");
+    }
+
+    function getParameterValue(li){
+        var err = 0;
+        var value = null;
+
+        var valueInput = li.find("input.dlg-value-value");
+        var paramVal = valueInput.val();
+        if (paramVal == "" || paramVal == dlg.txt.addNewValue){
+            alertWrongInput(valueInput, dlg.txt.alert.emptyValue);
+            err = 1;
+        }
+
+        var typeInput = li.find("input.dlg-value-type");
+        var paramType = typeInput.val();
+        if (paramType == "" || paramType == dlg.txt.addNewType){
+            alertWrongInput(typeInput, dlg.txt.alert.emptyType);
+            err = 2;
+        }
+        else if (isNaN(paramType) || !(Math.round(paramType) == paramType)){
+            alertWrongInput(typeInput, dlg.txt.alert.mustBeInteger);
+            err = 3;
+        }
+
+        if (err == 0){
+            value = {
+                type : paramType,
+                value : paramVal
+            }
+        }
+        else {
+            console.log("Error in getParameterValue():" + err);
+        }
+        return value;
     }
 
 })(jQuery);

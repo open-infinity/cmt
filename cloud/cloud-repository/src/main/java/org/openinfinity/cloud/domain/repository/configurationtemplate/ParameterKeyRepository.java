@@ -31,4 +31,8 @@ public interface ParameterKeyRepository extends AbstractCrudRepositoryInterface<
 	
     Collection<ParameterKey> loadAll(int elementId);
 
+    void deleteByElementId(int elementId);
+
+    int findIdByName(String name);
+
 }

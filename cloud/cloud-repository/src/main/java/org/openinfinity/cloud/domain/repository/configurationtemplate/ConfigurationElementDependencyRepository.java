@@ -30,4 +30,8 @@ public interface ConfigurationElementDependencyRepository {
 	
     List<ConfigurationElementDependency> getAll();
 
+    void deleteByDepenent(int elementFrom);
+
+    void create(int elementFrom , int elementTo);
+
 }

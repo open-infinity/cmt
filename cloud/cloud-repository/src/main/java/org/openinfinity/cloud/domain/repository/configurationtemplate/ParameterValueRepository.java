@@ -31,4 +31,6 @@ public interface ParameterValueRepository extends AbstractCrudRepositoryInterfac
 
     Collection<ParameterValue> loadAll(int parameterKeyId);
 
+    void deleteByKeyId(int keyId);
+
 }

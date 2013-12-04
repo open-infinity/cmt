@@ -39,8 +39,6 @@ import java.util.List;
 @Repository
 public class ConfigurationTemplateOrganizationRepositoryJdbcImpl implements ConfigurationTemplateOrganizationRepository {
 
-	private JdbcTemplate jdbcTemplate;
-
     private static final String CREATE_SQL = "insert into configuration_template_organization_tbl values(?, ?)";
 
     private static final String LOAD_ALL_FOR_TEMPLATE_SQL = "select * from configuration_template_organization_tbl where template_id = ?";
@@ -48,6 +46,8 @@ public class ConfigurationTemplateOrganizationRepositoryJdbcImpl implements Conf
     private static final String DELETE_BY_ORGANIZATION_ID_SQL = "delete from configuration_template_organization_tbl where organization_id = ?";
 
     private static final String DELETE_BY_TEMPLATE_ID_SQL = "delete from configuration_template_organization_tbl where template_id = ?";
+
+    private JdbcTemplate jdbcTemplate;
 
     @Autowired
     public ConfigurationTemplateOrganizationRepositoryJdbcImpl(@Qualifier("cloudDataSource") DataSource dataSource) {

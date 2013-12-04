@@ -17,14 +17,20 @@ package org.openinfinity.cloud.service.configurationtemplate;
 
 import org.apache.log4j.Logger;
 import org.openinfinity.cloud.domain.configurationtemplate.ConfigurationElement;
+import org.openinfinity.cloud.domain.configurationtemplate.ParameterKey;
+import org.openinfinity.cloud.domain.configurationtemplate.ParameterValue;
+import org.openinfinity.cloud.domain.repository.configurationtemplate.ConfigurationElementDependencyRepository;
 import org.openinfinity.cloud.domain.repository.configurationtemplate.ConfigurationElementRepository;
+import org.openinfinity.cloud.domain.repository.configurationtemplate.ParameterKeyRepository;
+import org.openinfinity.cloud.domain.repository.configurationtemplate.ParameterValueRepository;
 import org.openinfinity.core.annotation.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigInteger;
 import java.util.Collection;
-
+import java.util.Map;
 
 
 /**
@@ -38,45 +44,83 @@ public class ConfigurationElementServiceImpl implements ConfigurationElementServ
 	private static final Logger LOGGER = Logger.getLogger(ConfigurationElementServiceImpl.class.getName());
 
 	@Autowired
-	private ConfigurationElementRepository configurationElementRepository;
+	private ConfigurationElementRepository elementRepository;
+
+    @Autowired
+    ConfigurationElementDependencyRepository elementDependencyRepository;
+
+    @Autowired
+    ParameterKeyRepository keyRepository;
+
+    @Autowired
+    ParameterValueRepository valueRepository;
 
     @Override
     public ConfigurationElement create(ConfigurationElement ConfigurationElement) {
-        return configurationElementRepository.create(ConfigurationElement);
+        return elementRepository.create(ConfigurationElement);
     }
 
     @Override
     public void update(ConfigurationElement ConfigurationElement) {
-        configurationElementRepository.delete(ConfigurationElement);
+        elementRepository.delete(ConfigurationElement);
     }
 
     @Log
     public Collection<ConfigurationElement> loadAll() {
-        return configurationElementRepository.loadAll();
+        return elementRepository.loadAll();
     }
 
     @Log
     public Collection<ConfigurationElement> loadDependees(int elementId) {
-        return configurationElementRepository.loadDependees(elementId);
+        return elementRepository.loadDependees(elementId);
     }
 
     @Override
     public ConfigurationElement load(BigInteger id) {
-        return configurationElementRepository.load(id);
+        return elementRepository.load(id);
     }
 
     @Override
     public ConfigurationElement load(int id) {
-        return configurationElementRepository.load(id);
+        return elementRepository.load(id);
     }
 
     @Override
     public void delete(ConfigurationElement ConfigurationElement) {
-        configurationElementRepository.delete(ConfigurationElement);
+        elementRepository.delete(ConfigurationElement);
     }
 
     @Override
     public Collection<ConfigurationElement> loadAllForTemplate(int templateId) {
-        return configurationElementRepository.loadAllForTemplate(templateId);
+        return elementRepository.loadAllForTemplate(templateId);
     }
+
+    @Override
+    @Transactional(rollbackFor=Exception.class)
+    public void update(ConfigurationElement element, Collection<Integer> dependencies, Map<String, Collection<ParameterValue>> parameters){
+        elementRepository.update(element);
+
+        // Delete dependees, then put new dependees to database
+        elementDependencyRepository.deleteByDepenent(element.getId());
+        for(Integer o : dependencies){
+            elementDependencyRepository.create(element.getId(), o.intValue());
+        }
+
+        // Delete values for each key, then delete keys
+        for (String name : parameters.keySet()){
+            valueRepository.deleteByKeyId(keyRepository.findIdByName(name));
+        }
+        keyRepository.deleteByElementId(element.getId());
+
+        // Create keys and create values
+        for (String name : parameters.keySet()){
+            ParameterKey key = new ParameterKey(element.getId(), name);
+            keyRepository.create(key);
+            for (ParameterValue value : parameters.get(name)){
+                value.setParameterKeyId(key.getId());
+                valueRepository.create(value);
+            }
+        }
+    }
+
 }

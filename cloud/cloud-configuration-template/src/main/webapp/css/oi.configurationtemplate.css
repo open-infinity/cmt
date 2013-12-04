@@ -9,6 +9,7 @@
 .dlg-list-panel-container-columns{margin-left:10px}
 .dlg-list-panel-container-columns div {font-size:12px}
 
+
 /* Template edit/create dialog */
 .dlg-edit-template-list-panel-container{width:200px;}
 #dlg-edit-template-id-value{font-weight:normal;}
@@ -22,16 +23,31 @@
 .dlg-edit-template-organization-name{text-align:right;}
 #edit-template-fields textarea, input{padding:1px;}
 
+
 /* Element edit/create dialog */
+#dlg-element-general-tab{height:380px;}
 .dlg-element-container{margin:0 0 7px 0;}
 .dlg-element-value-label{width: 130px;margin-top:5px;float:left;}
 #dlg-element-value-id{padding-top:5px;}
 .dlg-element-dependee-name{float:left;width:125px;}
 #dlg-dependency-selection-container{height:300px;}
-.dlg-item-list-container ul{list-style-type:none;margin:0;padding:0;margin-bottom:10px;}
+.dlg-item-list-container ul{float:left;list-style-type:none;margin:0;padding:0;margin-bottom:10px;}
 .dlg-item-list-container li{margin:0px 0px 3px 10px;padding:2px;width:160px;}
-#dlg-element-general-tab{height:380px;}
-.dlg-element-parameter-value-type{float:left;width:125px;}
+
+#dlg-list-keys-container{width:200px}
+#dlg-list-keys-container li{width:152px}
+.dlg-element-parameter-key-name{width:110px;float:left}
+.dlg-element-list-item-button{width:18px;margin-left:20px;display:inline-block;border-style:solid;border-width:1px;border-color:#c4c4c4;text-align:center;border-radius:15px;background-color:#EEEEEE;font-weight:bold;}
+.dlg-key-value-space-filler{width:20px;border-width:0px}
+
+#dlg-list-values-container{width:325px;margin-left:25px;}
+#dlg-list-values-container li{width:282px}
+#dlg-list-values-container .list-item-column{width:135px}
+.dlg-element-parameter-value-type{float:left;width:110px;}
+.dlg-element-parameter-value-value{width:110px;padding-left:15px;display:inline-block;float:left}
+#dlg-keys-values-container li.dlg-element-key-value-list-item{border-width:0;background:white};
+input[type="text"].dlg-key-name, input[type="text"].dlg-value-type, input[type="text"].dlg-value-value{width:100%; padding:2px}
+
 
 /* Helper dialog for showing item information */
 #dlg-item-table th{border:1px solid #C4C4C4;padding:5px;text-align:center}
