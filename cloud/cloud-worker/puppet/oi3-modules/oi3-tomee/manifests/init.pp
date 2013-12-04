@@ -78,6 +78,13 @@ class oi3-tomee::config inherits oi3-bas::config {
                 source => "puppet:///modules/oi3-tomee/web.xml",
                 require => Class["oi3-tomee::install"],
         }
+	
+	file { "/opt/openinfinity/3.0.0/tomcat/apps":
+		ensure => directory,
+		group => "oiuser",
+		owner => "oiuser",
+		require => Class["oi3-tomee::install"],
+	}	
 }
 
 class oi3-tomee::service inherits oi3-bas::service {

@@ -8,11 +8,12 @@ JVM_MEMORY_OPTS="-Xmx<%= jvmmem %>m -XX:MaxPermSize=<%= jvmperm %>m"
 JMX_OPTS="-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=65329 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=true -Dcom.sun.management.jmxremote.password.file=$TOMCAT_CONF_PATH/jmxremote.password -Dcom.sun.management.jmxremote.access.file=$TOMCAT_CONF_PATH/jmxremote.access"
 TOMEE_OPTS="-javaagent:$CATALINA_HOME/lib/openejb-javaagent.jar"
 
-JAVA_OPTS="$JAVA_OPTS $LTT_OPTS $CLASS_LOADER_OPTS -Duser.timezone=EET -Dfile.encoding=UTF8 $JVM_MEMORY_OPTS"
-CATALINA_OPTS="$CATALINA_OPTS $JMX_OPTS $TOMEE_OPTS"
+#JAVA_OPTS="$JAVA_OPTS $LTT_OPTS $CLASS_LOADER_OPTS -Duser.timezone=EET -Dfile.encoding=UTF8 $JVM_MEMORY_OPTS"
+#CATALINA_OPTS="$CATALINA_OPTS $JMX_OPTS $TOMEE_OPTS"
 
-#EXTRA_JVM_OPS
-#EXTRA_CATALINA_OPS
+EXTRA_JVM_OPS="<%= extra_jvm_opts %>"
+EXTRA_CATALINA_OPS="<%= extra_catalina_opts %>"
 
-#JAVA_OPTS="$JAVA_OPTS $LTT_OPTS $CLASS_LOADER_OPTS $EXTRA_JVM_OPS -Duser.timezone=EET -Dfile.encoding=UTF8 $JVM_MEMORY_OPTS"
-#CATALINA_OPTS="$CATALINA_OPTS $JMX_OPTS $TOMEE_OPTS $EXTRA_CATALINA_OPS"
+JAVA_OPTS="$JAVA_OPTS $LTT_OPTS $CLASS_LOADER_OPTS $EXTRA_JVM_OPS -Duser.timezone=EET -Dfile.encoding=UTF8 $JVM_MEMORY_OPTS"
+CATALINA_OPTS="$CATALINA_OPTS $JMX_OPTS $TOMEE_OPTS $EXTRA_CATALINA_OPS"
+
