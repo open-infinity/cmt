@@ -5,39 +5,44 @@
 # supposed to receive the streamed output.
 #
 
-BACKUP_DIR=/opt/openinfinity/3.0.0/backup
+BACKUP_BASE_DIR=/opt/openinfinity/3.0.0/backup
 EXCLUDES_FILE=/tmp/merged-exclude-rules
 BACKUP_LOG=/var/log/cloud-backup.log
 
+date &>$BACKUP_LOG
+
 # Run scripts before making backup
-if [ "$(ls -A $BACKUP_DIR/before-backup.d)" ] ; then
-    run-parts $BACKUP_DIR/before-backup.d &>$BACKUP_LOG || exit 1
+if [ "$(ls -A $BACKUP_BASE_DIR/node-backup-before.d)" ] ; then
+    run-parts $BACKUP_BASE_DIR/node-backup-before.d &>>$BACKUP_LOG || exit 1
 fi
 
 # Combine include rules into one file
-if [ "$(ls -A $BACKUP_DIR/include-dirs.d)" ] ; then
-    INCLUDE_DIRS=`cat $BACKUP_DIR/include-dirs.d/* | tr '\n' ' '` || exit 1
+if [ "$(ls -A $BACKUP_BASE_DIR/include-dirs.d)" ] ; then
+    INCLUDE_DIRS=`cat $BACKUP_BASE_DIR/include-dirs.d/* | tr '\n' ' '` || exit 1
 else
     INCLUDE_DIRS=/opt
 fi    
 
 # Combine exclude rules into one file
 touch $EXCLUDES_FILE
-if [ "$(ls -A $BACKUP_DIR/exclude-rules.d)" ] ; then
-    cat $BACKUP_DIR/exclude-rules.d/* >$EXCLUDES_FILE || exit 1
+if [ "$(ls -A $BACKUP_BASE_DIR/exclude-rules.d)" ] ; then
+    cat $BACKUP_BASE_DIR/exclude-rules.d/* >$EXCLUDES_FILE || exit 1
 fi
 
 # Execute the backup command in root dir
 OLD_DIR=`pwd`
 cd /
-tar -cJ -X $EXCLUDES_FILE $INCLUDE_DIRS 2>$BACKUP_LOG || exit 1
+echo "Compressing directories: $INCLUDE_DIRS" >>$BACKUP_LOG
+tar -cJ -X $EXCLUDES_FILE $INCLUDE_DIRS 2>>$BACKUP_LOG || exit 1
 cd $OLD_DIR
 
 # Run scripts after backup
-if [ "$(ls -A $BACKUP_DIR/after-backup.d)" ] ; then
-    run-parts $BACKUP_DIR/after-backup.d &>$BACKUP_LOG || exit 1
+if [ "$(ls -A $BACKUP_BASE_DIR/node-backup-after.d)" ] ; then
+    run-parts $BACKUP_BASE_DIR/node-backup-after.d &>>$BACKUP_LOG || exit 1
 fi
 
 # Clean up
 rm -f $EXCLUDES_FILE
+
+date &>>$BACKUP_LOG
 

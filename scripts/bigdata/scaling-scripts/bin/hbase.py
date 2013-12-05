@@ -85,6 +85,10 @@ class HBaseConfigContext(object):
         return self.hmasters + self.zookeepers + self.hives + self.slaves
     everything = property(get_everything)
 
+    # Params for /etc/bigdata file
+    def get_bigdata_params(self):
+        return {}
+
     # Print presentation
     def __repr__(self):
         s = "Config context (%s)\n" % self.type

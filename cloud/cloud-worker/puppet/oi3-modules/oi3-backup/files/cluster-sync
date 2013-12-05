@@ -1,0 +1,31 @@
+#!/bin/sh
+
+BACKUP_BASE_DIR=/opt/openinfinity/3.0.0/backup
+BACKUP_LOG=/var/log/cloud-backup-cluster-sync.log
+
+date >$BACKUP_LOG
+
+if [ "x$1" = "x" ] ; then
+    echo "Usage: cluster-sync <before-backup|after-backup|before-restore|after-restore>" >/dev/stderr
+    exit 1
+elif [ "$1" = "before-backup" ] ; then
+    if [ "$(ls -A $BACKUP_BASE_DIR/cluster-backup-before.d)" ] ; then
+        run-parts $BACKUP_BASE_DIR/cluster-backup-before.d &>>$BACKUP_LOG || exit 1
+    fi
+elif [ "$1" = "after-backup" ] ; then
+    if [ "$(ls -A $BACKUP_BASE_DIR/cluster-backup-after.d)" ] ; then
+        run-parts $BACKUP_BASE_DIR/cluster-backup-after.d &>>$BACKUP_LOG || exit 1
+    fi
+elif [ "$1" = "before-restore" ] ; then
+    if [ "$(ls -A $BACKUP_BASE_DIR/cluster-restore-before.d)" ] ; then
+        run-parts $BACKUP_BASE_DIR/cluster-restore-before.d &>>$BACKUP_LOG || exit 1
+    fi
+elif [ "$1" = "after-restore" ] ; then
+    if [ "$(ls -A $BACKUP_BASE_DIR/cluster-restore-after.d)" ] ; then
+        run-parts $BACKUP_BASE_DIR/cluster-restore-after.d &>>$BACKUP_LOG || exit 1
+    fi
+else
+    echo "Usage: cluster-sync <before-backup|after-backup|before-restore|after-restore>" >/dev/stderr
+    exit 1
+fi
+

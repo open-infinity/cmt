@@ -5,21 +5,26 @@
 # supposed to send the tar archive in stream input.
 #
 
-BACKUP_DIR=/opt/openinfinity/3.0.0/backup
+BACKUP_BASE_DIR=/opt/openinfinity/3.0.0/backup
 RESTORE_LOG=/var/log/cloud-restore_`date +"%Y-%m-%d_%H%M"`.log
 
+date &>$BACKUP_LOG
+
 # Run scripts before making backup
-if [ "$(ls -A $BACKUP_DIR/before-restore.d)" ] ; then
-    run-parts $BACKUP_DIR/before-restore.d &>$RESTORE_LOG || exit 1
+if [ "$(ls -A $BACKUP_BASE_DIR/node-restore-before.d)" ] ; then
+    run-parts $BACKUP_BASE_DIR/node-restore-before.d &>>$RESTORE_LOG || exit 1
 fi
 
 # Execute the backup command in root dir
 OLD_DIR=`pwd`
 cd /
-tar -xpJ &>$RESTORE_LOG || exit 1
+tar -xvpJ &>>$RESTORE_LOG || exit 1
 cd $OLD_DIR
 
 # Run scripts after backup
-if [ "$(ls -A $BACKUP_DIR/after-restore.d)" ] ; then
-    run-parts $BACKUP_DIR/after-restore.d &>$RESTORE_LOG || exit 1
+if [ "$(ls -A $BACKUP_BASE_DIR/node-restore-after.d)" ] ; then
+    run-parts $BACKUP_BASE_DIR/node-restore-after.d &>>$RESTORE_LOG || exit 1
 fi
+
+date &>>$BACKUP_LOG
+

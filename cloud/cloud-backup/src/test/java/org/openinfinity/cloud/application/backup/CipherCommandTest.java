@@ -66,10 +66,12 @@ public class CipherCommandTest {
 
 	@Test
 	public void testCipherCommand1() throws Exception {
+		ClusterInfo cluster = new ClusterInfo(12345);
+		
 		// Cipher
 		{
 			// Create a job, which meets the basic requirements of the command
-			TestBackupInstanceJob job = new TestBackupInstanceJob();
+			TestBackupInstanceJob job = new TestBackupInstanceJob(cluster);
 			job.setLocalBackupFile(pfile);
 			job.setLocalPackageDirectory(pfile.getParent());
 			
@@ -86,7 +88,7 @@ public class CipherCommandTest {
 		// Decipher
 		{
 			// Create a job, which meets the basic requirements of the command
-			TestRestoreInstanceJob job = new TestRestoreInstanceJob();
+			TestRestoreInstanceJob job = new TestRestoreInstanceJob(cluster);
 			job.setLocalBackupFile(c1file);
 			job.setLocalPackageDirectory(c1file.getParent());
 			
@@ -106,10 +108,12 @@ public class CipherCommandTest {
 	@Test
 	public void testCipherCommand2() throws Exception {
 /*		
+		Cluster cluster = new Cluster("12345");
+		
 		// Cipher
 		{
 			// Create a job, which meets the basic requirements of the command
-			TestBackupInstanceJob job = new TestBackupInstanceJob();
+			TestBackupInstanceJob job = new TestBackupInstanceJob(cluster);
 			job.setLocalBackupFile(pfile);
 			job.setLocalPackageDirectory(pfile.getParent());
 
@@ -129,7 +133,7 @@ public class CipherCommandTest {
 		// Decipher
 		{
 			// Create a job, which meets the basic requirements of the command
-			TestRestoreInstanceJob job = new TestRestoreInstanceJob();
+			TestRestoreInstanceJob job = new TestRestoreInstanceJob(cluster);
 			job.setLocalBackupFile(c2file);
 			job.setLocalPackageDirectory(c2file.getParent());
 			
@@ -165,15 +169,15 @@ public class CipherCommandTest {
 	}
 
 	private class TestBackupInstanceJob extends InstanceBackupJob {
-		public TestBackupInstanceJob() throws BackupException {
-			super(applicationContext);
+		public TestBackupInstanceJob(ClusterInfo c) throws BackupException {
+			super(c, applicationContext);
 			commands.clear();
 		}
 	}
 
 	private class TestRestoreInstanceJob extends InstanceRestoreJob {
-		public TestRestoreInstanceJob() throws BackupException {
-			super(applicationContext);
+		public TestRestoreInstanceJob(ClusterInfo c) throws BackupException {
+			super(c, applicationContext);
 			commands.clear();
 		}
 	}

@@ -1,19 +1,13 @@
 package org.openinfinity.cloud.application.backup.job;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringWriter;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Collection;
 
 import org.apache.log4j.Logger;
-import org.apache.log4j.helpers.FileWatchdog;
 import org.openinfinity.cloud.domain.Key;
 import org.openinfinity.cloud.service.administrator.KeyService;
 import org.openinfinity.cloud.util.ssh.SSHGateway;
-import org.openinfinity.core.util.IOUtil;
 
 /**
  * Compresses/extracts virtual machine directories over SSH.
@@ -74,7 +68,7 @@ public class RemoteMachineCommand implements Command {
 		logger.debug("Local filename for backup will be " + package_file);
 
 		// The command to be executed in the remote host
-		String package_command = "/opt/openinfinity/3.0.0/backup/stream-backup";
+		String package_command = "/opt/openinfinity/3.0.0/backup/stream-backup"; // FIXME: non-hardcoded
 
 		// Create and compress the backup package remotely
 		logger.info("Creating and compressing backup package in the remote host and saving it to "
@@ -119,7 +113,7 @@ public class RemoteMachineCommand implements Command {
 		File package_file = job.getLocalBackupFile();
 		
 		// The comand to be execute in the remote host
-		String restore_command = "/opt/openinfinity/3.0.0/backup/stream-restore";
+		String restore_command = "/opt/openinfinity/3.0.0/backup/stream-restore"; // FIXME: non-hardcoded
 
 		// Stream the backup package to the remote host, where it's extracted
 		logger.info("Streaming the package file to remote host where it's extracted");
@@ -145,7 +139,7 @@ public class RemoteMachineCommand implements Command {
 	 *            Local file, where the output is streamed
 	 * @return Return value of the command or -1
 	 */
-	private int runRemoteCommand(String cmd, String local_stdin_file, String local_stdout_file)
+	protected int runRemoteCommand(String cmd, String local_stdin_file, String local_stdout_file)
 			throws BackupException {
 		int retval = -1;
 		List<String> cmds = new ArrayList<String>(1);

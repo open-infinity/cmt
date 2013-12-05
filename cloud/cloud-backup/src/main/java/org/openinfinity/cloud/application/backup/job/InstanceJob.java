@@ -82,12 +82,20 @@ abstract public class InstanceJob implements ApplicationContextAware {
 	protected List<Command> commands = new LinkedList<Command>();
 	
 	/**
+	 * Object taking care of cluster synchronization.
+	 */
+	protected ClusterInfo cluster;
+	
+	/**
 	 * Needed by Quartz Scheduler.
 	 */
 	public final void run() throws Exception {
 		logger.debug("Executing commands");
 		List<Command> finished_commands = new LinkedList<Command>();
 		try {
+			// Cluster synchronization
+			cluster.start(this);
+			
 			// Execute the commands
 			for (Command cmd : commands) {
 				logger.debug("Executing " + cmd.getClass().getSimpleName());
@@ -114,6 +122,9 @@ abstract public class InstanceJob implements ApplicationContextAware {
 			}
 			
 			// It would be pointless to throw anything at this point
+		} finally {
+			// Cluster synchronization
+			cluster.finish(this);
 		}
 	}
 
@@ -185,10 +196,21 @@ abstract public class InstanceJob implements ApplicationContextAware {
 	public void setVirtualMachineInstanceId(String virtualMachineInstanceId) {
 		this.virtualMachineInstanceId = virtualMachineInstanceId;
 	}
+	public ClusterInfo getCluster() {
+		return cluster;
+	}
+	public void setCluster(ClusterInfo cluster) {
+		this.cluster = cluster;
+	}
 
 	@Override
 	public void setApplicationContext(ApplicationContext context) {
 		logger.trace("setApplicationContext(" + context + ")");
 		this.context = (ClassPathXmlApplicationContext) context;
+	}
+	
+	@Override
+	public String toString() {
+		return jobName;
 	}
 }

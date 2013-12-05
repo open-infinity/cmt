@@ -1,4 +1,9 @@
 class oi3-bigdatamgmt {
-	include oi3-bigdatamgmt::install
-	include oi3-bigdatamgmt::config
+    require oi3-ebs
+    require oi3-basic
+    require oi3-backup
+    include oi3-bigdatamgmt::install
+    include oi3-bigdatamgmt::config
+    include oi3-bigdatamgmt::backup
 }
+

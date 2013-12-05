@@ -1,12 +1,35 @@
+class oi3-backup {
+	include oi3-backup::install
+	include oi3-backup::config
+}
+
+class oi3-backup::install {
+    # LZMA compression utilities rpm needed by tar
+	package { "xz":
+		ensure => present,
+	}
+}
+
 class oi3-backup::config {
 
     # Directories
     $backup_directories = [
         "/opt/openinfinity/3.0.0/backup",
-        "/opt/openinfinity/3.0.0/backup/before-backup.d",
-        "/opt/openinfinity/3.0.0/backup/after-backup.d",
-        "/opt/openinfinity/3.0.0/backup/before-restore.d",
-        "/opt/openinfinity/3.0.0/backup/after-restore.d",
+
+        "/opt/openinfinity/3.0.0/backup/common",
+
+        "/opt/openinfinity/3.0.0/backup/cluster-backup-before.d",
+        "/opt/openinfinity/3.0.0/backup/cluster-backup-after.d",
+        
+        "/opt/openinfinity/3.0.0/backup/node-backup-before.d",
+        "/opt/openinfinity/3.0.0/backup/node-backup-after.d",
+
+        "/opt/openinfinity/3.0.0/backup/cluster-restore-before.d",
+        "/opt/openinfinity/3.0.0/backup/cluster-restore-after.d",
+        
+        "/opt/openinfinity/3.0.0/backup/node-restore-before.d",
+        "/opt/openinfinity/3.0.0/backup/node-restore-after.d",
+        
         "/opt/openinfinity/3.0.0/backup/exclude-rules.d",
         "/opt/openinfinity/3.0.0/backup/include-dirs.d",
     ]
@@ -43,6 +66,16 @@ class oi3-backup::config {
 		group => 'oiuser',
 		mode => 0755,
 		source => "puppet:///modules/oi3-backup/stream-restore",
+		require => File['/opt/openinfinity/3.0.0/backup'],
+	}
+	
+    # Cluster sync
+	file {"/opt/openinfinity/3.0.0/backup/cluster-sync":
+		ensure => present,
+		owner => 'oiuser',
+		group => 'oiuser',
+		mode => 0755,
+		source => "puppet:///modules/oi3-backup/cluster-sync",
 		require => File['/opt/openinfinity/3.0.0/backup'],
 	}
 	

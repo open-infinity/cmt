@@ -67,6 +67,16 @@ class MongoConfigContext(object):
         return self.configs + self.shards
     everything = property(get_everything)
 
+    # Params for /etc/bigdata file
+    def get_bigdata_params(self):
+        params = {}
+        if len(self.configs) >= 1:
+            cfg_server_names = []
+            for cfg_node in self.configs:
+                cfg_server_names.append(cfg_node.hostname)
+            params['mongo-config-servers'] = ','.join(cfg_server_names)
+        return params
+
     # Returns the other members of this replica set or [] if none was found
     def find_replicaset_members(self, replsetnum):
         rset = []

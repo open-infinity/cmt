@@ -1,0 +1,39 @@
+#!/bin/sh
+
+# In case of MongoDB, the following procedure is followed:
+# http://docs.mongodb.org/manual/tutorial/backup-sharded-cluster-with-database-dumps/
+
+source /opt/openinfinity/3.0.0/backup/common/bigdata-common
+
+if [ "x$BIGDATA_ROLE" = "x" ] ; then
+    echo "Can't finish cluster backup because this node is not part of a bigdata/nosql cluster" >/dev/stderr
+    exit 1
+elif [ "$BIGDATA_ROLE" = "config" ] ; then
+    # --------------------------------------------------------------------------
+    # 5b. Start one of the config servers
+    # --------------------------------------------------------------------------
+    if [ "$HOSTNAME" = "$MONGO_CFG_SERVER1" ] ; then
+        echo "Starting config server"
+        /etc/init.d/mongo-cfgsrv start || exit 1
+    fi
+    
+    # --------------------------------------------------------------------------
+    # 6. Re-enable Mongo balancer process
+    # --------------------------------------------------------------------------
+    mongo localhost:27017 << EOF
+    sh.setBalancerState(true);
+    exit;
+EOF
+elif [ "$BIGDATA_ROLE" = "shard" ] ; then
+    # --------------------------------------------------------------------------
+    # 5a. Restart one member of each replica set.
+    # --------------------------------------------------------------------------
+    if [ "$HOSTNAME" = "$MONGO_RSET_MEMBER1" ] ; then
+        /etc/init.d/mongod start || exit 1
+    fi
+else
+    # TODO: Hadoop support?
+    echo "At moment other than MongoDB bigdata backups are not supported." >/dev/stderr
+    exit 1
+fi
+

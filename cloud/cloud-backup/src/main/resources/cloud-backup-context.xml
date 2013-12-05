@@ -22,13 +22,10 @@
     	classpath*:/META-INF/properties/repository.properties" />
 
 	<context:component-scan base-package="org.openinfinity">
-		<context:exclude-filter type="regex" expression=".*ClusterTypeRowMapper.*"/>
-		<context:exclude-filter type="regex" expression=".*ScalingRule.*"/>
-		<context:exclude-filter type="regex" expression=".*HealthMonitoring.*"/>
-		<context:exclude-filter type="regex" expression=".*ClusterService.*"/>
-		<context:exclude-filter type="regex" expression=".*ClusterType.*"/>
-		<context:exclude-filter type="regex" expression=".*Machine.*"/>
         <context:exclude-filter type="regex" expression=".*ssp.*"/>
+		<context:exclude-filter type="regex" expression=".*HealthMonitoring.*"/>
+		<context:exclude-filter type="regex" expression=".*ClusterTypeRowMapper.*"/>
+		<context:exclude-filter type="regex" expression=".*ClusterType.*"/>
 	</context:component-scan>
 
 <!-- 
@@ -36,6 +33,10 @@
 		<constructor-arg name="symmetricKeyPath" value="${symmetric.key.path}" />
 	</bean>
 -->	
+
+	<bean id="instanceService" class="org.openinfinity.cloud.service.administrator.InstanceServiceImpl" />
+	<bean id="clusterService" class="org.openinfinity.cloud.service.administrator.ClusterServiceImpl" />
+	<bean id="machineService" class="org.openinfinity.cloud.service.administrator.MachineServiceImpl" />
 
 	<bean id="cloudDataSource" destroy-method="close"
 		class="org.apache.commons.dbcp.BasicDataSource">

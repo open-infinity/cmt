@@ -1,0 +1,43 @@
+#!/bin/bash
+
+# In case of MongoDB, the following procedure is followed:
+# http://docs.mongodb.org/manual/tutorial/backup-small-sharded-cluster-with-mongodump/
+# We can't use the following, because we don't want to backup cluster meta data
+# http://docs.mongodb.org/manual/tutorial/backup-sharded-cluster-with-database-dumps/
+
+source /opt/openinfinity/3.0.0/backup/common/bigdata-common
+
+if [ "x$BIGDATA_ROLE" = "x" ] ; then
+    echo "Can't prepare node backup because this node is not part of a bigdata/nosql cluster" >/dev/stderr
+    exit 1
+elif [ "$BIGDATA_ROLE" = "config" ] ; then
+    # --------------------------------------------------------------------------
+    # 3. Use mongodump to backup one of the config servers.
+    # --------------------------------------------------------------------------
+    # Since the fist config server is shutdown, we use the second one
+    if [ "$HOSTNAME" = "$MONGO_CFG_SERVER2" ] ; then
+        mongodump --journal --db config --host localhost:27018 -o $BACKUP_DIR
+        echo $BACKUP_DIR > $BIGDATA_INCLUDE_DIRS_FILE
+    else
+        echo "/dev/null" > $BIGDATA_INCLUDE_DIRS_FILE
+    fi
+elif [ "$BIGDATA_ROLE" = "shard" ] ; then
+    # --------------------------------------------------------------------------
+    # 4. Back up the replica set members of the shards
+    # --------------------------------------------------------------------------
+    if [ "$HOSTNAME" = "$MONGO_RSET_MEMBER2" ] ; then
+        echo "show dbs" > /tmp/mongo-showdbs.js
+        MONGODBS=$(mongo --quiet localhost:27018 < /tmp/mongo-showdbs.js | cut -f 1 | tr '\n' ' ')
+        for db in $MONGODBS ; do
+            echo "Making a backup of database $db"
+            mongodump --host localhost --port 27018 --db $db -o - | gzip > $BACKUP_DIR/$db.gz || exit 1
+        done
+        
+        echo $BACKUP_DIR > $BIGDATA_INCLUDE_DIRS_FILE
+    fi
+else
+    # TODO: Hadoop support?
+    echo "At moment other than MongoDB bigdata backups are not supported. Unexpected node type: '$BIGDATA_ROLE'." >/dev/stderr
+    exit 1
+fi
+

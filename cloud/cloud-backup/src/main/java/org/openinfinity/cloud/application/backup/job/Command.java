@@ -11,10 +11,10 @@ public interface Command {
 	/**
 	 * Executes the command.
 	 */
-	public void execute() throws Exception;
+	public abstract void execute() throws Exception;
 	
 	/**
 	 * Executes the command.
 	 */
-	public void undo() throws Exception;
+	public abstract void undo() throws Exception;
 }

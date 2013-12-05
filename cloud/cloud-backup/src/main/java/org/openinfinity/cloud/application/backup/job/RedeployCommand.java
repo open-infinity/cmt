@@ -9,7 +9,7 @@ import org.apache.log4j.Logger;
  * 
  * @author Timo Saarinen
  */
-public class RedeployCommand {
+public class RedeployCommand implements Command {
 	private Logger logger = Logger.getLogger(RedeployCommand.class);
 
 	private InstanceJob job;
@@ -19,9 +19,11 @@ public class RedeployCommand {
 	}
 
 	public void execute() throws Exception {
+		// TODO
 	}
 	
 	public void undo() throws Exception {
+		// TODO
 	}
 
 }

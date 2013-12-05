@@ -293,8 +293,13 @@ class Node(object):
             # Write a new config
             config = ConfigParser.ConfigParser()
             config.add_section("bigdata")
+            config.set("bigdata", "type", self.type)
             config.set("bigdata", "bigdata-id", read_bigdata_unique_id())
             config.set("bigdata", "node-role", self.role)
+            config.set("bigdata", "hostname", self.hostname)
+            params = cc.get_bigdata_params()
+            for k in params:
+                config.set("bigdata", k, params[k])
             sio = string_io.StringIO()
             config.write(sio)
             ssh.send_file_to(sio.getvalue(), "/etc/bigdata")

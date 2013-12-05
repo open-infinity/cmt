@@ -54,6 +54,8 @@
 #
 # 1.3.1 2013-10-01  Hive support related fixes
 #
+# 1.4.0 2013-12-04  Cloud-backup related changes
+#
 
 # Update the application files
 export TMPDIR=/tmp/bigdata-fpm-ROOT
@@ -67,7 +69,7 @@ cp -pR ../bin $TMPDIR/ROOT/
 
 # Build RPM package
 fpm -s dir -t rpm -C $TMPDIR -p $TARGETDIR -a noarch \
-	-n oi3-bigdata-mgmt --version 1.3.1 --iteration 2 \
+	-n oi3-bigdata-mgmt --version 1.4.0 --iteration 1 \
 	--description "Hadoop, HBase and MongoDB cluster up and down scaling scipts" \
 	-d "python python-paramiko" \
 	--prefix /opt/bigdata \

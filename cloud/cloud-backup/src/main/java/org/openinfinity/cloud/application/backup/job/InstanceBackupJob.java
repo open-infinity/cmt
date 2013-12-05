@@ -9,8 +9,9 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  * @author Timo Saarinen
  */
 public class InstanceBackupJob extends InstanceJob {
-	public InstanceBackupJob(ClassPathXmlApplicationContext context) throws BackupException {
+	public InstanceBackupJob(ClusterInfo cluster, ClassPathXmlApplicationContext context) throws BackupException {
 		assert context != null;
+		this.cluster = cluster;
 		this.context = context;
 		
 		commands.add(new RemoteMachineCommand(this));

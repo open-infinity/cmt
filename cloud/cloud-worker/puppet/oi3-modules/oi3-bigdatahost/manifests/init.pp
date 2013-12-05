@@ -9,5 +9,6 @@ class oi3-bigdatahost::config {
 }
 
 class oi3-bigdatahost {
-	include oi3-bigdatahost::config
+	include oi3-bigdatahost::config, oi3-bigdatahost::backup
 }
+
