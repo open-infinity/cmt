@@ -42,10 +42,11 @@ public class ParameterValue {
     
     @NonNull
     @NotScript
-    private int type;
-    
-    @NonNull
-    @NotScript
     private String value;
-    
+
+    public ParameterValue(int parameterKeyId, String value) {
+        this.parameterKeyId = parameterKeyId;
+        this.value = value;
+    }
+
 }

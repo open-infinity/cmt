@@ -23,7 +23,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
 import java.util.Collection;
-
+import java.util.LinkedList;
 
 
 /**
@@ -63,7 +63,17 @@ public class ParameterValueServiceImpl implements ParameterValueService {
     }
 
     @Override
-    public Collection<ParameterValue> loadAll(int parameterKeyId) {
+    public Collection<ParameterValue> loadParameterValues(int parameterKeyId) {
         return parameterValueRepository.loadAll(parameterKeyId);
+    }
+
+    @Override
+    public Collection<String> loadValues(int parameterKeyId) {
+        Collection<ParameterValue> parameterValues = parameterValueRepository.loadAll(parameterKeyId);
+        LinkedList<String> values = new LinkedList<String>();
+        for (ParameterValue pv : parameterValues){
+            values.add(pv.getValue());
+        }
+        return values;
     }
 }

@@ -363,7 +363,6 @@ DROP TABLE IF EXISTS `configuration_template_parameter_value_tbl`;
 CREATE TABLE `configuration_template_parameter_value_tbl` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `parameter_key_id` int(11) NOT NULL,
-  `type` int(11) NOT NULL,
   `parameter_value` varchar(30) NOT NULL,
   PRIMARY KEY (`id`),
   CONSTRAINT fk_parameter_key_dependency FOREIGN KEY (parameter_key_id) REFERENCES configuration_template_parameter_key_tbl(id)

@@ -110,7 +110,7 @@ jQuery(function($){
                           {name:'description', index:'description', width:200, align:"left", sortable:true},
                           {name:'minMachines', index:'minMachines', width:60, align:"center", sortable:true},
                           {name:'maxMachines', index:'maxMachines', width:60, align:"center", sortable:true},
-                          {name:'replicated', index:'replicated', width:30, align:"center", sortable:true},
+                          {name:'replicated', index:'replicated', width:28, align:"center", sortable:true},
                           {name:'minReplicationMachines', index:'minReplicationMachines', width:86, align:"center", sortable:true},
                           {name:'maxReplicationMachines', index:'maxReplicationMachines', width:86, align:"center", sortable:true},
                           ],
@@ -162,18 +162,25 @@ jQuery(function($){
 
         bindEventHandlers: function(){
             // Templates
-            app.editTemplateButton.bind( "click", app.editTemplate);
+            //app.editTemplateButton.bind( "click", app.editTemplate);
+            app.editTemplateButton.bind( "click", app.editTableRow(app.templatesTable, app.dialog.template));
             app.newTemplateButton.bind( "click", app.createTemplate);
             app.deleteTemplateButton.bind( "click", app.deleteTemplate);
 
             // Elements
             app.editElementButton.bind( "click", app.editTableRow(app.elementsTable, app.dialog.element));
-            app.newElementButton.bind( "click", app.createElement);
+            app.newElementButton.bind( "click", app.create(app.dialog.element));
             app.deleteElementButton.bind( "click", app.deleteElement);
         },
 
         createTemplate : function(){
             app.dialog.template.create();
+        },
+
+        create : function(dialog){
+            return function(){
+                dialog.create();
+            }
         },
 
         deleteTemplate : function(){
@@ -227,7 +234,7 @@ jQuery(function($){
                     });
             });
         },
-
+        /*
         editTemplate : function(){
             var id = app.templatesTable.jqGrid('getGridParam','selrow');
             if (id)	{
@@ -237,7 +244,7 @@ jQuery(function($){
                 alert("Please select a row for editing");
             }
         },
-
+        */
         editTableRow: function(argTable, argDialog){
             return (function(){
                 var table = argTable;
