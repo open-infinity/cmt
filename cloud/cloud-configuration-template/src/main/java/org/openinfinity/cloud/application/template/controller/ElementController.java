@@ -23,7 +23,6 @@ import org.codehaus.jackson.type.TypeReference;
 import org.openinfinity.cloud.comon.web.LiferayService;
 import org.openinfinity.cloud.domain.configurationtemplate.ConfigurationElement;
 import org.openinfinity.cloud.domain.configurationtemplate.ParameterKey;
-import org.openinfinity.cloud.domain.configurationtemplate.ParameterValue;
 import org.openinfinity.cloud.service.configurationtemplate.ConfigurationElementDependencyService;
 import org.openinfinity.cloud.service.configurationtemplate.ConfigurationElementService;
 import org.openinfinity.cloud.service.configurationtemplate.ParameterKeyService;
@@ -62,6 +61,7 @@ public class ElementController {
     private static final String GET_ELEMENTS = "getElements";
 	private static final String GET_ELEMENT = "getElement";
 	private static final String GET_DEPENDENCIES = "getDependencies";
+	private static final String GET_ALL_DEPENDENCIES = "getAllAvailableDependencies";
 	private static final String GET_PARAMETER_KEYS_AND_VALUES = "getParameterKeysAndValues";
 	private static final String EDIT_ELEMENT = "editElement";
     private static final String DELETE_ELEMENT = "deleteElement";
@@ -137,7 +137,6 @@ public class ElementController {
         }
     }
 
-    // TODO: testme!
     @ResourceMapping(GET_DEPENDENCIES)
     public void getDependencies(ResourceRequest request, ResourceResponse response, @RequestParam("elementId") int elementId) throws Exception {
         try {
@@ -151,20 +150,32 @@ public class ElementController {
         }
     }
 
+    @ResourceMapping(GET_ALL_DEPENDENCIES)
+    public void getAllDependencies(ResourceRequest request, ResourceResponse response) throws Exception {
+        try {
+            // TODO: aspect for authenitaction
+            User user = liferayService.getUser(request, response);
+            if (user == null) return;
+            Collection<ConfigurationElement> availableItems = elementService.loadAll();
+            SerializerUtil.jsonSerialize(response.getWriter(), new ConfigurationElementContainer(availableItems, new ArrayList<ConfigurationElement>()));
+        } catch (Exception e) {
+            ExceptionUtil.throwSystemException(e);
+        }
+    }
+
     @ResourceMapping(GET_PARAMETER_KEYS_AND_VALUES)
     public void getParameterKeysAndValues(ResourceRequest request, ResourceResponse response, @RequestParam("elementId") int elementId) throws Exception {
         try {
-            LOG.debug("---------ENTER getParameterKeysAndValues() --------");
             User user = liferayService.getUser(request, response);
             if (user == null) return;
-            Map<String, Collection<ParameterValue>> parameters = new LinkedHashMap<String, Collection<ParameterValue>>();
+            Map<String, Collection<String>> keyValuesMap = new LinkedHashMap<String, Collection<String>>();
             Collection<ParameterKey> keys = parameterKeyService.loadAll(elementId);
             for (ParameterKey key : keys){
-                Collection<ParameterValue> values = parameterValueService.loadAll(key.getId());
+                Collection<String> values = parameterValueService.loadValues(key.getId());
                 LOG.debug("Key:" + key.getName() + "Value:" + values);
-                parameters.put(key.getName(), values);
+                keyValuesMap.put(key.getName(), values);
             }
-            SerializerUtil.jsonSerialize(response.getWriter(), parameters);
+            SerializerUtil.jsonSerialize(response.getWriter(), keyValuesMap);
         } catch (Exception e) {
             ExceptionUtil.throwSystemException(e);
         }
@@ -177,21 +188,46 @@ public class ElementController {
                              @RequestParam("parameters") String parametersData
     ) {
         try {
-            LOG.debug("---------ENTER editElement() --------");
             User user = liferayService.getUser(request, response);
             if (user == null) return;
 
             ObjectMapper mapper = new ObjectMapper();
             ConfigurationElement element = mapper.readValue(elementData, ConfigurationElement.class);
             Collection<Integer> dependenciesList = mapper.readValue(dependenciesData, Collection.class);
-            Map<String, Collection<ParameterValue>> keyValueMap = mapper.readValue(parametersData, new TypeReference<Map<String, Collection<ParameterValue>>>(){});
+            Map<String, Collection<String>> keyValuesMap = mapper.readValue(parametersData, new TypeReference<Map<String, Collection<String>>>(){});
+
+            LOG.debug("ConfigurationElement:" + element);
+            LOG.debug("dependenciesList:" + dependenciesList);
+            LOG.debug("Map kv:" + keyValuesMap);
+
+            elementService.update(element, dependenciesList, keyValuesMap);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.setProperty(ResourceResponse.HTTP_STATUS_CODE, HttpCodes.HTTP_ERROR_CODE_SERVER_ERROR);
+        }
+    }
+
+    @ResourceMapping(CREATE_ELEMENT)
+    public void createElement(ResourceRequest request, ResourceResponse response,
+                            @RequestParam("element") String elementData,
+                            @RequestParam("dependencies") String dependenciesData,
+                            @RequestParam("parameters") String parametersData
+    ) {
+        try {
+            User user = liferayService.getUser(request, response);
+            if (user == null) return;
+
+            ObjectMapper mapper = new ObjectMapper();
+            ConfigurationElement element = mapper.readValue(elementData, ConfigurationElement.class);
+            Collection<Integer> dependenciesList = mapper.readValue(dependenciesData, Collection.class);
+            Map<String, Collection<String>> keyValueMap = mapper.readValue(parametersData, new TypeReference<Map<String, Collection<String>>>(){});
 
             LOG.debug("ConfigurationElement:" + element);
             LOG.debug("dependenciesList:" + dependenciesList);
             LOG.debug("Map kv:" + keyValueMap);
-            //configurationTemplateService.update(new ConfigurationTemplate(templateId, templateName, templateDescription), mapper.readValue(elementsSelected, List.class), mapper.readValue(organizationsSelected, List.class));
 
-            elementService.update(element, dependenciesList, keyValueMap);
+            elementService.create(element, dependenciesList, keyValueMap);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -202,8 +238,6 @@ public class ElementController {
     @ResourceMapping(DELETE_ELEMENT)
     public void deleteElement(ResourceRequest request, ResourceResponse response, @RequestParam("id") int elementId) throws Exception {
         try {
-            LOG.debug("---------ENTER deleteElement() --------");
-            LOG.debug("id:" + elementId);
             User user = liferayService.getUser(request, response);
             if (user == null) return;
             elementService.delete(elementId);

@@ -38,8 +38,10 @@ public interface ConfigurationElementService extends AbstractCrudServiceInterfac
 
     Collection<ConfigurationElement> loadDependees(int elementId);
 
-    void update(ConfigurationElement element, Collection<Integer> dependencies, Map<String, Collection<ParameterValue>> keyValues);
+    void update(ConfigurationElement element, Collection<Integer> dependencies, Map<String, Collection<String>> keyValues);
 
     void delete(int elementId);
+
+    void create(ConfigurationElement element, Collection<Integer> dependencies, Map<String, Collection<String>> parameters);
 
 }

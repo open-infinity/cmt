@@ -68,10 +68,8 @@ public class TemplateController {
     private static final String GET_ORGANIZATIONS_FOR_TEMPLATE = "getOrganizationsForTemplate";
     private static final String GET_ALL_ELEMENTS = "getAllAvailableElements";
     private static final String GET_ALL_ORGANIZATIONS = "getAllOrganizations";
-
     private static final String EDIT_TEMPLATE = "editTemplate";
     private static final String GET_TEMPLATE = "getTemplate";
-
     private static final String CREATE_TEMPLATE = "createTemplate";
     private static final String DELETE_TEMPLATE = "deleteTemplate";
 

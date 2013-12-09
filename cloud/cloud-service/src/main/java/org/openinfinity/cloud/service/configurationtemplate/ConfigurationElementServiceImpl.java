@@ -107,11 +107,10 @@ public class ConfigurationElementServiceImpl implements ConfigurationElementServ
         return elementRepository.loadAllForTemplate(templateId);
     }
 
-    // TODO: refactoring needed.
-    // Do real update instead of delete + create
+    // TODO: refactoring needed. Do real update instead of delete + create
     @Override
     @Transactional(rollbackFor=Exception.class)
-    public void update(ConfigurationElement element, Collection<Integer> dependencies, Map<String, Collection<ParameterValue>> parameters){
+    public void update(ConfigurationElement element, Collection<Integer> dependencies, Map<String, Collection<String>> parameters){
         elementRepository.update(element);
 
         // Delete dependees, then put new dependees to database
@@ -121,21 +120,29 @@ public class ConfigurationElementServiceImpl implements ConfigurationElementServ
         }
 
         // Delete values for each key, then delete keys
-        for (String name : parameters.keySet()){
-            int keyId = keyRepository.findIdByName(name);
-            if (keyId >= 0){
-                valueRepository.deleteByKeyId(keyRepository.findIdByName(name));
-            }
+        for(ParameterKey key : keyRepository.loadAll(element.getId())){
+            valueRepository.deleteByKeyId(key.getId());
         }
         keyRepository.deleteByElementId(element.getId());
+        storeKeysAndValues(parameters, element);
+    }
 
-        // Create keys and create values
+    @Override
+    @Transactional(rollbackFor=Exception.class)
+    public void create(ConfigurationElement element, Collection<Integer> dependencies, Map<String, Collection<String>> parameters){
+        elementRepository.create(element);
+        for (Integer d : dependencies){
+            elementDependencyRepository.create(element.getId(), d.intValue());
+        }
+        storeKeysAndValues(parameters, element);
+    }
+
+    private void storeKeysAndValues(Map<String, Collection<String>> parameters, ConfigurationElement element){
         for (String name : parameters.keySet()){
             ParameterKey key = new ParameterKey(element.getId(), name);
             keyRepository.create(key);
-            for (ParameterValue value : parameters.get(name)){
-                value.setParameterKeyId(key.getId());
-                valueRepository.create(value);
+            for (String value : parameters.get(name)){
+                valueRepository.create(new ParameterValue(key.getId(), value));
             }
         }
     }

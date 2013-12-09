@@ -30,6 +30,9 @@ import java.util.Collection;
  */
 public interface ParameterValueService extends AbstractCrudServiceInterface<ParameterValue> {
 
-    Collection<ParameterValue> loadAll(int parameterKeyId);
+    Collection<ParameterValue> loadParameterValues(int parameterKeyId);
+
+    Collection<String> loadValues(int parameterKeyId);
+
 
 }

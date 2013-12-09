@@ -63,7 +63,7 @@ public class ParameterValueRepositoryJdbcImpl implements ParameterValueRepositor
         SimpleJdbcInsert insert = new SimpleJdbcInsert(dataSource).withTableName("configuration_template_parameter_value_tbl").usingGeneratedKeyColumns("id");
         Map<String,Object> parameters = new HashMap<String,Object>();
         parameters.put("parameter_key_id", value.getParameterKeyId());
-        parameters.put("type", value.getType());
+        //parameters.put("type", value.getType());
         parameters.put("parameter_value", value.getValue());
         Number newId = insert.executeAndReturnKey(parameters);
         value.setId(newId.intValue());
@@ -109,7 +109,7 @@ public class ParameterValueRepositoryJdbcImpl implements ParameterValueRepositor
 		public ParameterValue mapRow(ResultSet resultSet, int rowNum) throws SQLException {    
 		    return new ParameterValue(resultSet.getInt("id"),
 		                       resultSet.getInt("parameter_key_id"),
-		                       resultSet.getInt("type"),
+		                       //resultSet.getInt("type"),
 		                       resultSet.getString("parameter_value"));
 		}
 	}

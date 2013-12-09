@@ -95,7 +95,7 @@ public class ConfigurationTemplateServiceImpl implements ConfigurationTemplateSe
         return configurationTemplateRepository.load(id);
     }
 
-    // TODO: probably this function can be oprtimized
+    // TODO: probably this function can be optimized
     @Override
     @Transactional
     public List<ConfigurationTemplate> getTemplates(List<Long> organizationIds) {

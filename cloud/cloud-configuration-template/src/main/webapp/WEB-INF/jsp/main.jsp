@@ -265,7 +265,9 @@
                 <div id="dlg-list-values-container" class="dlg-list-panel-container dlg-tab-item">
                     <div class="dlg-list-panel-container-title">Values</div>
                     <div class="dlg-list-panel-container-columns">
+                         <%--
                         <div class="list-item-column">Type</div>
+                        --%>
                         <div>Value</div>
                     </div>
                     <div id="dlg-values" class="dlg-item-list-container">
