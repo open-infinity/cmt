@@ -2,6 +2,7 @@
 
     var app = window.app || {};
     var dlg = window.app.dialog.template || {};
+    var infoDlg = window.app.dialog.info;
 
     $.extend(dlg, {
 
@@ -13,8 +14,6 @@
         mode : null,
 
         tabs : $("#dlg-edit-template-tabs"),
-
-        infoDialog : $("#dlg-info"),
 
         // Template
         templateIdContainer : $(".dlg-edit-template-template-label-container").first(),
@@ -91,6 +90,7 @@
                 populateElements(dataElements[0]);
                 populateOrganizations(dataOrganizations[0]);
                 configureDragAndDrop();
+                infoDlg.bind();
                 })
             .fail(function(jqXHR, textStatus, errorThrown) {
                 console.log("Error fetching items for dialog");
@@ -127,7 +127,9 @@
         autoOpen: false,
         modal: true,
         width: 650,
-        height: 510 ,
+        height: 510,
+        draggable: false,
+        resizable: false,
         buttons: {
             "Submit changes": function() {
                 submitTemplate(dlg.mode);
@@ -138,20 +140,6 @@
             Cancel: function() {
                 cleanUpDialog($(this));
                 $(this).hide();
-                $(this).dialog( "close" );
-            }
-        }
-    });
-
-    dlg.infoDialog.dialog({
-        title: "Detailed information",
-        autoOpen: false,
-        modal: true,
-        width: 1000,
-        height: 200 ,
-        buttons: {
-            Ok: function() {
-                cleanUpTable($(this));
                 $(this).dialog( "close" );
             }
         }
@@ -174,7 +162,7 @@
             },
             tolerance: "touch"
         });
-        $("li", ".list-container").draggable({
+        $("li", ".dlg-item-list-container").draggable({
             revert: "invalid",
             containment: "document",
             helper: "clone",
@@ -188,15 +176,18 @@
                 }
             }
         });
-        $(".list-container").find("li").
+
+        /*
+        $(".dlg-item-list-container").find("li").
             click(function(){
                 $(this).toggleClass("ui-state-highlight");
             }).
             dblclick(function () {
-                dlg.infoDialog.dialog("open");
+                app.dialog.info.dialog("open");
                 var configData = $(this).data("config");
                 storeToTable(configData, $("#dlg-item-table"));
             });
+            */
     }
 
     function populateElements(data){
@@ -224,29 +215,24 @@
     }
 
     function populateOrganizations(data){
-        try{
-            var listSelected = dlg.selectedOrganizationsPanel.find("ul");
-            var listAvailable = dlg.availableOrganizationsPanel.find("ul");
-            var htmlTemplate = "<li class='ui-state-default'>\
-                                  <div class='dlg-edit-template-organization-id'></div>\
-                                  <div class='dlg-edit-template-organization-name'></div>\
-                               </li>";
-            var selectedIndices = [];
+        var listSelected = dlg.selectedOrganizationsPanel.find("ul");
+        var listAvailable = dlg.availableOrganizationsPanel.find("ul");
+        var htmlTemplate = "<li class='ui-state-default'>\
+                              <div class='dlg-edit-template-organization-id'></div>\
+                              <div class='dlg-edit-template-organization-name'></div>\
+                           </li>";
+        var selectedIndices = [];
 
-            $.each(data.selected, function(index, value){
-               storeOrganizationToDom(htmlTemplate, value, listSelected);
-               selectedIndices.push(value.organizationId);
-            });
+        $.each(data.selected, function(index, value){
+           storeOrganizationToDom(htmlTemplate, value, listSelected);
+           selectedIndices.push(value.organizationId);
+        });
 
-            $.each(data.available, function(index, value){
-               if (selectedIndices.indexOf(value.organizationId) == -1){
-                   storeOrganizationToDom(htmlTemplate, value, listAvailable);
-               }
-            });
-        }
-        catch(err){
-            console.log(err.message);
-        }
+        $.each(data.available, function(index, value){
+           if (selectedIndices.indexOf(value.organizationId) == -1){
+               storeOrganizationToDom(htmlTemplate, value, listAvailable);
+           }
+        });
     }
 
     function storeElementToDom(htmlTemplate, value, list){
@@ -257,19 +243,24 @@
         lastChild.data("config", value);
     }
 
+/*
     function storeToTable(configData, table){
-        var htmlTableRows = "<tr></tr><tr></tr>";
-        table.append(htmlTableRows);
         for (var key in configData) {
-            table.find("tr:first-child").append('<th>' + key + '</th>');
-            table.find("tr:last-child").append('<td>' + configData[key] + '</td>');
+            table.append("<tr>" + "<th style='text-align: left;'>" + key + "</th>" + "<td>" +  configData[key] +  "</td>" + "</tr>");
         }
     }
+  */
 
     function storeOrganizationToDom(htmlTemplate, value, list){
         list.append(htmlTemplate);
         var lastChild = list.find("li:last-child");
-        lastChild.find(".dlg-edit-template-organization-id").text(value.organizationId.substring(0, 7));
+
+        var oid = value.organizationId;
+        if (oid >= 1000000) {
+            oid = Math.floor(100000 / oid) + "..";
+        }
+
+        lastChild.find(".dlg-edit-template-organization-id").text(oid);
         lastChild.find(".dlg-edit-template-organization-name").text(value.name.substring(0, 13));
         lastChild.data("config", value);
      }
@@ -285,14 +276,10 @@
     }
 
     function cleanUpDialog(that){
-        that.find(".list-container").find("ul").empty();
+        that.find(".dlg-item-list-container").find("ul").empty();
         dlg.templateId.text("");
         dlg.templateName.val("");
         dlg.templateDescription.val("");
-    }
-
-    function cleanUpTable(that){
-        that.find("tr").remove();
     }
 
     function submitTemplate(mode){

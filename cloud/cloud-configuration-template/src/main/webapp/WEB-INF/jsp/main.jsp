@@ -47,6 +47,9 @@
         <ul id ="tabsReferenceList" >
 			<li><a href="#templatesTab">Templates</a></li>
 			<li><a href="#elementsTab">Elements</a></li>
+			<li><a href="#modulesTab">Installation modules</a></li>
+			<li><a href="#packagesTab">Installation packages</a></li>
+			<li><a href="#platformsTab">Platforms</a></li>
         </ul>
 
 		<div id="templatesTab">
@@ -66,6 +69,36 @@
                 <button id="edit-element">Edit</button>
                 <button id="new-element">New</button>
                 <button id="delete-element">Delete</button>
+            </div>
+        </div>
+
+        <div id="modulesTab">
+            <table id="modules-grid"> </table>
+            <div id="modules-grid-pager"> </div>
+            <div class="ui-button-bar">
+                <button id="edit-modules">Edit</button>
+                <button id="new-modules">New</button>
+                <button id="delete-modules">Delete</button>
+            </div>
+        </div>
+
+        <div id="packagesTab">
+            <table id="modules-grid"> </table>
+            <div id="modules-grid-pager"> </div>
+            <div class="ui-button-bar">
+                <button id="edit-modules">Edit</button>
+                <button id="new-modules">New</button>
+                <button id="delete-modules">Delete</button>
+            </div>
+        </div>
+
+        <div id="platformsTab">
+            <table id="modules-grid"> </table>
+            <div id="modules-grid-pager"> </div>
+            <div class="ui-button-bar">
+                <button id="edit-modules">Edit</button>
+                <button id="new-modules">New</button>
+                <button id="delete-modules">Delete</button>
             </div>
         </div>
 	</div>
@@ -110,7 +143,7 @@
                         <div class="list-item-column">Platform</div>
                         <div>Version</div>
                     </div>
-                    <div id="dlg-edit-template-selected-elements" class="list-container">
+                    <div id="dlg-edit-template-selected-elements" class="dlg-item-list-container">
                         <ul></ul>
                     </div>
                 </div>
@@ -121,7 +154,7 @@
                         <div class="list-item-column">Platform</div>
                         <div>Version</div>
                     </div>
-                    <div class="list-container">
+                    <div class="dlg-item-list-container">
                         <ul></ul>
                     </div>
                 </div>
@@ -137,7 +170,7 @@
                         <div class="list-item-column">Id</div>
                         <div>Name</div>
                     </div>
-                    <div id="dlg-edit-template-selected-organizations" class="list-container">
+                    <div id="dlg-edit-template-selected-organizations" class="dlg-item-list-container">
                         <ul></ul>
                     </div>
                 </div>
@@ -148,7 +181,7 @@
                         <div class="list-item-column">Id</div>
                         <div>Name</div>
                     </div>
-                    <div class="list-container">
+                    <div class="dlg-item-list-container">
                         <ul></ul>
                     </div>
                 </div>
@@ -205,7 +238,13 @@
                 </div>
                 <div class="dlg-element-container">
                     <div class="dlg-element-value-label">Replicated</div>
-                    <input id="dlg-element-value-replicated" type='text' value=''/>
+                    <%--
+                    <input id="dlg-element-value-replicated" type='radio' value=''/>
+                    --%>
+                    <div id="dlg-element-replicated-radio">
+                        <input type="radio" name="dlg-element-replicated-radio" value="true">Yes
+                        <input type="radio" name="dlg-element-replicated-radio" value="false">No
+                    </div>
                 </div>
                 <div class="dlg-element-container">
                     <div class="dlg-element-value-label">MinReplMachines</div>
@@ -255,21 +294,12 @@
             <div id="dlg-keys-values-container" class ="dlg-tab-items-container">
                 <div class="dlg-list-panel-container dlg-tab-item">
                     <div id="dlg-list-keys-container" class="dlg-list-panel-container-title">Keys</div>
-                    <div class="dlg-list-panel-container-columns">
-                        <div class="list-item-column">Name</div>
-                    </div>
                     <div id="dlg-keys" class="dlg-item-list-container">
                         <ul></ul>
                     </div>
                 </div>
                 <div id="dlg-list-values-container" class="dlg-list-panel-container dlg-tab-item">
-                    <div class="dlg-list-panel-container-title">Values</div>
-                    <div class="dlg-list-panel-container-columns">
-                         <%--
-                        <div class="list-item-column">Type</div>
-                        --%>
-                        <div>Value</div>
-                    </div>
+                    <div class="dlg-list-panel-container-title">Values for key:<span id="dlg-element-key-name"></span></div>
                     <div id="dlg-values" class="dlg-item-list-container">
                         <ul></ul>
                     </div>

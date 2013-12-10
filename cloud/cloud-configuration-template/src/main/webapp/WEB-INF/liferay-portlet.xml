@@ -13,6 +13,7 @@
 		<header-portlet-javascript>/js/plugins/jquery.jqGrid.min.js</header-portlet-javascript>
         <header-portlet-javascript>/js/configurationtemplate/init.js</header-portlet-javascript>
 		<header-portlet-javascript>/js/configurationtemplate/application.js</header-portlet-javascript>
+        <footer-portlet-javascript>/js/configurationtemplate/dialog/dialog.info.js</footer-portlet-javascript>
         <footer-portlet-javascript>/js/configurationtemplate/dialog/dialog.template.js</footer-portlet-javascript>
         <footer-portlet-javascript>/js/configurationtemplate/dialog/dialog.element.js</footer-portlet-javascript>
 	</portlet>

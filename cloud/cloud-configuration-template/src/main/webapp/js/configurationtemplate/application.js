@@ -43,6 +43,9 @@ jQuery(function($){
             app.editElementButton = $("#edit-element");
             app.newElementButton = $("#new-element");
             app.deleteElementButton = $("#delete-element");
+
+            // Generic info dialog
+            //app.dialog.info = $("#dlg-info");
         },
 
         setupTemplatesTable: function(){
@@ -138,9 +141,26 @@ jQuery(function($){
                 {odata : ['equal', 'not equal', 'less', 'less or equal','greater','greater or equal', 'begins with','does not begin with','is in','is not in','ends with','does not end with','contains','does not contain']}, // search options
                 {}  //  view parameters
             );
-
         },
-
+        /*
+        setupDialogs: function(){
+            app.dialog.info.dialog({
+                title: "Detailed information",
+                autoOpen: false,
+                modal: true,
+                width: "auto",
+                height: "auto",
+                draggable: false,
+                resizable: false,
+                buttons: {
+                    Ok: function() {
+                        cleanUpInfoDialogTable($(this));
+                        $(this).dialog("close");
+                    }
+                }
+            });
+        },
+        */
         reloadTemplatesTable: function(){
             app.templatesTable.setGridParam({datatype:'json', page:1}).trigger('reloadGrid');
         },
@@ -171,6 +191,18 @@ jQuery(function($){
             app.editElementButton.bind( "click", app.editTableRow(app.elementsTable, app.dialog.element));
             app.newElementButton.bind( "click", app.create(app.dialog.element));
             app.deleteElementButton.bind( "click", app.deleteElement);
+        },
+
+        bindInfoDblClick : function(){
+            $(".dlg-item-list-container").find("li").
+            click(function(){
+                $(this).toggleClass("ui-state-highlight");
+            }).
+            dblclick(function () {
+                app.dialog.info.dialog("open");
+                var configData = $(this).data("config");
+                storeToTable(configData, $("#dlg-item-table"));
+            });
         },
 
         createTemplate : function(){
@@ -259,15 +291,30 @@ jQuery(function($){
                     alert("Please select a row for editing");
                 }
             });
-        },
-
-
+        }
     });
+    /*
+    function cleanUpInfoDialogTable(that){
+        that.find("tr").remove();
+    }
 
+    function bindInfoDblClick(){
+        $(".dlg-item-list-container").find("li").
+        click(function(){
+            $(this).toggleClass("ui-state-highlight");
+        }).
+        dblclick(function () {
+            app.dialog.info.dialog("open");
+            var configData = $(this).data("config");
+            storeToTable(configData, $("#dlg-item-table"));
+        });
+    }
+    */
 	app.init();
 	app.setupTemplatesTable();
 	app.setupElementsTable();
 	app.setupTabs();
+	//app.setupDialogs();
 	app.bindEventHandlers();
 });
 		

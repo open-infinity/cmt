@@ -23,5 +23,7 @@
  app.dialog = new Object();
  app.dialog.template = new Object();
  app.dialog.element = new Object();
+ app.dialog.info = new Object();
+
 
 
