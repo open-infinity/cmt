@@ -1,8 +1,8 @@
 (function($) {
 
-    var app = window.app || {};
+    //var app = window.app || {};
     var dlg = window.app.dialog.module || {};
-    var infoDlg = window.app.dialog.info;
+    //var infoDlg = window.app.dialog.info;
 
     dlg.mode =  null;
     dlg.state = {};
@@ -16,11 +16,11 @@
         },
 
         edit : function(id){
-            var jqxhrTemplate = $.ajax({
-                url: portletURL.url.element.getModuleURL + "&moduleId=" + id,
+            $.ajax({
+                url: portletURL.url.module.getURL + "&moduleId=" + id,
                 dataType: "json"
                 }).done(function(data) {
-
+                console.log(data);	
                 }).fail(function(jqXHR, textStatus, errorThrown) {
                     console.log("Error fetching installation module");
             });
@@ -54,15 +54,16 @@
             dlg.mode = mode;
             var title;
             if (mode == "edit"){
-                dlg.html.idContainer.show();
+                //dlg.html.idContainer.show();
                 title = "Edit element";
             }
             else if (mode == "create"){
-                dlg.html.idContainer.hide();
+                //dlg.html.idContainer.hide();
                 title = "Create new element";
             }
             else{
                 console.log("Unexpected mode for dialog.");
+                return;
             }
 
             // set default value to radio box
@@ -71,8 +72,8 @@
 
             // open dialog
             dlg.html.self.dialog("option", "title", title);
-            dlg.html.tabs.tabs(('select', 0));
-            dlg.html.self.show();
+            //dlg.html.tabs.tabs(('select', 0));
+            //dlg.html.self.show();
             dlg.html.self.dialog("open");
         },
 
@@ -96,9 +97,9 @@
         height: 560 ,
         buttons: {
             "Submit changes": function() {
-                if (submitElement(dlg.mode) === 0){
-                    dlg.close();
-                }
+                //if (submitElement(dlg.mode) === 0){
+                //    dlg.close();
+                //}
             },
             Cancel: function() {
                 dlg.close();
@@ -167,7 +168,7 @@
                 err = 2;
             });
             */
-        }
+        //}
         /*)
         else{
             console.log("Invalid parameters, aborting submit");

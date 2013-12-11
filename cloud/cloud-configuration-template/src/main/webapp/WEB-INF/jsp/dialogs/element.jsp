@@ -32,90 +32,90 @@
 
         <%-- Tabs --%>
         <div id="dlg-element-tabs">
-        <ul>
-            <li><a href="#dlg-element-general-tab">General</a></li>
-            <li><a href="#dlg-element-dependencies-tab">Dependencies</a></li>
-            <li><a href="#dlg-element-keys-tab">Keys</a></li>
-        </ul>
-
-        <%-- General --%>
-        <div id = "dlg-element-general-tab">
-            <div id="dlg-element-fields" class="dlg-tab-items-container">
-                <div class="dlg-element-container">
-                    <div class="dlg-element-value-label">Id</div>
-                    <div id="dlg-element-value-id"></div>
-                </div>
-                <div class="dlg-element-container">
-                    <div class="dlg-element-value-label">Type</div>
-                    <input id="dlg-element-value-type" type='text' value=''/>
-                </div>
-                <div class="dlg-element-container">
-                    <div class="dlg-element-value-label">Name</div>
-                    <input id="dlg-element-value-name" type='text' value=''/>
-                </div>
-                 <div class="dlg-element-container">
-                    <div class="dlg-element-value-label">Version</div>
-                    <input id="dlg-element-value-version" type='text' value=''/>
-                </div>
-                <div class="dlg-element-container">
-                    <div class="dlg-element-value-label">Description</div>
-                    <textarea id="dlg-element-value-description" rows="3" cols="40"></textarea>
-                </div>
-                <div class="dlg-element-container">
-                    <div class="dlg-element-value-label">MinMachines</div>
-                    <input id="dlg-element-value-min-machines" type='text' value=''/>
-                </div>
-                <div class="dlg-element-container">
-                    <div class="dlg-element-value-label">MaxMachines</div>
-                    <input id="dlg-element-value-max-machines" type='text' value=''/>
-                </div>
-                <div class="dlg-element-container">
-                    <div class="dlg-element-value-label">Replicated</div>
-                    <div id="dlg-element-replicated-radio">
-                        <input type="radio" name="dlg-element-replicated-radio" value="true">Yes
-                        <input type="radio" name="dlg-element-replicated-radio" value="false">No
-                    </div>
-                </div>
-                <div class="dlg-element-container">
-                    <div class="dlg-element-value-label">MinReplMachines</div>
-                    <input id="dlg-element-value-min-repl-machines" type='text' value=''/>
-                </div>
-                <div class="dlg-element-container">
-                    <div class="dlg-element-value-label">MaxReplMachines</div>
-                    <input id="dlg-element-value-max-repl-machines" type='text' value=''/>
-                </div>
-            </div>
-        </div>
-
-        <%-- Dependees for element --%>
-        <div id="dlg-element-dependencies-tab">
-            <div id="dlg-dependency-selection-container" class ="dlg-tab-items-container">
-                <div class="dlg-list-panel-container dlg-tab-item">
-                    <div class="dlg-list-panel-container-title">Dependees</div>
-                    <div class="dlg-list-panel-container-columns">
-                        <div class="list-item-column">Platform</div>
-                        <div>Version</div>
-                    </div>
-                    <div id="dlg-element-selected-dependees" class="dlg-item-list-container">
-                        <ul></ul>
-                    </div>
-                </div>
-                <div class="dlg-arrows-img dlg-tab-item"></div>
-                <div class="dlg-list-panel-container dlg-tab-item">
-                    <div class="dlg-list-panel-container-title">All</div>
-                    <div class="dlg-list-panel-container-columns">
-                        <div class="list-item-column">Platform</div>
-                        <div>Version</div>
-                    </div>
-                    <div id="dlg-element-available-dependees" class="dlg-item-list-container">
-                        <ul></ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <%-- Keys for element  --%>
-        <div id="dlg-element-keys-tab">
+	        <ul>
+	            <li><a href="#dlg-element-general-tab">General</a></li>
+	            <li><a href="#dlg-element-dependencies-tab">Dependencies</a></li>
+	            <li><a href="#dlg-element-keys-tab">Keys</a></li>
+	        </ul>
+	
+	        <%-- General --%>
+	        <div id = "dlg-element-general-tab">
+	            <div id="dlg-element-fields" class="dlg-tab-items-container">
+	                <div class="dlg-input-container">
+	                    <div class="dlg-element-value-label">Id</div>
+	                    <div id="dlg-element-value-id"></div>
+	                </div>
+	                <div class="dlg-input-container">
+	                    <div class="dlg-element-value-label">Type</div>
+	                    <input id="dlg-element-value-type" type='text' value=''/>
+	                </div>
+	                <div class="dlg-input-container">
+	                    <div class="dlg-element-value-label">Name</div>
+	                    <input id="dlg-element-value-name" type='text' value=''/>
+	                </div>
+	                 <div class="dlg-input-container">
+	                    <div class="dlg-element-value-label">Version</div>
+	                    <input id="dlg-element-value-version" type='text' value=''/>
+	                </div>
+	                <div class="dlg-input-container">
+	                    <div class="dlg-element-value-label">Description</div>
+	                    <textarea id="dlg-element-value-description" rows="3" cols="40"></textarea>
+	                </div>
+	                <div class="dlg-input-container">
+	                    <div class="dlg-element-value-label">MinMachines</div>
+	                    <input id="dlg-element-value-min-machines" type='text' value=''/>
+	                </div>
+	                <div class="dlg-input-container">
+	                    <div class="dlg-element-value-label">MaxMachines</div>
+	                    <input id="dlg-element-value-max-machines" type='text' value=''/>
+	                </div>
+	                <div class="dlg-input-container">
+	                    <div class="dlg-element-value-label">Replicated</div>
+	                    <div id="dlg-element-replicated-radio">
+	                        <input type="radio" name="dlg-element-replicated-radio" value="true">Yes
+	                        <input type="radio" name="dlg-element-replicated-radio" value="false">No
+	                    </div>
+	                </div>
+	                <div class="dlg-input-container">
+	                    <div class="dlg-element-value-label">MinReplMachines</div>
+	                    <input id="dlg-element-value-min-repl-machines" type='text' value=''/>
+	                </div>
+	                <div class="dlg-input-container">
+	                    <div class="dlg-element-value-label">MaxReplMachines</div>
+	                    <input id="dlg-element-value-max-repl-machines" type='text' value=''/>
+	                </div>
+	            </div>
+	        </div>
+	
+	        <%-- Dependees for element --%>
+	        <div id="dlg-element-dependencies-tab">
+	            <div id="dlg-dependency-selection-container" class ="dlg-tab-items-container">
+	                <div class="dlg-list-panel-container dlg-tab-item">
+	                    <div class="dlg-list-panel-container-title">Dependees</div>
+	                    <div class="dlg-list-panel-container-columns">
+	                        <div class="list-item-column">Platform</div>
+	                        <div>Version</div>
+	                    </div>
+	                    <div id="dlg-element-selected-dependees" class="dlg-item-list-container">
+	                        <ul></ul>
+	                    </div>
+	                </div>
+	                <div class="dlg-arrows-img dlg-tab-item"></div>
+	                <div class="dlg-list-panel-container dlg-tab-item">
+	                    <div class="dlg-list-panel-container-title">All</div>
+	                    <div class="dlg-list-panel-container-columns">
+	                        <div class="list-item-column">Platform</div>
+	                        <div>Version</div>
+	                    </div>
+	                    <div id="dlg-element-available-dependees" class="dlg-item-list-container">
+	                        <ul></ul>
+	                    </div>
+	                </div>
+	            </div>
+	        </div>
+	
+	        <%-- Keys for element  --%>
+	        <div id="dlg-element-keys-tab">
             <div id="dlg-keys-values-container" class ="dlg-tab-items-container">
                 <div class="dlg-list-panel-container dlg-tab-item">
                     <div id="dlg-list-keys-container" class="dlg-list-panel-container-title">Keys</div>
@@ -131,4 +131,5 @@
                 </div>
             </div>
         </div>
-    </div>
+    	</div>
+	</div>

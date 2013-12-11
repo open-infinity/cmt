@@ -13,7 +13,7 @@
     dlg.model.parameters = {};
     dlg.html = {};
 
-    dlg.html.idContainer = $($(".dlg-element-container", "#dlg-element-general-tab").first());
+    dlg.html.idContainer = $($(".dlg-input-container", "#dlg-element-general-tab").first());
     dlg.html.self = $("#dlg-element");
     dlg.html.tabs = $("#dlg-element-tabs");
     dlg.html.selectedDependeesList = $("ul", "#dlg-element-selected-dependees");

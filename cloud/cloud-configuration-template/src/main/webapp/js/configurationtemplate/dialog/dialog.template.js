@@ -67,7 +67,7 @@
         },
 
         edit: function(id){
-            var jqxhrTemplate = $.ajax({
+            $.ajax({
                 url: portletURL.url.template.getTemplateURL + "&templateId=" + id,
                 dataType: "json"
                 }).done(function(data) {
@@ -101,14 +101,10 @@
 
         open : function(mode){
             dlg.mode = mode;
-            var title;
+            var title = "Create new template";
             if (mode == "edit"){
                 dlg.templateIdContainer.show();
                 title = "Edit template";
-            }
-            else if (mode == "create"){
-                dlg.templateIdContainer.hide();
-                title = "Create new template";
             }
             else{
                 console.log("Unexpected mode for dialog.");
@@ -152,7 +148,6 @@
             activeClass: "ui-state-highlight",
             drop: function (event, ui) {
                 var list = $(this).find("ul");
-                var helper = ui.helper;
                 var selected = $(this).siblings().find("li.ui-state-highlight");
                 if (selected.length > 1) {
                     moveMultipleElements(list, selected);
@@ -256,7 +251,7 @@
         var lastChild = list.find("li:last-child");
 
         var oid = value.organizationId;
-        if (oid >= 1000000) {
+        if (oid >= 1000000){
             oid = Math.floor(100000 / oid) + "..";
         }
 

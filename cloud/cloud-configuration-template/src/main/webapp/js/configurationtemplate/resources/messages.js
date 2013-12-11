@@ -15,4 +15,4 @@ var err = {
     invalidMachineRange : "Maximal number of machines must be grater than minimal number of machines for a cluster",
     internalError : "Internal error",
     invalidDependencies : "Error: Element dependencies are invalid"
-}
+};

@@ -11,6 +11,7 @@
 .dlg-item-list-container ul{height:250px;width:200px;overflow-y:auto;float:left;list-style-type:none;margin:0;padding:0;margin-bottom:10px;}
 .dlg-item-list-container li{margin:0px 0px 3px 10px;padding:3px;width:160px;}
 input[type="text"].dlg-error-input{border-color:red;border-radius:2px;margin-left:-1px;}
+.dlg-input-container{margin:0 0 7px 0;}
 
 /* Template edit/create dialog */
 .dlg-edit-template-list-panel-container{width:200px;}
@@ -28,7 +29,6 @@ input[type="text"].dlg-error-input{border-color:red;border-radius:2px;margin-lef
 
 /* Element edit/create dialog */
 #dlg-element-general-tab{height:380px;}
-.dlg-element-container{margin:0 0 7px 0;}
 .dlg-element-value-label{width: 130px;margin-top:5px;float:left;}
 #dlg-element-value-id{padding-top:5px;}
 .dlg-element-dependee-name{float:left;width:125px;}

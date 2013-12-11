@@ -37,6 +37,13 @@ portletURL.initialize({
     	getDependenciesURL : '<portlet:resourceURL id="getDependencies"/>',
     	getAllAvailableDependenciesURL : '<portlet:resourceURL id="getAllAvailableDependencies"/>',
     	getParameterKeysAndValuesURL : '<portlet:resourceURL id="getParameterKeysAndValues"/>',
+    },
+    module: {
+    	getURL : '<portlet:resourceURL id="get"/>',
+    	editURL : '<portlet:resourceURL id="edit"/>',
+    	createURL : '<portlet:resourceURL id="create"/>',
+        deleteURL : '<portlet:resourceURL id="delete"/>',
+    	getKeysAndValuesURL : '<portlet:resourceURL id="getKeysAndValues"/>'
     }
 });
 

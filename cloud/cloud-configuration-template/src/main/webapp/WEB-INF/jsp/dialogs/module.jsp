@@ -41,23 +41,23 @@
         <%-- General --%>
         <div id = "dlg-module-general-tab">
             <div id="dlg-module-fields" class="dlg-tab-items-container">
-                <div class="dlg-module-container">
+                <div class="dlg-input-container">
                     <div class="dlg-module-value-label">Id</div>
                     <div id="dlg-module-value-id"></div>
                 </div>
-                <div class="dlg-module-container">
+                <div class="dlg-input-container">
                     <div class="dlg-module-value-label">Type</div>
                     <input id="dlg-module-value-type" type='text' value=''/>
                 </div>
-                <div class="dlg-module-container">
+                <div class="dlg-input-container">
                     <div class="dlg-module-value-label">Name</div>
                     <input id="dlg-module-value-name" type='text' value=''/>
                 </div>
-                 <div class="dlg-module-container">
+                 <div class="dlg-input-container">
                     <div class="dlg-module-value-label">Version</div>
                     <input id="dlg-module-value-version" type='text' value=''/>
                 </div>
-                <div class="dlg-module-container">
+                <div class="dlg-input-container">
                     <div class="dlg-module-value-label">Description</div>
                     <textarea id="dlg-module-value-description" rows="3" cols="40"></textarea>
                 </div>
