@@ -6,11 +6,12 @@ var msg = {
 var err = {
     emptyKey : "Key name must not be empty",
     emptyValue : "Value name must not be empty",
-    emptyItem : "Item name must not be empty",
+    emptyItem : "Field must not be empty",
     keyFirst : "First create a key, then assign value to it",
     keyAlreadyExists : "Name already exists",
-    mustBeInteger : "Integer value expected",
+    mustBePositiveInteger : "Positive integer value expected",
     mustBeBoolean : "Boolean value expected",
     mustBeString : "String value expected",
-    internalError : "Internal error"
+    internalError : "Internal error",
+    invalidDependencies : "Error: Element dependencies are invalid"
 }

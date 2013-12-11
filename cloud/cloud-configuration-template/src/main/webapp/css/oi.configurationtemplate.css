@@ -10,7 +10,7 @@
 .dlg-list-panel-container-columns div {font-size:12px}
 .dlg-item-list-container ul{height:250px;width:200px;overflow-y:auto;float:left;list-style-type:none;margin:0;padding:0;margin-bottom:10px;}
 .dlg-item-list-container li{margin:0px 0px 3px 10px;padding:3px;width:160px;}
-input[type="text"].dlg-error-input{border-color:orange;border-width:3px;border-radius:3px;margin-left:-1px;}
+input[type="text"].dlg-error-input{border-color:red;border-radius:2px;margin-left:-1px;}
 
 /* Template edit/create dialog */
 .dlg-edit-template-list-panel-container{width:200px;}

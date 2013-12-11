@@ -207,7 +207,7 @@
 
         <%-- General --%>
         <div id = "dlg-element-general-tab">
-            <div id="edit-template-fields" class="dlg-tab-items-container">
+            <div id="dlg-element-fields" class="dlg-tab-items-container">
                 <div class="dlg-element-container">
                     <div class="dlg-element-value-label">Id</div>
                     <div id="dlg-element-value-id"></div>

@@ -155,7 +155,7 @@
 
             // open dialog
             dlg.html.self.dialog("option", "title", title);
-            dlg.html.tabs.tabs({active: 1});
+            dlg.html.tabs.tabs(('select', 0));
             dlg.html.self.show();
             dlg.html.self.dialog("open");
         }
@@ -193,6 +193,7 @@
         bindNewItemInputClicks();
         bindDeleteKeysButtonsClick($(".dlg-element-list-item-delete-button", "#dlg-keys"));
         bindNewKeyButtonClick();
+        bindInputClicksAndKeys();
         infoDlg.bind();
         bindRadioChange();
     }
@@ -237,13 +238,13 @@
 
     function bindGeneralAttributeInputClicks(){
         $("input","#dlg-element-general-tab").bind( "click",  function(){
-            clearStyleForErrorInput($(this));
+            clearStyleForErrorInput(0, $(this));
         });
     }
 
     function bindKeyListItemClicks(){
         $("input", ".key", "#dlg-keys").bind( "click",  function(){
-            clearStyleForErrorInput($(this));
+            clearStyleForErrorInput(0, $(this));
             // do nothing if selected key remains the same
             if (dlg.state.selectedKey == $(this).parents("li").data("keyName")){
                 return;
@@ -263,18 +264,30 @@
     }
 
     function bindNewItemInputClicks(){
-        bindInputClicks(findNewKeyInput());
-        bindInputClicks(findNewValueInput());
+        bindKeyValueInputClicks(findNewKeyInput());
+        bindKeyValueInputClicks(findNewValueInput());
     }
 
-    function bindInputClicks(items){
-        items.bind( "click", function(){
+    function bindKeyValueInputClicks(items){
+        items.bind("click", function(){
             var val =  $(this).val();
             if (val === "" || val == msg.addNewKey || val == msg.addNewValue /*|| val == dlg.txt.addNewType*/){
                 $(this).val("").css("color", "black");
             }
+            clearStyleForErrorInput(0, $(this));
         });
     }
+
+    function bindInputClicksAndKeys(){
+        var inputs = $("input", "#dlg-element-fields");
+        inputs.bind("click", function(){
+            clearStyleForErrorInput(0, $(this));
+        });
+        inputs.keypress(function(event) {
+            clearStyleForErrorInput(0, $(this));
+        });
+    }
+
 
     function bindDeleteButtonsClick(items){
         bindDeleteKeysButtonsClick(items);
@@ -544,7 +557,7 @@
                 addButton.text("+").addClass("dlg-element-new-value-button").removeClass("dlg-element-list-item-delete-button");
 
                 // bind events for new value item
-                bindInputClicks(lastChild.find("input"));
+                bindKeyValueInputClicks(lastChild.find("input"));
                 bindNewValueButtonClick(addButton);
 
                 lastChild.data("index", -1);
@@ -584,7 +597,9 @@
         dlg.state.selectedKey = null;
 
         // clear error styles
-        clearStyleForErrorInput(dlg.html.self);
+        $.each(dlg.html.self.find("input"), function(index, value){
+            clearStyleForErrorInput(index, $(value));
+        });
     }
 
     function cleanUpTable(that){
@@ -594,28 +609,24 @@
     function submitElement(mode){
         var err = 0;
         if (updateModel() === 0){
-            var element = {};
-            element["id"] = (dlg.mode == "edit") ? parseInt(dlg.html.elem.id.text(), 10) : -1;
-            element["type"] = dlg.html.elem.type.val();
-            element["name"] = dlg.html.elem.name.val();
-            element["version"] = dlg.html.elem.version.val();
-            element["description"] = dlg.html.elem.description.val();
-            element["minMachines"] = dlg.html.elem.minMachines.val();
-            element["maxMachines"] = dlg.html.elem.maxMachines.val();
-            //element["replicated"] = dlg.html.elem.replicated.val();
-            element["replicated"] = dlg.html.elem.replicated.find('input[name=dlg-element-replicated-radio]:checked').val();
-            element["minReplicationMachines"] = dlg.html.elem.minReplicationMachines.val();
-            element["maxReplicationMachines"] = dlg.html.elem.maxReplicationMachines.val();
 
+            // get input data
+            var dependencies = getDependencies();
+            var element = getElement();
+
+            // validate input data
+            if (!validateInput(element, dependencies, dlg.model.parameters)){
+                return;
+            }
+
+            // serialize input data
             var outData = {};
             outData.element = JSON.stringify(element);
-            outData.dependencies = JSON.stringify(getDependencies());
+            outData.dependencies = JSON.stringify(dependencies);
             outData.parameters = JSON.stringify(dlg.model.parameters);
 
-            //var dataValid = validateInput(outData);
-            if (!validateInput(outData)) return;
+            // send input data
             console.log("Posting element parameters:" + outData.parameters);
-
             $.post((mode == "edit") ? portletURL.url.element.editElementURL : portletURL.url.element.createElementURL, outData)
             .done(function(){
                 app.reloadElementsTable();
@@ -644,7 +655,7 @@
     function updateKeysModel(){
         var err = 0;
         var arrayOfKeyLis = dlg.html.parameterKeysList.find(".dlg-element-key-value-list-item");
-        for (var i = 0; i < arrayOfKeyLis.length - 1; i++){
+        for(var i = 0; i < arrayOfKeyLis.length - 1; i++){
             var li = $(arrayOfKeyLis[i]);
             var keyName = li.data("keyName");
             var newKeyName = li.find("input").val();
@@ -693,6 +704,21 @@
         return selectedItems;
     }
 
+    function getElement(){
+        var e = {};
+        e.id = (dlg.mode == "edit") ? parseInt(dlg.html.elem.id.text(), 10) : -1;
+        e.type = dlg.html.elem.type.val();
+        e.name = dlg.html.elem.name.val();
+        e.version = dlg.html.elem.version.val();
+        e.description = dlg.html.elem.description.val();
+        e.minMachines = dlg.html.elem.minMachines.val();
+        e.maxMachines = dlg.html.elem.maxMachines.val();
+        e.replicated = dlg.html.elem.replicated.find('input[name=dlg-element-replicated-radio]:checked').val();
+        e.minReplicationMachines = dlg.html.elem.minReplicationMachines.val();
+        e.maxReplicationMachines = dlg.html.elem.maxReplicationMachines.val();
+        return e;
+    }
+
     function alertPostFailure(mode, textStatus, errorThrown){
         alert("Server error at template" + mode + ", text status:" + textStatus + " " + "errorThrown:" + errorThrown);
     }
@@ -700,6 +726,17 @@
     function alertWrongInput(item, msg){
         alert(msg);
         item.addClass("dlg-error-input");
+
+        // open the tab with erroneous item and focus on it
+        var inElementTab = (item.parents("#dlg-element-general-tab")).length > 0;
+        if (inElementTab){
+            dlg.html.tabs.tabs('select', 0);
+        }
+        else{
+            dlg.html.tabs.tabs('select', 2);
+        }
+
+        item.focus();
     }
 
     function getParameterValue(li){
@@ -721,56 +758,72 @@
         return $(".dlg-element-new-value-button").parent().find("input");
     }
 
-    function validateInput(data){
+    function validateInput(element, dependencies, parameters){
         var res = true;
-        if (isInt(data.element["id"])) {
+
+        // validate element
+        if (!isPosInt(element.id)) {
             res = false;
             console.log("err.internalError");
         }
-        else if (isInt(data.element.type)){
+        else if (!isPosInt(element.type)){
             res = false;
-            alertWrongInput(dlg.html.elem.type, err.mustBeInteger);
+            alertWrongInput(dlg.html.elem.type, err.mustBePositiveInteger);
         }
-        else if (typeof data.element.name === 'undefined'){
+        else if (element.name === ""){
             res = false;
             alertWrongInput(dlg.html.elem.name, err.emptyItem);
         }
-        else if (typeof data.element.version === 'undefined'){
+        else if (element.version === ""){
             res = false;
             alertWrongInput(dlg.html.elem.version, err.emptyItem);
         }
-        else if (typeof data.element.description === 'undefined'){
+        /*
+        else if (element.description == ""){
             res = false;
             alertWrongInput(dlg.html.elem.description, err.emptyItem);
         }
-        else if (isInt(data.element.minMachines)){
+        */
+        else if (!isPosInt(element.minMachines)){
             res = false;
-            alertWrongInput(dlg.html.elem.minMachines, err.mustBeInteger);
+            alertWrongInput(dlg.html.elem.minMachines, err.mustBePositiveInteger);
         }
-        else if (isInt(data.element.maxMachines)){
+        else if (!isPosInt(element.maxMachines)){
             res = false;
-            alertWrongInput(dlg.html.elem.maxMachines, err.mustBeInteger);
+            alertWrongInput(dlg.html.elem.maxMachines, err.mustBePositiveInteger);
         }
-        else if (typeof data.element.replicated !== 'boolean'){
+        else if (element.replicated !== 'false' && element.replicated !== 'true'){
             res = false;
             alertWrongInput(dlg.html.elem.replicated, err.mustBeBoolean);
         }
-        else if (isInt(element.minReplicationMachines)){
+        else if (!isPosInt(element.minReplicationMachines)){
             res = false;
-            alertWrongInput(dlg.html.elem.minReplicationMachines, err.mustBeInteger);
+            alertWrongInput(dlg.html.elem.minReplicationMachines, err.mustBePositiveInteger);
         }
-        else if (isInt(maxReplicationMachines)){
+        else if (!isPosInt(element.maxReplicationMachines)){
             res = false;
-            alertWrongInput(dlg.html.elem.maxReplicationMachines, err.mustBeInteger);
+            alertWrongInput(dlg.html.elem.maxReplicationMachines, err.mustBePositiveInteger);
         }
+
+        // validate dependencies
+        for (var i = 0; i < dependencies.length; i++){
+            if (!isPosInt(dependencies[i]) || dependencies[i] < 0){
+                res = false;
+                alert(err.invalidDependencies);
+                break;
+             }
+        }
+
+        // TODO: validate keys and values
+
         return res;
     }
 
-    function isInt(obj){
-        return (typeof obj !== 'undefined' && !isNaN(obj) && (Math.round(obj) == obj)) ? true : false;
+    function isPosInt(obj){
+        return (obj !== "" && typeof obj !== 'undefined' && !isNaN(obj) && (Math.round(obj) == obj) && obj > 0) ? true : false;
     }
 
-    function clearStyleForErrorInput(item){
+    function clearStyleForErrorInput(index, item){
         if (item.hasClass("dlg-error-input")){
             item.removeClass("dlg-error-input");
         }
