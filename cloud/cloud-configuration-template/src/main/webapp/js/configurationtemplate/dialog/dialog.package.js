@@ -55,6 +55,11 @@
             dlg.open("create");
         },
 
+        remove : function(id){
+            console.log("remove with argument id:" + id);
+
+        },
+
         edit : function(id){
             var jqxhrTemplate = $.ajax({
                 url: portletURL.url.element.getElementURL + "&elementId=" + id,
@@ -127,37 +132,9 @@
 
             // open dialog
             dlg.html.self.dialog("option", "title", title);
-            dlg.html.tabs.tabs();
-            dlg.html.tabs.tabs('select', 0);
+            dlg.html.tabs.tabs(('select', 0));
             dlg.html.self.show();
             dlg.html.self.dialog("open");
-        },
-
-        close : function(){
-            // cleanup dialog html elements
-            dlg.html.self.find(".dlg-item-list-container").find("ul").empty();
-            dlg.html.keyName.text("");
-            dlg.html.elem.id.text("");
-            dlg.html.elem.type.val("");
-            dlg.html.elem.version.val("");
-            dlg.html.elem.name.val("");
-            dlg.html.elem.description.val("");
-            dlg.html.elem.minMachines.val("");
-            dlg.html.elem.maxMachines.val("");
-            dlg.html.elem.replicated.find("input").first().prop('checked', false);
-            dlg.html.elem.replicated.find("input").last().prop('checked', true);
-            dlg.html.elem.minReplicationMachines.val("");
-            dlg.html.elem.maxReplicationMachines.val("");
-            delete dlg.model.parameters;
-            dlg.state.selectedKey = null;
-
-            // clear error styles
-            $.each(dlg.html.self.find("input"), function(index, value){
-                clearStyleForErrorInput(index, $(value));
-            });
-
-            // close jQuery dialog
-            dlg.html.self.dialog("close");
         }
     });
 
@@ -171,14 +148,46 @@
         buttons: {
             "Submit changes": function() {
                 if (submitElement(dlg.mode) === 0){
-                    dlg.close();
+                    cleanUpDialog($(this));
+                    $(this).dialog( "close" );
                 }
             },
             Cancel: function() {
-                dlg.close();
+                cleanUpDialog($(this));
+                $(this).hide();
+                $(this).dialog( "close" );
             }
         }
     });
+
+    // Cleanup
+
+    function cleanUpDialog(that){
+        that.find(".dlg-item-list-container").find("ul").empty();
+        dlg.html.keyName.text("");
+        dlg.html.elem.id.text("");
+        dlg.html.elem.type.val("");
+        dlg.html.elem.version.val("");
+        dlg.html.elem.name.val("");
+        dlg.html.elem.description.val("");
+        dlg.html.elem.minMachines.val("");
+        dlg.html.elem.maxMachines.val("");
+        dlg.html.elem.replicated.find("input").first().prop('checked', false);
+        dlg.html.elem.replicated.find("input").last().prop('checked', true);
+        dlg.html.elem.minReplicationMachines.val("");
+        dlg.html.elem.maxReplicationMachines.val("");
+        delete dlg.model.parameters;
+        dlg.state.selectedKey = null;
+
+        // clear error styles
+        $.each(dlg.html.self.find("input"), function(index, value){
+            clearStyleForErrorInput(index, $(value));
+        });
+    }
+
+    function cleanUpTable(that){
+        that.find("tr").remove();
+    }
 
     // Sending data to backend
 
@@ -380,6 +389,9 @@
                         alertWrongInput(keyInput, err.keyAlreadyExists);
                         exists = true;
                     }
+                    //else{
+                    //    dlg.model.parameters[key] = [];
+                    //}
                 });
                 if (exists === true) {
                     return;
@@ -387,12 +399,14 @@
 
                 // store key to model
                 else{
+                    //dlg.model.parameters[key] = [];
                     dlg.model.parameters[key] = [];
                 }
             }
 
             // if model is empty, store key to model
             else{
+                //dlg.model.parameters[key] = [];
                 dlg.model.parameters[key] = [];
             }
 
@@ -745,7 +759,7 @@
         var res = true;
 
         // validate element
-        if (!isPosInt(element.id) && dlg.mode == "edit") {
+        if (!isPosInt(element.id)) {
             res = false;
             console.log("err.internalError");
         }
@@ -761,6 +775,12 @@
             res = false;
             alertWrongInput(dlg.html.elem.version, err.emptyItem);
         }
+        /*
+        else if (element.description == ""){
+            res = false;
+            alertWrongInput(dlg.html.elem.description, err.emptyItem);
+        }
+        */
         else if (!isPosInt(element.minMachines)){
             res = false;
             alertWrongInput(dlg.html.elem.minMachines, err.mustBePositiveInteger);
@@ -769,25 +789,17 @@
             res = false;
             alertWrongInput(dlg.html.elem.maxMachines, err.mustBePositiveInteger);
         }
-        else if (element.minMachines >= element.maxMachines){
-            res = false;
-            alertWrongInput(dlg.html.elem.maxMachines, err.invalidMachineRange);
-        }
         else if (element.replicated !== 'false' && element.replicated !== 'true'){
             res = false;
             alertWrongInput(dlg.html.elem.replicated, err.mustBeBoolean);
         }
-        else if (!isPosInt(element.minReplicationMachines) && element.replicated === 'true'){
+        else if (!isPosInt(element.minReplicationMachines)){
             res = false;
             alertWrongInput(dlg.html.elem.minReplicationMachines, err.mustBePositiveInteger);
         }
-        else if (!isPosInt(element.maxReplicationMachines) && element.replicated === 'true'){
+        else if (!isPosInt(element.maxReplicationMachines)){
             res = false;
             alertWrongInput(dlg.html.elem.maxReplicationMachines, err.mustBePositiveInteger);
-        }
-        else if (element.minReplicationMachines >= element.maxReplicationMachines && element.replicated === 'true') {
-            res = false;
-            alertWrongInput(dlg.html.elem.maxReplicationMachines, err.invalidMachineRange);
         }
 
         // validate dependencies
@@ -798,6 +810,8 @@
                 break;
              }
         }
+
+        // TODO: validate keys and values
 
         return res;
     }

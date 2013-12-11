@@ -1,94 +1,38 @@
 (function($) {
 
     var app = window.app || {};
-    var dlg = window.app.dialog.element || {};
+    var dlg = window.app.dialog.module || {};
     var infoDlg = window.app.dialog.info;
 
     dlg.mode =  null;
-
     dlg.state = {};
-    dlg.state.selectedKey = null;
-
     dlg.model = {};
-    dlg.model.parameters = {};
     dlg.html = {};
-
-    dlg.html.idContainer = $($(".dlg-element-container", "#dlg-element-general-tab").first());
-    dlg.html.self = $("#dlg-element");
-    dlg.html.tabs = $("#dlg-element-tabs");
-    dlg.html.selectedDependeesList = $("ul", "#dlg-element-selected-dependees");
-    dlg.html.availableDependeesList = $("ul", "#dlg-element-available-dependees");
-    dlg.html.parameterKeysList = $("ul", "#dlg-keys");
-    dlg.html.parameterValuesList = $("ul", "#dlg-values");
-    dlg.html.keyName = $("#dlg-element-key-name");
-
-    dlg.html.elem = {};
-    dlg.html.elem.id = $("#dlg-element-value-id");
-    dlg.html.elem.type = $("#dlg-element-value-type");
-    dlg.html.elem.name = $("#dlg-element-value-name");
-    dlg.html.elem.version = $("#dlg-element-value-version");
-    dlg.html.elem.description = $("#dlg-element-value-description");
-    dlg.html.elem.minMachines = $("#dlg-element-value-min-machines");
-    dlg.html.elem.maxMachines = $("#dlg-element-value-max-machines");
-    dlg.html.elem.replicated = $("#dlg-element-replicated-radio");
-    dlg.html.elem.minReplicationMachines = $("#dlg-element-value-min-repl-machines");
-    dlg.html.elem.maxReplicationMachines = $("#dlg-element-value-max-repl-machines");
 
     $.extend(dlg, {
 
         create : function(){
-            $.ajax({
-                url: portletURL.url.element.getAllAvailableDependenciesURL,
-                dataType: "json"
-            })
-            .done(function(data){
-                dlg.keyCount = 0;
-                dlg.model.parameters = {};
-                console.log("received parameters:" + dlg.model.parameters);
-                populateDependencies(data);
-                showViewSelectedKeyInitial([]);
-                configureEventHandling();
-                })
-            .fail(function(jqXHR, textStatus, errorThrown) {
-                console.log("Error fetching items for dialog");
-                });
-            dlg.open("create");
+
         },
 
         edit : function(id){
             var jqxhrTemplate = $.ajax({
-                url: portletURL.url.element.getElementURL + "&elementId=" + id,
+                url: portletURL.url.element.getModuleURL + "&moduleId=" + id,
                 dataType: "json"
                 }).done(function(data) {
-                    dlg.html.elem.id.text(data.id);
-                    dlg.html.elem.type.val(data.type);
-                    dlg.html.elem.name.val(data.name);
-                    dlg.html.elem.version.val(data.version);
-                    dlg.html.elem.description.val(data.description);
-                    dlg.html.elem.minMachines.val(data.minMachines);
-                    dlg.html.elem.maxMachines.val(data.maxMachines);
-                    if (data.replicated === true){
-                        dlg.html.elem.replicated.find("input").first().prop('checked', true);
-                        dlg.html.elem.replicated.find("input").last().prop('checked', false);
-                        toggleReplicatedMachinesInput("true");
-                    }
-                    else{
-                        dlg.html.elem.replicated.find("input").first().prop('checked', false);
-                        dlg.html.elem.replicated.find("input").last().prop('checked', true);
-                        toggleReplicatedMachinesInput("false");
-                    }
-                    dlg.html.elem.minReplicationMachines.val(data.minReplicationMachines);
-                    dlg.html.elem.maxReplicationMachines.val(data.maxReplicationMachines);
+
                 }).fail(function(jqXHR, textStatus, errorThrown) {
-                    console.log("Error fetching element");
+                    console.log("Error fetching installation module");
             });
+            /*
             $.when(
+
                 $.ajax({
-                    url: portletURL.url.element.getDependenciesURL + "&elementId=" + id,
+                    url: portletURL.url.element.getDependenciesURL + "&moduleId=" + id,
                     dataType: "json"
                 }),
                 $.ajax({
-                    url: portletURL.url.element.getParameterKeysAndValuesURL + "&elementId=" + id,
+                    url: portletURL.url.element.getParameterKeysAndValuesURL + "&moduleId=" + id,
                     dataType: "json"
                 }))
             .done(function(dataDependencies, dataKeyValues){
@@ -102,7 +46,7 @@
             .fail(function(jqXHR, textStatus, errorThrown) {
                 console.log("Error fetching items for dialog");
                 });
-
+            */
             dlg.open("edit");
         },
 
@@ -121,49 +65,31 @@
                 console.log("Unexpected mode for dialog.");
             }
 
-            // set default value to  radio box
-            dlg.html.elem.replicated.find("input").last().prop('checked', true);
-            toggleReplicatedMachinesInput("false");
+            // set default value to radio box
+            //dlg.html.elem.replicated.find("input").last().prop('checked', true);
+            // toggleReplicatedMachinesInput("false");
 
             // open dialog
             dlg.html.self.dialog("option", "title", title);
-            dlg.html.tabs.tabs();
-            dlg.html.tabs.tabs('select', 0);
+            dlg.html.tabs.tabs(('select', 0));
             dlg.html.self.show();
             dlg.html.self.dialog("open");
         },
 
         close : function(){
             // cleanup dialog html elements
-            dlg.html.self.find(".dlg-item-list-container").find("ul").empty();
-            dlg.html.keyName.text("");
-            dlg.html.elem.id.text("");
-            dlg.html.elem.type.val("");
-            dlg.html.elem.version.val("");
-            dlg.html.elem.name.val("");
-            dlg.html.elem.description.val("");
-            dlg.html.elem.minMachines.val("");
-            dlg.html.elem.maxMachines.val("");
-            dlg.html.elem.replicated.find("input").first().prop('checked', false);
-            dlg.html.elem.replicated.find("input").last().prop('checked', true);
-            dlg.html.elem.minReplicationMachines.val("");
-            dlg.html.elem.maxReplicationMachines.val("");
-            delete dlg.model.parameters;
-            dlg.state.selectedKey = null;
 
             // clear error styles
-            $.each(dlg.html.self.find("input"), function(index, value){
-                clearStyleForErrorInput(index, $(value));
-            });
 
             // close jQuery dialog
             dlg.html.self.dialog("close");
+
         }
     });
 
     // initialize dialog
     dlg.html.self.dialog({
-        title: "Edit element",
+        title: "Edit module",
         autoOpen: false,
         modal: true,
         width: 650,
@@ -180,11 +106,39 @@
         }
     });
 
+    // Cleanup
+
+    function cleanUpDialog(that){
+        /*
+        that.find(".dlg-item-list-container").find("ul").empty();
+        dlg.html.keyName.text("");
+        dlg.html.elem.id.text("");
+        dlg.html.elem.type.val("");
+        dlg.html.elem.version.val("");
+        dlg.html.elem.name.val("");
+        dlg.html.elem.description.val("");
+        dlg.html.elem.minMachines.val("");
+        dlg.html.elem.maxMachines.val("");
+        dlg.html.elem.replicated.find("input").first().prop('checked', false);
+        dlg.html.elem.replicated.find("input").last().prop('checked', true);
+        dlg.html.elem.minReplicationMachines.val("");
+        dlg.html.elem.maxReplicationMachines.val("");
+        delete dlg.model.parameters;
+        dlg.state.selectedKey = null;
+
+        // clear error styles
+        $.each(dlg.html.self.find("input"), function(index, value){
+            clearStyleForErrorInput(index, $(value));
+        });
+        */
+    }
+
+
     // Sending data to backend
 
     function submitElement(mode){
         var err = 0;
-        if (updateModel() === 0){
+        //if (updateModel() === 0){
 
             // get input data
             var dependencies = getDependencies();
@@ -197,12 +151,13 @@
 
             // serialize input data
             var outData = {};
-            outData.element = JSON.stringify(element);
-            outData.dependencies = JSON.stringify(dependencies);
-            outData.parameters = JSON.stringify(dlg.model.parameters);
+            //outData.element = JSON.stringify(element);
+            //outData.dependencies = JSON.stringify(dependencies);
+            //outData.parameters = JSON.stringify(dlg.model.parameters);
 
             // send input data
-            console.log("Posting element parameters:" + outData.parameters);
+            //console.log("Posting module parameters:" + outData.parameters);
+            /*
             $.post((mode == "edit") ? portletURL.url.element.editElementURL : portletURL.url.element.createElementURL, outData)
             .done(function(){
                 app.reloadElementsTable();
@@ -211,17 +166,21 @@
                 alertPostFailure(dlg.mode, textStatus, errorThrown);
                 err = 2;
             });
+            */
         }
+        /*)
         else{
             console.log("Invalid parameters, aborting submit");
             err = 1;
         }
+        */
         return err;
     }
 
     // Events handling
 
     function configureEventHandling(){
+        /*
         configureDragAndDrop();
         bindDependencyListItemClicks();
         bindKeyListItemClicks();
@@ -231,6 +190,7 @@
         bindInputClicksAndKeys();
         infoDlg.bind();
         bindRadioChange();
+        */
     }
 
     function configureDragAndDrop(){
@@ -263,7 +223,7 @@
             }
         });
     }
-
+    /*
     function bindDependencyListItemClicks(){
          $("li", "#dlg-dependency-selection-container").
             click(function(){
@@ -306,7 +266,7 @@
     function bindKeyValueInputClicks(items){
         items.bind("click", function(){
             var val =  $(this).val();
-            if (val === "" || val == msg.addNewKey || val == msg.addNewValue /*|| val == dlg.txt.addNewType*/){
+            if (val === "" || val == msg.addNewKey || val == msg.addNewValue ){
                 $(this).val("").css("color", "black");
             }
             clearStyleForErrorInput(0, $(this));
@@ -380,6 +340,9 @@
                         alertWrongInput(keyInput, err.keyAlreadyExists);
                         exists = true;
                     }
+                    //else{
+                    //    dlg.model.parameters[key] = [];
+                    //}
                 });
                 if (exists === true) {
                     return;
@@ -387,12 +350,14 @@
 
                 // store key to model
                 else{
+                    //dlg.model.parameters[key] = [];
                     dlg.model.parameters[key] = [];
                 }
             }
 
             // if model is empty, store key to model
             else{
+                //dlg.model.parameters[key] = [];
                 dlg.model.parameters[key] = [];
             }
 
@@ -738,68 +703,9 @@
 
         item.focus();
     }
-
+    */
     // Validation
 
-    function validateInput(element, dependencies, parameters){
-        var res = true;
 
-        // validate element
-        if (!isPosInt(element.id) && dlg.mode == "edit") {
-            res = false;
-            console.log("err.internalError");
-        }
-        else if (!isPosInt(element.type)){
-            res = false;
-            alertWrongInput(dlg.html.elem.type, err.mustBePositiveInteger);
-        }
-        else if (element.name === ""){
-            res = false;
-            alertWrongInput(dlg.html.elem.name, err.emptyItem);
-        }
-        else if (element.version === ""){
-            res = false;
-            alertWrongInput(dlg.html.elem.version, err.emptyItem);
-        }
-        else if (!isPosInt(element.minMachines)){
-            res = false;
-            alertWrongInput(dlg.html.elem.minMachines, err.mustBePositiveInteger);
-        }
-        else if (!isPosInt(element.maxMachines)){
-            res = false;
-            alertWrongInput(dlg.html.elem.maxMachines, err.mustBePositiveInteger);
-        }
-        else if (element.minMachines >= element.maxMachines){
-            res = false;
-            alertWrongInput(dlg.html.elem.maxMachines, err.invalidMachineRange);
-        }
-        else if (element.replicated !== 'false' && element.replicated !== 'true'){
-            res = false;
-            alertWrongInput(dlg.html.elem.replicated, err.mustBeBoolean);
-        }
-        else if (!isPosInt(element.minReplicationMachines) && element.replicated === 'true'){
-            res = false;
-            alertWrongInput(dlg.html.elem.minReplicationMachines, err.mustBePositiveInteger);
-        }
-        else if (!isPosInt(element.maxReplicationMachines) && element.replicated === 'true'){
-            res = false;
-            alertWrongInput(dlg.html.elem.maxReplicationMachines, err.mustBePositiveInteger);
-        }
-        else if (element.minReplicationMachines >= element.maxReplicationMachines && element.replicated === 'true') {
-            res = false;
-            alertWrongInput(dlg.html.elem.maxReplicationMachines, err.invalidMachineRange);
-        }
-
-        // validate dependencies
-        for (var i = 0; i < dependencies.length; i++){
-            if (!isPosInt(dependencies[i]) || dependencies[i] < 0){
-                res = false;
-                alert(err.invalidDependencies);
-                break;
-             }
-        }
-
-        return res;
-    }
 
 })(jQuery);
