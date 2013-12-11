@@ -33,7 +33,8 @@ fi
 OLD_DIR=`pwd`
 cd /
 echo "Compressing directories: $INCLUDE_DIRS" >>$BACKUP_LOG
-tar -cJ -X $EXCLUDES_FILE $INCLUDE_DIRS 2>>$BACKUP_LOG || exit 1
+# We use --warning=no-file-changed to be able to archive log files too
+tar --warning=no-file-changed -cJ -X $EXCLUDES_FILE $INCLUDE_DIRS 2>>$BACKUP_LOG || exit 1
 cd $OLD_DIR
 
 # Run scripts after backup

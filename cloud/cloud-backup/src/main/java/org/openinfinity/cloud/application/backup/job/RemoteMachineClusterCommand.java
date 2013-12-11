@@ -12,7 +12,7 @@ public class RemoteMachineClusterCommand extends RemoteMachineCommand implements
 	@Override
 	public void execute() throws Exception {
 		String cmd = "/opt/openinfinity/3.0.0/backup/cluster-sync " + operation; // FIXME: non-hardcoded path;
-		if (runRemoteCommand(cmd, null, null) > 0) {
+		if (runRemoteCommand(cmd, "/dev/null", null) > 0) {
 			throw new BackupException("Failed to run " + operation + " for the cluster!");
 		}
 	}
@@ -20,7 +20,7 @@ public class RemoteMachineClusterCommand extends RemoteMachineCommand implements
 	@Override
 	public void undo() throws Exception {
 		String cmd = "/opt/openinfinity/3.0.0/backup/cluster-sync " + reverseOperation(operation); // FIXME: non-hardcoded path;
-		if (runRemoteCommand(cmd, null, null) > 0) {
+		if (runRemoteCommand(cmd, "/dev/null", null) > 0) {
 			throw new BackupException("Failed to run " + reverseOperation(operation) + " for the cluster!");
 		}
 	}

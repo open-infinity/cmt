@@ -369,3 +369,19 @@ CREATE TABLE `configuration_template_parameter_value_tbl` (
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 SET foreign_key_checks = 1;
+
+CREATE TABLE `backup_rule_tbl` (
+`backup_rule_id` int(11) NOT NULL AUTO_INCREMENT,
+`cluster_id` int(11) NOT NULL,
+`active` ENUM('yes', 'no') NOT NULL,
+`cron_minutes` varchar(12) NOT NULL DEFAULT '0',
+`cron_hours` varchar(12) NOT NULL DEFAULT '22',
+`cron_day_of_month` varchar(12) NOT NULL DEFAULT '*',
+`cron_month` varchar(12) NOT NULL DEFAULT '*',
+`cron_day_of_week` varchar(12) NOT NULL DEFAULT '?',
+`cron_year` varchar(12) NOT NULL DEFAULT '*',
+PRIMARY KEY (`backup_rule_id`),
+FOREIGN KEY (`cluster_id`) REFERENCES cluster_tbl(cluster_id) ON DELETE CASCADE,
+CONSTRAINT `cluster_id` FOREIGN KEY (`cluster_id`) REFERENCES `cluster_tbl` (`cluster_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+

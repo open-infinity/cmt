@@ -11,6 +11,7 @@ import org.openinfinity.cloud.domain.Machine;
 import org.openinfinity.cloud.service.administrator.ClusterService;
 import org.openinfinity.cloud.service.administrator.InstanceService;
 import org.openinfinity.cloud.service.administrator.MachineService;
+import org.openinfinity.cloud.service.backup.RestoreInfo;
 import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -41,6 +42,15 @@ public class CloudBackup {
 	}
 
 	/**
+	 * Analyze failed cluster.
+	 * 
+	 * @return Object for Worker about the approach.
+	 */
+	public RestoreInfo analyze() {
+		throw new RuntimeException("UNIMPLEMENTED"); // TODO
+	}
+	
+	/**
 	 * Reads initial instance data from the database and creates schedulable jobs based on that. 
 	 */
 	public void initialize() {
@@ -65,7 +75,7 @@ public class CloudBackup {
 			logger.info("Quartz Scheduler started");
 			
 			// Read instance information from the database
-			Instance instance = instanceService.getInstance(1001); // FIXME: real criterion for backup
+			Instance instance = instanceService.getInstance(1003); // FIXME: real criterion for backup
 			if (instance != null) { 
 				// Iterate all the cluster in instance
 				for (Cluster cluster : clusterService.getClusters(instance.getInstanceId())) {
@@ -91,36 +101,6 @@ public class CloudBackup {
 			}
 			
 			// TODO: restore (but not here)
-
-/*			
-			Cluster test_cluster = new Cluster("1524"); 
-			
-			// Local backup test
-			{
-				InstanceJob job = new InstanceBackupJob(test_cluster, context);
-				job.setJobName("backup-test");
-				job.setToasInstanceId(993);
-				job.setHostname("10.33.208.10");
-				job.setVirtualMachineInstanceId("1234"); // FIXME
-				job.setUsername("root");
-				job.setLocalPackageDirectory("/var/tmp");
-				Date d = new Date(System.currentTimeMillis() + 3000L);
-				dynamicQuartzSchedulerManager.addJob(job.getJobName(), job, "" + d.getSeconds() + " " + d.getMinutes() + " * * * ?");
-			}
-			
-			// Local restore test
-			{
-				InstanceJob job = new InstanceRestoreJob(test_cluster, context);
-				job.setJobName("restore-test");
-				job.setToasInstanceId(981);
-				job.setHostname("10.33.208.10");
-				job.setVirtualMachineInstanceId("1234"); // FIXME
-				job.setUsername("root");
-				job.setLocalPackageDirectory("/var/tmp");
-				Date d = new Date(System.currentTimeMillis() + 3000L + 30000L);
-				dynamicQuartzSchedulerManager.addJob(job.getJobName(), job, "" + d.getSeconds() + " " + d.getMinutes() + " * * * ?");
-			}
-*/			
 			
 			logger.debug("Intialize completed and the scheduler started successfully.");
 		} catch (SchedulerException e) {

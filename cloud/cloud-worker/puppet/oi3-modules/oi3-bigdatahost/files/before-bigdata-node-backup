@@ -6,7 +6,7 @@
 # http://docs.mongodb.org/manual/tutorial/backup-sharded-cluster-with-database-dumps/
 
 source /opt/openinfinity/3.0.0/backup/common/bigdata-common
-
+    
 if [ "x$BIGDATA_ROLE" = "x" ] ; then
     echo "Can't prepare node backup because this node is not part of a bigdata/nosql cluster" >/dev/stderr
     exit 1
@@ -21,6 +21,7 @@ elif [ "$BIGDATA_ROLE" = "config" ] ; then
     else
         echo "/dev/null" > $BIGDATA_INCLUDE_DIRS_FILE
     fi
+    echo " $MONGODB_LOG_DIR" >> $BIGDATA_INCLUDE_DIRS_FILE
 elif [ "$BIGDATA_ROLE" = "shard" ] ; then
     # --------------------------------------------------------------------------
     # 4. Back up the replica set members of the shards
@@ -35,6 +36,7 @@ elif [ "$BIGDATA_ROLE" = "shard" ] ; then
         
         echo $BACKUP_DIR > $BIGDATA_INCLUDE_DIRS_FILE
     fi
+    echo " $MONGODB_LOG_DIR" >> $BIGDATA_INCLUDE_DIRS_FILE
 else
     # TODO: Hadoop support?
     echo "At moment other than MongoDB bigdata backups are not supported. Unexpected node type: '$BIGDATA_ROLE'." >/dev/stderr

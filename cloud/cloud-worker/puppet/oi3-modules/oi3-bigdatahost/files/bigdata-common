@@ -25,6 +25,8 @@ EOF
         echo "The first replica set member is $MONGO_RSET_MEMBER3"
     fi
     rm -f /tmp/mongodb-replset-find.js
+    
+    export MONGODB_LOG_DIR=/opt/openinfinity/3.0.0/bigdata/log
 else
     echo "The cluster type is '$BIGDATA_TYPE' which is not supported at moment"
 fi
@@ -33,5 +35,10 @@ fi
 export BIGDATA_BASE_DIR=/opt/openinfinity/3.0.0/backup
 export BACKUP_DIR=$BIGDATA_BASE_DIR/tmp
 export BIGDATA_INCLUDE_DIRS_FILE=$BIGDATA_BASE_DIR/include-dirs.d/bigdata
-mkdir $BACKUP_DIR
+
+# Initialize
+if [ ! -d $BACKUP_DIR ]; then
+    mkdir $BACKUP_DIR || exit 1
+fi
+echo "" > $BIGDATA_INCLUDE_DIRS_FILE
 
