@@ -44,8 +44,17 @@ jQuery(function($){
             app.newElementButton = $("#new-element");
             app.deleteElementButton = $("#delete-element");
 
-            // Generic info dialog
-            //app.dialog.info = $("#dlg-info");
+            // Modules tab
+            app.modulesTable = $("#modules-grid");
+            app.editModuleButton = $("#edit-module");
+            app.newModuleButton = $("#new-module");
+            app.deleteModuleButton = $("#delete-module");
+
+            // Packages tab
+            app.packagesTable = $("#packages-grid");
+            app.editPackageButton = $("#edit-package");
+            app.newPackageButton = $("#new-package");
+            app.deletePackageButton = $("#delete-package");
         },
 
         setupTemplatesTable: function(){
@@ -142,25 +151,6 @@ jQuery(function($){
                 {}  //  view parameters
             );
         },
-        /*
-        setupDialogs: function(){
-            app.dialog.info.dialog({
-                title: "Detailed information",
-                autoOpen: false,
-                modal: true,
-                width: "auto",
-                height: "auto",
-                draggable: false,
-                resizable: false,
-                buttons: {
-                    Ok: function() {
-                        cleanUpInfoDialogTable($(this));
-                        $(this).dialog("close");
-                    }
-                }
-            });
-        },
-        */
         reloadTemplatesTable: function(){
             app.templatesTable.setGridParam({datatype:'json', page:1}).trigger('reloadGrid');
         },
@@ -182,7 +172,6 @@ jQuery(function($){
 
         bindEventHandlers: function(){
             // Templates
-            //app.editTemplateButton.bind( "click", app.editTemplate);
             app.editTemplateButton.bind( "click", app.editTableRow(app.templatesTable, app.dialog.template));
             app.newTemplateButton.bind( "click", app.createTemplate);
             app.deleteTemplateButton.bind( "click", app.deleteTemplate);
@@ -191,6 +180,16 @@ jQuery(function($){
             app.editElementButton.bind( "click", app.editTableRow(app.elementsTable, app.dialog.element));
             app.newElementButton.bind( "click", app.create(app.dialog.element));
             app.deleteElementButton.bind( "click", app.deleteElement);
+
+            // Modules
+            app.editModuleButton.bind( "click", app.editTableRow(app.modulesTable, app.dialog.module));
+            app.newModuleButton.bind( "click", app.create(app.dialog.module));
+            app.deleteModuleButton.bind( "click", app.deleteModule);
+
+            // Packages
+            app.editPackageButton.bind( "click", app.editTableRow(app.packagesTable, app.dialog.package));
+            app.newPackageButton.bind( "click", app.create(app.dialog.package));
+            app.deletePackageButton.bind( "click", app.deletePackage);
         },
 
         bindInfoDblClick : function(){
@@ -266,17 +265,6 @@ jQuery(function($){
                     });
             });
         },
-        /*
-        editTemplate : function(){
-            var id = app.templatesTable.jqGrid('getGridParam','selrow');
-            if (id)	{
-                var ret = app.templatesTable.jqGrid('getRowData',id);
-                app.dialog.template.edit(ret.id);
-            } else {
-                alert("Please select a row for editing");
-            }
-        },
-        */
         editTableRow: function(argTable, argDialog){
             return (function(){
                 var table = argTable;
@@ -293,28 +281,10 @@ jQuery(function($){
             });
         }
     });
-    /*
-    function cleanUpInfoDialogTable(that){
-        that.find("tr").remove();
-    }
-
-    function bindInfoDblClick(){
-        $(".dlg-item-list-container").find("li").
-        click(function(){
-            $(this).toggleClass("ui-state-highlight");
-        }).
-        dblclick(function () {
-            app.dialog.info.dialog("open");
-            var configData = $(this).data("config");
-            storeToTable(configData, $("#dlg-item-table"));
-        });
-    }
-    */
 	app.init();
 	app.setupTemplatesTable();
 	app.setupElementsTable();
 	app.setupTabs();
-	//app.setupDialogs();
 	app.bindEventHandlers();
 });
 		
