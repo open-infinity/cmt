@@ -12,6 +12,7 @@ var err = {
     mustBePositiveInteger : "Positive integer value expected",
     mustBeBoolean : "Boolean value expected",
     mustBeString : "String value expected",
+    invalidMachineRange : "Maximal number of machines must be grater than minimal number of machines for a cluster",
     internalError : "Internal error",
     invalidDependencies : "Error: Element dependencies are invalid"
 }

@@ -24,6 +24,8 @@
  app.dialog.template = new Object();
  app.dialog.element = new Object();
  app.dialog.info = new Object();
+ app.dialog.module = new Object();
+ app.dialog.package = new Object();
 
 
 
