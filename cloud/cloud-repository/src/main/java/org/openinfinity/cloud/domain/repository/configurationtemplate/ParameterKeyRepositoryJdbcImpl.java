@@ -41,11 +41,11 @@ import java.util.Map;
 @Repository
 public class ParameterKeyRepositoryJdbcImpl implements ParameterKeyRepository {
 
-	private static final String GET_ALL_FOR_ELEMENT_SQL = "select * from configuration_template_parameter_key_tbl where element_id = ?";
+	private static final String GET_ALL_FOR_MODULE_SQL = "select * from configuration_template_parameter_key_tbl where module_id = ?";
 
     private static final String FIND_BY_NAME_SQL = "select * from configuration_template_parameter_key_tbl where name = ?";
 
-    private static final String DELETE_SQL = "delete from configuration_template_parameter_key_tbl where element_id = ?";
+    private static final String DELETE_SQL = "delete from configuration_template_parameter_key_tbl where moduleId = ?";
 
     private static final String CREATE_SQL = "insert into configuration_template_parameter_key_tbl (name, description) values(?, ?)";
 
@@ -62,15 +62,15 @@ public class ParameterKeyRepositoryJdbcImpl implements ParameterKeyRepository {
 
     @Override
     @AuditTrail
-    public Collection<ParameterKey> loadAll(int elementId) {
-        return jdbcTemplate.query(GET_ALL_FOR_ELEMENT_SQL, new Object[] {elementId}, new ParameterKeyMapper());
+    public Collection<ParameterKey> loadAll(int moduleId) {
+        return jdbcTemplate.query(GET_ALL_FOR_MODULE_SQL, new Object[] {moduleId}, new ParameterKeyMapper());
     }
 
     @Override
     public ParameterKey create(ParameterKey key) {
         SimpleJdbcInsert insert = new SimpleJdbcInsert(dataSource).withTableName("configuration_template_parameter_key_tbl").usingGeneratedKeyColumns("id");
         Map<String,Object> parameters = new HashMap<String,Object>();
-        parameters.put("element_id", key.getElementId());
+        parameters.put("module_id", key.getModuleId());
         parameters.put("name", key.getName());
         Number newId = insert.executeAndReturnKey(parameters);
         key.setId(newId.intValue());
@@ -114,13 +114,13 @@ public class ParameterKeyRepositoryJdbcImpl implements ParameterKeyRepository {
 
     @Override
     @AuditTrail
-    public void deleteByElementId(int elementId){
-        jdbcTemplate.update(DELETE_SQL, elementId);
+    public void deleteByModuleId(int moduleId){
+        jdbcTemplate.update(DELETE_SQL, moduleId);
     }
 
     private class ParameterKeyMapper implements RowMapper<ParameterKey> {
 		public ParameterKey mapRow(ResultSet resultSet, int rowNum) throws SQLException {
-		    return new ParameterKey(resultSet.getInt("id"), resultSet.getInt("element_id"), resultSet.getString("name"));
+		    return new ParameterKey(resultSet.getInt("id"), resultSet.getInt("moduleId"), resultSet.getString("name"));
 		}
 	}
 

@@ -15,9 +15,9 @@
  */
 package org.openinfinity.cloud.domain.repository.configurationtemplate;
 
-import org.openinfinity.cloud.domain.configurationtemplate.ParameterKey;
-import org.openinfinity.cloud.domain.repository.common.AbstractCrudRepositoryInterface;
+import org.openinfinity.cloud.domain.configurationtemplate.InstallationModulePackage;
 
+import java.math.BigInteger;
 import java.util.Collection;
 
 /**
@@ -27,12 +27,13 @@ import java.util.Collection;
  * @version 1.3.0
  * @since 1.3.0
  */
-public interface ParameterKeyRepository extends AbstractCrudRepositoryInterface<ParameterKey> {
-	
-    Collection<ParameterKey> loadAll(int elementId);
+public interface InstallationModulePackageRepository {
 
-    void deleteByModuleId(int elementId);
-
-    int findIdByName(String name);
+    void create(InstallationModulePackage installationModulePackage);
+    void update(InstallationModulePackage installationModulePackage);
+    Collection<InstallationModulePackage> loadAll();
+    InstallationModulePackage load(BigInteger id);
+    void deleteByModule(int moduleId);
+    void deleteByPackage(int packageId);
 
 }

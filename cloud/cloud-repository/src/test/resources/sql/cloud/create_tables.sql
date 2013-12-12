@@ -179,7 +179,8 @@ CREATE TABLE `cluster_type_tbl` (
   `min_machines` int(11) DEFAULT NULL,
   `max_machines` int(11) DEFAULT NULL,
   `min_repl_machines` int(11) DEFAULT NULL,
-  `max_repl_machines` int(11) DEFAULT NULL,  PRIMARY KEY (`id`)
+  `max_repl_machines` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `cloud_provider_tbl`;
@@ -299,17 +300,18 @@ CREATE TABLE `properties_tbl` (
 
 SET foreign_key_checks = 0;
 
-DROP TABLE IF EXISTS `configuration_template_organization_tbl`;
+DROP TABLE IF EXISTS `cfg_template_organization_tbl`;
 
-CREATE TABLE `configuration_template_organization_tbl` (
+CREATE TABLE `cfg_template_organization_tbl` (
   `template_id` int(11) NOT NULL,
   `organization_id` bigint(20) NOT NULL,
-  CONSTRAINT fk_configuration_template FOREIGN KEY (template_id) REFERENCES configuration_template_tbl(id)
+  PRIMARY KEY (`template_id`, `organization_id`),
+  CONSTRAINT fk_cfg_template_organization FOREIGN KEY (template_id) REFERENCES cfg_template_tbl(id)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `configuration_element_tbl`;
+DROP TABLE IF EXISTS `cfg_element_tbl`;
 
-CREATE TABLE `configuration_element_tbl` (
+CREATE TABLE `cfg_element_tbl` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `type` int(11) NOT NULL,
   `name` varchar(30) NOT NULL,
@@ -323,52 +325,90 @@ CREATE TABLE `configuration_element_tbl` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `configuration_template_element_tbl`;
+DROP TABLE IF EXISTS `cfg_template_element_tbl`;
 
-CREATE TABLE `configuration_template_element_tbl` (
+CREATE TABLE `cfg_template_element_tbl` (
   `template_id` int(11) NOT NULL,
   `element_id` int(11) NOT NULL,
-  CONSTRAINT fk_configuration_element FOREIGN KEY (element_id) REFERENCES configuration_element_tbl(id)
+  PRIMARY KEY (`template_id`, `element_id`),
+  CONSTRAINT fk_cfg_template_element_to_template FOREIGN KEY (template_id) REFERENCES cfg_template_tbl(id),
+  CONSTRAINT fk_cfg_template_element_to_element FOREIGN KEY (element_id) REFERENCES cfg_element_tbl(id)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `configuration_element_dependency_tbl`;
+DROP TABLE IF EXISTS `cfg_element_dependency_tbl`;
 
-CREATE TABLE `configuration_element_dependency_tbl` (
+CREATE TABLE `cfg_element_dependency_tbl` (
   `element_from` int(11) NOT NULL,
   `element_to` int(11) NOT NULL,
-  CONSTRAINT fk_configuration_element_dependency FOREIGN KEY (element_from) REFERENCES configuration_element_tbl(id)
+  PRIMARY KEY (`element_from`, `element_to`),
+  CONSTRAINT fk_cfg_element_dependency_from FOREIGN KEY (element_from) REFERENCES cfg_element_tbl(id),
+  CONSTRAINT fk_cfg_element_dependency_to FOREIGN KEY (element_to) REFERENCES cfg_element_tbl(id)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `configuration_template_tbl`;
+DROP TABLE IF EXISTS `cfg_template_tbl`;
 
-CREATE TABLE `configuration_template_tbl` (
+CREATE TABLE `cfg_template_tbl` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(30) NOT NULL,
   `description` varchar(256),
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `configuration_template_parameter_key_tbl`;
+DROP TABLE IF EXISTS `parameter_key_tbl`;
 
-CREATE TABLE `configuration_template_parameter_key_tbl` (
+CREATE TABLE `parameter_key_tbl` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `element_id` int(11) NOT NULL,
+  `module_id` int(11) NOT NULL,
   `name` varchar(30) NOT NULL,
   PRIMARY KEY (`id`),
-  CONSTRAINT fk_element_dependency FOREIGN KEY (element_id) REFERENCES configuration_element_tbl(id)
+  CONSTRAINT fk_parameter_key_dependency FOREIGN KEY (module_id) REFERENCES installation_module_tbl(id)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `configuration_template_parameter_value_tbl`;
+DROP TABLE IF EXISTS `parameter_value_tbl`;
 
-CREATE TABLE `configuration_template_parameter_value_tbl` (
+CREATE TABLE `parameter_value_tbl` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `parameter_key_id` int(11) NOT NULL,
   `parameter_value` varchar(30) NOT NULL,
   PRIMARY KEY (`id`),
-  CONSTRAINT fk_parameter_key_dependency FOREIGN KEY (parameter_key_id) REFERENCES configuration_template_parameter_key_tbl(id)
+  CONSTRAINT fk_parameter_value_dependency FOREIGN KEY (parameter_key_id) REFERENCES parameter_key_tbl(id)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `installation_module_tbl`;
+
+CREATE TABLE `installation_module_tbl` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `element_id` int(11) NOT NULL,
+  `name` varchar(30) NOT NULL,
+  `version` varchar(30) NOT NULL,
+  `description` varchar(30) NOT NULL,
+  PRIMARY KEY (`id`),
+  CONSTRAINT fk_installation_module_dependency FOREIGN KEY (element_id) REFERENCES cfg_element_tbl(id)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `installation_package_tbl`;
+
+CREATE TABLE `installation_package_tbl` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(30) NOT NULL,
+  `version` varchar(30) NOT NULL,
+  `description` varchar(30) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `installation_module_package_tbl`;
+
+CREATE TABLE `installation_module_package_tbl` (
+  `module_id` int(11) NOT NULL,
+  `package_id` int(11) NOT NULL,
+  PRIMARY KEY (`module_id`, `package_id`),
+  CONSTRAINT fk_installation_module_package_tbl_to_module FOREIGN KEY (module_id) REFERENCES installation_module_tbl(id),
+  CONSTRAINT fk_installation_module_package_tbl_to_package FOREIGN KEY (package_id) REFERENCES installation_package_tbl(id)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 SET foreign_key_checks = 1;
+
+DROP TABLE IF EXISTS `backup_rule_tbl`;
 
 CREATE TABLE `backup_rule_tbl` (
 `backup_rule_id` int(11) NOT NULL AUTO_INCREMENT,

@@ -18,3 +18,14 @@ DROP TABLE IF EXISTS `user_authorized_ip_tbl`;
 DROP TABLE IF EXISTS `scaling_rule_tbl`;
 DROP TABLE IF EXISTS `cluster_type_tbl`;
 DROP TABLE IF EXISTS `usage_hours_tbl`;
+DROP TABLE IF EXISTS `cfg_template_organization_tbl`;
+DROP TABLE IF EXISTS `cfg_element_tbl`;
+DROP TABLE IF EXISTS `cfg_template_element_tbl`;
+DROP TABLE IF EXISTS `cfg_element_dependency_tbl`;
+DROP TABLE IF EXISTS `cfg_template_tbl`;
+DROP TABLE IF EXISTS `parameter_key_tbl`;
+DROP TABLE IF EXISTS `parameter_value_tbl`;
+DROP TABLE IF EXISTS `installation_module_tbl`;
+DROP TABLE IF EXISTS `installation_package_tbl`;
+DROP TABLE IF EXISTS `backup_rule_tbl`;
+

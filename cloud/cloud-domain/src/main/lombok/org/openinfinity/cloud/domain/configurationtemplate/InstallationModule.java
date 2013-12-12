@@ -30,7 +30,7 @@ import lombok.RequiredArgsConstructor;
 @Data
 @NoArgsConstructor
 @RequiredArgsConstructor
-public class ParameterKey {
+public class InstallationModule {
     
     @NonNull
     @NotScript
@@ -38,14 +38,17 @@ public class ParameterKey {
 
     @NonNull
     @NotScript
-    private int moduleId;
-    
+    private int elementId;
+
     @NonNull
     @NotScript
     private String name;
-
-    public ParameterKey(int moduleId, String name) {
-        this.moduleId = moduleId;
-        this.name = name;
-    }
+    
+    @NonNull
+    @NotScript
+    private String version;
+    
+    @NonNull
+    @NotScript
+    private String description;
 }
