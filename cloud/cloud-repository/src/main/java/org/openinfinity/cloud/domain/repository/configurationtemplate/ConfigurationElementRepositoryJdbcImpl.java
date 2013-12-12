@@ -41,28 +41,25 @@ import java.util.Map;
 @Repository
 public class ConfigurationElementRepositoryJdbcImpl implements ConfigurationElementRepository {
 
-    private static final String CREATE_SQL = "insert into configuration_element_tbl (type, name, version, description, minMachines, " +
-            "minMachines, maxMachines, replicated, minReplicationMachines, maxReplicationMachines) values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    private static final String DELETE_SQL = "delete from cfg_element_tbl where id = ?";
 
-    private static final String DELETE_SQL = "delete from configuration_element_tbl where id = ?";
+    private static final String GET_ALL_SQL = "select * from cfg_element_tbl";
 
-    private static final String GET_ALL_SQL = "select * from configuration_element_tbl";
-
-	private static final String GET_BY_ID_SQL = "select * from configuration_element_tbl where id = ?";
+	private static final String GET_BY_ID_SQL = "select * from cfg_element_tbl where id = ?";
 
     private static final String GET_ALL_FOR_TEMPLATE_SQL =
-            "select configuration_element_tbl.* from configuration_element_tbl " +
+            "select cfg_element_tbl.* from cfg_element_tbl " +
             "inner join configuration_template_element_tbl on " +
-            "configuration_element_tbl.id = configuration_template_element_tbl.element_id " +
-            "where configuration_template_element_tbl.template_id = ?";
+            "cfg_element_tbl.id = cfg_template_element_tbl.element_id " +
+            "where cfg_template_element_tbl.template_id = ?";
 
     private static final String GET_DEPENDEES_SQL =
-            "select configuration_element_tbl.* from configuration_element_tbl " +
-            "inner join configuration_element_dependency_tbl on " +
-            "configuration_element_tbl.id = configuration_element_dependency_tbl.element_to " +
-            "where configuration_element_dependency_tbl.element_from = ?";
+            "select cfg_element_tbl.* from cfg_element_tbl " +
+            "inner join cfg_element_dependency_tbl on " +
+            "cfg_element_tbl.id = cfg_element_dependency_tbl.element_to " +
+            "where cfg_element_dependency_tbl.element_from = ?";
 
-    private static final String UPDATE_SQL = "update configuration_element_tbl set type = ?, name = ?,  version = ?, description = ?, " +
+    private static final String UPDATE_SQL = "update cfg_element_tbl set type = ?, name = ?,  version = ?, description = ?, " +
             "minMachines = ?, maxMachines = ?, replicated = ?, minReplicationMachines = ?, maxReplicationMachines = ? where id = ?";
 
     private JdbcTemplate jdbcTemplate;
@@ -78,7 +75,7 @@ public class ConfigurationElementRepositoryJdbcImpl implements ConfigurationElem
 
     @Override
     public ConfigurationElement create(ConfigurationElement element) {
-        SimpleJdbcInsert insert = new SimpleJdbcInsert(dataSource).withTableName("configuration_element_tbl").usingGeneratedKeyColumns("id");
+        SimpleJdbcInsert insert = new SimpleJdbcInsert(dataSource).withTableName("cfg_element_tbl").usingGeneratedKeyColumns("id");
         Map<String,Object> parameters = new HashMap<String,Object>();
         parameters.put("type", element.getName());
         parameters.put("name", element.getDescription());

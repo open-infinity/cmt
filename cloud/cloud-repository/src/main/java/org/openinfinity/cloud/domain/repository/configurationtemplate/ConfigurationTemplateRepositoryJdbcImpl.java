@@ -45,22 +45,20 @@ public class ConfigurationTemplateRepositoryJdbcImpl implements ConfigurationTem
 
 	private JdbcTemplate jdbcTemplate;
 
-    private static final String CREATE_SQL = "insert into configuration_template_tbl (name, description) values(?, ?)";
+    private static final String DELETE_SQL = "delete from cfg_template_tbl where id = ?";
 
-    private static final String DELETE_SQL = "delete from configuration_template_tbl where id = ?";
+    private static final String UPDATE_SQL = "update cfg_template_tbl set name = ?, description = ? where id = ?";
 
-    private static final String UPDATE_SQL = "update configuration_template_tbl set name = ?, description = ? where id = ?";
-
-    private static final String GET_ALL_SQL = "select * from configuration_template_tbl";
+    private static final String GET_ALL_SQL = "select * from cfg_template_tbl";
 
     private static final String GET_ALL_FOR_ORGANIZATION_SQL =
-        "select configuration_template_tbl.id, configuration_template_tbl.name, " + 
-        "configuration_template_tbl.description from configuration_template_tbl " +
-        "inner join configuration_template_organization_tbl on " +
-        "configuration_template_tbl.id = configuration_template_organization_tbl.template_id " +
+        "select cfg_template_tbl.id, cfg_template_tbl.name, " + 
+        "cfg_template_tbl.description from cfg_template_tbl " +
+        "inner join cfg_template_organization_tbl on " +
+        "cfg_template_tbl.id = cfg_template_organization_tbl.template_id " +
         "where organization_id = ?";
 
-    private static final String GET_BY_ID_SQL = "select * from configuration_template_tbl where id = ?";
+    private static final String GET_BY_ID_SQL = "select * from cfg_template_tbl where id = ?";
 
     private DataSource dataSource;
 
@@ -81,7 +79,7 @@ public class ConfigurationTemplateRepositoryJdbcImpl implements ConfigurationTem
 
     @Override
     public ConfigurationTemplate create(ConfigurationTemplate configurationTemplate) {
-        SimpleJdbcInsert insert = new SimpleJdbcInsert(dataSource).withTableName("configuration_template_tbl").usingGeneratedKeyColumns("id");
+        SimpleJdbcInsert insert = new SimpleJdbcInsert(dataSource).withTableName("cfg_template_tbl").usingGeneratedKeyColumns("id");
         Map<String,Object> parameters = new HashMap<String,Object>();
         parameters.put("name", configurationTemplate.getName());
         parameters.put("description", configurationTemplate.getDescription());

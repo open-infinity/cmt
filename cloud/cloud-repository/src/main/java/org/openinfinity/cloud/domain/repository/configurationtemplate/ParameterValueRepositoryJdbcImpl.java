@@ -41,11 +41,9 @@ import java.util.Map;
 @Repository
 public class ParameterValueRepositoryJdbcImpl implements ParameterValueRepository {
 
-    private static final String GET_ALL_FOR_KEY_SQL = "select * from configuration_template_parameter_value_tbl where parameter_key_id = ?";
+    private static final String GET_ALL_FOR_KEY_SQL = "select * from parameter_value_tbl where parameter_key_id = ?";
 
-    private static final String DELETE_FOR_KEY_SQL = "delete from configuration_template_parameter_value_tbl where parameter_key_id = ?";
-
-    private static final String CREATE_SQL = "insert into configuration_template_parameter_value_tbl (name, description) values(?, ?)";
+    private static final String DELETE_FOR_KEY_SQL = "delete from parameter_value_tbl where parameter_key_id = ?";
 
     private JdbcTemplate jdbcTemplate;
 
@@ -60,10 +58,9 @@ public class ParameterValueRepositoryJdbcImpl implements ParameterValueRepositor
 
     @Override
     public ParameterValue create(ParameterValue value) {
-        SimpleJdbcInsert insert = new SimpleJdbcInsert(dataSource).withTableName("configuration_template_parameter_value_tbl").usingGeneratedKeyColumns("id");
+        SimpleJdbcInsert insert = new SimpleJdbcInsert(dataSource).withTableName("parameter_value_tbl").usingGeneratedKeyColumns("id");
         Map<String,Object> parameters = new HashMap<String,Object>();
         parameters.put("parameter_key_id", value.getParameterKeyId());
-        //parameters.put("type", value.getType());
         parameters.put("parameter_value", value.getValue());
         Number newId = insert.executeAndReturnKey(parameters);
         value.setId(newId.intValue());
@@ -109,7 +106,6 @@ public class ParameterValueRepositoryJdbcImpl implements ParameterValueRepositor
 		public ParameterValue mapRow(ResultSet resultSet, int rowNum) throws SQLException {    
 		    return new ParameterValue(resultSet.getInt("id"),
 		                       resultSet.getInt("parameter_key_id"),
-		                       //resultSet.getInt("type"),
 		                       resultSet.getString("parameter_value"));
 		}
 	}

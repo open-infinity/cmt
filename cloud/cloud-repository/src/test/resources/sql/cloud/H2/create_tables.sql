@@ -285,27 +285,27 @@ CREATE TABLE `deployment_state_tbl` (
   PRIMARY KEY (`id`)
 );
 
-DROP TABLE IF EXISTS `configuration_template_tbl`;
+DROP TABLE IF EXISTS `cfg_template_tbl`;
 
-CREATE TABLE `configuration_template_tbl` (
+CREATE TABLE `cfg_template_tbl` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(30) NOT NULL,
   `description` varchar(256),
   PRIMARY KEY (`id`)
 );
 
-DROP TABLE IF EXISTS `configuration_template_organization_tbl`;
+DROP TABLE IF EXISTS `cfg_template_organization_tbl`;
 
-CREATE TABLE `configuration_template_organization_tbl` (
+CREATE TABLE `cfg_template_organization_tbl` (
   `template_id` int(11) NOT NULL,
-  `organization_id`bigint(20) NOT NULL,
+  `organization_id` bigint(20) NOT NULL,
   PRIMARY KEY (`organization_id`),
-  CONSTRAINT fk_configuration_template FOREIGN KEY (template_id) REFERENCES configuration_template_tbl(id)
+  CONSTRAINT fk_configuration_template FOREIGN KEY (template_id) REFERENCES cfg_template_tbl(id)
 );
 
-DROP TABLE IF EXISTS `configuration_template_element_tbl`;
+DROP TABLE IF EXISTS `cfg_template_element_tbl`;
 
-CREATE TABLE `configuration_template_element_tbl` (
+CREATE TABLE `cfg_template_element_tbl` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `type` int(11) NOT NULL,
   `name` varchar(30) NOT NULL,
@@ -318,20 +318,5 @@ CREATE TABLE `configuration_template_element_tbl` (
   `minReplicationMachines` int(11),
   `maxReplicationMachines` int(11),
   PRIMARY KEY (`id`)
-);
-
-CREATE TABLE `backup_rule_tbl` (
-`backup_rule_id` int(11) NOT NULL AUTO_INCREMENT,
-`cluster_id` int(11) NOT NULL,
-`active` ENUM('yes', 'no') NOT NULL,
-`cron_minutes` varchar(12) NOT NULL DEFAULT '0',
-`cron_hours` varchar(12) NOT NULL DEFAULT '22',
-`cron_day_of_month` varchar(12) NOT NULL DEFAULT '*',
-`cron_month` varchar(12) NOT NULL DEFAULT '*',
-`cron_day_of_week` varchar(12) NOT NULL DEFAULT '?',
-`cron_year` varchar(12) NOT NULL DEFAULT '*',
-PRIMARY KEY (`backup_rule_id`),
-FOREIGN KEY (`cluster_id`) REFERENCES cluster_tbl(cluster_id) ON DELETE CASCADE,
-CONSTRAINT `cluster_id` FOREIGN KEY (`cluster_id`) REFERENCES `cluster_tbl` (`cluster_id`)
 );
 

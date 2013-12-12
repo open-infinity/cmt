@@ -29,5 +29,5 @@ import java.util.Collection;
  */
 public interface ParameterKeyService extends AbstractCrudServiceInterface<ParameterKey> {
 
-    Collection<ParameterKey> loadAll(int elementId);
+    Collection<ParameterKey> loadAll(int moduleId);
 }

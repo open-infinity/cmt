@@ -19,10 +19,8 @@ package org.openinfinity.cloud.application.template.controller;
 import com.liferay.portal.model.User;
 import org.apache.log4j.Logger;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.type.TypeReference;
 import org.openinfinity.cloud.comon.web.LiferayService;
 import org.openinfinity.cloud.domain.configurationtemplate.ConfigurationElement;
-import org.openinfinity.cloud.domain.configurationtemplate.ParameterKey;
 import org.openinfinity.cloud.service.configurationtemplate.ConfigurationElementDependencyService;
 import org.openinfinity.cloud.service.configurationtemplate.ConfigurationElementService;
 import org.openinfinity.cloud.service.configurationtemplate.ParameterKeyService;
@@ -163,6 +161,7 @@ public class ElementController {
         }
     }
 
+    /*
     @ResourceMapping(GET_PARAMETER_KEYS_AND_VALUES)
     public void getParameterKeysAndValues(ResourceRequest request, ResourceResponse response, @RequestParam("elementId") int elementId) throws Exception {
         try {
@@ -180,7 +179,9 @@ public class ElementController {
             ExceptionUtil.throwSystemException(e);
         }
     }
+    */
 
+    /*
     @ResourceMapping(EDIT_ELEMENT)
     public void editElement(ResourceRequest request, ResourceResponse response,
                              @RequestParam("element") String elementData,
@@ -207,7 +208,24 @@ public class ElementController {
             response.setProperty(ResourceResponse.HTTP_STATUS_CODE, HttpCodes.HTTP_ERROR_CODE_SERVER_ERROR);
         }
     }
+    */
 
+    @ResourceMapping(EDIT_ELEMENT)
+    public void editElement(ResourceRequest request, ResourceResponse response,
+                            @RequestParam("element") String elementData,
+                            @RequestParam("dependencies") String dependenciesData){
+        try {
+            if (liferayService.getUser(request, response) == null) return;
+            ObjectMapper mapper = new ObjectMapper();
+            elementService.update(mapper.readValue(elementData, ConfigurationElement.class), mapper.readValue(dependenciesData, Collection.class));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.setProperty(ResourceResponse.HTTP_STATUS_CODE, HttpCodes.HTTP_ERROR_CODE_SERVER_ERROR);
+        }
+    }
+
+    /*
     @ResourceMapping(CREATE_ELEMENT)
     public void createElement(ResourceRequest request, ResourceResponse response,
                             @RequestParam("element") String elementData,
@@ -234,12 +252,27 @@ public class ElementController {
             response.setProperty(ResourceResponse.HTTP_STATUS_CODE, HttpCodes.HTTP_ERROR_CODE_SERVER_ERROR);
         }
     }
+    */
+
+    @ResourceMapping(CREATE_ELEMENT)
+    public void createElement(ResourceRequest request, ResourceResponse response,
+                              @RequestParam("element") String elementData,
+                              @RequestParam("dependencies") String dependenciesData){
+        try {
+            if (liferayService.getUser(request, response) == null) return;
+            ObjectMapper mapper = new ObjectMapper();
+            elementService.create(mapper.readValue(elementData, ConfigurationElement.class), mapper.readValue(dependenciesData, Collection.class));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.setProperty(ResourceResponse.HTTP_STATUS_CODE, HttpCodes.HTTP_ERROR_CODE_SERVER_ERROR);
+        }
+    }
 
     @ResourceMapping(DELETE_ELEMENT)
     public void deleteElement(ResourceRequest request, ResourceResponse response, @RequestParam("id") int elementId) throws Exception {
         try {
-            User user = liferayService.getUser(request, response);
-            if (user == null) return;
+            if (liferayService.getUser(request, response) == null) return;
             elementService.delete(elementId);
         } catch (Exception e) {
             ExceptionUtil.throwSystemException(e);

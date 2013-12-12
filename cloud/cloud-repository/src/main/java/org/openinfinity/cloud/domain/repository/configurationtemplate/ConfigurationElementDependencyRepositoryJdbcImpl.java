@@ -39,9 +39,9 @@ import java.util.List;
 @Repository
 public class ConfigurationElementDependencyRepositoryJdbcImpl implements ConfigurationElementDependencyRepository {
 
-    private static final String DELETE_BY_DEPENDENT_ID_SQL = "delete from configuration_element_dependency_tbl where element_from = ?";
+    private static final String DELETE_BY_DEPENDENT_ID_SQL = "delete from cfg_element_dependency_tbl where element_from = ?";
 
-    private static final String CREATE_SQL = "insert into configuration_element_dependency_tbl values(?, ?)";
+    private static final String CREATE_SQL = "insert into cfg_element_dependency_tbl values(?, ?)";
 
 
     private JdbcTemplate jdbcTemplate;
@@ -55,7 +55,6 @@ public class ConfigurationElementDependencyRepositoryJdbcImpl implements Configu
     @AuditTrail
     @Transactional
     public List<ConfigurationElementDependency> getAll() {
-        // TODO Auto-generated method stub
         return null;
     }
 

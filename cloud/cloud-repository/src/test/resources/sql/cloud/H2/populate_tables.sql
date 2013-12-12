@@ -72,14 +72,14 @@ insert into acl_machine_type_tbl select 'TOAS', id from machine_type_tbl;
 insert into acl_machine_type_tbl select 'Tieto Finland', id from machine_type_tbl;
 
 -- Configuration template test data
-insert into configuration_template_element_tbl values(1, 2, 'bas', '1.2.2', 'Tomcat with TOAS goodies', NULL, 3, 8, 0, NULL, NULL);
-insert into configuration_template_tbl values (1, 'TEMPLATE_WEB_SIMPLE', 'Platforms suitable for simple web services');
-insert into configuration_template_tbl values (2, 'TEMPLATE_WEB_IG', 'Platforms suitable for web services with authentication support');
+insert into cfg_template_element_tbl values(1, 2, 'bas', '1.2.2', 'Tomcat with TOAS goodies', NULL, 3, 8, 0, NULL, NULL);
+insert into cfg_template_tbl values (1, 'TEMPLATE_WEB_SIMPLE', 'Platforms suitable for simple web services');
+insert into cfg_template_tbl values (2, 'TEMPLATE_WEB_IG', 'Platforms suitable for web services with authentication support');
 
-insert into configuration_template_organization_tbl values (1, 1);
-insert into configuration_template_organization_tbl values (1, 2);
-insert into configuration_template_organization_tbl values (1, 3);
-insert into configuration_template_organization_tbl values (1, 4);
+insert into cfg_template_organization_tbl values (1, 1);
+insert into cfg_template_organization_tbl values (1, 2);
+insert into cfg_template_organization_tbl values (1, 3);
+insert into cfg_template_organization_tbl values (1, 4);
 
 -- SSP billing test data
 insert into usage_hours_tbl values(1, 10687, 1513, 5, 3532, 1, '2013-10-17 10:30:01');

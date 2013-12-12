@@ -38,15 +38,13 @@ public class ConfigurationTemplateElementRepositoryJdbcImpl implements Configura
 
 	private JdbcTemplate jdbcTemplate;
 
-    private static final String CREATE_SQL = "insert into configuration_template_element_tbl values(?, ?)";
+    private static final String CREATE_SQL = "insert into cfg_template_element_tbl values(?, ?)";
 
-    private static final String LOAD_ALL_SQL = "select * from configuration_template_element_tbl";
+    private static final String LOAD_ALL_FOR_TEMPLATE_SQL = "select * from cfg_template_element_tbl where template_id = ?";
 
-    private static final String LOAD_ALL_FOR_TEMPLATE_SQL = "select * from configuration_template_element_tbl where template_id = ?";
+    private static final String DELETE_BY_ELEMENT_ID_SQL = "delete from cfg_template_element_tbl where element_id = ?";
 
-    private static final String DELETE_BY_ELEMENT_ID_SQL = "delete from configuration_template_element_tbl where element_id = ?";
-
-    private static final String DELETE_BY_TEMPLATE_ID_SQL = "delete from configuration_template_element_tbl where template_id = ?";
+    private static final String DELETE_BY_TEMPLATE_ID_SQL = "delete from cfg_template_element_tbl where template_id = ?";
 
     @Autowired
     public ConfigurationTemplateElementRepositoryJdbcImpl(@Qualifier("cloudDataSource") DataSource dataSource) {

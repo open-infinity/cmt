@@ -37,7 +37,6 @@ public class ParameterKeyServiceImpl implements ParameterKeyService {
 	@Autowired
 	private ParameterKeyRepository parameterKeyRepository;
 
-
     @Override
     public ParameterKey create(ParameterKey obj) {
         return null;
@@ -53,8 +52,8 @@ public class ParameterKeyServiceImpl implements ParameterKeyService {
     }
 
     @Override
-    public Collection<ParameterKey> loadAll(int elementId) {
-        return parameterKeyRepository.loadAll(elementId);
+    public Collection<ParameterKey> loadAll(int moduleId) {
+        return parameterKeyRepository.loadAll(moduleId);
     }
 
     @Override

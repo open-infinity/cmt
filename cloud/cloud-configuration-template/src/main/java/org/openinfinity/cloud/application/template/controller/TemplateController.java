@@ -156,8 +156,6 @@ public class TemplateController {
     @ResourceMapping(DELETE_TEMPLATE)
     public void deleteTemplate(ResourceRequest request, ResourceResponse response, @RequestParam("id") int templateId) throws Exception {
         try {
-            LOG.debug("---------ENTER deleteTemplate() --------");
-            LOG.debug("id:" + templateId);
             User user = liferayService.getUser(request, response);
             if (user == null) return;
             configurationTemplateService.delete(templateId);

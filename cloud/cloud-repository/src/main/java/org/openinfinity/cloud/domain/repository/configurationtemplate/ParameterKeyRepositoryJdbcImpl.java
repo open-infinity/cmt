@@ -41,13 +41,11 @@ import java.util.Map;
 @Repository
 public class ParameterKeyRepositoryJdbcImpl implements ParameterKeyRepository {
 
-	private static final String GET_ALL_FOR_MODULE_SQL = "select * from configuration_template_parameter_key_tbl where module_id = ?";
+	private static final String GET_ALL_FOR_MODULE_SQL = "select * from parameter_key_tbl where module_id = ?";
 
-    private static final String FIND_BY_NAME_SQL = "select * from configuration_template_parameter_key_tbl where name = ?";
+    private static final String FIND_BY_NAME_SQL = "select * from parameter_key_tbl where name = ?";
 
-    private static final String DELETE_SQL = "delete from configuration_template_parameter_key_tbl where moduleId = ?";
-
-    private static final String CREATE_SQL = "insert into configuration_template_parameter_key_tbl (name, description) values(?, ?)";
+    private static final String DELETE_SQL = "delete from parameter_key_tbl where moduleId = ?";
 
     private JdbcTemplate jdbcTemplate;
 
@@ -68,7 +66,7 @@ public class ParameterKeyRepositoryJdbcImpl implements ParameterKeyRepository {
 
     @Override
     public ParameterKey create(ParameterKey key) {
-        SimpleJdbcInsert insert = new SimpleJdbcInsert(dataSource).withTableName("configuration_template_parameter_key_tbl").usingGeneratedKeyColumns("id");
+        SimpleJdbcInsert insert = new SimpleJdbcInsert(dataSource).withTableName("parameter_key_tbl").usingGeneratedKeyColumns("id");
         Map<String,Object> parameters = new HashMap<String,Object>();
         parameters.put("module_id", key.getModuleId());
         parameters.put("name", key.getName());
