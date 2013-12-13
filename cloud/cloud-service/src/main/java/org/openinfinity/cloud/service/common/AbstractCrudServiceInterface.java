@@ -14,5 +14,7 @@ public abstract interface AbstractCrudServiceInterface<T extends Object> {
 	public T load(BigInteger id);
 	
 	public void delete (T obj);
+
+    void delete(BigInteger id);
 	
 }

@@ -130,12 +130,12 @@
             "Submit changes": function() {
                 submitTemplate(dlg.mode);
                 cleanUpDialog($(this));
-                $(this).hide();
+                //$(this).hide();
                 $(this).dialog( "close" );
             },
             Cancel: function() {
                 cleanUpDialog($(this));
-                $(this).hide();
+                //$(this).hide();
                 $(this).dialog( "close" );
             }
         }
@@ -186,27 +186,22 @@
     }
 
     function populateElements(data){
-        try{
-            var listSelected = dlg.selectedElementsPanel.find("ul");
-            var listAvailable = dlg.availableElementsPanel.find("ul");
-            htmlTemplate = "<li class='ui-state-default'>\
-                                <div class='name list-item-column'></div>\
-                                <div class='version'></div>\
-                            </li>";
-            var selectedIndices = [];
-            $.each(data.selected, function(index, value){
-                storeElementToDom(htmlTemplate, value, listSelected);
-                selectedIndices.push(value.id);
-            });
-            $.each(data.available, function(index, value){
-                if (selectedIndices.indexOf(value.id) == -1){
-                    storeElementToDom(htmlTemplate, value, listAvailable);
-                }
-            });
-        }
-        catch(err){
-            console.log(err.message);
-        }
+        var listSelected = dlg.selectedElementsPanel.find("ul");
+        var listAvailable = dlg.availableElementsPanel.find("ul");
+        htmlTemplate = "<li class='ui-state-default'>\
+                            <div class='name list-item-column'></div>\
+                            <div class='version'></div>\
+                        </li>";
+        var selectedIndices = [];
+        $.each(data.selected, function(index, value){
+            storeElementToDom(htmlTemplate, value, listSelected);
+            selectedIndices.push(value.id);
+        });
+        $.each(data.available, function(index, value){
+            if (selectedIndices.indexOf(value.id) == -1){
+                storeElementToDom(htmlTemplate, value, listAvailable);
+            }
+        });
     }
 
     function populateOrganizations(data){

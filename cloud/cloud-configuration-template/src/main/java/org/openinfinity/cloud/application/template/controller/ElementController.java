@@ -19,31 +19,32 @@ package org.openinfinity.cloud.application.template.controller;
 import com.liferay.portal.model.User;
 import org.apache.log4j.Logger;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.openinfinity.cloud.annotation.Authenticated;
+import org.openinfinity.cloud.application.template.serialization.ConfigurationElementContainer;
 import org.openinfinity.cloud.comon.web.LiferayService;
-import org.openinfinity.cloud.domain.configurationtemplate.ConfigurationElement;
-import org.openinfinity.cloud.service.configurationtemplate.ConfigurationElementDependencyService;
-import org.openinfinity.cloud.service.configurationtemplate.ConfigurationElementService;
-import org.openinfinity.cloud.service.configurationtemplate.ParameterKeyService;
-import org.openinfinity.cloud.service.configurationtemplate.ParameterValueService;
+import org.openinfinity.cloud.domain.configurationtemplate.entity.ConfigurationElement;
+import org.openinfinity.cloud.service.configurationtemplate.entity.api.ConfigurationElementService;
+import org.openinfinity.cloud.service.configurationtemplate.entity.api.ParameterKeyService;
+import org.openinfinity.cloud.service.configurationtemplate.entity.api.ParameterValueService;
+import org.openinfinity.cloud.service.configurationtemplate.relation.api.ElementToElementService;
 import org.openinfinity.cloud.util.collection.ListUtil;
 import org.openinfinity.cloud.util.http.HttpCodes;
 import org.openinfinity.cloud.util.serialization.JsonDataWrapper;
 import org.openinfinity.cloud.util.serialization.SerializerUtil;
-import org.openinfinity.core.exception.AbstractCoreException;
-import org.openinfinity.core.exception.ApplicationException;
-import org.openinfinity.core.exception.BusinessViolationException;
-import org.openinfinity.core.exception.SystemException;
 import org.openinfinity.core.util.ExceptionUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.portlet.ModelAndView;
 import org.springframework.web.portlet.bind.annotation.ResourceMapping;
 
-import javax.portlet.*;
-import java.util.*;
+import javax.portlet.ResourceRequest;
+import javax.portlet.ResourceResponse;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Spring portlet controller for handling templates.
@@ -71,7 +72,7 @@ public class ElementController {
 	private ConfigurationElementService elementService;
 
     @Autowired
-    private ConfigurationElementDependencyService dependencyService;
+    private ElementToElementService dependencyService;
 
     @Autowired
     private ParameterKeyService parameterKeyService;
@@ -82,30 +83,8 @@ public class ElementController {
     @Autowired
     private LiferayService liferayService;
 
-	@ExceptionHandler({ApplicationException.class, BusinessViolationException.class,
-	                   SystemException.class})
-    public ModelAndView handleException(RenderRequest renderRequest, RenderResponse renderResponse,
-                                        AbstractCoreException abstractCoreException) {
-		ModelAndView modelAndView = new ModelAndView("error");
-		if (abstractCoreException.isErrorLevelExceptionMessagesIncluded())
-			modelAndView.addObject("errorLevelExceptions",
-			                        abstractCoreException.getErrorLevelExceptionIds());
-		if (abstractCoreException.isWarningLevelExceptionMessagesIncluded())
-			modelAndView.addObject("warningLevelExceptions",
-			                        abstractCoreException.getWarningLevelExceptionIds());
-		if (abstractCoreException.isInformativeLevelExceptionMessagesIncluded())
-			modelAndView.addObject("informativeLevelExceptions",
-			                        abstractCoreException.getInformativeLevelExceptionIds());
 
-		// TODO
-		@SuppressWarnings("unchecked")
-        Map<String, Object> userInfo = (Map<String, Object>)
-		                                renderRequest.getAttribute(ActionRequest.USER_INFO);
-		if (userInfo == null) return new ModelAndView("home");
-
-		return modelAndView;
-    }
-
+    @Authenticated
     @ResourceMapping(GET_ELEMENTS)
     public void getElements(ResourceRequest request, ResourceResponse response, @RequestParam("page") int page, @RequestParam("rows") int rows) throws Exception {
         try {
@@ -123,18 +102,18 @@ public class ElementController {
         }
 
     }
-
+    @Authenticated
     @ResourceMapping(GET_ELEMENT)
     public void getElement(ResourceRequest request, ResourceResponse response, @RequestParam("elementId") int elementId) throws Exception {
         try {
             User user = liferayService.getUser(request, response);
             if (user == null) return;
-            SerializerUtil.jsonSerialize(response.getWriter(), elementService.load(elementId));
+            SerializerUtil.jsonSerialize(response.getWriter(), elementService.load(BigInteger.valueOf(elementId)));
         } catch (Exception e) {
             ExceptionUtil.throwSystemException(e);
         }
     }
-
+    @Authenticated
     @ResourceMapping(GET_DEPENDENCIES)
     public void getDependencies(ResourceRequest request, ResourceResponse response, @RequestParam("elementId") int elementId) throws Exception {
         try {
@@ -147,7 +126,7 @@ public class ElementController {
             ExceptionUtil.throwSystemException(e);
         }
     }
-
+    @Authenticated
     @ResourceMapping(GET_ALL_DEPENDENCIES)
     public void getAllDependencies(ResourceRequest request, ResourceResponse response) throws Exception {
         try {
@@ -209,7 +188,7 @@ public class ElementController {
         }
     }
     */
-
+    @Authenticated
     @ResourceMapping(EDIT_ELEMENT)
     public void editElement(ResourceRequest request, ResourceResponse response,
                             @RequestParam("element") String elementData,
@@ -253,7 +232,7 @@ public class ElementController {
         }
     }
     */
-
+    @Authenticated
     @ResourceMapping(CREATE_ELEMENT)
     public void createElement(ResourceRequest request, ResourceResponse response,
                               @RequestParam("element") String elementData,
@@ -268,12 +247,12 @@ public class ElementController {
             response.setProperty(ResourceResponse.HTTP_STATUS_CODE, HttpCodes.HTTP_ERROR_CODE_SERVER_ERROR);
         }
     }
-
+    @Authenticated
     @ResourceMapping(DELETE_ELEMENT)
     public void deleteElement(ResourceRequest request, ResourceResponse response, @RequestParam("id") int elementId) throws Exception {
         try {
             if (liferayService.getUser(request, response) == null) return;
-            elementService.delete(elementId);
+            elementService.delete(BigInteger.valueOf(elementId));
         } catch (Exception e) {
             ExceptionUtil.throwSystemException(e);
         }

@@ -8,6 +8,7 @@
     dlg.state = {};
     dlg.model = {};
     dlg.html = {};
+    dlg.html.self = $("#dlg-module");
 
     $.extend(dlg, {
 
@@ -17,7 +18,7 @@
 
         edit : function(id){
             $.ajax({
-                url: portletURL.url.module.getURL + "&moduleId=" + id,
+                url: portletURL.url.module.getModulesURL + "&moduleId=" + id,
                 dataType: "json"
                 }).done(function(data) {
                 console.log(data);	

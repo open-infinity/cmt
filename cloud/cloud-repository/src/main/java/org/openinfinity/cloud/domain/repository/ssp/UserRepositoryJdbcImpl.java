@@ -15,16 +15,6 @@
  */
 package org.openinfinity.cloud.domain.repository.ssp;
 
-import java.math.BigInteger;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.sql.DataSource;
-
 import org.apache.log4j.Logger;
 import org.openinfinity.cloud.domain.ssp.User;
 import org.openinfinity.core.annotation.AuditTrail;
@@ -36,6 +26,15 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.Assert;
+
+import javax.sql.DataSource;
+import java.math.BigInteger;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * User repository implementation.
@@ -123,8 +122,12 @@ public class UserRepositoryJdbcImpl implements UserRepository{
 
 	@AuditTrail
 	public void delete (User user){}
-	
-	private static final class UserWrapper implements RowMapper<User> {
+
+    @Override
+    public void delete(BigInteger id) {
+    }
+
+    private static final class UserWrapper implements RowMapper<User> {
 		public User mapRow(ResultSet rs, int rowNumber) throws SQLException {
 			User user = new User();
 			user.setId(BigInteger.valueOf(rs.getInt("id")));

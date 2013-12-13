@@ -15,16 +15,15 @@
  */
 package org.openinfinity.cloud.service.ssp;
 
-import java.math.BigInteger;
-import java.util.Collection;
-
+import org.openinfinity.cloud.domain.repository.ssp.UserRepository;
+import org.openinfinity.cloud.domain.ssp.User;
 import org.openinfinity.core.annotation.AuditTrail;
 import org.openinfinity.core.annotation.Log;
-import org.openinfinity.cloud.domain.ssp.User;
-import org.openinfinity.cloud.domain.repository.ssp.UserRepository;
-import org.openinfinity.cloud.service.ssp.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.math.BigInteger;
+import java.util.Collection;
 
 /**
  * User service implementation.
@@ -41,7 +40,6 @@ public class UserServiceImpl implements UserService {
 	@Log
 	@AuditTrail
 	public User create(User user) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -49,15 +47,12 @@ public class UserServiceImpl implements UserService {
 	@Log
 	@AuditTrail
 	public void update(User user) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	@Log
 	@AuditTrail
 	public Collection<User> loadAll() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -65,7 +60,6 @@ public class UserServiceImpl implements UserService {
 	@Log
 	@AuditTrail
 	public User load(BigInteger id) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -73,7 +67,6 @@ public class UserServiceImpl implements UserService {
 	@Log
 	@AuditTrail
 	public User loadByUsername(String username) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 	
@@ -88,9 +81,11 @@ public class UserServiceImpl implements UserService {
 	@Log
 	@AuditTrail
 	public void delete(User user) {
-		// TODO Auto-generated method stub
-		
 	}
+
+    @Override
+    public void delete(BigInteger id) {
+    }
 	
 	
 

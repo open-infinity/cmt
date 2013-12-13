@@ -64,7 +64,7 @@ jQuery(function($){
                 jsonReader : {
                     repeatitems : false,
                     id: "Id",
-                    root : function(obj) { return obj.rows;},
+                    root : function(obj) {return obj.rows;},
                     page : function(obj) {return obj.page;},
                     total : function(obj) {return obj.total;},
                     records : function(obj) {return obj.records;}
@@ -108,7 +108,7 @@ jQuery(function($){
                 jsonReader : {
                     repeatitems : false,
                     id: "Id",
-                    root : function(obj) { return obj.rows;},
+                    root : function(obj) {return obj.rows;},
                     page : function(obj) {return obj.page;},
                     total : function(obj) {return obj.total;},
                     records : function(obj) {return obj.records;}
@@ -151,6 +151,52 @@ jQuery(function($){
                 {}  //  view parameters
             );
         },
+        setupModulesTable: function(){
+            app.modulesTable.jqGrid({
+                url: portletURL.url.module.getModulesURL,
+                datatype: "json",
+                jsonReader : {
+                    repeatitems : false,
+                    id: "Id",
+                    root : function(obj) {return obj.rows;},
+                    page : function(obj) {return obj.page;},
+                    total : function(obj) {return obj.total;},
+                    records : function(obj) {return obj.records;}
+                    },
+                colNames:['Id', 'ElementId', 'Name', 'Version', 'Description'],
+                colModel:[
+                          {name:'id', index:'id', width:50, align:"center", sortable:true, sorttype:"int"},
+                          {name:'elementId', index:'elementId', width:50, align:"center", sortable:true, sorttype:"int"},
+                          {name:'name', index:'name', width:150, align:"left"},
+                          {name:'version', index:'version', width:150, align:"left"},
+                          {name:'description', index:'description', width:335, align:"left"}
+                          ],
+                rowNum: 10,
+                width: 750,
+                height: "auto",
+                pager: '#module-grid-pager',
+                sortname: 'id',
+                viewrecords: true,
+                shrinkToFit: false,
+                sortorder: "asc",
+                ondblClickRow: app.editTableRow(app.modulesTable, app.dialog.module),
+                loadonce: true,
+                gridComplete: function(){
+                    $("#modules-grid").setGridParam({datatype: 'local'});
+                }
+            });
+            app.modulesTable.jqGrid(
+                'navGrid',
+                '#module-grid-pager',
+                {add:false, del:false, search:true, refresh:false, edit:false},
+                {}, //  default settings for edit
+                {}, //  default settings for add
+                {}, //  default settings for delete
+                {odata : ['equal', 'not equal', 'less', 'less or equal','greater','greater or equal', 'begins with','does not begin with','is in','is not in','ends with','does not end with','contains','does not contain']}, // search options
+                {} /* view parameters*/
+            );
+
+        },
         reloadTemplatesTable: function(){
             app.templatesTable.setGridParam({datatype:'json', page:1}).trigger('reloadGrid');
         },
@@ -167,7 +213,8 @@ jQuery(function($){
         },
 
         setupTabs: function(){
-            app.tabsContainer.tabs({active: 1});
+            app.tabsContainer.tabs();
+            app.tabsContainer.tabs('select', 0);
         },
 
         bindEventHandlers: function(){
@@ -284,6 +331,7 @@ jQuery(function($){
 	app.init();
 	app.setupTemplatesTable();
 	app.setupElementsTable();
+	app.setupModulesTable();
 	app.setupTabs();
 	app.bindEventHandlers();
 });

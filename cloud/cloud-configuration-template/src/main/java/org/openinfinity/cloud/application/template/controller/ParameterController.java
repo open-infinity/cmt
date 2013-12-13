@@ -16,7 +16,7 @@
 
 package org.openinfinity.cloud.application.template.controller;
 
-import org.openinfinity.cloud.service.configurationtemplate.ParameterKeyService;
+import org.openinfinity.cloud.service.configurationtemplate.entity.api.ParameterKeyService;
 import org.openinfinity.core.annotation.AuditTrail;
 import org.openinfinity.core.annotation.Log;
 import org.openinfinity.core.exception.AbstractCoreException;

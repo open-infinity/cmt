@@ -39,10 +39,11 @@ portletURL.initialize({
     	getParameterKeysAndValuesURL : '<portlet:resourceURL id="getParameterKeysAndValues"/>',
     },
     module: {
-    	getURL : '<portlet:resourceURL id="get"/>',
-    	editURL : '<portlet:resourceURL id="edit"/>',
-    	createURL : '<portlet:resourceURL id="create"/>',
-        deleteURL : '<portlet:resourceURL id="delete"/>',
+    	getModuleURL : '<portlet:resourceURL id="getModule"/>',
+    	getModulesURL : '<portlet:resourceURL id="getModules"/>',
+    	editModuleURL : '<portlet:resourceURL id="editModule"/>',
+    	createModuleURL : '<portlet:resourceURL id="createModule"/>',
+        deleteModuleURL : '<portlet:resourceURL id="deleteModule"/>',
     	getKeysAndValuesURL : '<portlet:resourceURL id="getKeysAndValues"/>'
     }
 });

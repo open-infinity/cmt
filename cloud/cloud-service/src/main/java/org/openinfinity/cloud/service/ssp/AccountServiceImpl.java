@@ -15,17 +15,15 @@
  */
 package org.openinfinity.cloud.service.ssp;
 
-import java.math.BigInteger;
-import java.util.Collection;
-
-import org.openinfinity.cloud.domain.repository.administrator.ClusterRepository;
 import org.openinfinity.cloud.domain.repository.ssp.AccountRepository;
 import org.openinfinity.cloud.domain.ssp.Account;
 import org.openinfinity.core.annotation.AuditTrail;
 import org.openinfinity.core.annotation.Log;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+
+import java.math.BigInteger;
+import java.util.Collection;
 
 /**
  * Account service implementation.
@@ -77,9 +75,11 @@ public class AccountServiceImpl implements AccountService {
 	@Log
 	@AuditTrail
 	public void delete(Account account) {
-		// TODO Auto-generated method stub
-		
 	}
+
+    @Override
+    public void delete(BigInteger id) {
+    }
 	
 	
 

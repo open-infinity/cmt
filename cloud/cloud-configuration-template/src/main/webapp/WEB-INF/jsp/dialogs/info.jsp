@@ -26,8 +26,8 @@
 
 <%@ taglib prefix="portlet" uri="http://java.sun.com/portlet"%>
 
-    <%-- Info dialog --%>
+<%-- Info dialog --%>
 
-    <div id="dlg-info">
-        <table id="dlg-item-table"></table>
-    </div>
+<div id="dlg-info">
+	<table id="dlg-item-table"></table>
+</div>

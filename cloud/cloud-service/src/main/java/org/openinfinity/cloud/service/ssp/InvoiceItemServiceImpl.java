@@ -68,8 +68,11 @@ public class InvoiceItemServiceImpl implements InvoiceItemService {
     @Log
     @AuditTrail
     public void delete(InvoiceItem invoiceItem) {
-        // TODO Auto-generated method stub
 
+    }
+
+    @Override
+    public void delete(BigInteger id) {
     }
 
 }

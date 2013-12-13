@@ -73,6 +73,10 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
+    public void delete(BigInteger id) {
+    }
+
+    @Override
     @Log
     @AuditTrail
     public Invoice loadLast(BigInteger accountId){

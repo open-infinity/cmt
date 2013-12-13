@@ -1,19 +1,18 @@
 package org.openinfinity.cloud.domain.repository.common;
 
-import java.math.BigInteger;
 import java.util.Collection;
 
 public  interface AbstractIndexMapperRepositoryInterface<T extends Object>{
 
-	public T create(T product);
+	public T create(T item);
 	
-	public void update(T product);
+	public void update(T item);
 	
 	public Collection<T> loadAll();
 	
-	public T load(BigInteger id);
+	public T load(int id);
 	
-	public void delete(T product);
+	public void delete(T item);
 
 
     Collection<T> loadAllForTemplate(int index1);

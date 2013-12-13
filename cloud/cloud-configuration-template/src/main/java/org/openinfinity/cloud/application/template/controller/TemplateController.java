@@ -20,13 +20,16 @@ import com.liferay.portal.model.Organization;
 import com.liferay.portal.model.User;
 import org.apache.log4j.Logger;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.openinfinity.cloud.annotation.Authenticated;
+import org.openinfinity.cloud.application.template.serialization.ConfigurationElementContainer;
+import org.openinfinity.cloud.application.template.serialization.OrganizationContainer;
 import org.openinfinity.cloud.comon.web.LiferayService;
-import org.openinfinity.cloud.domain.configurationtemplate.ConfigurationElement;
-import org.openinfinity.cloud.domain.configurationtemplate.ConfigurationTemplate;
-import org.openinfinity.cloud.domain.configurationtemplate.ConfigurationTemplateOrganization;
-import org.openinfinity.cloud.service.configurationtemplate.ConfigurationElementService;
-import org.openinfinity.cloud.service.configurationtemplate.ConfigurationTemplateOrganizationService;
-import org.openinfinity.cloud.service.configurationtemplate.ConfigurationTemplateService;
+import org.openinfinity.cloud.domain.configurationtemplate.entity.ConfigurationElement;
+import org.openinfinity.cloud.domain.configurationtemplate.entity.ConfigurationTemplate;
+import org.openinfinity.cloud.domain.configurationtemplate.relation.TemplateToOrganization;
+import org.openinfinity.cloud.service.configurationtemplate.entity.api.ConfigurationElementService;
+import org.openinfinity.cloud.service.configurationtemplate.entity.api.ConfigurationTemplateService;
+import org.openinfinity.cloud.service.configurationtemplate.relation.api.TemplateToOrganizationService;
 import org.openinfinity.cloud.util.collection.ListUtil;
 import org.openinfinity.cloud.util.http.HttpCodes;
 import org.openinfinity.cloud.util.serialization.JsonDataWrapper;
@@ -88,7 +91,7 @@ public class TemplateController {
     private LiferayService liferayService;
 
     @Autowired
-    private ConfigurationTemplateOrganizationService organizationService;
+    private TemplateToOrganizationService organizationService;
 
     @RenderMapping
     public String showView(RenderRequest request, RenderResponse response) {
@@ -122,15 +125,17 @@ public class TemplateController {
         return modelAndView;
     }
 
+    @Authenticated
     @ResourceMapping(GET_TEMPLATES_FOR_USER)
     public void getTemplatesForUser(ResourceRequest request, ResourceResponse response,
                                     @RequestParam("page") int page, @RequestParam("rows") int rows)
             throws Exception {
         try {
+            LOG.debug("ENTER getTemplatesForUser, page=" + page + ",rows=" + rows);
             User user = liferayService.getUser(request, response);
             if (user == null) return;
             List<Long> organizationIds = liferayService.getOrganizationIds(user);
-            List<ConfigurationTemplate> templates = configurationTemplateService.getTemplates(organizationIds);
+            List<ConfigurationTemplate> templates = configurationTemplateService.loadAllForOrganizations(organizationIds);
             int records = templates.size();
             int mod = records % rows;
             int totalPages = records / rows;
@@ -142,6 +147,7 @@ public class TemplateController {
         }
     }
 
+    @Authenticated
     @ResourceMapping(GET_TEMPLATE)
     public void getTemplate(ResourceRequest request, ResourceResponse response, @RequestParam("templateId") int templateId) throws Exception {
         try {
@@ -153,17 +159,19 @@ public class TemplateController {
         }
     }
 
+    @Authenticated
     @ResourceMapping(DELETE_TEMPLATE)
     public void deleteTemplate(ResourceRequest request, ResourceResponse response, @RequestParam("id") int templateId) throws Exception {
         try {
             User user = liferayService.getUser(request, response);
             if (user == null) return;
-            configurationTemplateService.delete(templateId);
+            configurationTemplateService.delete(BigInteger.valueOf(templateId));
         } catch (Exception e) {
             ExceptionUtil.throwSystemException(e);
         }
     }
 
+    @Authenticated
     @ResourceMapping(GET_ELEMENTS_FOR_TEMPLATE)
     public void getElementsForTemplate(ResourceRequest request, ResourceResponse response, @RequestParam("templateId") int templateId) throws Exception {
         try {
@@ -176,6 +184,7 @@ public class TemplateController {
         }
     }
 
+    @Authenticated
     @ResourceMapping(GET_ALL_ELEMENTS)
     public void getAllAvailableElements(ResourceRequest request, ResourceResponse response) throws Exception {
         try {
@@ -188,6 +197,7 @@ public class TemplateController {
         }
     }
 
+    @Authenticated
     @ResourceMapping(GET_ORGANIZATIONS_FOR_TEMPLATE)
     public void getOrganizationsForTemplate(ResourceRequest request, ResourceResponse response, @RequestParam("templateId") int templateId) throws Exception {
         try {
@@ -197,7 +207,7 @@ public class TemplateController {
             Collection<Organization> selectedOrganizations = new LinkedList<Organization>();
 
             // Note: the code below was needed to avoid duplicates in selectedOrganizations.
-            for (ConfigurationTemplateOrganization cto : organizationService.loadAllForTemplate(templateId)) {
+            for (TemplateToOrganization cto : organizationService.loadAllForTemplate(templateId)) {
                 for (Organization o : organizations) {
                     if (o.getOrganizationId() == cto.getOrganizationId()) {
                         selectedOrganizations.add(o);
@@ -211,6 +221,7 @@ public class TemplateController {
         }
     }
 
+    @Authenticated
     @ResourceMapping(GET_ALL_ORGANIZATIONS)
     public void getAllOrganizations(ResourceRequest request, ResourceResponse response) throws Exception {
         try {
@@ -228,6 +239,8 @@ public class TemplateController {
     Note 2: @RequestParam("elementsSelected") String[] elementsSelected does not work for some reason.
     That's why the array was sent as json -vbartoni
      */
+
+    @Authenticated
     @ResourceMapping(EDIT_TEMPLATE)
     public void editTemplate(ResourceRequest request, ResourceResponse response,
                              @RequestParam("templateId") int templateId,
@@ -248,7 +261,7 @@ public class TemplateController {
             response.setProperty(ResourceResponse.HTTP_STATUS_CODE, HttpCodes.HTTP_ERROR_CODE_SERVER_ERROR);
         }
     }
-
+    @Authenticated
     @ResourceMapping(CREATE_TEMPLATE)
     public void createTemplate(ResourceRequest request, ResourceResponse response,
                              @RequestParam("templateName") String templateName,

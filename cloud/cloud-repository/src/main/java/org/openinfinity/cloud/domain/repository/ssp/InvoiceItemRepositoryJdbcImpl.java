@@ -102,6 +102,11 @@ public class InvoiceItemRepositoryJdbcImpl implements InvoiceItemRepository{
         this.jdbcTemplate.update("delete from invoice_item where id = ?", invoiceItem.getId().intValue());
     }
 
+    @Override
+    public void delete(BigInteger id) {
+        this.jdbcTemplate.update("delete from invoice_item where id = ?", id.intValue());
+    }
+
     private static final class InvoiceItemRowMapper implements RowMapper<InvoiceItem> {
         public InvoiceItem mapRow(ResultSet rs, int rowNumber) throws SQLException {
             InvoiceItem invoiceItem = new InvoiceItem();

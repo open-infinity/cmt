@@ -102,6 +102,11 @@ public class InvoiceRepositoryJdbcImpl implements InvoiceRepository{
         this.jdbcTemplate.update("delete from invoice where id = ?", invoice.getId().intValue());
     }
 
+    @Override
+    public void delete(BigInteger id) {
+        this.jdbcTemplate.update("delete from invoice where id = ?", id.intValue());
+    }
+
     @AuditTrail
     public Invoice loadLast(BigInteger accountId){
         return this.jdbcTemplate.queryForObject("select * from invoice where account_id = ? and period_to = (select max(period_to) from invoice) limit 1", new Object[] { accountId.intValue() }, new InvoiceRowMapper());

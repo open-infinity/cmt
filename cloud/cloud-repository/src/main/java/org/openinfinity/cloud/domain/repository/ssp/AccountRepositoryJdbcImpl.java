@@ -15,16 +15,6 @@
  */
 package org.openinfinity.cloud.domain.repository.ssp;
 
-import java.math.BigInteger;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.sql.DataSource;
-
 import org.apache.log4j.Logger;
 import org.openinfinity.cloud.domain.ssp.Account;
 import org.openinfinity.core.annotation.AuditTrail;
@@ -36,6 +26,15 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.Assert;
+
+import javax.sql.DataSource;
+import java.math.BigInteger;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Account repository implementation.
@@ -96,8 +95,13 @@ public class AccountRepositoryJdbcImpl implements AccountRepository{
 		
 	@AuditTrail
 	public void delete (Account account){}
-	
-	private static final class AccountWrapper implements RowMapper<Account> {
+
+    @Override
+    public void delete(BigInteger id) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    private static final class AccountWrapper implements RowMapper<Account> {
 		public Account mapRow(ResultSet rs, int rowNumber) throws SQLException {
 			Account account = new Account();
 			account.setId(BigInteger.valueOf(rs.getInt("id")));

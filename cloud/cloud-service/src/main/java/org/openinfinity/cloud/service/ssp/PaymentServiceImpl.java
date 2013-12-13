@@ -15,13 +15,13 @@
  */
 package org.openinfinity.cloud.service.ssp;
 
-import java.math.BigInteger;
-import java.util.Collection;
-
 import org.openinfinity.cloud.domain.ssp.Payment;
 import org.openinfinity.core.annotation.AuditTrail;
 import org.openinfinity.core.annotation.Log;
 import org.springframework.stereotype.Service;
+
+import java.math.BigInteger;
+import java.util.Collection;
 
 /**
  * Payment service implementation.
@@ -35,7 +35,6 @@ public class PaymentServiceImpl implements PaymentService {
 	@Log
 	@AuditTrail
 	public Payment create(Payment payment) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -43,15 +42,12 @@ public class PaymentServiceImpl implements PaymentService {
 	@Log
 	@AuditTrail
 	public void update(Payment payment) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	@Log
 	@AuditTrail
 	public Collection<Payment> loadAll() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -59,7 +55,6 @@ public class PaymentServiceImpl implements PaymentService {
 	@Log
 	@AuditTrail
 	public Payment load(BigInteger id) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 	
@@ -67,9 +62,12 @@ public class PaymentServiceImpl implements PaymentService {
 	@Log
 	@AuditTrail
 	public void delete(Payment payment) {
-		// TODO Auto-generated method stub
-		
+
 	}
+
+    @Override
+    public void delete(BigInteger id) {
+    }
 	
 	
 

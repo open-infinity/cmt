@@ -26,4 +26,6 @@
 
 <%@ taglib prefix="portlet" uri="http://java.sun.com/portlet"%>
 
-    <%-- Installation package edit and create dialog --%>
+<%-- Templates edit and create dialog --%>
+
+<div></div>

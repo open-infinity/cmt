@@ -5,14 +5,16 @@ import java.util.Collection;
 
 public  interface AbstractCrudRepositoryInterface<T extends Object> /**extends Repository<T, BigInteger>*/ {
 
-	public T create(T product);
+	public T create(T item);
 	
-	public void update(T product);
+	public void update(T item);
 	
 	public Collection<T> loadAll();
 	
 	public T load(BigInteger id);
 	
-	public void delete (T product);
-	
+	public void delete (T item);
+
+    void delete(BigInteger id);
+
 }
