@@ -20,7 +20,7 @@ import org.openinfinity.cloud.domain.configurationtemplate.relation.ElementToMod
 import java.util.List;
 
 /**
- * CRUD interface for storing <code>org.openinfinity.core.cloud.domain.template</code> objects.
+ * CRUD interface for storing ElementToModule objects.
  * 
  * @author Vedran Bartonicek
  * @version 1.3.0
@@ -30,8 +30,9 @@ public interface ElementToModuleRepository {
 	
     List<ElementToModule> loadAll();
 
-    void deleteByDepenent(int elementFrom);
+    void create(int elementId, int moduleId);
 
-    void create(int elementFrom, int elementTo);
+    void deleteByElement(int elementId);
 
+    void deleteByModule(int moduleId);
 }

@@ -13,26 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.openinfinity.cloud.domain.repository.configurationtemplate.relation.api;
+package org.openinfinity.cloud.service.configurationtemplate.relation.api;
 
-import org.openinfinity.cloud.domain.configurationtemplate.relation.ModuleToPackage;
+import org.openinfinity.cloud.domain.configurationtemplate.relation.ElementToModule;
 
-import java.math.BigInteger;
-import java.util.Collection;
+import java.util.List;
+
 
 /**
- * CRUD interface for storing <code>org.openinfinity.core.cloud.domain.template</code> objects.
+ * Template interface for management of cloud configuration tempaltes.
  * 
  * @author Vedran Bartonicek
  * @version 1.3.0
  * @since 1.3.0
  */
-public interface ModuleToPackageRepository {
-    void create(ModuleToPackage installationModulePackage);
-    void update(ModuleToPackage installationModulePackage);
-    Collection<ModuleToPackage> loadAll();
-    ModuleToPackage load(BigInteger id);
-    void deleteByModule(int moduleId);
-    void deleteByPackage(int packageId);
+public interface ElementToModuleService {
+	
+    List<ElementToModule> loadAll();
 
 }

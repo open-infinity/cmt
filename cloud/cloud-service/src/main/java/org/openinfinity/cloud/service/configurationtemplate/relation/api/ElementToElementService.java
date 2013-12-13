@@ -16,7 +16,6 @@
 package org.openinfinity.cloud.service.configurationtemplate.relation.api;
 
 import org.openinfinity.cloud.domain.configurationtemplate.relation.ElementToElement;
-import org.openinfinity.cloud.service.common.AbstractCrudServiceInterface;
 
 import java.util.List;
 
@@ -28,7 +27,7 @@ import java.util.List;
  * @version 1.3.0
  * @since 1.3.0
  */
-public interface ElementToElementService extends AbstractCrudServiceInterface<ElementToElement> {
+public interface ElementToElementService{
 	
     List<ElementToElement> loadAll();
 

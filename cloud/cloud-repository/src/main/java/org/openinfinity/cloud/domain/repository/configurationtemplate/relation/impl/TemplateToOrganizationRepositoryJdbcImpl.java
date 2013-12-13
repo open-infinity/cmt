@@ -24,6 +24,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 import javax.sql.DataSource;
 import java.sql.ResultSet;
@@ -51,6 +52,7 @@ public class TemplateToOrganizationRepositoryJdbcImpl implements TemplateToOrgan
 
     @Autowired
     public TemplateToOrganizationRepositoryJdbcImpl(@Qualifier("cloudDataSource") DataSource dataSource) {
+        Assert.notNull(dataSource, "Please define datasource.");
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 

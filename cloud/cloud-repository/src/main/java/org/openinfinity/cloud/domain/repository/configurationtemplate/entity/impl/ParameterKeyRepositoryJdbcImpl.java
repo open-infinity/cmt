@@ -54,7 +54,7 @@ public class ParameterKeyRepositoryJdbcImpl implements ParameterKeyRepository {
 
     @Autowired
     public ParameterKeyRepositoryJdbcImpl(@Qualifier("cloudDataSource") DataSource dataSource) {
-        Assert.notNull(dataSource, "Please define data source.");
+        Assert.notNull(dataSource, "Please define datasource.");
         this.jdbcTemplate = new JdbcTemplate(dataSource);
         this.dataSource = dataSource;
     }

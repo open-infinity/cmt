@@ -46,7 +46,7 @@
                 dlg.model.parameters = {};
                 console.log("received parameters:" + dlg.model.parameters);
                 populateDependencies(data);
-                showViewSelectedKeyInitial([]);
+                //showViewSelectedKeyInitial([]);
                 configureEventHandling();
                 })
             .fail(function(jqXHR, textStatus, errorThrown) {
@@ -224,10 +224,10 @@
     function configureEventHandling(){
         configureDragAndDrop();
         bindDependencyListItemClicks();
-        bindKeyListItemClicks();
-        bindNewItemInputClicks();
-        bindDeleteKeysButtonsClick($(".dlg-element-list-item-delete-button", "#dlg-keys"));
-        bindNewKeyButtonClick();
+        //bindKeyListItemClicks();
+        //bindNewItemInputClicks();
+        //bindDeleteKeysButtonsClick($(".dlg-element-list-item-delete-button", "#dlg-keys"));
+        //bindNewKeyButtonClick();
         bindInputClicksAndKeys();
         infoDlg.bind();
         bindRadioChange();

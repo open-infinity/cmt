@@ -163,18 +163,17 @@ jQuery(function($){
                     total : function(obj) {return obj.total;},
                     records : function(obj) {return obj.records;}
                     },
-                colNames:['Id', 'ElementId', 'Name', 'Version', 'Description'],
+                colNames:['Id', 'Name', 'Version', 'Description'],
                 colModel:[
                           {name:'id', index:'id', width:50, align:"center", sortable:true, sorttype:"int"},
-                          {name:'elementId', index:'elementId', width:50, align:"center", sortable:true, sorttype:"int"},
-                          {name:'name', index:'name', width:150, align:"left"},
+                          {name:'name', index:'name', width:195, align:"left"},
                           {name:'version', index:'version', width:150, align:"left"},
                           {name:'description', index:'description', width:335, align:"left"}
                           ],
                 rowNum: 10,
                 width: 750,
                 height: "auto",
-                pager: '#module-grid-pager',
+                pager: '#modules-grid-pager',
                 sortname: 'id',
                 viewrecords: true,
                 shrinkToFit: false,
@@ -187,7 +186,7 @@ jQuery(function($){
             });
             app.modulesTable.jqGrid(
                 'navGrid',
-                '#module-grid-pager',
+                '#modules-grid-pager',
                 {add:false, del:false, search:true, refresh:false, edit:false},
                 {}, //  default settings for edit
                 {}, //  default settings for add

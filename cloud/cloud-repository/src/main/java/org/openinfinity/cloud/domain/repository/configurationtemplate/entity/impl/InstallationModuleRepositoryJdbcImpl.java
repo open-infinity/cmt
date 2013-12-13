@@ -45,7 +45,7 @@ public class InstallationModuleRepositoryJdbcImpl implements InstallationModuleR
 
     private static final String DELETE_SQL = "delete from installation_module_tbl where id = ?";
 
-    private static final String UPDATE_SQL = "update installation_module_tbl set element_id = ?, name = ?, version = ?, description = ?";
+    private static final String UPDATE_SQL = "update installation_module_tbl set name = ?, version = ?, description = ?";
 
     private static final String GET_ALL_SQL = "select * from installation_module_tbl";
 
@@ -55,7 +55,7 @@ public class InstallationModuleRepositoryJdbcImpl implements InstallationModuleR
 
     @Autowired
     public InstallationModuleRepositoryJdbcImpl(@Qualifier("cloudDataSource") DataSource dataSource) {
-        Assert.notNull(dataSource, "Please define datasource for scaling rule repository.");
+        Assert.notNull(dataSource, "Please define datasource.");
         this.jdbcTemplate = new JdbcTemplate(dataSource);
         this.dataSource = dataSource;
     }
@@ -64,7 +64,6 @@ public class InstallationModuleRepositoryJdbcImpl implements InstallationModuleR
     public InstallationModule create(InstallationModule installationModule) {
         SimpleJdbcInsert insert = new SimpleJdbcInsert(dataSource).withTableName("installation_module_tbl").usingGeneratedKeyColumns("id");
         Map<String,Object> parameters = new HashMap<String,Object>();
-        parameters.put("element_id", installationModule.getElementId());
         parameters.put("name", installationModule.getName());
         parameters.put("version", installationModule.getVersion());
         parameters.put("description", installationModule.getDescription());
@@ -75,7 +74,7 @@ public class InstallationModuleRepositoryJdbcImpl implements InstallationModuleR
 
     @Override
     public void update(InstallationModule installationModule) {
-        jdbcTemplate.update(UPDATE_SQL, installationModule.getElementId(), installationModule.getName(), installationModule.getVersion(), installationModule.getDescription());
+        jdbcTemplate.update(UPDATE_SQL, installationModule.getName(), installationModule.getVersion(), installationModule.getDescription());
     }
 
     @Override
@@ -102,7 +101,6 @@ public class InstallationModuleRepositoryJdbcImpl implements InstallationModuleR
 		public InstallationModule mapRow(ResultSet resultSet, int rowNum) throws SQLException {    
 		    return new InstallationModule(
                     resultSet.getInt("id"),
-                    resultSet.getInt("element_id"),
                     resultSet.getString("version"),
                     resultSet.getString("name"),
                     resultSet.getString("description"));

@@ -39,32 +39,41 @@ import java.util.List;
 @Repository
 public class ElementToModuleRepositoryJdbcImpl implements ElementToModuleRepository {
 
-    private static final String DELETE_BY_DEPENDENT_ID_SQL = "delete from cfg_element_dependency_tbl where element_from = ?";
+    private static final String DELETE_BY_ELEMENT_ID_SQL = "delete from cfg_element_module_tbl where element_id = ?";
 
-    private static final String CREATE_SQL = "insert into cfg_element_dependency_tbl values(?, ?)";
+    private static final String DELETE_BY_MODULE_ID_SQL = "delete from cfg_element_module_tbl where module_id = ?";
+
+    private static final String CREATE_SQL = "insert into cfg_element_module_tbl values(?, ?)";
 
 
     private JdbcTemplate jdbcTemplate;
 
     @Autowired
     public ElementToModuleRepositoryJdbcImpl(@Qualifier("cloudDataSource") DataSource dataSource) {
-        Assert.notNull(dataSource, "Please define datasource for scaling rule repository.");
+        Assert.notNull(dataSource, "Please define datasource.");
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
+    @AuditTrail
     @Override
     public List<ElementToModule> loadAll() {
         return null;
     }
 
     @AuditTrail
-    public void deleteByDepenent(int elementFrom){
-        jdbcTemplate.update(DELETE_BY_DEPENDENT_ID_SQL, elementFrom);
+    public void deleteByElement(int elementId){
+        jdbcTemplate.update(DELETE_BY_ELEMENT_ID_SQL, elementId);
     }
 
+    @AuditTrail
+    public void deleteByModule(int moduleId){
+        jdbcTemplate.update(DELETE_BY_MODULE_ID_SQL, moduleId);
+    }
+
+    @AuditTrail
     @Override
-    public void create(int elementFrom , int elementTo) {
-        jdbcTemplate.update(CREATE_SQL, elementFrom, elementTo);
+    public void create(int elementId , int moduleId) {
+        jdbcTemplate.update(CREATE_SQL, elementId, moduleId);
     }
 
     private class DependencyRowMapper implements RowMapper<ElementToModule> {

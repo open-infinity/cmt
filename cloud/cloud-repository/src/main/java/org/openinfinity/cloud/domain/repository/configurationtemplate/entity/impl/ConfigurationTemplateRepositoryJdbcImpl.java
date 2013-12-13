@@ -65,7 +65,7 @@ public class ConfigurationTemplateRepositoryJdbcImpl implements ConfigurationTem
 
     @Autowired
     public ConfigurationTemplateRepositoryJdbcImpl(@Qualifier("cloudDataSource") DataSource dataSource) {
-        Assert.notNull(dataSource, "Please define datasource for scaling rule repository.");
+        Assert.notNull(dataSource, "Please define datasource.");
         this.jdbcTemplate = new JdbcTemplate(dataSource);
         this.dataSource = dataSource;
     }

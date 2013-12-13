@@ -54,7 +54,7 @@ public class ModuleToPackageRepositoryJdbcImpl implements ModuleToPackageReposit
 
     @Autowired
     public ModuleToPackageRepositoryJdbcImpl(@Qualifier("cloudDataSource") DataSource dataSource) {
-        Assert.notNull(dataSource, "Please define datasource for scaling rule repository.");
+        Assert.notNull(dataSource, "Please define datasource.");
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 

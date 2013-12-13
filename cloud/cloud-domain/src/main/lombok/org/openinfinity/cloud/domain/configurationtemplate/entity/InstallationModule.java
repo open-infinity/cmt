@@ -38,10 +38,6 @@ public class InstallationModule {
 
     @NonNull
     @NotScript
-    private int elementId;
-
-    @NonNull
-    @NotScript
     private String name;
     
     @NonNull

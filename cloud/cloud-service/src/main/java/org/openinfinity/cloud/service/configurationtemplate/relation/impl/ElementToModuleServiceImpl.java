@@ -16,15 +16,14 @@
 package org.openinfinity.cloud.service.configurationtemplate.relation.impl;
 
 import org.apache.log4j.Logger;
-import org.openinfinity.cloud.domain.configurationtemplate.relation.ElementToElement;
-import org.openinfinity.cloud.domain.repository.configurationtemplate.relation.api.ElementToElementRepository;
-import org.openinfinity.cloud.service.configurationtemplate.relation.api.ElementToElementService;
+import org.openinfinity.cloud.domain.configurationtemplate.relation.ElementToModule;
+import org.openinfinity.cloud.domain.repository.configurationtemplate.relation.api.ElementToModuleRepository;
+import org.openinfinity.cloud.service.configurationtemplate.relation.api.ElementToModuleService;
 import org.openinfinity.core.annotation.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-
 
 
 /**
@@ -34,15 +33,15 @@ import java.util.List;
  */
 
 @Service
-public class ElementToElementServiceImpl implements ElementToElementService {
-	private static final Logger LOGGER = Logger.getLogger(ElementToElementServiceImpl.class.getName());
+public class ElementToModuleServiceImpl implements ElementToModuleService {
+	private static final Logger LOGGER = Logger.getLogger(ElementToModuleServiceImpl.class.getName());
 
     @Autowired
-	private ElementToElementRepository elementToElementRepository;
+	private ElementToModuleRepository elementToModuleRepository;
 
 	@Log
-    public List<ElementToElement> loadAll() {
-        return elementToElementRepository.loadAll();
+    public List<ElementToModule> loadAll() {
+        return elementToModuleRepository.loadAll();
     }
 
 }

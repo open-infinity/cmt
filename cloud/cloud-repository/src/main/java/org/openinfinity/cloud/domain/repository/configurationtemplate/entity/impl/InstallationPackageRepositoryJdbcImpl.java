@@ -55,7 +55,7 @@ public class InstallationPackageRepositoryJdbcImpl implements InstallationPackag
 
     @Autowired
     public InstallationPackageRepositoryJdbcImpl(@Qualifier("cloudDataSource") DataSource dataSource) {
-        Assert.notNull(dataSource, "Please define datasource for scaling rule repository.");
+        Assert.notNull(dataSource, "Please define datasource.");
         this.jdbcTemplate = new JdbcTemplate(dataSource);
         this.dataSource = dataSource;
     }

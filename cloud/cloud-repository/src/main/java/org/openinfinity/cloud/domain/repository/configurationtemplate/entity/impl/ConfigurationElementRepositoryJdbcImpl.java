@@ -50,7 +50,7 @@ public class ConfigurationElementRepositoryJdbcImpl implements ConfigurationElem
 
     private static final String LOAD_ALL_FOR_TEMPLATE_SQL =
             "select cfg_element_tbl.* from cfg_element_tbl " +
-            "inner join configuration_template_element_tbl on " +
+            "inner join cfg_template_element_tbl on " +
             "cfg_element_tbl.id = cfg_template_element_tbl.element_id " +
             "where cfg_template_element_tbl.template_id = ?";
 
@@ -69,7 +69,7 @@ public class ConfigurationElementRepositoryJdbcImpl implements ConfigurationElem
 
     @Autowired
     public ConfigurationElementRepositoryJdbcImpl(@Qualifier("cloudDataSource") DataSource dataSource) {
-        Assert.notNull(dataSource, "Please define datasource for scaling rule repository.");
+        Assert.notNull(dataSource, "Please define datasource.");
         this.jdbcTemplate = new JdbcTemplate(dataSource);
         this.dataSource = dataSource;
     }

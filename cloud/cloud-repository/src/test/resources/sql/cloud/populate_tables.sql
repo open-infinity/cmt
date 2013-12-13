@@ -86,14 +86,16 @@ insert into cfg_template_element_tbl values (2, 2);
 insert into cfg_element_dependency_tbl values (3, 5);
 insert into cfg_element_dependency_tbl values (4, 5);
 
-insert into installation_module_tbl values (1, 1, 'bas', '2.0', 'TOAS BAS module');
-insert into installation_module_tbl values (2, 1, 'hm', '2.0', 'TOAS Health monitoring module');
-insert into installation_module_tbl values (3, 2, 'portal', '2.0', 'TOAS Liferay portal module');
-insert into installation_module_tbl values (4, 2, 'hm', '2.0', 'TOAS Health monitoring module');
-insert into installation_module_tbl values (5, 3, 'rdbms', '2.0', 'TOAS Maria database');
-insert into installation_module_tbl values (6, 3, 'hm', '2.0', 'TOAS Health monitoring module');
-insert into installation_module_tbl values (7, 4, 'esb', '2.0', 'TOAS ESB module');
-insert into installation_module_tbl values (8, 4, 'hm', '2.0', 'TOAS Health monitoring module');
+insert into installation_module_tbl values (1, 'bas', '2.0', 'TOAS BAS module');
+insert into installation_module_tbl values (2, 'portal', '2.0', 'TOAS Liferay portal module');
+insert into installation_module_tbl values (3, 'rdbms', '2.0', 'TOAS Maria database');
+insert into installation_module_tbl values (4, 'esb', '2.0', 'TOAS ESB module');
+insert into installation_module_tbl values (5, 'hm', '2.0', 'TOAS Health monitoring module');
+
+insert into cfg_element_module_tbl values (2, 1);
+insert into cfg_element_module_tbl values (2, 5);
+insert into cfg_element_module_tbl values (3, 2);
+insert into cfg_element_module_tbl values (3, 5);
 
 insert into installation_package_tbl values (1, 'bas', '7.0', 'TOAS BAS package based on Apache Tomcat and other stuff');
 insert into installation_package_tbl values (2, 'ha proxy', '999', 'HA Proxy');
@@ -104,12 +106,12 @@ insert into installation_package_tbl values (6, 'nodechecker', '2.0', 'TOAS heal
 insert into installation_package_tbl values (7, 'rrd-server', '2.9', 'TOAS http server for health monitoring data');
 
 insert into installation_module_package_tbl values (1, 1);
-insert into installation_module_package_tbl values (2, 1);
-insert into installation_module_package_tbl values (3, 1);
-insert into installation_module_package_tbl values (4, 2);
-insert into installation_module_package_tbl values (5, 2);
-insert into installation_module_package_tbl values (6, 2);
-insert into installation_module_package_tbl values (7, 2);
+insert into installation_module_package_tbl values (1, 2);
+insert into installation_module_package_tbl values (1, 3);
+insert into installation_module_package_tbl values (5, 4);
+insert into installation_module_package_tbl values (5, 5);
+insert into installation_module_package_tbl values (5, 6);
+insert into installation_module_package_tbl values (5, 7);
 
 insert into parameter_key_tbl values (1, 1, 'test_1');
 insert into parameter_key_tbl values (2, 2, 'test_2');

@@ -49,7 +49,7 @@ public class TemplateToElementRepositoryJdbcImpl implements TemplateToElementRep
 
     @Autowired
     public TemplateToElementRepositoryJdbcImpl(@Qualifier("cloudDataSource") DataSource dataSource) {
-        Assert.notNull(dataSource, "Please define datasource for scaling rule repository.");
+        Assert.notNull(dataSource, "Please define datasource.");
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
