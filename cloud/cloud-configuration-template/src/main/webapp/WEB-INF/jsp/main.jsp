@@ -37,8 +37,8 @@
 
 <div id="tabsContainer">
     <ul id ="tabsReferenceList" >
-        <li><a href="#templatesTab">Templates</a></li>
-        <li><a href="#elementsTab">Elements</a></li>
+        <li><a href="#templatesTab">Configuration templates</a></li>
+        <li><a href="#elementsTab">Configuration elements</a></li>
         <li><a href="#modulesTab">Installation modules</a></li>
         <li><a href="#packagesTab">Installation packages</a></li>
     </ul>

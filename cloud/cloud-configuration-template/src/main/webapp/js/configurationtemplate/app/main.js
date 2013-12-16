@@ -59,7 +59,7 @@ jQuery(function($){
 
         setupTemplatesTable: function(){
             app.templatesTable.jqGrid({
-                url: portletURL.url.template.getTemplatesForUserURL,
+                url: portletURL.url.template.getTemplatesURL,
                 datatype: "json",
                 jsonReader : {
                     repeatitems : false,
@@ -196,6 +196,53 @@ jQuery(function($){
             );
 
         },
+
+        setupPackagesTable: function(){
+            app.packagesTable.jqGrid({
+                url: portletURL.url.package.getPackagesURL,
+                datatype: "json",
+                jsonReader : {
+                    repeatitems : false,
+                    id: "Id",
+                    root : function(obj) {return obj.rows;},
+                    page : function(obj) {return obj.page;},
+                    total : function(obj) {return obj.total;},
+                    records : function(obj) {return obj.records;}
+                    },
+                colNames:['Id', 'Name', 'Version', 'Description'],
+                colModel:[
+                          {name:'id', index:'id', width:50, align:"center", sortable:true, sorttype:"int"},
+                          {name:'name', index:'name', width:195, align:"left"},
+                          {name:'version', index:'version', width:150, align:"left"},
+                          {name:'description', index:'description', width:335, align:"left"}
+                          ],
+                rowNum: 10,
+                width: 750,
+                height: "auto",
+                pager: '#packages-grid-pager',
+                sortname: 'id',
+                viewrecords: true,
+                shrinkToFit: false,
+                sortorder: "asc",
+                ondblClickRow: app.editTableRow(app.packagesTable, app.dialog.package),
+                loadonce: true,
+                gridComplete: function(){
+                    $("#packages-grid").setGridParam({datatype: 'local'});
+                }
+            });
+            app.packagesTable.jqGrid(
+                'navGrid',
+                '#packages-grid-pager',
+                {add:false, del:false, search:true, refresh:false, edit:false},
+                {}, //  default settings for edit
+                {}, //  default settings for add
+                {}, //  default settings for delete
+                {odata : ['equal', 'not equal', 'less', 'less or equal','greater','greater or equal', 'begins with','does not begin with','is in','is not in','ends with','does not end with','contains','does not contain']}, // search options
+                {} /* view parameters*/
+            );
+
+        },
+
         reloadTemplatesTable: function(){
             app.templatesTable.setGridParam({datatype:'json', page:1}).trigger('reloadGrid');
         },
@@ -300,6 +347,38 @@ jQuery(function($){
             });
         },
 
+        deleteModule : function(){
+                    var id = app.modulesTable.jqGrid('getGridParam','selrow');
+                    if (id == null) {
+                        alert( "Please select a row for deletion");
+                        return;
+                    }
+                    var ret = app.modulesTable.jqGrid('getRowData', id);
+                    $.ajax({
+                      url: portletURL.url.module.deleteModuleURL + "&id=" + ret.id,
+                      cache: false
+                    })
+                    .done(function() {
+                        app.reloadModulesTable();
+                    });
+                },
+
+        deletePackage : function(){
+            var id = app.packagesTable.jqGrid('getGridParam','selrow');
+            if (id == null) {
+                alert( "Please select a row for deletion");
+                return;
+            }
+            var ret = app.packagesTable.jqGrid('getRowData', id);
+            $.ajax({
+              url: portletURL.url.package.deletePackageURL + "&id=" + ret.id,
+              cache: false
+            })
+            .done(function() {
+                app.reloadPackagesTable();
+            });
+        },
+        // TODO:use me
         deleteTableItem : function(argTable, argUrlPrefix){
             return (function(){
                 var table = argTable;
@@ -339,6 +418,7 @@ jQuery(function($){
 	app.setupTemplatesTable();
 	app.setupElementsTable();
 	app.setupModulesTable();
+	app.setupPackagesTable();
 	app.setupTabs();
 	app.bindEventHandlers();
 });

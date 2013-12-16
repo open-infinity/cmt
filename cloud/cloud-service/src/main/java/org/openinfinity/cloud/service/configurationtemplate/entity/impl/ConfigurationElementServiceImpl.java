@@ -21,6 +21,7 @@ import org.openinfinity.cloud.domain.repository.configurationtemplate.entity.api
 import org.openinfinity.cloud.domain.repository.configurationtemplate.entity.api.ParameterKeyRepository;
 import org.openinfinity.cloud.domain.repository.configurationtemplate.entity.api.ParameterValueRepository;
 import org.openinfinity.cloud.domain.repository.configurationtemplate.relation.api.ElementToElementRepository;
+import org.openinfinity.cloud.domain.repository.configurationtemplate.relation.api.ElementToModuleRepository;
 import org.openinfinity.cloud.domain.repository.configurationtemplate.relation.api.TemplateToElementRepository;
 import org.openinfinity.cloud.service.configurationtemplate.entity.api.ConfigurationElementService;
 import org.openinfinity.core.annotation.Log;
@@ -50,6 +51,9 @@ public class ConfigurationElementServiceImpl implements ConfigurationElementServ
 
     @Autowired
     TemplateToElementRepository templateElementRepository;
+
+    @Autowired
+    ElementToModuleRepository elementToModuleRepository;
 
     @Autowired
     ParameterKeyRepository keyRepository;
@@ -145,11 +149,15 @@ public class ConfigurationElementServiceImpl implements ConfigurationElementServ
 
     @Override
     @Transactional(rollbackFor=Exception.class)
-    public void update(ConfigurationElement element, Collection<Integer> dependencies){
+    public void update(ConfigurationElement element, Collection<Integer> dependencies, Collection<Integer> modules){
         elementRepository.update(element);
         elementDependencyRepository.deleteByDepenent(element.getId());
         for(Integer o : dependencies){
             elementDependencyRepository.create(element.getId(), o.intValue());
+        }
+        elementToModuleRepository.deleteByElement(element.getId());
+        for(Integer o : modules){
+            elementToModuleRepository.create(element.getId(), o.intValue());
         }
     }
 
@@ -167,10 +175,13 @@ public class ConfigurationElementServiceImpl implements ConfigurationElementServ
 
     @Override
     @Transactional(rollbackFor=Exception.class)
-    public void create(ConfigurationElement element, Collection<Integer> dependencies){
+    public void create(ConfigurationElement element, Collection<Integer> dependencies, Collection<Integer> modules){
         elementRepository.create(element);
         for (Integer d : dependencies){
             elementDependencyRepository.create(element.getId(), d.intValue());
+        }
+        for (Integer d : modules){
+            elementToModuleRepository.create(element.getId(), d.intValue());
         }
     }
 

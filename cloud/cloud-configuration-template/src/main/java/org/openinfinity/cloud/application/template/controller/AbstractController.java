@@ -20,20 +20,16 @@ import java.util.Map;
  * @since 1.3.0
  */
 public class AbstractController {
-    @ExceptionHandler({ApplicationException.class, BusinessViolationException.class,
-            SystemException.class})
+    @ExceptionHandler({ApplicationException.class, BusinessViolationException.class, SystemException.class})
     public ModelAndView handleException(RenderRequest renderRequest, RenderResponse renderResponse,
                                         AbstractCoreException abstractCoreException) {
         ModelAndView modelAndView = new ModelAndView("error");
         if (abstractCoreException.isErrorLevelExceptionMessagesIncluded())
-            modelAndView.addObject("errorLevelExceptions",
-                    abstractCoreException.getErrorLevelExceptionIds());
+            modelAndView.addObject("errorLevelExceptions", abstractCoreException.getErrorLevelExceptionIds());
         if (abstractCoreException.isWarningLevelExceptionMessagesIncluded())
-            modelAndView.addObject("warningLevelExceptions",
-                    abstractCoreException.getWarningLevelExceptionIds());
+            modelAndView.addObject("warningLevelExceptions", abstractCoreException.getWarningLevelExceptionIds());
         if (abstractCoreException.isInformativeLevelExceptionMessagesIncluded())
-            modelAndView.addObject("informativeLevelExceptions",
-                    abstractCoreException.getInformativeLevelExceptionIds());
+            modelAndView.addObject("informativeLevelExceptions", abstractCoreException.getInformativeLevelExceptionIds());
 
         // TODO
         @SuppressWarnings("unchecked")

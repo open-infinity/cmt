@@ -51,6 +51,12 @@ public class InstallationPackageRepositoryJdbcImpl implements InstallationPackag
 
     private static final String GET_BY_ID_SQL = "select * from installation_package_tbl where id = ?";
 
+    private static final String LOAD_PACKAGES_SQL =
+            "select installation_package_tbl.* from installation_package_tbl " +
+            "inner join installation_module_package_tbl on " +
+            "installation_package_tbl.id = installation_module_package_tbl.package_id " +
+            "where installation_module_package_tbl.module_id = ?";
+
     private DataSource dataSource;
 
     @Autowired
@@ -85,6 +91,10 @@ public class InstallationPackageRepositoryJdbcImpl implements InstallationPackag
     @Override
     public InstallationPackage load(BigInteger id) {
         return jdbcTemplate.queryForObject(GET_BY_ID_SQL, new Object[]{id}, new InstallationPackageRowMapper());
+    }
+
+    public Collection<InstallationPackage> loadByModule(int moduleId){
+        return jdbcTemplate.query(LOAD_PACKAGES_SQL, new Object[]{moduleId}, new InstallationPackageRowMapper());
     }
 
     @Override

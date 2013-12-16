@@ -20,16 +20,17 @@ import com.liferay.portal.model.User;
 import org.apache.log4j.Logger;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.openinfinity.cloud.annotation.Authenticated;
+import org.openinfinity.cloud.application.template.serialization.CollectionsContainer;
 import org.openinfinity.cloud.application.template.serialization.ConfigurationElementContainer;
 import org.openinfinity.cloud.comon.web.LiferayService;
 import org.openinfinity.cloud.domain.configurationtemplate.entity.ConfigurationElement;
+import org.openinfinity.cloud.domain.configurationtemplate.entity.InstallationModule;
 import org.openinfinity.cloud.service.configurationtemplate.entity.api.ConfigurationElementService;
+import org.openinfinity.cloud.service.configurationtemplate.entity.api.InstallationModuleService;
 import org.openinfinity.cloud.service.configurationtemplate.entity.api.ParameterKeyService;
 import org.openinfinity.cloud.service.configurationtemplate.entity.api.ParameterValueService;
 import org.openinfinity.cloud.service.configurationtemplate.relation.api.ElementToElementService;
-import org.openinfinity.cloud.util.collection.ListUtil;
 import org.openinfinity.cloud.util.http.HttpCodes;
-import org.openinfinity.cloud.util.serialization.JsonDataWrapper;
 import org.openinfinity.cloud.util.serialization.SerializerUtil;
 import org.openinfinity.core.util.ExceptionUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,11 +44,11 @@ import javax.portlet.ResourceResponse;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
 
 /**
- * Spring portlet controller for handling templates.
+ * Spring portlet controller for handling Configuration Element requests.
+ *
+ * Handles requests from "Main view, Element tab" and requests from "Element dialog"
  *
  * @author Vedran Bartonicek
  * @version 1.3.0
@@ -55,16 +56,15 @@ import java.util.List;
  */
 @Controller
 @RequestMapping("VIEW")
-public class ElementController {
+public class ElementController extends AbstractController{
 
-    private static final String GET_ELEMENTS = "getElements";
-	private static final String GET_ELEMENT = "getElement";
+    private static final String CREATE_ELEMENT = "createElement";private static final String GET_ELEMENT = "getElement";
 	private static final String GET_DEPENDENCIES = "getDependencies";
 	private static final String GET_ALL_DEPENDENCIES = "getAllAvailableDependencies";
-	private static final String GET_PARAMETER_KEYS_AND_VALUES = "getParameterKeysAndValues";
-	private static final String EDIT_ELEMENT = "editElement";
+    private static final String GET_ALL_MODULES = "getAllAvailableModules";
+    private static final String GET_MODULES_FOR_ELEMENT = "getModulesForElement";
+    private static final String EDIT_ELEMENT = "editElement";
     private static final String DELETE_ELEMENT = "deleteElement";
-    private static final String CREATE_ELEMENT = "createElement";
 
     private static final Logger LOG = Logger.getLogger(ElementController.class.getName());
 
@@ -73,6 +73,9 @@ public class ElementController {
 
     @Autowired
     private ElementToElementService dependencyService;
+
+    @Autowired
+    InstallationModuleService moduleService;
 
     @Autowired
     private ParameterKeyService parameterKeyService;
@@ -84,24 +87,7 @@ public class ElementController {
     private LiferayService liferayService;
 
 
-    @Authenticated
-    @ResourceMapping(GET_ELEMENTS)
-    public void getElements(ResourceRequest request, ResourceResponse response, @RequestParam("page") int page, @RequestParam("rows") int rows) throws Exception {
-        try {
-            User user = liferayService.getUser(request, response);
-            if (user == null) return;
-            Collection<ConfigurationElement> templates = elementService.loadAll();
-            int records = templates.size();
-            int mod = records % rows;
-            int totalPages = records / rows;
-            if (mod > 0) totalPages++;
-            List<ConfigurationElement> onePage = ListUtil.sliceList(page, rows, new LinkedList<ConfigurationElement>(templates));
-            SerializerUtil.jsonSerialize(response.getWriter(), new JsonDataWrapper(page, totalPages, records, onePage));
-        } catch (Exception e) {
-            ExceptionUtil.throwSystemException(e);
-        }
 
-    }
     @Authenticated
     @ResourceMapping(GET_ELEMENT)
     public void getElement(ResourceRequest request, ResourceResponse response, @RequestParam("elementId") int elementId) throws Exception {
@@ -113,6 +99,7 @@ public class ElementController {
             ExceptionUtil.throwSystemException(e);
         }
     }
+
     @Authenticated
     @ResourceMapping(GET_DEPENDENCIES)
     public void getDependencies(ResourceRequest request, ResourceResponse response, @RequestParam("elementId") int elementId) throws Exception {
@@ -121,16 +108,21 @@ public class ElementController {
             if (user == null) return;
             Collection<ConfigurationElement> availableItems = elementService.loadAll();
             Collection<ConfigurationElement> selectedItems = elementService.loadDependees(elementId);
+
+            LOG.debug("ENTER getDependencies()");
+            LOG.debug("availableItems:" + availableItems);
+            LOG.debug("selectedItems:" + selectedItems);
+
             SerializerUtil.jsonSerialize(response.getWriter(), new ConfigurationElementContainer(availableItems, selectedItems));
         } catch (Exception e) {
             ExceptionUtil.throwSystemException(e);
         }
     }
+
     @Authenticated
     @ResourceMapping(GET_ALL_DEPENDENCIES)
     public void getAllDependencies(ResourceRequest request, ResourceResponse response) throws Exception {
         try {
-            // TODO: aspect for authenitaction
             User user = liferayService.getUser(request, response);
             if (user == null) return;
             Collection<ConfigurationElement> availableItems = elementService.loadAll();
@@ -140,25 +132,39 @@ public class ElementController {
         }
     }
 
-    /*
-    @ResourceMapping(GET_PARAMETER_KEYS_AND_VALUES)
-    public void getParameterKeysAndValues(ResourceRequest request, ResourceResponse response, @RequestParam("elementId") int elementId) throws Exception {
+    @Authenticated
+    @ResourceMapping(GET_ALL_MODULES)
+    public void getAllModules(ResourceRequest request, ResourceResponse response) throws Exception {
         try {
-            User user = liferayService.getUser(request, response);
-            if (user == null) return;
-            Map<String, Collection<String>> keyValuesMap = new LinkedHashMap<String, Collection<String>>();
-            Collection<ParameterKey> keys = parameterKeyService.loadAll(elementId);
-            for (ParameterKey key : keys){
-                Collection<String> values = parameterValueService.loadValues(key.getId());
-                LOG.debug("Key:" + key.getName() + "Value:" + values);
-                keyValuesMap.put(key.getName(), values);
-            }
-            SerializerUtil.jsonSerialize(response.getWriter(), keyValuesMap);
+            Collection<InstallationModule> availableItems = moduleService.loadAll();
+
+            LOG.debug("ENTER getAllModules()");
+            LOG.debug("availableItems:" + availableItems);
+
+            SerializerUtil.jsonSerialize(response.getWriter(), new CollectionsContainer<InstallationModule>(availableItems, new ArrayList<InstallationModule>()));
         } catch (Exception e) {
             ExceptionUtil.throwSystemException(e);
         }
     }
-    */
+
+    @Authenticated
+    @ResourceMapping(GET_MODULES_FOR_ELEMENT)
+    public void getModules(ResourceRequest request, ResourceResponse response, @RequestParam("elementId") int elementId) throws Exception {
+        try {
+            User user = liferayService.getUser(request, response);
+            if (user == null) return;
+            Collection<InstallationModule> availableItems = moduleService.loadAll();
+            Collection<InstallationModule> selectedItems = moduleService.loadModules(elementId);
+
+            LOG.debug("ENTER getModules()");
+            LOG.debug("availableItems:" + availableItems);
+            LOG.debug("selectedItems:" + selectedItems);
+
+            SerializerUtil.jsonSerialize(response.getWriter(), new CollectionsContainer<InstallationModule>(availableItems, selectedItems));
+        } catch (Exception e) {
+            ExceptionUtil.throwSystemException(e);
+        }
+    }
 
     /*
     @ResourceMapping(EDIT_ELEMENT)
@@ -192,11 +198,21 @@ public class ElementController {
     @ResourceMapping(EDIT_ELEMENT)
     public void editElement(ResourceRequest request, ResourceResponse response,
                             @RequestParam("element") String elementData,
-                            @RequestParam("dependencies") String dependenciesData){
+                            @RequestParam("dependees") String dependeesData,
+                            @RequestParam("modules") String modulesData)
+    {
         try {
+            LOG.debug("ENTER editElement");
+            LOG.debug("element:" + elementData);
+            LOG.debug("dependees:" + dependeesData);
+            LOG.debug("modules:" + modulesData);
+
             if (liferayService.getUser(request, response) == null) return;
             ObjectMapper mapper = new ObjectMapper();
-            elementService.update(mapper.readValue(elementData, ConfigurationElement.class), mapper.readValue(dependenciesData, Collection.class));
+            ConfigurationElement element = mapper.readValue(elementData, ConfigurationElement.class);
+            Collection<Integer> dependeees = mapper.readValue(dependeesData, Collection.class);
+            Collection<Integer> modules = mapper.readValue(modulesData, Collection.class);
+            elementService.update(element, dependeees, modules);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -236,11 +252,22 @@ public class ElementController {
     @ResourceMapping(CREATE_ELEMENT)
     public void createElement(ResourceRequest request, ResourceResponse response,
                               @RequestParam("element") String elementData,
-                              @RequestParam("dependencies") String dependenciesData){
+                              @RequestParam("dependees") String dependeesData,
+                              @RequestParam("modules") String modulesData){
         try {
+            LOG.debug("ENTER editElement");
+            LOG.debug("element:" + elementData);
+            LOG.debug("dependeees:" + dependeesData);
+            LOG.debug("modules:" + modulesData);
+
             if (liferayService.getUser(request, response) == null) return;
             ObjectMapper mapper = new ObjectMapper();
-            elementService.create(mapper.readValue(elementData, ConfigurationElement.class), mapper.readValue(dependenciesData, Collection.class));
+            ConfigurationElement element = mapper.readValue(elementData, ConfigurationElement.class);
+            Collection<Integer> dependeees = mapper.readValue(dependeesData, Collection.class);
+            Collection<Integer> modules = mapper.readValue(modulesData, Collection.class);
+
+            if (liferayService.getUser(request, response) == null) return;
+            elementService.create(element, dependeees, modules);
 
         } catch (Exception e) {
             e.printStackTrace();

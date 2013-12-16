@@ -11,15 +11,17 @@
 		<header-portlet-javascript>/js/plugins/jquery.metadata.js</header-portlet-javascript>
 		<header-portlet-javascript>/js/plugins/i18n/grid.locale-en.js</header-portlet-javascript>
 		<header-portlet-javascript>/js/plugins/jquery.jqGrid.min.js</header-portlet-javascript>
-        <header-portlet-javascript>/js/configurationtemplate/init.js</header-portlet-javascript>
+        <header-portlet-javascript>/js/configurationtemplate/app/init.js</header-portlet-javascript>
         <header-portlet-javascript>/js/configurationtemplate/resources/message.js</header-portlet-javascript>
         <header-portlet-javascript>/js/configurationtemplate/resources/template.js</header-portlet-javascript>
-		<header-portlet-javascript>/js/configurationtemplate/application.js</header-portlet-javascript>
-        <footer-portlet-javascript>/js/configurationtemplate/dialog/dialog.info.js</footer-portlet-javascript>
-        <footer-portlet-javascript>/js/configurationtemplate/dialog/dialog.template.js</footer-portlet-javascript>
-        <footer-portlet-javascript>/js/configurationtemplate/dialog/dialog.element.js</footer-portlet-javascript>
-        <footer-portlet-javascript>/js/configurationtemplate/dialog/dialog.module.js</footer-portlet-javascript>
-        <footer-portlet-javascript>/js/configurationtemplate/dialog/dialog.package.js</footer-portlet-javascript>
+		<header-portlet-javascript>/js/configurationtemplate/util/util.js</header-portlet-javascript>
+		<header-portlet-javascript>/js/configurationtemplate/controls/widgets/itemselect.js</header-portlet-javascript>
+		<header-portlet-javascript>/js/configurationtemplate/app/main.js</header-portlet-javascript>
+        <footer-portlet-javascript>/js/configurationtemplate/controls/dialogs/info.js</footer-portlet-javascript>
+        <footer-portlet-javascript>/js/configurationtemplate/controls/dialogs/template.js</footer-portlet-javascript>
+        <footer-portlet-javascript>/js/configurationtemplate/controls/dialogs/element.js</footer-portlet-javascript>
+        <footer-portlet-javascript>/js/configurationtemplate/controls/dialogs/module.js</footer-portlet-javascript>
+        <footer-portlet-javascript>/js/configurationtemplate/controls/dialogs/package.js</footer-portlet-javascript>
 	</portlet>
 	<role-mapper>
 		<role-name>administrator</role-name>

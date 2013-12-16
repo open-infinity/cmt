@@ -18,14 +18,7 @@
  * @since 1.3.0
  */
 
- var app = window.app || new Object();
- app.templatesTable = new Object();
- app.dialog = new Object();
- app.dialog.template = new Object();
- app.dialog.element = new Object();
- app.dialog.info = new Object();
- app.dialog.module = new Object();
- app.dialog.package = new Object();
+
 
 
 

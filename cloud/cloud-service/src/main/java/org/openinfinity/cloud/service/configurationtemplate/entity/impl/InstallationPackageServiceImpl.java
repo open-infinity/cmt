@@ -17,7 +17,9 @@ package org.openinfinity.cloud.service.configurationtemplate.entity.impl;
 
 import org.apache.log4j.Logger;
 import org.openinfinity.cloud.domain.configurationtemplate.entity.InstallationPackage;
+import org.openinfinity.cloud.domain.repository.configurationtemplate.entity.api.InstallationPackageRepository;
 import org.openinfinity.cloud.service.configurationtemplate.entity.api.InstallationPackageService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
@@ -33,34 +35,41 @@ import java.util.Collection;
 public class InstallationPackageServiceImpl implements InstallationPackageService {
 	private static final Logger LOGGER = Logger.getLogger(InstallationPackageServiceImpl.class.getName());
 
+    @Autowired
+    InstallationPackageRepository packageRepository;
 
     @Override
     public InstallationPackage create(InstallationPackage obj) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return packageRepository.create(obj);
     }
 
     @Override
     public void update(InstallationPackage obj) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        packageRepository.update(obj);
     }
 
     @Override
     public Collection<InstallationPackage> loadAll() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return packageRepository.loadAll();
     }
 
     @Override
     public InstallationPackage load(BigInteger id) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return packageRepository.load(id);
+    }
+
+    @Override
+    public Collection<InstallationPackage> loadByModule(int moduleId) {
+        return packageRepository.loadByModule(moduleId);
     }
 
     @Override
     public void delete(InstallationPackage obj) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        packageRepository.delete(obj);
     }
 
     @Override
     public void delete(BigInteger id) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        packageRepository.delete(id);
     }
 }

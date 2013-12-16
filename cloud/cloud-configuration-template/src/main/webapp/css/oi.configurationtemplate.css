@@ -32,7 +32,7 @@ input[type="text"].dlg-error-input{border-color:red;border-radius:2px;margin-lef
 #dlg-element-general-tab{height:380px;}
 .dlg-element-value-label{width: 130px;margin-top:5px;float:left;}
 #dlg-element-value-id{padding-top:5px;}
-.dlg-element-dependee-name{float:left;width:125px;}
+/*.dlg-element-dependee-name{float:left;width:125px;}*/
 /*#dlg-dependency-selection-container{height:300px;}*/
 #dlg-keys li {width:155px;margin:0 0 0 10px;padding:5px 0px 5px 5px;border-radius:5px;}
 #dlg-list-keys-container{width:200px}
@@ -51,6 +51,9 @@ input[type="text"].dlg-key-name, input[type="text"].dlg-value-type, input[type="
 #dlg-element-key-name{padding-left:10px;font-weight:normal;}
 #dlg-element-replicated-radio{padding-top:6px;}
 
+/*Selection widget*/
+/*dlg-item-list-container*/
+div.dlg-item-list-container>ul>li>div:first-child{float:left;width:125px;}
 
 /* Helper dialog for showing item information */
 #dlg-item-table th{border:1px solid #C4C4C4;padding:5px;text-align:center}

@@ -17,6 +17,7 @@ package org.openinfinity.cloud.domain.repository.configurationtemplate.entity.im
 
 import org.openinfinity.cloud.domain.configurationtemplate.entity.InstallationModule;
 import org.openinfinity.cloud.domain.repository.configurationtemplate.entity.api.InstallationModuleRepository;
+import org.openinfinity.core.annotation.AuditTrail;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -50,6 +51,12 @@ public class InstallationModuleRepositoryJdbcImpl implements InstallationModuleR
     private static final String GET_ALL_SQL = "select * from installation_module_tbl";
 
     private static final String GET_BY_ID_SQL = "select * from installation_module_tbl where id = ?";
+
+    private static final String LOAD_MODULES_SQL =
+            "select installation_module_tbl.* from installation_module_tbl " +
+            "inner join cfg_element_module_tbl on " +
+            "installation_module_tbl.id = cfg_element_module_tbl.module_id " +
+            "where cfg_element_module_tbl.element_id = ?";
 
     private DataSource dataSource;
 
@@ -85,6 +92,12 @@ public class InstallationModuleRepositoryJdbcImpl implements InstallationModuleR
     @Override
     public InstallationModule load(BigInteger id) {
         return jdbcTemplate.queryForObject(GET_BY_ID_SQL, new Object[] {id}, new InstallationModuleRowMapper());
+    }
+
+    @Override
+    @AuditTrail
+    public Collection<InstallationModule> loadModules(int elementId) {
+        return jdbcTemplate.query(LOAD_MODULES_SQL, new Object[]{elementId}, new InstallationModuleRowMapper());
     }
 
     @Override

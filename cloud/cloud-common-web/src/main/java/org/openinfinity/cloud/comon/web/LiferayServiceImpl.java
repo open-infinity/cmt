@@ -23,7 +23,6 @@ private static final Logger LOG = Logger.getLogger(LiferayServiceImpl.class.getN
     
     public User getUser(PortletRequest request) {
         User user = null;
-        
         try {
             user = com.liferay.portal.util.PortalUtil.getUser(request);
         } catch (PortalException e) {
@@ -33,8 +32,7 @@ private static final Logger LOG = Logger.getLogger(LiferayServiceImpl.class.getN
             LOG.error("Someting is wrong: "+e.getLocalizedMessage());
             return null;
         }
-        
-        return user;    
+        return user;
     }
     
     public User getUser(PortletRequest request, ResourceResponse response) {
