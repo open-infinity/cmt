@@ -33,15 +33,15 @@ import static org.mockito.Mockito.*;
 
 @ContextConfiguration(locations={"/cloud-template-test-config.xml"})
 @RunWith(SpringJUnit4ClassRunner.class)
-public class TemplateControllerTest {
+public class MainControllerTest {
 
     @InjectMocks
     @Autowired
-    private TemplateController templateController;
+    private MainController mainController;
     
     @Mock
     private LiferayService mockLiferayService;
-    
+
     @Mock
     private User mockUser;
      
@@ -66,7 +66,7 @@ public class TemplateControllerTest {
         when(mockLiferayService.getOrganizationIds(mockUser)).thenReturn(organizationIds);  
             
         try{
-            templateController.getTemplatesForUser(request, response, 1, 1);
+            mainController.getTemplates(request, response, 1, 1);
             JsonNode rootNode = objectMapper.readValue(response.getContentAsString(), JsonNode.class);
             
             int templatesExpected = 1;

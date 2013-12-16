@@ -18,6 +18,8 @@ package org.openinfinity.cloud.service.configurationtemplate.entity.api;
 import org.openinfinity.cloud.domain.configurationtemplate.entity.InstallationPackage;
 import org.openinfinity.cloud.service.common.AbstractCrudServiceInterface;
 
+import java.util.Collection;
+
 
 /**
  * ConfigurationTemplate interface for management of cloud configuration templates.
@@ -27,5 +29,7 @@ import org.openinfinity.cloud.service.common.AbstractCrudServiceInterface;
  * @since 1.3.0
  */
 public interface InstallationPackageService extends AbstractCrudServiceInterface<InstallationPackage> {
+
+    Collection<InstallationPackage> loadByModule(int moduleId);
 	
 }

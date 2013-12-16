@@ -30,9 +30,7 @@ import org.openinfinity.cloud.domain.configurationtemplate.relation.TemplateToOr
 import org.openinfinity.cloud.service.configurationtemplate.entity.api.ConfigurationElementService;
 import org.openinfinity.cloud.service.configurationtemplate.entity.api.ConfigurationTemplateService;
 import org.openinfinity.cloud.service.configurationtemplate.relation.api.TemplateToOrganizationService;
-import org.openinfinity.cloud.util.collection.ListUtil;
 import org.openinfinity.cloud.util.http.HttpCodes;
-import org.openinfinity.cloud.util.serialization.JsonDataWrapper;
 import org.openinfinity.cloud.util.serialization.SerializerUtil;
 import org.openinfinity.core.exception.AbstractCoreException;
 import org.openinfinity.core.exception.ApplicationException;
@@ -49,12 +47,13 @@ import org.springframework.web.portlet.bind.annotation.RenderMapping;
 import org.springframework.web.portlet.bind.annotation.ResourceMapping;
 
 import javax.portlet.*;
-import java.io.IOException;
 import java.math.BigInteger;
 import java.util.*;
 
 /**
- * Spring portlet controller for handling templates.
+ * Spring portlet controller for handling Configuration Template requests.
+ *
+ * Handles requests from "Main view, Template tab" and requests from "Template dialog"
  *
  * @author Vedran Bartonicek
  * @version 1.3.0
@@ -62,18 +61,16 @@ import java.util.*;
  */
 
 @Controller(value = "templateController")
-
 @RequestMapping("VIEW")
-public class TemplateController {
+public class TemplateController extends AbstractController{
 
-    private static final String GET_TEMPLATES_FOR_USER = "getTemplatesForUser";
+    private static final String CREATE_TEMPLATE = "createTemplate";
+    private static final String GET_TEMPLATE = "getTemplate";
     private static final String GET_ELEMENTS_FOR_TEMPLATE = "getElementsForTemplate";
     private static final String GET_ORGANIZATIONS_FOR_TEMPLATE = "getOrganizationsForTemplate";
     private static final String GET_ALL_ELEMENTS = "getAllAvailableElements";
     private static final String GET_ALL_ORGANIZATIONS = "getAllOrganizations";
     private static final String EDIT_TEMPLATE = "editTemplate";
-    private static final String GET_TEMPLATE = "getTemplate";
-    private static final String CREATE_TEMPLATE = "createTemplate";
     private static final String DELETE_TEMPLATE = "deleteTemplate";
 
     private static final Logger LOG = Logger.getLogger(TemplateController.class.getName());
@@ -120,31 +117,9 @@ public class TemplateController {
         Map<String, Object> userInfo =
                 (Map<String, Object>) renderRequest.getAttribute(ActionRequest.USER_INFO);
         if (userInfo == null)
-            return new ModelAndView("home");
+            return new ModelAndView("error");
 
         return modelAndView;
-    }
-
-    @Authenticated
-    @ResourceMapping(GET_TEMPLATES_FOR_USER)
-    public void getTemplatesForUser(ResourceRequest request, ResourceResponse response,
-                                    @RequestParam("page") int page, @RequestParam("rows") int rows)
-            throws Exception {
-        try {
-            LOG.debug("ENTER getTemplatesForUser, page=" + page + ",rows=" + rows);
-            User user = liferayService.getUser(request, response);
-            if (user == null) return;
-            List<Long> organizationIds = liferayService.getOrganizationIds(user);
-            List<ConfigurationTemplate> templates = configurationTemplateService.loadAllForOrganizations(organizationIds);
-            int records = templates.size();
-            int mod = records % rows;
-            int totalPages = records / rows;
-            if (mod > 0) totalPages++;
-            List<ConfigurationTemplate> onePage = ListUtil.sliceList(page, rows, new LinkedList<ConfigurationTemplate>(templates));
-            SerializerUtil.jsonSerialize(response.getWriter(), new JsonDataWrapper(page, totalPages, records, onePage));
-        } catch (Exception e) {
-            ExceptionUtil.throwSystemException(e);
-        }
     }
 
     @Authenticated
@@ -278,18 +253,6 @@ public class TemplateController {
             e.printStackTrace();
             response.setProperty(ResourceResponse.HTTP_STATUS_CODE, HttpCodes.HTTP_ERROR_CODE_SERVER_ERROR);
         }
-    }
-
-    // Slices a subset from list, the result fits into one jqGgrid page.
-    private <T> void sliceAndSerialize(ResourceResponse response, List<T> items, int page, int rows) throws IOException {
-        int records = items.size();
-        int mod = records % rows;
-        int totalPages = records / rows;
-        if (mod > 0) totalPages++;
-        List<T> itemsCopy = new LinkedList<T>();
-        itemsCopy.addAll(items);
-        List<T> onePage = ListUtil.sliceList(page, rows, itemsCopy);
-        SerializerUtil.jsonSerialize(response.getWriter(), new JsonDataWrapper(page, totalPages, records, onePage));
     }
 
 }

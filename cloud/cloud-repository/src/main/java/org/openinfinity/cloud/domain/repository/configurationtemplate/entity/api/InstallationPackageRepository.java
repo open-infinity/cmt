@@ -18,6 +18,8 @@ package org.openinfinity.cloud.domain.repository.configurationtemplate.entity.ap
 import org.openinfinity.cloud.domain.configurationtemplate.entity.InstallationPackage;
 import org.openinfinity.cloud.domain.repository.common.AbstractCrudRepositoryInterface;
 
+import java.util.Collection;
+
 /**
  * CRUD interface for storing <code>org.openinfinity.core.cloud.domain.template</code> objects.
  * 
@@ -26,5 +28,7 @@ import org.openinfinity.cloud.domain.repository.common.AbstractCrudRepositoryInt
  * @since 1.3.0
  */
 public interface InstallationPackageRepository extends AbstractCrudRepositoryInterface<InstallationPackage> {
-	
+
+    Collection<InstallationPackage> loadByModule(int moduleId);
+
 }

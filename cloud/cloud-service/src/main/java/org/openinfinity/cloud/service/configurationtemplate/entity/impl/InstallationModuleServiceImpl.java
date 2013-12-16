@@ -25,6 +25,7 @@ import org.openinfinity.cloud.domain.repository.configurationtemplate.entity.api
 import org.openinfinity.cloud.domain.repository.configurationtemplate.entity.api.ParameterValueRepository;
 import org.openinfinity.cloud.domain.repository.configurationtemplate.relation.api.ModuleToPackageRepository;
 import org.openinfinity.cloud.service.configurationtemplate.entity.api.InstallationModuleService;
+import org.openinfinity.core.annotation.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -90,7 +91,12 @@ public class InstallationModuleServiceImpl implements InstallationModuleService 
 
     @Override
     public InstallationModule load(BigInteger id) {
-        return null;
+        return moduleRepository.load(id);
+    }
+
+    @Log
+    public Collection<InstallationModule> loadModules(int elementId) {
+        return moduleRepository.loadModules(elementId);
     }
 
     @Override
@@ -99,7 +105,7 @@ public class InstallationModuleServiceImpl implements InstallationModuleService 
 
     @Override
     public void delete(BigInteger id) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        moduleRepository.delete(id);
     }
 
     private void storeKeysAndValues(Map<String, Collection<String>> parameters, InstallationModule module){

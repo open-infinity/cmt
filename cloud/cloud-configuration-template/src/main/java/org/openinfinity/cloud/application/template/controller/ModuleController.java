@@ -20,14 +20,15 @@ import org.apache.log4j.Logger;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 import org.openinfinity.cloud.annotation.Authenticated;
+import org.openinfinity.cloud.application.template.serialization.CollectionsContainer;
 import org.openinfinity.cloud.domain.configurationtemplate.entity.InstallationModule;
+import org.openinfinity.cloud.domain.configurationtemplate.entity.InstallationPackage;
+import org.openinfinity.cloud.domain.configurationtemplate.entity.ParameterKey;
 import org.openinfinity.cloud.service.configurationtemplate.entity.api.InstallationModuleService;
 import org.openinfinity.cloud.service.configurationtemplate.entity.api.InstallationPackageService;
 import org.openinfinity.cloud.service.configurationtemplate.entity.api.ParameterKeyService;
 import org.openinfinity.cloud.service.configurationtemplate.entity.api.ParameterValueService;
-import org.openinfinity.cloud.util.collection.ListUtil;
 import org.openinfinity.cloud.util.http.HttpCodes;
-import org.openinfinity.cloud.util.serialization.JsonDataWrapper;
 import org.openinfinity.cloud.util.serialization.SerializerUtil;
 import org.openinfinity.core.util.ExceptionUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,12 +41,13 @@ import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
 import java.math.BigInteger;
 import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * Spring portlet controller for handling installation modules.
+ * Spring portlet controller for handling Installation Module requests.
+ *
+ * Handles requests from "Main view, Module tab" and requests from "Module dialog"
  *
  * @author Vedran Bartonicek
  * @version 1.3.0
@@ -55,10 +57,9 @@ import java.util.Map;
 @RequestMapping("VIEW")
 public class ModuleController extends AbstractController{
 
-    private static final String LOAD_MODULES = "getModules";
-	private static final String LOAD_MODULE = "getModule";
-	private static final String LOAD_PACKAGES = "getPackages";
-	private static final String LOAD_PARAMETER_KEYS_AND_VALUES = "getParameterKeysAndValues";
+	private static final String GET_MODULE = "getModule";
+	private static final String GET_PACKAGES_FOR_MODULE = "getPackagesForModule";
+	private static final String GET_PARAMETER_KEYS_AND_VALUES = "getParameterKeysAndValues";
 	private static final String EDIT_MODULE = "editModule";
     private static final String DELETE_MODULE = "deleteModule";
     private static final String CREATE_MODULE = "createModule";
@@ -77,33 +78,9 @@ public class ModuleController extends AbstractController{
     @Autowired
     private ParameterValueService parameterValueService;
 
+
     @Authenticated
-    @ResourceMapping(LOAD_MODULES)
-    public void getModules(ResourceRequest request, ResourceResponse response, @RequestParam("page") int page, @RequestParam("rows") int rows) throws Exception {
-        try {
-            //User user = liferayService.getUser(request, response);
-            //if (user == null) return;
-            LOG.debug("ENTER getTemplatesForUser, page=" + page + ",rows=" + rows);
-            Collection<InstallationModule> modules = moduleService.loadAll();
-            LOG.debug("modules=" + modules);
-
-            int records = modules.size();
-            int mod = records % rows;
-            int totalPages = records / rows;
-            if (mod > 0) totalPages++;
-            List<InstallationModule> onePage = ListUtil.sliceList(page, rows, new LinkedList<InstallationModule>(modules));
-            LOG.debug("onePage=" + onePage);
-
-            SerializerUtil.jsonSerialize(response.getWriter(), new JsonDataWrapper(page, totalPages, records, onePage));
-            LOG.debug("EXIT");
-
-        } catch (Exception e) {
-            ExceptionUtil.throwSystemException(e);
-        }
-
-    }
-    @Authenticated
-    @ResourceMapping(LOAD_MODULE)
+    @ResourceMapping(GET_MODULE)
     public void getModule(ResourceRequest request, ResourceResponse response, @RequestParam("moduleId") int moduleId) throws Exception {
         try {
             //User user = liferayService.getUser(request, response);
@@ -114,46 +91,15 @@ public class ModuleController extends AbstractController{
         }
     }
 
-    /*
     @Authenticated
-    @ResourceMapping(GET_DEPENDENCIES)
-    public void getDependencies(ResourceRequest request, ResourceResponse response, @RequestParam("moduleId") int moduleId) throws Exception {
-        try {
-            //User user = liferayService.getUser(request, response);
-            //if (user == null) return;
-            Collection<InstallationModule> availableItems = moduleService.loadAll();
-            Collection<InstallationModule> selectedItems = moduleService.loadDependees(moduleId);
-            SerializerUtil.jsonSerialize(response.getWriter(), new InstallationModuleContainer(availableItems, selectedItems));
-        } catch (Exception e) {
-            ExceptionUtil.throwSystemException(e);
-        }
-    }
-
-
-    @Authenticated
-    @ResourceMapping(GET_ALL_DEPENDENCIES)
-    public void getAllDependencies(ResourceRequest request, ResourceResponse response) throws Exception {
-        try {
-            // TODO: aspect for authenitaction
-            //User user = liferayService.getUser(request, response);
-            //if (user == null) return;
-            Collection<InstallationModule> availableItems = moduleService.loadAll();
-            SerializerUtil.jsonSerialize(response.getWriter(), new InstallationModuleContainer(availableItems, new ArrayList<InstallationModule>()));
-        } catch (Exception e) {
-            ExceptionUtil.throwSystemException(e);
-        }
-    }
-    */
-    /*
     @ResourceMapping(GET_PARAMETER_KEYS_AND_VALUES)
     public void getParameterKeysAndValues(ResourceRequest request, ResourceResponse response, @RequestParam("moduleId") int moduleId) throws Exception {
         try {
-            User user = liferayService.getUser(request, response);
-            if (user == null) return;
             Map<String, Collection<String>> keyValuesMap = new LinkedHashMap<String, Collection<String>>();
-            Collection<ParameterKey> keys = parameterKeyService.loadAll(moduleId);
+            //Collection<ParameterKey> keys = parameterKeyService.loadAll(moduleId);
+            Collection<ParameterKey> keys = parameterKeyService.loadAllForModule(moduleId);
             for (ParameterKey key : keys){
-                Collection<String> values = parameterValueService.loadValues(key.getId());
+                Collection<String> values = parameterValueService.loadStringValuesForKey(key.getId());
                 LOG.debug("Key:" + key.getName() + "Value:" + values);
                 keyValuesMap.put(key.getName(), values);
             }
@@ -162,36 +108,18 @@ public class ModuleController extends AbstractController{
             ExceptionUtil.throwSystemException(e);
         }
     }
-    */
 
-    /*
-    @ResourceMapping(EDIT_MODULE)
-    public void editModule(ResourceRequest request, ResourceResponse response,
-                             @RequestParam("module") String moduleData,
-                             @RequestParam("dependencies") String dependenciesData,
-                             @RequestParam("parameters") String parametersData
-    ) {
+    @Authenticated
+    @ResourceMapping(GET_PACKAGES_FOR_MODULE)
+    public void getPackagesForModule(ResourceRequest request, ResourceResponse response, @RequestParam("moduleId") int moduleId) throws Exception {
         try {
-            User user = liferayService.getUser(request, response);
-            if (user == null) return;
-
-            ObjectMapper mapper = new ObjectMapper();
-            InstallationModule module = mapper.readValue(moduleData, InstallationModule.class);
-            Collection<Integer> dependenciesList = mapper.readValue(dependenciesData, Collection.class);
-            Map<String, Collection<String>> keyValuesMap = mapper.readValue(parametersData, new TypeReference<Map<String, Collection<String>>>(){});
-
-            LOG.debug("InstallationModule:" + module);
-            LOG.debug("dependenciesList:" + dependenciesList);
-            LOG.debug("Map kv:" + keyValuesMap);
-
-            moduleService.update(module, dependenciesList, keyValuesMap);
-
+            Collection<InstallationPackage> availableItems = packageService.loadAll();
+            Collection<InstallationPackage> selectedItems = packageService.loadByModule(moduleId);
+            SerializerUtil.jsonSerialize(response.getWriter(), new CollectionsContainer<InstallationPackage>(availableItems, selectedItems));
         } catch (Exception e) {
-            e.printStackTrace();
-            response.setProperty(ResourceResponse.HTTP_STATUS_CODE, HttpCodes.HTTP_ERROR_CODE_SERVER_ERROR);
+            ExceptionUtil.throwSystemException(e);
         }
     }
-    */
 
     @Authenticated
     @ResourceMapping(EDIT_MODULE)
@@ -200,7 +128,6 @@ public class ModuleController extends AbstractController{
                             @RequestParam("packages") String packagesData,
                             @RequestParam("parameters") String parametersData){
         try {
-            //if (liferayService.getUser(request, response) == null) return;
             ObjectMapper mapper = new ObjectMapper();
             InstallationModule module = mapper.readValue(moduleData, InstallationModule.class);
             Collection<Integer> packages = mapper.readValue(packagesData, Collection.class);

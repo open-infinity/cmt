@@ -37,9 +37,9 @@ public interface ConfigurationElementService extends AbstractCrudServiceInterfac
     Collection<ConfigurationElement> loadDependees(int elementId);
 
     //void update(ConfigurationElement element, Collection<Integer> dependencies, Map<String, Collection<String>> keyValues);
-    void update(ConfigurationElement element, Collection<Integer> dependencies);
+    void update(ConfigurationElement element, Collection<Integer> dependencies, Collection<Integer> modules);
 
     //void create(ConfigurationElement element, Collection<Integer> dependencies, Map<String, Collection<String>> parameters);
-    void create(ConfigurationElement element, Collection<Integer> dependencies);
+    void create(ConfigurationElement element, Collection<Integer> dependencies, Collection<Integer> modules);
 
 }

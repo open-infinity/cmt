@@ -4,6 +4,11 @@
  * -generalize item selection events
  * -generalize item selection fetching data
  * -validate modules
+
+ * Server side
+ * -optimize edits
+ * -available items can  not contain self
+ * -auth aspect
  */
 (function($) {
 
@@ -17,8 +22,20 @@
     dlg.html.idContainer = $($(".dlg-input-container", "#dlg-element-general-tab").first());
     dlg.html.self = $("#dlg-element");
     dlg.html.tabs = $("#dlg-element-tabs");
-    dlg.html.selectedDependeesList = $("ul", "#dlg-element-selected-dependees");
-    dlg.html.availableDependeesList = $("ul", "#dlg-element-available-dependees");
+
+    // Selection widget
+    dlg.html.selectionWidget = {};
+    dlg.html.selectionWidget.dependencies = $("#dlg-element-dependencies-tab").find(".dlg-item-selection-container");
+    dlg.html.selectionWidget.modules = $("#dlg-element-modules-tab").find(".dlg-item-selection-container");
+
+    // Selection widget internals
+    // TODO: remove this once the widget is isolated
+    dlg.html.selectionWidget.selectedDependeesList = dlg.html.selectionWidget.dependencies.find(".dlg-item-list-container").first().find("ul");
+    dlg.html.selectionWidget.availableDependeesList = dlg.html.selectionWidget.dependencies.find(".dlg-item-list-container").last().find("ul");
+    dlg.html.selectionWidget.selectedModulesList = dlg.html.selectionWidget.modules.find(".dlg-item-list-container").first().find("ul");
+    dlg.html.selectionWidget.availableModulesList = dlg.html.selectionWidget.modules.find(".dlg-item-list-container").last().find("ul");
+
+    //dlg.html.availableDependeesList = $("ul", "#dlg-element-available-dependees");
 
     dlg.html.elem = {};
     dlg.html.elem.id = $("#dlg-element-value-id");
@@ -34,9 +51,10 @@
 
     $.extend(dlg, {
 
-        create : function(id){
-        	dlg.open("create");
-        },
+		create : function(){
+		    dlg.mode = "create";
+			dlg.open();
+		},
 
         edit : function(id){
             $.ajax({
@@ -65,40 +83,40 @@
                 }).fail(function(jqXHR, textStatus, errorThrown) {
                     console.log("Error fetching element");
             });
-            dlg.open("edit");
+            dlg.mode = "edit";
+            dlg.open(id);
         },
 
-        open : function(mode){
-        	if (mode !== "create" || mode != "edit") {
-        		console.log("Invalid dialog mode: " + mode);
-        		return;
-        	}
-            dlg.mode = mode;
-
-        	$.when(
+        open : function(id){
+			if (dlg.mode !== "create" && dlg.mode != "edit") {
+				console.log("Invalid dialog mode: " + dlg.mode);
+				return;
+			}
+            $.when(
                     $.ajax({
-                        url: portletURL.url.element.getAllAvailableDependenciesURL + "&elementId=" + id,
+                        url: portletURL.url.element.getDependenciesURL + "&elementId=" + id,
                         dataType: "json"
                     }),
                     $.ajax({
-                        url: portletURL.url.element.getAllAvailableModulesURL + "&elementId=" + id,
+                        url: portletURL.url.element.getModulesForElementURL + "&elementId=" + id,
                         dataType: "json"
                     }))
-            .done(function(data){
-                updateSelectionPanel(data, tpl.item, dlg.html.selectedDependeesList, dlg.html.availableDependeesList);
-                updateSelectionPanel(data, tpl.item, dlg.html.selectedModulesList, dlg.html.availableModulesList);
+            .done(function(dataDependencies, dataModules){
+                // TODO : this function belongs to selectionWidget
+                updateSelectionWidget(dataDependencies[0], tpl.item, dlg.html.selectionWidget.selectedDependeesList, dlg.html.selectionWidget.availableDependeesList);
+                updateSelectionWidget(dataModules[0], tpl.item, dlg.html.selectionWidget.selectedModulesList, dlg.html.selectionWidget.availableModulesList);
                 configureEventHandling();
                 })
             .fail(function(jqXHR, textStatus, errorThrown) {
                 console.log("Error fetching items for dialog");
                 });
-        	
+            
             var title = "";
-            if (mode == "edit"){
+            if (dlg.mode == "edit"){
                 dlg.html.idContainer.show();
                 title = "Edit element";
             }
-            else if (mode == "create"){
+            else if (dlg.mode == "create"){
                 dlg.html.idContainer.hide();
                 title = "Create new element";
             }
@@ -165,21 +183,20 @@
         var err = 0;
 
         // get input data
-        // var dependencies = getDependencies();
-        var dependencies = getItems();//TODO
-        var modules = getItems();
+        var dependees = getSelectionWidgetItems(dlg.html.selectionWidget.selectedDependeesList);
+        var modules = getSelectionWidgetItems(dlg.html.selectionWidget.selectedModulesList);
         var element = getElement();
 
         // validate input data
-        if (!validateInput(element, dependencies, modules)){
+        if (!validateInput(element, dependees, modules)){
             return;
         }
 
         // serialize input data
         var outData = {};
         outData.element = JSON.stringify(element);
-        outData.dependencies = JSON.stringify(dependencies);
-        outData.modules = JSON.stringify(dlg.model.parameters);
+        outData.dependees = JSON.stringify(dependees);
+        outData.modules = JSON.stringify(modules);
 
         // send input data
         $.post((mode == "edit") ? portletURL.url.element.editElementURL : portletURL.url.element.createElementURL, outData)
@@ -235,10 +252,10 @@
     }
 */
     //dlg-element-tabs
-    function configureDragAndDrop(){
-    	dlg.html.self.find(".dlg-list-panel-container").droppable({
-            activeClass: "ui-state-highlight",
-            drop: function (event, ui) {
+	function configureDragAndDrop(){
+		dlg.html.self.find(".dlg-list-panel-container").droppable({
+			activeClass: "ui-state-highlight",
+			drop: function (event, ui) {
                 var list = $(this).find("ul");
                 var selected = $(this).siblings().find("li.ui-state-highlight");
                 if (selected.length > 1) {
@@ -263,7 +280,8 @@
                 }
             }
         });
-    }    
+    }
+
     function bindDependencyListItemClicks(){
          $("li", ".dlg-item-selection-container").
             click(function(){
@@ -305,24 +323,17 @@
         }
     }
 
-    function updateSelectionPanel(data, template, listSelected, listAvailable){
-        try{
-            var selectedIndices = [];
-
-            $.each(data.selected, function(index, value){
-            	storeItemToDom(template, value, listSelected);
-               selectedIndices.push(value.id);
-            });
-
-            $.each(data.available, function(index, value){
-               if (selectedIndices.indexOf(value.id) == -1){
-            	   storeItemToDom(template, value, listSelected);
-               }
-            });
-        }
-        catch(err){
-            console.log(err.message);
-        }
+    function updateSelectionWidget(data, template, listSelected, listAvailable){
+        var selectedIndices = [];
+        $.each(data.selected, function(index, value){
+            storeItemToDom(template, value, listSelected);
+            selectedIndices.push(value.id);
+        });
+        $.each(data.available, function(index, value){
+            if (selectedIndices.indexOf(value.id) == -1){
+                storeItemToDom(template, value, listAvailable);
+            }
+        });
     }
     
 /*
@@ -367,6 +378,7 @@
         return (obj !== "" && typeof obj !== 'undefined' && !isNaN(obj) && (Math.round(obj) == obj) && obj > 0) ? true : false;
     }
 
+    /*
     function getDependencies(){
         var selectedItems = [];
             var arrayOfLis = dlg.html.selectedDependeesList.find("li");
@@ -375,6 +387,16 @@
         }
         return selectedItems;
     }
+    */
+
+    function getSelectionWidgetItems(widget){
+            var selectedItems = [];
+                var arrayOfLis = widget.find("li");
+            for (var i = 0; i < arrayOfLis.length; i++){
+                selectedItems.push($(arrayOfLis[i]).data("config").id);
+            }
+            return selectedItems;
+        }
 
     function getElement(){
         var e = {};
@@ -415,7 +437,7 @@
 
     // Validation
 
-    function validateInput(element, dependencies, modules){
+    function validateInput(element, dependees, modules){
         var res = true;
 
         // validate element
@@ -464,15 +486,22 @@
             alertWrongInput(dlg.html.elem.maxReplicationMachines, err.invalidMachineRange);
         }
 
-        // validate dependencies
-        for (var i = 0; i < dependencies.length; i++){
-            if (!isPosInt(dependencies[i]) || dependencies[i] < 0){
+        if (res === true){
+            res = validateItems(dependees) && validateItems(modules);
+        }
+
+        return res;
+    }
+
+    function validateItems(items) {
+        res = true;
+        for (var i = 0; i < items.length; i++){
+            if (!isPosInt(items[i]) || items[i] < 0){
                 res = false;
-                alert(err.invalidDependencies);
+                alert(err.invalidItems);
                 break;
              }
         }
-
         return res;
     }
 

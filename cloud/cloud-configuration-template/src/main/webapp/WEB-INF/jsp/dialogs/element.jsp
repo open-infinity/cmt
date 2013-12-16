@@ -92,16 +92,14 @@
 
 		<%-- Other Configuration Elements as dependees for Configuration Element --%>
 		<div id="dlg-element-dependencies-tab">
-			<div class="dlg-item-selection-container"
-				class="dlg-tab-items-container">
+			<div class="dlg-item-selection-container" class="dlg-tab-items-container">
 				<div class="dlg-list-panel-container dlg-tab-item">
 					<div class="dlg-list-panel-container-title">Dependees</div>
 					<div class="dlg-list-panel-container-columns">
 						<div class="list-item-column">Platform</div>
 						<div>Version</div>
 					</div>
-					<div id="dlg-element-selected-dependees"
-						class="dlg-item-list-container">
+					<div class="dlg-item-list-container">
 						<ul></ul>
 					</div>
 				</div>
@@ -112,8 +110,7 @@
 						<div class="list-item-column">Platform</div>
 						<div>Version</div>
 					</div>
-					<div id="dlg-element-available-dependees"
-						class="dlg-item-list-container">
+					<div class="dlg-item-list-container">
 						<ul></ul>
 					</div>
 				</div>

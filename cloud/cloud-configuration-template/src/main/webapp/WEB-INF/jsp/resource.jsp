@@ -16,36 +16,44 @@ var portletURL = new urlContainer("portletURL");
 portletURL.initialize({
     template: {
         createTemplateURL : '<portlet:resourceURL id="createTemplate"/>',
-        deleteTemplateURL : '<portlet:resourceURL id="deleteTemplate"/>',
-        editTemplateURL : '<portlet:resourceURL id="editTemplate"/>',
         getTemplateURL : '<portlet:resourceURL id="getTemplate"/>',
-    	getTemplatesForUserURL : '<portlet:resourceURL id="getTemplatesForUser"/>',
-    	getElementsForTemplateURL : '<portlet:resourceURL id="getElementsForTemplate"/>',
-    	getAllAvailableElementsURL : '<portlet:resourceURL id="getAllAvailableElements"/>',
-    	getOrganizationsForTemplateURL : '<portlet:resourceURL id="getOrganizationsForTemplate"/>',
-    	getAllOrganizationsURL : '<portlet:resourceURL id="getAllOrganizations"/>',
+        getTemplatesURL : '<portlet:resourceURL id="getTemplates"/>',
+        getElementsForTemplateURL : '<portlet:resourceURL id="getElementsForTemplate"/>',
+        getAllAvailableElementsURL : '<portlet:resourceURL id="getAllAvailableElements"/>',
+        getOrganizationsForTemplateURL : '<portlet:resourceURL id="getOrganizationsForTemplate"/>',
+        getAllOrganizationsURL : '<portlet:resourceURL id="getAllOrganizations"/>',
+        editTemplateURL : '<portlet:resourceURL id="editTemplate"/>',
+        deleteTemplateURL : '<portlet:resourceURL id="deleteTemplate"/>'
     },
     organization: {
     	availableClustersURL :'<portlet:resourceURL id="availableClusters"/>',
     },
     element: {
+       	createElementURL : '<portlet:resourceURL id="createElement"/>',
     	getElementURL : '<portlet:resourceURL id="getElement"/>',
     	getElementsURL : '<portlet:resourceURL id="getElements"/>',
     	getAllAvailableDependenciesURL : '<portlet:resourceURL id="getAllAvailableDependencies"/>',
-    	getModulesURL : '<portlet:resourceURL id="getModules"/>',
-    	editElementURL : '<portlet:resourceURL id="editElement"/>',
-    	createElementURL : '<portlet:resourceURL id="createElement"/>',
-        deleteElementURL : '<portlet:resourceURL id="deleteElement"/>',
+    	getAllAvailableModulesURL : '<portlet:resourceURL id="getAllAvailableModules"/>',
+    	getModulesForElementURL : '<portlet:resourceURL id="getModulesForElement"/>',
     	getDependenciesURL : '<portlet:resourceURL id="getDependencies"/>',
+    	editElementURL : '<portlet:resourceURL id="editElement"/>',
+        deleteElementURL : '<portlet:resourceURL id="deleteElement"/>'
     },
     module: {
+      	createModuleURL : '<portlet:resourceURL id="createModule"/>',
     	getModuleURL : '<portlet:resourceURL id="getModule"/>',
     	getModulesURL : '<portlet:resourceURL id="getModules"/>',
-    	getPackagesURL : '<portlet:resourceURL id="getPackages"/>',
+    	getPackagesForModuleURL : '<portlet:resourceURL id="getPackagesForModule"/>',
     	getParameterKeysAndValuesURL : '<portlet:resourceURL id="getParameterKeysAndValues"/>',
     	editModuleURL : '<portlet:resourceURL id="editModule"/>',
-    	createModuleURL : '<portlet:resourceURL id="createModule"/>',
         deleteModuleURL : '<portlet:resourceURL id="deleteModule"/>'
+    },
+    package: {
+        createPackageURL : '<portlet:resourceURL id="createPackage"/>',
+        getPackageURL : '<portlet:resourceURL id="getPackage"/>',
+        getPackagesURL : '<portlet:resourceURL id="getPackages"/>',
+        editPackageURL : '<portlet:resourceURL id="editPackage"/>',
+        deletePackageURL : '<portlet:resourceURL id="deletePackage"/>'
     }
 });
 

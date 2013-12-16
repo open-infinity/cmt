@@ -274,11 +274,11 @@
 
     function submitTemplate(mode){
         var outData = {};
-        outData["templateId"] = parseInt(dlg.templateId.text());
-        outData["templateName"] = dlg.templateName.val();
-        outData["templateDescription"] = dlg.templateDescription.val();
-        outData["elementsSelected"] = JSON.stringify(getSelectedElements());
-        outData["organizationsSelected"] = JSON.stringify(getSelectedOrganizations());
+        outData.templateId = parseInt(dlg.templateId.text());
+        outData.templateName = dlg.templateName.val();
+        outData.templateDescription = dlg.templateDescription.val();
+        outData.elementsSelected = JSON.stringify(getSelectedElements());
+        outData.organizationsSelected = JSON.stringify(getSelectedOrganizations());
 
         $.post((mode == "edit") ? portletURL.url.template.editTemplateURL : portletURL.url.template.createTemplateURL, outData)
         .done(function(){
