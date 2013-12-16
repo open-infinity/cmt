@@ -25,6 +25,7 @@ input[type="text"].dlg-error-input{border-color:red;border-radius:2px;margin-lef
 .dlg-edit-template-organization-id{float:left;width:40px;}
 .dlg-edit-template-organization-name{text-align:right;}
 #edit-template-fields textarea, input{padding:1px;}
+.dlg-item-selection-container{height:300px;}
 
 
 /* Element edit/create dialog */
@@ -32,7 +33,7 @@ input[type="text"].dlg-error-input{border-color:red;border-radius:2px;margin-lef
 .dlg-element-value-label{width: 130px;margin-top:5px;float:left;}
 #dlg-element-value-id{padding-top:5px;}
 .dlg-element-dependee-name{float:left;width:125px;}
-#dlg-dependency-selection-container{height:300px;}
+/*#dlg-dependency-selection-container{height:300px;}*/
 #dlg-keys li {width:155px;margin:0 0 0 10px;padding:5px 0px 5px 5px;border-radius:5px;}
 #dlg-list-keys-container{width:200px}
 #dlg-list-keys-container li{width:152px}

@@ -48,6 +48,27 @@
                 console.log("Error fetching items for dialog");
                 });
             */
+            $.when(
+
+                    $.ajax({
+                        url: portletURL.url.module.getPackagesURL + "&moduleId=" + id,
+                        dataType: "json"
+                    }),
+                    $.ajax({
+                        url: portletURL.url.module.getParameterKeysAndValuesURL + "&moduleId=" + id,
+                        dataType: "json"
+                    }))
+                .done(function(dataPackages, dataKeyValues){
+                    dlg.keyCount = 0;
+                    dlg.model.parameters = dataKeyValues[0];
+                    console.log("received parameters:" + dlg.model.parameters);
+                    populatePackages(dataPackages[0]);
+                    showViewSelectedKeyInitial(dataKeyValues[0]);
+                    configureEventHandling();
+                    })
+                .fail(function(jqXHR, textStatus, errorThrown) {
+                    console.log("Error fetching items for dialog");
+                    });
             dlg.open("edit");
         },
 
@@ -56,11 +77,11 @@
             var title;
             if (mode == "edit"){
                 //dlg.html.idContainer.show();
-                title = "Edit element";
+                title = "Edit module";
             }
             else if (mode == "create"){
                 //dlg.html.idContainer.hide();
-                title = "Create new element";
+                title = "Create new module";
             }
             else{
                 console.log("Unexpected mode for dialog.");
@@ -224,6 +245,26 @@
                 }
             }
         });
+    }
+    
+    function populatePackages(data){
+        try{
+            var selectedIndices = [];
+
+            $.each(data.selected, function(index, value){
+               storeDependeesToDom(tpl.dependee, value, dlg.html.selectedDependeesList);
+               selectedIndices.push(value.id);
+            });
+
+            $.each(data.available, function(index, value){
+               if (selectedIndices.indexOf(value.id) == -1){
+                   storeDependeesToDom(tpl.dependee, value, dlg.html.availableDependeesList);
+               }
+            });
+        }
+        catch(err){
+            console.log(err.message);
+        }
     }
     /*
     function bindDependencyListItemClicks(){

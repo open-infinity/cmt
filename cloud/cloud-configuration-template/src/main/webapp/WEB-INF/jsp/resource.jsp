@@ -31,20 +31,21 @@ portletURL.initialize({
     element: {
     	getElementURL : '<portlet:resourceURL id="getElement"/>',
     	getElementsURL : '<portlet:resourceURL id="getElements"/>',
+    	getAllAvailableDependenciesURL : '<portlet:resourceURL id="getAllAvailableDependencies"/>',
+    	getModulesURL : '<portlet:resourceURL id="getModules"/>',
     	editElementURL : '<portlet:resourceURL id="editElement"/>',
     	createElementURL : '<portlet:resourceURL id="createElement"/>',
         deleteElementURL : '<portlet:resourceURL id="deleteElement"/>',
     	getDependenciesURL : '<portlet:resourceURL id="getDependencies"/>',
-    	getAllAvailableDependenciesURL : '<portlet:resourceURL id="getAllAvailableDependencies"/>',
-    	getParameterKeysAndValuesURL : '<portlet:resourceURL id="getParameterKeysAndValues"/>',
     },
     module: {
     	getModuleURL : '<portlet:resourceURL id="getModule"/>',
     	getModulesURL : '<portlet:resourceURL id="getModules"/>',
+    	getPackagesURL : '<portlet:resourceURL id="getPackages"/>',
+    	getParameterKeysAndValuesURL : '<portlet:resourceURL id="getParameterKeysAndValues"/>',
     	editModuleURL : '<portlet:resourceURL id="editModule"/>',
     	createModuleURL : '<portlet:resourceURL id="createModule"/>',
-        deleteModuleURL : '<portlet:resourceURL id="deleteModule"/>',
-    	getKeysAndValuesURL : '<portlet:resourceURL id="getKeysAndValues"/>'
+        deleteModuleURL : '<portlet:resourceURL id="deleteModule"/>'
     }
 });
 

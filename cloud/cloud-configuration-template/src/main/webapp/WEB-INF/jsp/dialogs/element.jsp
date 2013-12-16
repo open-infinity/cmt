@@ -26,7 +26,7 @@
 
 <%@ taglib prefix="portlet" uri="http://java.sun.com/portlet"%>
 
-<%-- Element edit and create dialog --%>
+<%-- Configuration Element edit and create dialog --%>
 
 <div id="dlg-element">
 
@@ -34,13 +34,11 @@
 	<div id="dlg-element-tabs">
 		<ul>
 			<li><a href="#dlg-element-general-tab">General</a></li>
-			<li><a href="#dlg-element-dependencies-tab">Dependencies</a></li>
-			<%--
-			<li><a href="#dlg-element-keys-tab">Keys</a></li>
-			--%>
+			<li><a href="#dlg-element-dependencies-tab">Dependencies </a></li>
+			<li><a href="#dlg-element-modules-tab">Modules</a></li>
 		</ul>
 
-		<%-- General --%>
+		<%-- General Configuration Element data--%>
 		<div id="dlg-element-general-tab">
 			<div id="dlg-element-fields" class="dlg-tab-items-container">
 				<div class="dlg-input-container">
@@ -92,9 +90,9 @@
 			</div>
 		</div>
 
-		<%-- Dependees for element --%>
+		<%-- Other Configuration Elements as dependees for Configuration Element --%>
 		<div id="dlg-element-dependencies-tab">
-			<div id="dlg-dependency-selection-container"
+			<div class="dlg-item-selection-container"
 				class="dlg-tab-items-container">
 				<div class="dlg-list-panel-container dlg-tab-item">
 					<div class="dlg-list-panel-container-title">Dependees</div>
@@ -121,29 +119,33 @@
 				</div>
 			</div>
 		</div>
-
-		<%-- Keys for element  --%>
-
-		<%--
-
-	        <div id="dlg-element-keys-tab">
-                <div id="dlg-keys-values-container" class ="dlg-tab-items-container">
-                    <div class="dlg-list-panel-container dlg-tab-item">
-                        <div id="dlg-list-keys-container" class="dlg-list-panel-container-title">Keys</div>
-                        <div id="dlg-keys" class="dlg-item-list-container">
-                            <ul></ul>
-                        </div>
-                    </div>
-                    <div id="dlg-list-values-container" class="dlg-list-panel-container dlg-tab-item">
-                        <div class="dlg-list-panel-container-title">Values for key:<span id="dlg-element-key-name"></span></div>
-                        <div id="dlg-values" class="dlg-item-list-container">
-                            <ul></ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            --%>
+		
+		<%-- Installation Modules for Configuration Element --%>
+		<div id="dlg-element-modules-tab">
+			<div class="dlg-item-selection-container" class="dlg-tab-items-container">
+				<div class="dlg-list-panel-container dlg-tab-item">
+					<div class="dlg-list-panel-container-title">Selected</div>
+					<div class="dlg-list-panel-container-columns">
+						<div class="list-item-column">Name</div>
+						<div>Version</div>
+					</div>
+					<div id="dlg-element-selected-modules" class="dlg-item-list-container">
+						<ul></ul>
+					</div>
+				</div>
+				<div class="dlg-arrows-img dlg-tab-item"></div>
+				<div class="dlg-list-panel-container dlg-tab-item">
+					<div class="dlg-list-panel-container-title">Available</div>
+					<div class="dlg-list-panel-container-columns">
+						<div class="list-item-column">Name</div>
+						<div>Version</div>
+					</div>
+					<div id="dlg-element-available-dependees" class="dlg-item-list-container">
+						<ul></ul>
+					</div>
+				</div>
+			</div>
+		</div>
 
 	</div>
 </div>

@@ -204,6 +204,14 @@ jQuery(function($){
             app.elementsTable.setGridParam({datatype:'json', page:1}).trigger('reloadGrid');
         },
 
+        reloadModulesTable: function(){
+            app.modulesTable.setGridParam({datatype:'json', page:1}).trigger('reloadGrid');
+        },
+        
+        reloadPackagesTable: function(){
+            app.packagesTable.setGridParam({datatype:'json', page:1}).trigger('reloadGrid');
+        },
+
         reloadTable: function(argTable){
             return (function(){
                 var table = argTable;
@@ -257,7 +265,7 @@ jQuery(function($){
         create : function(dialog){
             return function(){
                 dialog.create();
-            }
+            };
         },
 
         deleteTemplate : function(){
