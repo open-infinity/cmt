@@ -4,6 +4,7 @@ ehcache.multi.vm.config.location=/ehcache/liferay-multi-vm-clustered.xml
 
 
 cluster.link.enabled=true
+cluster.link.autodetect.address=<%= dbaddress %>:3306
 lucene.replicate.write=true
 
 multicast.group.address["cluster-link-control"]=<%= multicastaddress %>
