@@ -101,6 +101,7 @@ jQuery(function($){
             );
 
         },
+        
         setupElementsTable: function(){
             app.elementsTable.jqGrid({
                 url: portletURL.url.element.getElementsURL,
@@ -151,6 +152,7 @@ jQuery(function($){
                 {}  //  view parameters
             );
         },
+        
         setupModulesTable: function(){
             app.modulesTable.jqGrid({
                 url: portletURL.url.module.getModulesURL,
@@ -348,20 +350,20 @@ jQuery(function($){
         },
 
         deleteModule : function(){
-                    var id = app.modulesTable.jqGrid('getGridParam','selrow');
-                    if (id == null) {
-                        alert( "Please select a row for deletion");
-                        return;
-                    }
-                    var ret = app.modulesTable.jqGrid('getRowData', id);
-                    $.ajax({
-                      url: portletURL.url.module.deleteModuleURL + "&id=" + ret.id,
-                      cache: false
-                    })
-                    .done(function() {
-                        app.reloadModulesTable();
-                    });
-                },
+            var id = app.modulesTable.jqGrid('getGridParam','selrow');
+            if (id == null) {
+                alert( "Please select a row for deletion");
+                return;
+            }
+            var ret = app.modulesTable.jqGrid('getRowData', id);
+            $.ajax({
+              url: portletURL.url.module.deleteModuleURL + "&id=" + ret.id,
+              cache: false
+            })
+            .done(function() {
+                app.reloadModulesTable();
+            });
+        },
 
         deletePackage : function(){
             var id = app.packagesTable.jqGrid('getGridParam','selrow');
@@ -398,6 +400,7 @@ jQuery(function($){
                     });
             });
         },
+        
         editTableRow: function(argTable, argDialog){
             return (function(){
                 var table = argTable;
@@ -414,6 +417,7 @@ jQuery(function($){
             });
         }
     });
+      
 	app.init();
 	app.setupTemplatesTable();
 	app.setupElementsTable();

@@ -28,3 +28,15 @@ function itemSelectConfigureDragAndDrop(widget){
         }
     });
 }
+
+function validateItems(items){
+    res = true;
+    for (var i = 0; i < items.length; i++){
+        if (!isPosInt(items[i]) || items[i] < 0){
+            res = false;
+            alert(err.invalidItems);
+            break;
+         }
+    }
+    return res;
+}

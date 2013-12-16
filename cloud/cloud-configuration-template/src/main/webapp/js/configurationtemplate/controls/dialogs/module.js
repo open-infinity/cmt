@@ -1,13 +1,24 @@
 (function($) {
 
-    //var app = window.app || {};
     var dlg = window.app.dialog.module || {};
     //var infoDlg = window.app.dialog.info;
-
+    
     dlg.mode =  null;
-    dlg.state = {};
+    
     dlg.model = {};
+    dlg.model.parameters = null;
+    
+    dlg.state = {};
+    dlg.state.selectedKey = null;
+    
     dlg.html = {};
+    dlg.html.module = {};
+    dlg.html.module.id = $("#dlg-module-value-id");
+    dlg.html.module.type = $("#dlg-module-value-type");
+    dlg.html.module.name = $("#dlg-module-value-name");
+    dlg.html.module.version = $("#dlg-module-value-version");
+    dlg.html.module.description = $("#dlg-module-value-description");
+    
     dlg.html.self = $("#dlg-module");
 
     $.extend(dlg, {
@@ -21,7 +32,13 @@
                 url: portletURL.url.module.getModuleURL + "&moduleId=" + id,
                 dataType: "json"
                 }).done(function(data) {
-                console.log(data);	
+                	console.log(data);	
+                	dlg.html.module.id.text(data.id);
+                    dlg.html.module.type.val(data.type);
+                    dlg.html.module.name.val(data.name);
+                    dlg.html.module.version.val(data.version);
+                    dlg.html.module.description.val(data.description);
+                    
                 }).fail(function(jqXHR, textStatus, errorThrown) {
                     console.log("Error fetching installation module");
             });
@@ -72,7 +89,7 @@
 
         close : function(){
             // cleanup dialog html elements
-
+        	cleanUpDialog(dlg.html.self);
             // clear error styles
 
             // close jQuery dialog
@@ -90,9 +107,9 @@
         height: 560 ,
         buttons: {
             "Submit changes": function() {
-                //if (submitModule(dlg.mode) === 0){
-                //    dlg.close();
-                //}
+                if (submitModule(dlg.mode) === 0){
+                    dlg.close();
+                }
             },
             Cancel: function() {
                 dlg.close();
@@ -103,71 +120,58 @@
     // Cleanup
 
     function cleanUpDialog(that){
-        /*
-        that.find(".dlg-item-list-container").find("ul").empty();
-        dlg.html.keyName.text("");
-        dlg.html.elem.id.text("");
-        dlg.html.elem.type.val("");
-        dlg.html.elem.version.val("");
-        dlg.html.elem.name.val("");
-        dlg.html.elem.description.val("");
-        dlg.html.elem.minMachines.val("");
-        dlg.html.elem.maxMachines.val("");
-        dlg.html.elem.replicated.find("input").first().prop('checked', false);
-        dlg.html.elem.replicated.find("input").last().prop('checked', true);
-        dlg.html.elem.minReplicationMachines.val("");
-        dlg.html.elem.maxReplicationMachines.val("");
+    	that.find(".dlg-item-list-container").find("ul").empty();
+    	dlg.html.module.id.text("");
+        dlg.html.module.type.val("");
+        dlg.html.module.name.val("");
+        dlg.html.module.version.val("");
+        dlg.html.module.description.val("");
         delete dlg.model.parameters;
         dlg.state.selectedKey = null;
-
+        
         // clear error styles
         $.each(dlg.html.self.find("input"), function(index, value){
             clearStyleForErrorInput(index, $(value));
         });
-        */
     }
 
 
     // Sending data to backend
 
     function submitModule(mode){
-        var err = 0;                  submit
-        //if (updateModel() === 0){
+        var err = 0;                  
+        if (updateModel() === 0){
 
             // get input data
+            var module = getModule();
             var packages = getPackages();
-            var parameters = getElement();
 
             // validate input data
-            if (!validateInput(element, dependencies, dlg.model.parameters)){
+            if (!validateInput(module, packages, dlg.model.parameters)){
                 return;
             }
 
             // serialize input data
             var outData = {};
-            //outData.element = JSON.stringify(element);
-            //outData.dependencies = JSON.stringify(dependencies);
-            //outData.parameters = JSON.stringify(dlg.model.parameters);
+            outData.module = JSON.stringify(module);
+            outData.packages = JSON.stringify(packages);
+            outData.parameters = JSON.stringify(dlg.model.parameters);
 
             // send input data
-            //console.log("Posting module parameters:" + outData.parameters);
-            /*
-            $.post((mode == "edit") ? portletURL.url.element.editElementURL : portletURL.url.element.createElementURL, outData)
+            console.log("Posting module parameters:" + outData.parameters);
+            
+            $.post((mode == "edit") ? portletURL.url.module.editModuleURL : portletURL.url.module.createModuleURL, outData)
             .done(function(){
-                app.reloadElementsTable();
+                app.reloadModulesTable();
             })
             .fail(function(jqXHR, textStatus, errorThrown) {
                 alertPostFailure(dlg.mode, textStatus, errorThrown);
                 err = 2;
             });
-            */
-        //}
-        /*)
-        else{
+        } else{
             console.log("Invalid parameters, aborting submit");
             err = 1;
         }
-        */
         return err;
     }
 
@@ -635,18 +639,13 @@
             return selectedItems;
         }
 
-        function getElement(){
+        function getModule(){
             var e = {};
-            e.id = (dlg.mode == "edit") ? parseInt(dlg.html.elem.id.text(), 10) : -1;
-            e.type = dlg.html.elem.type.val();
-            e.name = dlg.html.elem.name.val();
-            e.version = dlg.html.elem.version.val();
-            e.description = dlg.html.elem.description.val();
-            e.minMachines = dlg.html.elem.minMachines.val();
-            e.maxMachines = dlg.html.elem.maxMachines.val();
-            e.replicated = dlg.html.elem.replicated.find('input[name=dlg-element-replicated-radio]:checked').val();
-            e.minReplicationMachines = dlg.html.elem.minReplicationMachines.val();
-            e.maxReplicationMachines = dlg.html.elem.maxReplicationMachines.val();
+            e.id = (dlg.mode == "edit") ? parseInt(dlg.html.module.id.text(), 10) : -1;
+            e.type = dlg.html.module.type.val();
+            e.name = dlg.html.module.name.val();
+            e.version = dlg.html.module.version.val();
+            e.description = dlg.html.module.description.val();
             return e;
         }
 
@@ -680,7 +679,7 @@
             item.addClass("dlg-error-input");
 
             // open the tab with erroneous item and focus on it
-            var inElementTab = (item.parents("#dlg-element-general-tab")).length > 0;
+            var inElementTab = (item.parents("#dlg-module-general-tab")).length > 0;
             if (inElementTab){
                 dlg.html.tabs.tabs('select', 0);
             }
@@ -1171,8 +1170,37 @@
         item.focus();
     }
     */
+        
     // Validation
 
+    function validateInput(module, pacakges, parameters){
+        var res = true;
+
+        // validate element
+        if (!isPosInt(module.id) && dlg.mode == "edit") {
+            res = false;
+            console.log("err.internalError");
+        }
+        else if (!isPosInt(module.type)){
+            res = false;
+            alertWrongInput(dlg.html.module.type, err.mustBePositiveInteger);
+        }
+        else if (module.name === ""){
+            res = false;
+            alertWrongInput(dlg.html.module.name, err.emptyItem);
+        }
+        else if (module.version === ""){
+            res = false;
+            alertWrongInput(dlg.html.module.version, err.emptyItem);
+        }
+        
+        if (res === true){
+            res = validateItems(pacakges);
+            // TODO validate parameters
+        }
+
+        return res;
+    }
 
 
 })(jQuery);

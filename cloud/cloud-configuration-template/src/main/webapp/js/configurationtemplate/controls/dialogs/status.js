@@ -1,6 +1,5 @@
 (function($) {
 
-    var app = window.app || {};
     var dlg = window.app.dialog.info || {};
     dlg.self = $("#dlg-status");
 
@@ -22,7 +21,6 @@
              });
         }
     });
-
 
     dlg.setup();
 

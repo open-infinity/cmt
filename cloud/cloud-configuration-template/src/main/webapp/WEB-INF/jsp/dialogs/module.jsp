@@ -74,8 +74,7 @@
 						<div class="list-item-column">Platform</div>
 						<div>Version</div>
 					</div>
-					<div id="dlg-module-selected-dependees"
-						class="dlg-item-list-container">
+					<div id="dlg-module-selected-dependees"	class="dlg-item-list-container">
 						<ul></ul>
 					</div>
 				</div>
