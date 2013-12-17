@@ -123,7 +123,7 @@ public class ParameterKeyRepositoryJdbcImpl implements ParameterKeyRepository {
 
     private class ParameterKeyMapper implements RowMapper<ParameterKey> {
 		public ParameterKey mapRow(ResultSet resultSet, int rowNum) throws SQLException {
-		    return new ParameterKey(resultSet.getInt("id"), resultSet.getInt("moduleId"), resultSet.getString("name"));
+		    return new ParameterKey(resultSet.getInt("id"), resultSet.getInt("module_id"), resultSet.getString("name"));
 		}
 	}
 

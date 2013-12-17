@@ -66,8 +66,9 @@
 
 		<%-- Packages for module --%>
 		<div id="dlg-module-packages-tab">
-			<div id="dlg-package-selection-container"
-				class="dlg-tab-items-container">
+		    <div id="dlg-module-packages-item-select" class='dlg-tab-items-container'></div>
+		    <%--
+			<div id="dlg-package-selection-container" class="dlg-tab-items-container">
 				<div class="dlg-list-panel-container dlg-tab-item">
 					<div class="dlg-list-panel-container-title">Dependees</div>
 					<div class="dlg-list-panel-container-columns">
@@ -91,6 +92,7 @@
 					</div>
 				</div>
 			</div>
+			--%>
 		</div>
 
 		<%-- Keys and values for module  --%>

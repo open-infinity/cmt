@@ -18,7 +18,19 @@
  * @since 1.3.0
  */
 
+function validateItems(items){
+    res = true;
+    for (var i = 0; i < items.length; i++){
+        if (!isPosInt(items[i]) || items[i] < 0){
+            res = false;
+            alert(err.invalidItems);
+            break;
+        }
+    }
+    return res;
+}
 
-
-
+function isPosInt(obj){
+    return (obj !== "" && typeof obj !== 'undefined' && !isNaN(obj) && (Math.round(obj) == obj) && obj > 0) ? true : false;
+}
 

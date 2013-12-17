@@ -7,6 +7,7 @@
 		<icon>/icon.png</icon>
 		<instanceable>true</instanceable>
 		<header-portlet-css>/css/oi.configurationtemplate.css</header-portlet-css>
+		<header-portlet-css>/css/oi.itemselect.css</header-portlet-css>
         <header-portlet-css>/css/plugins/ui.jqgrid.css</header-portlet-css>
 		<header-portlet-javascript>/js/plugins/jquery.metadata.js</header-portlet-javascript>
 		<header-portlet-javascript>/js/plugins/i18n/grid.locale-en.js</header-portlet-javascript>
