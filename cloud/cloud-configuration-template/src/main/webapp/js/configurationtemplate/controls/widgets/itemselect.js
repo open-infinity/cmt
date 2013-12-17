@@ -29,6 +29,12 @@ function itemSelectConfigureDragAndDrop(widget){
     });
 }
 
+function itemSelectBindEvents(widget){
+    widget.find("li").click(function(){
+        $(this).toggleClass("ui-state-highlight");
+    });
+}
+
 function validateItems(items){
     res = true;
     for (var i = 0; i < items.length; i++){

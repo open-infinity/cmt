@@ -179,11 +179,17 @@
 
     function configureEventHandling(){
 
+        //itemSelect events
         itemSelectConfigureDragAndDrop();
-        /*
-        bindDependencyListItemClicks();
+
+        // Parameter key-value events
         bindKeyListItemClicks();
         bindNewItemInputClicks();
+        bindDeleteKeysButtonsClick($(".dlg-module-list-item-delete-button", "#dlg-keys"));
+
+
+        /*
+
         bindDeleteKeysButtonsClick($(".dlg-element-list-item-delete-button", "#dlg-keys"));
         bindNewKeyButtonClick();
         bindInputClicksAndKeys();
@@ -215,15 +221,10 @@
         }
     }
 
-       function bindDependencyListItemClicks(){
-             $("li", "#dlg-dependency-selection-container").
-                click(function(){
-                    $(this).toggleClass("ui-state-highlight");
-             });
-        }
+
 
         function bindGeneralAttributeInputClicks(){
-            $("input","#dlg-element-general-tab").bind( "click",  function(){
+            $("input","#dlg-module-general-tab").bind( "click",  function(){
                 clearStyleForErrorInput(0, $(this));
             });
         }
@@ -265,7 +266,7 @@
         }
 
         function bindInputClicksAndKeys(){
-            var inputs = $("input", "#dlg-element-fields");
+            var inputs = $("input", "#dlg-module-fields");
             inputs.bind("click", function(){
                 clearStyleForErrorInput(0, $(this));
             });
@@ -309,7 +310,7 @@
         }
 
         function bindNewKeyButtonClick(){
-            $(".dlg-element-new-key-button").bind( "click", function(){
+            $(".dlg-module-new-key-button").bind( "click", function(){
 
                 // fetch the new key
                 var keyInput = $(this).parent("li").find("input");
@@ -364,7 +365,7 @@
                 unbindKeyHandlers();
                 bindKeyListItemClicks();
                 bindNewItemInputClicks();
-                bindDeleteButtonsClick($(".dlg-element-list-item-delete-button"));
+                bindDeleteButtonsClick($(".dlg-module-list-item-delete-button"));
                 bindNewKeyButtonClick();
             });
         }
@@ -395,7 +396,7 @@
         }
         function bindRadioChange(){
             dlg.html.elem.replicated.find("input").on('change', function(){
-                var replicated = dlg.html.elem.replicated.find('input[name=dlg-element-replicated-radio]:checked').val();
+                var replicated = dlg.html.elem.replicated.find('input[name=dlg-module-replicated-radio]:checked').val();
                 toggleReplicatedMachinesInput(replicated);
             });
         }
@@ -415,15 +416,15 @@
             $("input", ".key", "#dlg-keys").unbind();
             findNewKeyInput().unbind();
             findNewValueInput().unbind();
-            $(".dlg-element-list-item-delete-button").unbind();
-            $(".dlg-element-new-key-button").unbind();
+            $(".dlg-module-list-item-delete-button").unbind();
+            $(".dlg-module-new-key-button").unbind();
         }
 
         function unbindValueHandlers(){
             findNewKshowViewSelectedKeyInitialeyInput().unbind();
             findNewValueInput().unbind();
-            $(".dlg-element-list-item-delete-button").unbind();
-            $(".dlg-element-new-value-button", "#dlg-values").unbind();
+            $(".dlg-module-list-item-delete-button").unbind();
+            $(".dlg-module-new-value-button", "#dlg-values").unbind();
         }
 
         // View management functions
@@ -506,8 +507,8 @@
         function storeDependeesToDom(htmlTemplate, value, list){
             list.append(htmlTemplate);
             var lastChild = list.find("li:last-child");
-            lastChild.find(".dlg-element-dependee-name").text(value.name.substring(0, 17));
-            lastChild.find(".dlg-element-dependee-version").text(value.version.substring(0, 5));
+            lastChild.find(".dlg-module-dependee-name").text(value.name.substring(0, 17));
+            lastChild.find(".dlg-module-dependee-version").text(value.version.substring(0, 5));
             lastChild.data("config", value);
         }
 
@@ -520,7 +521,7 @@
                 }
                 else {
                     lastChild.find(".dlg-key-name").val(msg.addNewKey).css("color", "silver");
-                    lastChild.find(".dlg-element-list-item-button").text("+").addClass("dlg-element-new-key-button").removeClass("dlg-element-list-item-delete-button").removeClass("key");
+                    lastChild.find(".dlg-module-list-item-button").text("+").addClass("dlg-module-new-key-button").removeClass("dlg-module-list-item-delete-button").removeClass("key");
                 }
                 return lastChild;
         }
@@ -530,14 +531,14 @@
                 var lastChild = list.find("li:last-child");
                 if (paramValue !== null && index!== null){
                     lastChild.find(".dlg-value-value").val(paramValue);
-                    bindDeleteValuesButtonsClick(lastChild.find(".dlg-element-list-item-delete-button"));
+                    bindDeleteValuesButtonsClick(lastChild.find(".dlg-module-list-item-delete-button"));
                     lastChild.data("index", index);
                 }
                 else{
                     // create a new value item
                     lastChild.find(".dlg-value-value").val(msg.addNewValue).css("color", "silver");
-                    var addButton = lastChild.find(".dlg-element-list-item-button");
-                    addButton.text("+").addClass("dlg-element-new-value-button").removeClass("dlg-element-list-item-delete-button");
+                    var addButton = lastChild.find(".dlg-module-list-item-button");
+                    addButton.text("+").addClass("dlg-module-new-value-button").removeClass("dlg-module-list-item-delete-button");
 
                     // bind events for new value item
                     bindKeyValueInputClicks(lastChild.find("input"));
@@ -554,7 +555,7 @@
 
         // Style handling functions
 
-        function moveMultipleElements(list, selected) {
+        function moveMultipleModules(list, selected) {
             $(selected).each(function () {
                 $(this).appendTo(list).removeClass("ui-state-highlight").fadeIn();
             });
@@ -583,7 +584,7 @@
         // for each key, check if possibly edited key name is matching with the value stored in model.
         function updateKeysModel(){
             var err = 0;
-            var arrayOfKeyLis = dlg.html.parameterKeysList.find(".dlg-element-key-value-list-item");
+            var arrayOfKeyLis = dlg.html.parameterKeysList.find(".dlg-module-key-value-list-item");
             for(var i = 0; i < arrayOfKeyLis.length - 1; i++){
                 var li = $(arrayOfKeyLis[i]);
                 var keyName = li.data("keyName");
@@ -601,7 +602,7 @@
         function updateValuesModel(){
             var err = 0;
             if (isSelectedKeyInModel()){
-                var arrayOfValueLis = dlg.html.parameterValuesList.find(".dlg-element-key-value-list-item");
+                var arrayOfValueLis = dlg.html.parameterValuesList.find(".dlg-module-key-value-list-item");
                 var values = [];
                 for (var i = 0; i < arrayOfValueLis.length - 1; i++){
                     var value = getParameterValue($(arrayOfValueLis[i]));
@@ -661,11 +662,11 @@
         }
 
         function findNewKeyInput(){
-            return dlg.html.parameterKeysList.find(".dlg-element-new-key-button").parent().find("input");
+            return dlg.html.parameterKeysList.find(".dlg-module-new-key-button").parent().find("input");
         }
 
         function findNewValueInput(){
-            return $(".dlg-element-new-value-button").parent().find("input");
+            return $(".dlg-module-new-value-button").parent().find("input");
         }
 
         // Alerts
@@ -679,8 +680,8 @@
             item.addClass("dlg-error-input");
 
             // open the tab with erroneous item and focus on it
-            var inElementTab = (item.parents("#dlg-module-general-tab")).length > 0;
-            if (inElementTab){
+            var inModuleTab = (item.parents("#dlg-module-general-tab")).length > 0;
+            if (inModuleTab){
                 dlg.html.tabs.tabs('select', 0);
             }
             else{
@@ -1173,10 +1174,10 @@
         
     // Validation
 
-    function validateInput(module, pacakges, parameters){
+    function validateInput(module, packages, parameters){
         var res = true;
 
-        // validate element
+        // validate module
         if (!isPosInt(module.id) && dlg.mode == "edit") {
             res = false;
             console.log("err.internalError");
@@ -1195,7 +1196,7 @@
         }
         
         if (res === true){
-            res = validateItems(pacakges);
+            res = validateItems(packages);
             // TODO validate parameters
         }
 
