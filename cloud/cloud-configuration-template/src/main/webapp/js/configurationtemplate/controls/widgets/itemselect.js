@@ -40,7 +40,7 @@
                 widget.html.root = $("<div class='is-container'></div>");
                 widget.html.panelSelected = $("<div class='is-panel dlg-tab-item'></div>");   //dlg-list-panel-container
                 widget.html.panelAvailable = $("<div class='is-panel dlg-tab-item'></div>");
-                widget.html.placeholder = $("<div class=dlg-arrows-img dlg-tab-item></div>");
+                widget.html.placeholder = $("<div class='is-placeholder dlg-tab-item'></div>");
                 widget.html.panelSelectedTitle = $("<div class='is-panel-title'>" + widget.settings.text.selected.title + "</div>");
                 widget.html.panelAvailableTitle = $("<div class='is-panel-title'>" + widget.settings.text.available.title + "</div>");
                 widget.html.panelSelectedColumns = $("<div class='is-panel-columns'></div>");
