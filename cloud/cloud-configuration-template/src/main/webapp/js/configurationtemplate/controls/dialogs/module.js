@@ -48,7 +48,6 @@
                     console.log("Error fetching installation module");
             });
             $.when(
-
                     $.ajax({
                         url: portletURL.url.module.getPackagesForModuleURL + "&moduleId=" + id,
                         dataType: "json"
@@ -126,8 +125,7 @@
     // Cleanup
 
     function cleanUpDialog(that){
-    	//that.find(".dlg-item-list-container").find("ul").empty();
-    	dlg.html.packages.itemselect("clean");
+    	dlg.html.packages.itemselect("destroy");
     	dlg.html.module.id.text("");
         dlg.html.module.type.val("");
         dlg.html.module.name.val("");
