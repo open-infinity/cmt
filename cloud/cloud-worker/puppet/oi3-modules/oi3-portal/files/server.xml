@@ -32,6 +32,11 @@
   <Listener className="org.apache.catalina.mbeans.GlobalResourcesLifecycleListener" />
   <Listener className="org.apache.catalina.core.ThreadLocalLeakPreventionListener" />
 
+
+  <!-- Open Infinity IdentityContext listener -->
+  <Listener className="org.openinfinity.sso.security.context.grid.IdentityContext" />
+
+
   <!-- Global JNDI resources
        Documentation at /docs/jndi-resources-howto.html
   -->
@@ -135,6 +140,9 @@
         <Valve className="org.apache.catalina.valves.AccessLogValve" directory="logs"
                prefix="localhost_access_log." suffix=".txt"
                pattern="%h %l %u %t &quot;%r&quot; %s %b" />
+
+        <!-- Open Infinity Security Vault -->
+        <Valve className="org.openinfinity.sso.valve.AttributeBasedSecurityVaultValve" />
 
       </Host>
     </Engine>

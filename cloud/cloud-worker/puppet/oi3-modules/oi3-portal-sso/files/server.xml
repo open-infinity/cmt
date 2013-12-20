@@ -20,8 +20,6 @@
      Documentation at /docs/config/server.html
  -->
 <Server port="8005" shutdown="SHUTDOWN">
-  <!-- TomEE plugin for Tomcat -->
-  <Listener className="org.apache.tomee.loader.OpenEJBListener" />
   <!-- Security listener. Documentation at /docs/config/listeners.html
   <Listener className="org.apache.catalina.security.SecurityListener" />
   -->
@@ -142,10 +140,10 @@
         <Valve className="org.apache.catalina.valves.AccessLogValve" directory="logs"
                prefix="localhost_access_log." suffix=".txt"
                pattern="%h %l %u %t &quot;%r&quot; %s %b" />
-
+	
+<!--	<Valve className="org.openinfinity.security.spring.catalina.v7.Valve"/> -->
         <!-- Open Infinity Security Vault -->
         <Valve className="org.openinfinity.sso.valve.AttributeBasedSecurityVaultValve" />
-
       </Host>
     </Engine>
   </Service>
