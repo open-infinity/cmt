@@ -87,6 +87,9 @@
         clean : function(){
             $("ul", $(this)).empty();
         },
+        destroy : function(){
+        	$(this).empty();
+        },
         getVal : function(){
             var selectedIndices = [];
                 var lis = widget.html.selected.find("li");

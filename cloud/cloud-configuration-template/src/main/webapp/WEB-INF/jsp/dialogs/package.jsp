@@ -26,6 +26,45 @@
 
 <%@ taglib prefix="portlet" uri="http://java.sun.com/portlet"%>
 
-<%-- Templates edit and create dialog --%>
+<%-- Package edit and create dialog --%>
 
-<div></div>
+<div id="dlg-package">
+
+	<%-- Tabs --%>
+	<div id="dlg-package-tabs">
+		<ul>
+			<li><a href="#dlg-package-general-tab">General</a></li>
+			<li><a href="#dlg-package-upload-tab">Upload</a></li>
+		</ul>
+
+		<%-- General --%>
+		<div id="dlg-package-general-tab">
+			<div id="dlg-package-fields" class="dlg-tab-items-container">
+				<div class="dlg-input-container">
+					<div class="dlg-package-value-label">Id</div>
+					<div id="dlg-package-value-id"></div>
+				</div>
+				<div class="dlg-input-container">
+					<div class="dlg-package-value-label">Type</div>
+					<input id="dlg-package-value-type" type='text' value='' />
+				</div>
+				<div class="dlg-input-container">
+					<div class="dlg-package-value-label">Name</div>
+					<input id="dlg-package-value-name" type='text' value='' />
+				</div>
+				<div class="dlg-input-container">
+					<div class="dlg-package-value-label">Version</div>
+					<input id="dlg-package-value-version" type='text' value='' />
+				</div>
+				<div class="dlg-input-container">
+					<div class="dlg-package-value-label">Description</div>
+					<textarea id="dlg-package-value-description" rows="3" cols="40"></textarea>
+				</div>
+			</div>
+		</div>
+
+		<%-- Packages for package --%>
+		<div id="#dlg-package-upload-tab"></div>
+
+	</div>
+</div>

@@ -110,8 +110,8 @@ public class InstallationPackageRepositoryJdbcImpl implements InstallationPackag
 		public InstallationPackage mapRow(ResultSet resultSet, int rowNum) throws SQLException {    
 		    return new InstallationPackage(
                     resultSet.getInt("id"),
-                    resultSet.getString("version"),
                     resultSet.getString("name"),
+                    resultSet.getString("version"),
                     resultSet.getString("description"));
 		}
 	}
