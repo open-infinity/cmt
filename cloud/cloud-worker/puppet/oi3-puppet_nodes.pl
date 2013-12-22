@@ -32,11 +32,11 @@ if($hostname eq "galeratesti1") {
         push(@class, "oi3-mariadbgalera");
 
         %parameters = (
-                rootpass => "passu",
-                galeraClusterAddress => "10.99.1.2,10.99.1.3,10.33.1.4",
-                galeraNodeAddress => "10.99.1.2",
-                galeraNodeName => "node1",
-                galeraRootPassword => "passu"
+                rootpass => "xxxx",
+                galeraClusterAddress => "xxxx",
+                galeraNodeAddress => "xxxx",
+                galeraNodeName => "xxxx",
+                galeraRootPassword => "xxxx"
         );
 
         print Dump({
@@ -130,15 +130,15 @@ if ($instance eq "93" && $hostname ne "omatrafitestdb1.trafi.fi" && $hostname ne
                 public_ip => $dns_name,
                 hostname => $node_hostname,
 		java_home => "/etc/alternatives/jre_1.7.0",
-		mail_host => "gate33.gw.tietoenator.com",
-		mail_from => "support.toas\@tieto.com",
-		default_mail_recepient => "DLSupportToas\@tieto.com",
+		mail_host => "xxxx",
+		mail_from => "xxxx",
+		default_mail_recepient => "xxxx",
 		oi_collectd_root => "/opt/openinfinity/3.0.0/healthmonitoring/collectd",
                 oi_rrd_http_server_root => "/opt/openinfinity/3.0.0/healthmonitoring/rrd-http-server",
 		oi_monitoring_root => "/opt/openinfinity/3.0.0/healthmonitoring/nodechecker",
                 cluster_member_data => \@datalist,
-                tomcat_monitor_role_pwd => "oy1Eewai",
-                tomcat_jmx_port => "65329",
+                tomcat_monitor_role_pwd => "xxxx",
+                tomcat_jmx_port => "xxxx",
                 threshold_warn_max_jvm_committed =>, roundup($ram * .75 * .95 * 1000000 , 10),
 	);
 
@@ -150,23 +150,23 @@ if($hostname eq "omatrafitest1.trafi.fi") {
         push(@class, "oi3-basic", "oi3-ebs", "oi3-portal", "oi3-lttwatch");
 
         %parameters = (
-	    activiti_password => "toas",
-	    amq_password => "toas",
-	    backup_dir => "backup/55/188",
-	    backup_host => "131.207.105.13",
-	    backup_source_dir => "/opt/openinfinity",
-	    backup_user => "toas-backup",
-	    dbaddress => "10.98.17.161",
+	    activiti_password => "xxxx",
+	    amq_password => "xxxx",
+	    backup_dir => "xxxx",
+	    backup_host => "xxxx",
+	    backup_source_dir => "xxxx",
+	    backup_user => "xxxx",
+	    dbaddress => "xxxx",
 	    ebsDeviceName => "''",
 	    ebsVolumeUsed => "false",
 	    jvmmem => "1540",
 	    jvmperm => "512",
-	    liferay_db_password => "toas",
-	    multicastaddress => "224.2.1.3",
-	    oi_dbuser_password => "toas",
-	    oi_httpuser_pwd => "toas",
+	    liferay_db_password => "xxxx",
+	    multicastaddress => "xxxx",
+	    oi_dbuser_password => "xxxx",
+	    oi_httpuser_pwd => "xxxx",
 	    ebsImageUsed => "true",
-	    tomcat_monitor_role_pwd => "toas"
+	    tomcat_monitor_role_pwd => "xxxx"
 
 
         );
@@ -186,17 +186,17 @@ if($hostname eq "omatrafitestdb1.trafi.fi") {
 
         %parameters = (
 	    
-	    activiti_password => "toas",
-	    amq_password => "toas",
+	    activiti_password => "xxxx",
+	    amq_password => "xxxx",
 	    backup_dir => "backup/55/186",
-	    backup_host => "131.207.105.13",
+	    backup_host => "xxxx",
 	    backup_source_dir => "/opt/openinfinity/2.0.0/backup/dumps",
-	    backup_user => "toas-backup",
+	    backup_user => "xxxxx",
 	    ebsDeviceName => "''",
 	    ebsVolumeUsed => "false",
-	    liferay_db_password => "toas",
-	    mysql_password => "Ca7kANP9",
-	    oi_httpuser_pwd => "toas",
+	    liferay_db_password => "xxxx",
+	    mysql_password => "xxxx",
+	    oi_httpuser_pwd => "xxxx",
 	    ebsImageUsed => "true"
 	   
         );
@@ -217,13 +217,13 @@ if($hostname eq "wms.ee.amazon.instance") {
 	      ebsVolumeUsed => "false",
 	      jvmmem => "512",
 	      jvmperm => "128",
-	      multicastaddress => "224.2.1.3",
+	      multicastaddress => "xxxx",
 	      ebsImageUsed => "true",
-	      tomcat_monitor_role_pwd => "toas",
+	      tomcat_monitor_role_pwd => "xxxx",
 	      extra_catalina_opts => "",
 	  #    extra_jvm_opts => "-DappNode=localhost -Dlog4j.configuration=/opt/openinfinity/3.0.0/tomcat/logs/wms/wms_log4j.xml -Dlog4j.debug=true -Dfocus.log=true -Dnora.log=false -Dapp.server=dynamic -Dwms.core.config.dbvalidation=false -Dapp.server.jndi.remotePre=java:global/WMS10g_ear/WMSApplicationEJB -Dapp.server.jndi.localPre=java:global/WMS10g_ear/WMSApplicationEJB -Dapp.server.jndi.datasourcebase=java: -Dwms.psl.env=localdev -Dpsl.enabled=true -Dpsl.dequeuing=true -Dwms.customer=standalone",
 	      extra_jvm_opts => "",
-	      mysql_password => "Queek7ai"
+	      mysql_password => "xxxx"
         );
 
         print Dump({
@@ -333,11 +333,11 @@ if($type eq "portal_lb" || $type eq "service_lb") {
 			backup_source_dir => "/opt/openinfinity",
 			jvmmem => $javaMem,
                         jvmperm => $javaPerm,
-			oi_httpuser_pwd => "toas",
-			amq_password => "toas",
-			activiti_password => "toas",
-			oi_dbuser_password => "toas",
-			liferay_db_password => "toas",
+			oi_httpuser_pwd => "xxxx",
+			amq_password => "xxxx",
+			activiti_password => "xxxx",
+			oi_dbuser_password => "xxxx",
+			liferay_db_password => "xxxx",
 		);
 		if($type eq "portal") {
 			push(@class, "oi3-portal");
@@ -365,11 +365,11 @@ if($type eq "portal_lb" || $type eq "service_lb") {
 			identityGatewayAddress => $igaddress,
 			identityGatewayPort => "80",
 			liferayAddress => $liferayAddress,
-			amAdminUsername => "amadmin",
-			amAdminPassword => "admin1234",
+			amAdminUsername => "xxxx",
+			amAdminPassword => "xxxx",
 			multicastaddress => $multicastaddress,
 			backup_source_dir => "/opt/openinfinity",
-			liferay_db_password => "toas",
+			liferay_db_password => "xxxx",
 			jvmmem => $javaMem,
                         jvmperm => $javaPerm,
 		);
@@ -414,15 +414,15 @@ if($type eq "portal_lb" || $type eq "service_lb") {
 	%parameters = (
                         dbaddress => $db_address,
                         idpIPAddress => $igAddress,
-                        idpPort => "80",
+                        idpPort => "xxxx",
                         spAddress => $portalAddress,
-                        spPort => "80",
+                        spPort => "xxxx",
                         serverAddress => $igAddress,
-                        serverPort => "80",
-                        dbUser => "liferay",
-                        dbPassword => "toasliferay",
-                        adminPassword => "admin1234",
-                        userAgentPassword => "toas1234",
+                        serverPort => "xxxx",
+                        dbUser => "xxxx",
+                        dbPassword => "xxxx",
+                        adminPassword => "xxxx",
+                        userAgentPassword => "xxxx",
 			backup_source_dir => "/opt/openinfinity/",
         );
 	push(@class, "oibackup");
@@ -477,7 +477,7 @@ if($type eq "portal_lb" || $type eq "service_lb") {
 			backup_source_dir => "/opt/openinfinity",
 			jvmmem => $javaMem,
 			jvmperm => $javaPerm,
-			tomcat_monitor_role_pwd => "toas",
+			tomcat_monitor_role_pwd => "xxxx",
 	);
 	push(@class, "oi3-lttwatch");
 } elsif ($type eq "ee") {
@@ -721,8 +721,8 @@ $dbh->disconnect;
 # Set backup parameters
 my %backup_parameters = (
 	# Production parameters
-	backup_host => "131.207.105.13",
-	backup_user => "toas-backup",
+	backup_host => "xxxx",
+	backup_user => "xxxx",
 	backup_dir => "backup/" . $instance . "/" . $machine,
 );
 
