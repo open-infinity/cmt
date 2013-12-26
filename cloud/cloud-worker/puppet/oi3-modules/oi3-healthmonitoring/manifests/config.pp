@@ -40,4 +40,16 @@ class oi3-healthmonitoring::config {
         content => template("oi3-healthmonitoring/threshold.conf.erb"),
         require => Class["oi3-healthmonitoring::install"],
     }
+
+    file { "/opt/openinfinity/3.0.0/healthmonitoring/nodechecker/var/lib/notifications/inbox":
+        mode => 0777,
+        require => Class["oi3-healthmonitoring::install"],
+    }
+
+    file { "/opt/openinfinity/3.0.0/healthmonitoring/nodechecker/var/lib/notifications/sent":
+        mode => 0777,
+        require => Class["oi3-healthmonitoring::install"],
+    }
+
+
 }
