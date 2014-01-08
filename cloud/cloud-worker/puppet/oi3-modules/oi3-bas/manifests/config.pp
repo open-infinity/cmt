@@ -32,6 +32,16 @@ class oi3-bas::config {
 		require => Class["oi3-bas::install"],
 	}
 
+	# Security Vault configuration
+	file {"/opt/openinfinity/3.0.0/tomcat/conf/secvault.properties":
+		ensure => present,
+		owner => 'oiuser',
+		group => 'oiuser',
+		mode => 0600,
+		source => "puppet:///modules/oi3-bas/secvault.properties",
+		require => Class["oi3-bas::install"],
+	}
+
 	file {"/opt/openinfinity/3.0.0/tomcat/conf/context.xml":
 		ensure => present,
 		owner => 'oiuser',
