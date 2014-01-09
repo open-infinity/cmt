@@ -19,6 +19,13 @@ TypesDB     "<%=oi_collectd_root%>/share/collectd/types.db"
 TypesDB     "<%=oi_collectd_root%>/share/collectd/types.db.monitoring"
 
 #----------------------------------------------------------------------------#
+# When enabled, plugins are loaded automatically with the default options    #
+# when an appropriate <Plugin ...> block is encountered.                     #
+# Disabled by default.                                                       #
+#----------------------------------------------------------------------------#
+#AutoLoadPlugin false
+
+#----------------------------------------------------------------------------#
 # Interval at which to query values. This may be overwritten on a per-plugin #
 # base by using the 'Interval' option of the LoadPlugin block:               #
 #   <LoadPlugin foo>                                                         #
@@ -26,11 +33,16 @@ TypesDB     "<%=oi_collectd_root%>/share/collectd/types.db.monitoring"
 #   </LoadPlugin>                                                            #
 #----------------------------------------------------------------------------#
 Interval     10
-
 Timeout      2
 ReadThreads  5
+WriteThreads 5
 
 Include "<%=oi_collectd_root%>/etc/collectd.d/"
+
+# Limit the size of the write queue. Default is no limit. Setting up a limit is
+# recommended for servers handling a high volume of traffic.
+#WriteQueueLimitHigh 1000000
+#WriteQueueLimitLow   800000
 
 ##############################################################################
 # Logging                                                                    #
@@ -45,13 +57,13 @@ LoadPlugin logfile
 
 <Plugin logfile>
 	LogLevel err
-#	File STDOUT
-#	Timestamp true
-#	PrintSeverity false
+	#File STDOUT
+	Timestamp true
+	#PrintSeverity false
 </Plugin>
 
 #<Plugin syslog>
-#	LogLevel info
+#	LogLevel debug
 #</Plugin>
 
 ##############################################################################
@@ -69,11 +81,13 @@ LoadPlugin logfile
 ##LoadPlugin apache
 #LoadPlugin apcups
 ##LoadPlugin apple_sensors
+##LoadPlugin aquaero
 ##LoadPlugin ascent
 #LoadPlugin battery
 ##LoadPlugin bind
 #LoadPlugin conntrack
 #LoadPlugin contextswitch
+#LoadPlugin cgroups
 LoadPlugin cpu
 #LoadPlugin cpufreq
 #LoadPlugin csv
@@ -101,6 +115,7 @@ LoadPlugin java
 ##LoadPlugin libvirt
 LoadPlugin load
 ##LoadPlugin lpar
+##LoadPlugin lvm
 #LoadPlugin madwifi
 #LoadPlugin mbmon
 #LoadPlugin md
@@ -124,9 +139,9 @@ LoadPlugin memory
 ##LoadPlugin onewire
 #LoadPlugin openvpn
 ##LoadPlugin oracle
-##<LoadPlugin perl>
-##  Globals true
-##</LoadPlugin>
+#<LoadPlugin perl>
+#  Globals true
+#</LoadPlugin>
 ##LoadPlugin pinba
 ##LoadPlugin ping
 ##LoadPlugin postgresql
@@ -142,10 +157,13 @@ LoadPlugin memory
 LoadPlugin rrdtool
 ##LoadPlugin sensors
 #LoadPlugin serial
+##LoadPlugin sigrok
 ##LoadPlugin snmp
+#LoadPlugin statsd
 #LoadPlugin swap
 #LoadPlugin table
 #LoadPlugin tail
+#LoadPlugin tail_csv
 ##LoadPlugin tape
 #LoadPlugin tcpconns
 #LoadPlugin teamspeak2
@@ -157,13 +175,15 @@ LoadPlugin rrdtool
 #LoadPlugin users
 #LoadPlugin uuid
 ##LoadPlugin varnish
+##LoadPlugin mic
 #LoadPlugin vmem
 #LoadPlugin vserver
 #LoadPlugin wireless
 #LoadPlugin write_graphite
 ##LoadPlugin write_http
-##LoadPlugin write_redis
 ##LoadPlugin write_mongodb
+##LoadPlugin write_redis
+##LoadPlugin write_riemann
 ##LoadPlugin xmms
 ##LoadPlugin zfs_arc
 
@@ -220,6 +240,11 @@ LoadPlugin rrdtool
 #<Plugin apcups>
 #	Host "localhost"
 #	Port "3551"
+#	ReportSeconds true
+#</Plugin>
+
+#<Plugin aquaero>
+#	Device ""
 #</Plugin>
 
 #<Plugin ascent>
@@ -337,6 +362,7 @@ LoadPlugin rrdtool
 #		#SelectDB "custdb0"
 #		Query "num_of_customers"
 #		#Query "..."
+#		#Host "..."
 #	</Database>
 #</Plugin>
 
@@ -438,11 +464,11 @@ LoadPlugin rrdtool
 
 <Plugin "java">
        JVMARG "-Djava.class.path=<%=oi_collectd_root%>/share/collectd/java/collectd-api.jar:<%=oi_collectd_root%>/share/collectd/java/generic-jmx.jar"
-       LoadPlugin "org.collectd.java.GenericJMX"  
+       LoadPlugin "org.collectd.java.GenericJMX"
        <Plugin "GenericJMX">
               <MBean "memory">
                      ObjectName "java.lang:type=Memory"
-      	             <Value>
+                     <Value>
                             Type "jmx_memory"
                             Table true
                             Attribute "HeapMemoryUsage"
@@ -470,8 +496,7 @@ LoadPlugin rrdtool
 #</Plugin>
 
 <Plugin load>
-    ReportAbsoluteLoad false
-    ReportRelativeLoad true
+        ReportRelative true
 </Plugin>
 
 #<Plugin lpar>
@@ -870,13 +895,16 @@ LoadPlugin rrdtool
 #	DaemonAddress "unix:/tmp/rrdcached.sock"
 #	DataDir "${prefix}/var/lib/collectd/rrd"
 #	CreateFiles true
+#	CreateFilesAsync false
 #	CollectStatistics true
 #</Plugin>
 
 <Plugin rrdtool>
-        DataDir "<%=oi_collectd_root%>/var/lib/collectd/rrd"
+	DataDir "<%=oi_collectd_root%>/var/lib/collectd/rrd"
+	CreateFilesAsync true
 	CacheTimeout 0
 	CacheFlush   10
+#	WritesPerSecond 50
 </Plugin>
 
 #<Plugin sensors>
@@ -885,6 +913,19 @@ LoadPlugin rrdtool
 #	Sensor "it8712-isa-0290/fanspeed-fan3"
 #	Sensor "it8712-isa-0290/voltage-in8"
 #	IgnoreSelected false
+#</Plugin>
+
+#<Plugin sigrok>
+#  LogLevel 3
+#  <Device "AC Voltage">
+#    Driver "fluke-dmm"
+#    MinimumInterval 10
+#    Conn "/dev/ttyUSB2"
+#  </Device>
+#  <Device "Sound Level">
+#    Driver "cem-dt-885x"
+#    Conn "/dev/ttyUSB1"
+#  </Device>
 #</Plugin>
 
 #<Plugin snmp>
@@ -927,6 +968,16 @@ LoadPlugin rrdtool
 #       Collect "powerplus_voltge_input"
 #       Interval 300
 #   </Host>
+#</Plugin>
+
+#<Plugin statsd>
+#  Host "::"
+#  Port "8125"
+#  DeleteCounters false
+#  DeleteTimers   false
+#  DeleteGauges   false
+#  DeleteSets     false
+#  TimerPercentile 90.0
 #</Plugin>
 
 #<Plugin "swap">
@@ -972,6 +1023,33 @@ LoadPlugin rrdtool
 #  </File>
 #</Plugin>
 
+#<Plugin "tail_csv">
+#   <Metric "dropped">
+#       Type "percent"
+#       Instance "dropped"
+#       ValueFrom 1
+#   </Metric>
+#   <Metric "mbps">
+#       Type "bytes"
+#       Instance "wire-realtime"
+#       ValueFrom 2
+#   </Metric>
+#   <Metric "alerts">
+#       Type "alerts_per_second"
+#       ValueFrom 3
+#   </Metric>
+#   <Metric "kpps">
+#       Type "kpackets_wire_per_sec.realtime"
+#       ValueFrom 4
+#   </Metric>
+#   <File "/var/log/snort/snort.stats">
+#       Instance "snort-eth0"
+#       Interval 600
+#       Collect "dropped" "mbps" "alerts" "kpps"
+#       TimeFrom 0
+#   </File>
+#</Plugin>
+
 #<Plugin tcpconns>
 #	ListeningPorts false
 #	LocalPort "25"
@@ -1001,7 +1079,7 @@ LoadPlugin rrdtool
 #</Plugin>
 
 #<Plugin unixsock>
-#	SocketFile ""
+#	SocketFile "/root/src/collectd/collectd-master-dev/install/var/run/collectd-unixsock"
 #	SocketGroup "collectd"
 #	SocketPerms "0660"
 #	DeleteSocket false
@@ -1009,6 +1087,24 @@ LoadPlugin rrdtool
 
 #<Plugin uuid>
 #	UUIDFile "/etc/uuid"
+#</Plugin>
+
+#<Plugin mic>
+#   ShowCPU true
+#   ShowCPUCores true
+#   ShowMemory true
+#   ShowTemperatures true
+##  Temperature Sensors can be ignored/shown by repeated #Temperature lines, and
+##  then inverted with a IgnoreSelectedTemperature.
+##  Known Temperature sensors: die, devmem, fin, fout, vccp, vddg, vddq
+#   Temperature vddg
+#   IgnoreSelectedTemperature true
+#   ShowPower true
+##  Power Sensors can be ignored/shown by repeated #Power lines, and
+##  then inverted with a IgnoreSelectedTemperature.
+##  Known Temperature sensors: total0, total1, inst, imax, pci3, c2x3, c2x4, vccp, vddg, vddq
+#   Power total1
+#   IgnoreSelectedPower true
 #</Plugin>
 
 #<Plugin varnish>
@@ -1019,15 +1115,23 @@ LoadPlugin rrdtool
 #   <Instance>
 #      CollectCache true
 #      CollectBackend true
+#      CollectBan false           # Varnish 3 only
 #      CollectConnections true
+#      CollectDirectorDNS false   # Varnish 3 only
 #      CollectSHM true
 #      CollectESI false
 #      CollectFetch false
 #      CollectHCB false
-#      CollectSMA false
+#      CollectObjects false
+#      CollectPurge false         # Varnish 2 only
+#      CollectSession false
+#      CollectSMA false           # Varnish 2 only
 #      CollectSMS false
-#      CollectSM false
+#      CollectSM false            # Varnish 2 only
+#      CollectStruct false
 #      CollectTotals false
+#      CollectUptime false
+#      CollectVCL false
 #      CollectWorkers false
 #   </Instance>
 #</Plugin>
@@ -1037,15 +1141,17 @@ LoadPlugin rrdtool
 #</Plugin>
 
 #<Plugin write_graphite>
-#  <Carbon>
+#  <Node "example">
 #    Host "localhost"
 #    Port "2003"
+#    Protocol "udp"
+#    LogSendErrors true
 #    Prefix "collectd"
 #    Postfix "collectd"
-#    StoreRates false
+#    StoreRates true
 #    AlwaysAppendDS false
 #    EscapeCharacter "_"
-#  </Carbon>
+#  </Node>
 #</Plugin>
 
 #<Plugin write_http>
@@ -1060,6 +1166,18 @@ LoadPlugin rrdtool
 #	</URL>
 #</Plugin>
 
+#<Plugin write_mongodb>
+#	<Node "example">
+#		Host "localhost"
+#		Port "27017"
+#		Timeout 1000
+#		StoreRates false
+#		Database "auth_db"
+#		User "auth_user"
+#		Password "auth_passwd"
+#	</Node>
+#</Plugin>
+
 #<Plugin write_redis>
 #	<Node "example">
 #		Host "localhost"
@@ -1068,13 +1186,16 @@ LoadPlugin rrdtool
 #	</Node>
 #</Plugin>
 
-#<Plugin write_mongodb>
+#<Plugin write_riemann>
 #	<Node "example">
 #		Host "localhost"
-#		Port "27017"
-#		Timeout 1000
-#		StoreRates false
+#		Port 5555
+#		Protocol UDP
+#		StoreRates true
+#		AlwaysAppendDS false
 #	</Node>
+#	Tag "foobar"
+#       Attribute "foo" "bar"
 #</Plugin>
 
 ##############################################################################
@@ -1156,4 +1277,3 @@ LoadPlugin rrdtool
 #    </Type>
 #  </Host>
 #</Plugin>
-
