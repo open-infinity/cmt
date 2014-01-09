@@ -2,10 +2,13 @@ package org.openinfinity.cloud.service.backup;
 
 import java.util.List;
 
+import org.openinfinity.cloud.domain.BackupOperation;
 import org.openinfinity.cloud.domain.BackupRule;
 
 /**
- * Service for communicating with the Cloud Backup and scheduling backup jobs.
+ * This class takes care of two different functions:
+ * 1) direct backup and restore
+ * 2) managing backup scheduling rules
  * 
  * @author Timo Saarinen
  */
@@ -40,6 +43,14 @@ public interface BackupService {
 	 */
 	public void partialRestore(RestoreInfo info);
 
+	// -----------------------------------------------------------------------
+
+	
+	/**
+	 * Returns list of clusters to be backed up.
+	 * @return List of cluster ids
+	 */
+	public List<Integer> getBackupClusters();
 	
 	/**
 	 * Get all backup rules of the given cluster.

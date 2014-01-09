@@ -5,10 +5,14 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.openinfinity.cloud.domain.BackupRule;
+import org.openinfinity.cloud.domain.repository.backup.BackupRuleRepository;
 
 @Service("backupService")
-public class BackupServiceImpl {
+public class BackupServiceImpl implements BackupService {
 
+	@Autowired
+	private BackupRuleRepository backupRuleRepository;
+	
 	public void backupCluster(int clusterId) {
 		throw new RuntimeException("UNIMPLEMENTED"); // TODO
 	}
@@ -25,23 +29,29 @@ public class BackupServiceImpl {
 		throw new RuntimeException("UNIMPLEMENTED"); // TODO
 	}
 	
+	// --------------------------------------------------------------
+	
+	public List<Integer> getBackupClusters() {
+		return backupRuleRepository.getBackupClusters();
+	}
+
 	public List<BackupRule> getClusterBackupRules(int cluster_id) {
-		throw new RuntimeException("UNIMPLEMENTED"); // TODO
+		return backupRuleRepository.getClusterBackupRules(cluster_id);
 	}
 
 	public void deleteClusterBackupRules(int cluster_id) {
-		throw new RuntimeException("UNIMPLEMENTED"); // TODO
+		backupRuleRepository.deleteClusterBackupRules(cluster_id);
 	}
 
 	public void createBackupRule(BackupRule br) {
-		throw new RuntimeException("UNIMPLEMENTED"); // TODO
+		backupRuleRepository.createBackupRule(br);
 	}
 	
 	public void deleteBackupRule(BackupRule br) {
-		throw new RuntimeException("UNIMPLEMENTED"); // TODO
+		backupRuleRepository.createBackupRule(br);
 	}
 	
 	public void updateBackupRule(BackupRule br) {
-		throw new RuntimeException("UNIMPLEMENTED"); // TODO
+		backupRuleRepository.createBackupRule(br);
 	}
 }

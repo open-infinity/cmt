@@ -26,6 +26,12 @@ import org.openinfinity.cloud.domain.BackupRule;
  */
 public interface BackupRuleRepository {
 	/**
+	 * Returns list of clusters to be backed up.
+	 * @return List of cluster ids
+	 */
+	public List<Integer> getBackupClusters();
+	
+	/**
 	 * Get all backup rules of the given cluster.
 	 * 
 	 * @param cluster_id Primary key of cluster_tbl
@@ -38,7 +44,7 @@ public interface BackupRuleRepository {
 	 * 
 	 * @param cluster_id Primary key of cluster_tbl
 	 */
-	public void deleteClusterBackupRules(int cluster_id);
+	public boolean deleteClusterBackupRules(int cluster_id);
 
 	/**
 	 * Add new backup rule for cluster.
@@ -52,7 +58,7 @@ public interface BackupRuleRepository {
 	 * 
 	 * @param br BackupRule to be deleted
 	 */
-	public void deleteBackupRule(BackupRule br);
+	public boolean deleteBackupRule(BackupRule br);
 	
 	
 	/**

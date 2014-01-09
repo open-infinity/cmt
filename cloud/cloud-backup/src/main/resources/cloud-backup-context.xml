@@ -14,6 +14,17 @@
         http://www.springframework.org/schema/task
         http://www.springframework.org/schema/task/spring-task-3.0.xsd">
 
+	<context:component-scan base-package="org.openinfinity">
+		<context:exclude-filter type="regex"
+			expression=".*ssp.*" />
+		<context:exclude-filter type="regex"
+			expression=".*HealthMonitoring.*" />
+		<context:exclude-filter type="regex"
+			expression=".*ClusterTypeRowMapper.*" />
+		<context:exclude-filter type="regex"
+			expression=".*ClusterType.*" />
+	</context:component-scan>
+
 	<context:property-placeholder
 		location="classpath*:/META-INF/properties/system.properties,
     	classpath*:/META-INF/properties/infrastructure.properties,
@@ -21,22 +32,16 @@
     	classpath*:/META-INF/properties/crypto.properties,
     	classpath*:/META-INF/properties/repository.properties" />
 
-	<context:component-scan base-package="org.openinfinity">
-        <context:exclude-filter type="regex" expression=".*ssp.*"/>
-		<context:exclude-filter type="regex" expression=".*HealthMonitoring.*"/>
-		<context:exclude-filter type="regex" expression=".*ClusterTypeRowMapper.*"/>
-		<context:exclude-filter type="regex" expression=".*ClusterType.*"/>
-	</context:component-scan>
-
-<!-- 
-	<bean id="cryptoSupport" class="org.openinfinity.core.crypto.CryptoSupport">
-		<constructor-arg name="symmetricKeyPath" value="${symmetric.key.path}" />
-	</bean>
--->	
+	<!-- <bean id="cryptoSupport" class="org.openinfinity.core.crypto.CryptoSupport"> 
+		<constructor-arg name="symmetricKeyPath" value="${symmetric.key.path}" /> 
+		</bean> -->
 
 	<bean id="instanceService" class="org.openinfinity.cloud.service.administrator.InstanceServiceImpl" />
 	<bean id="clusterService" class="org.openinfinity.cloud.service.administrator.ClusterServiceImpl" />
 	<bean id="machineService" class="org.openinfinity.cloud.service.administrator.MachineServiceImpl" />
+	<bean id="backupService" class="org.openinfinity.cloud.service.backup.BackupServiceImpl" />
+	<bean id="backupWorkRepository" class="org.openinfinity.cloud.domain.repository.backup.BackupWorkRepositoryJdbcImpl">
+	</bean>
 
 	<bean id="cloudDataSource" destroy-method="close"
 		class="org.apache.commons.dbcp.BasicDataSource">
@@ -48,7 +53,7 @@
 		<property name="maxActive" value="8" />
 		<property name="maxIdle" value="2" />
 	</bean>
-	
+
 	<bean id="txManager"
 		class="org.springframework.jdbc.datasource.DataSourceTransactionManager"
 		p:dataSource-ref="cloudDataSource" />

@@ -5,7 +5,7 @@ package org.openinfinity.cloud.application.backup.job;
  * 
  * @author Timo Saarinen
  */
-public class BackupException extends Exception {
+public class BackupException extends RuntimeException {
 	public BackupException(String msg) {
 		super(msg);
 	}

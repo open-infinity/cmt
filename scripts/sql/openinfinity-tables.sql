@@ -364,3 +364,16 @@ FOREIGN KEY (`cluster_id`) REFERENCES cluster_tbl(cluster_id) ON DELETE CASCADE,
 CONSTRAINT `cluster_id` FOREIGN KEY (`cluster_id`) REFERENCES `cluster_tbl` (`cluster_id`)
 );
 
+CREATE TABLE `backup_operation_tbl` (
+`backup_operation_id` int(11) NOT NULL AUTO_INCREMENT,
+`operation` ENUM('backup', 'full-restore', 'partial-restore') NOT NULL,
+`create_time` datetime DEFAULT NULL,
+`update_time` datetime DEFAULT NULL,
+`backup_rule_id` int(11) NOT NULL,
+`target_cluster_id` int(11),
+`state` ENUM('requested', 'in-progress', 'succeeded', 'failed') NOT NULL,
+PRIMARY KEY (`backup_operation_id`),
+FOREIGN KEY (`backup_rule_id`) REFERENCES backup_rule_tbl(backup_rule_id) ON DELETE CASCADE,
+CONSTRAINT `backup_rule_id` FOREIGN KEY (`backup_rule_id`) REFERENCES `backup_rule_tbl` (`backup_rule_id`)
+);
+
