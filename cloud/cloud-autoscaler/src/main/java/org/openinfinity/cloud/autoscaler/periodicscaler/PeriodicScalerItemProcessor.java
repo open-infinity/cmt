@@ -16,20 +16,11 @@
 
 package org.openinfinity.cloud.autoscaler.periodicscaler;
 
-import java.io.IOException;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
 import org.apache.log4j.Logger;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
-import org.openinfinity.cloud.domain.Cluster;
-import org.openinfinity.cloud.domain.HealthStatusResponse;
+import org.openinfinity.cloud.domain.*;
 import org.openinfinity.cloud.domain.HealthStatusResponse.SingleHealthStatus;
-import org.openinfinity.cloud.domain.Instance;
-import org.openinfinity.cloud.domain.Job;
-import org.openinfinity.cloud.domain.Machine;
-import org.openinfinity.cloud.domain.RrdValue;
 import org.openinfinity.cloud.service.administrator.ClusterService;
 import org.openinfinity.cloud.service.administrator.InstanceService;
 import org.openinfinity.cloud.service.administrator.JobService;
@@ -37,12 +28,16 @@ import org.openinfinity.cloud.service.administrator.MachineService;
 import org.openinfinity.cloud.service.healthmonitoring.HealthMonitoringService;
 import org.openinfinity.cloud.service.scaling.Enumerations.ClusterScalingState;
 import org.openinfinity.cloud.service.scaling.ScalingRuleService;
-import org.openinfinity.cloud.domain.ScalingRule;
 import org.openinfinity.core.exception.SystemException;
 import org.openinfinity.core.util.ExceptionUtil;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.io.IOException;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Batch processor for verifying the scaling rules.
@@ -58,7 +53,7 @@ public class PeriodicScalerItemProcessor implements ItemProcessor<Machine, Job> 
 
 	private static final String MSG_HM_METRIC_NOT_AVAILABLE = "Requested metric is not available";
 	
-	private static final String METRIC_RRD_FILE_LOAD = "load_relative.rrd";
+	private static final String METRIC_RRD_FILE_LOAD = "load-relative.rrd";
 	
 	private static final String METRIC_TYPE_LOAD = "load";
 	
@@ -96,8 +91,9 @@ public class PeriodicScalerItemProcessor implements ItemProcessor<Machine, Job> 
         Cluster cluster = null;
 	    try{
             rule = scalingRuleService.getRule(clusterId);
-            if (rule == null) return null;                
-            cluster = clusterService.getCluster(clusterId);
+            if (rule == null) return null;
+            else if (rule.isPeriodicScalingOn() == false) return null;
+            else cluster = clusterService.getCluster(clusterId);
         }
         catch(Exception e){
             if (rule == null){ 
@@ -110,8 +106,8 @@ public class PeriodicScalerItemProcessor implements ItemProcessor<Machine, Job> 
         }
         float load = getClusterLoad(machine);
         LOG.debug("load = " + load);
-
         if (load == -1) return null;
+
         ClusterScalingState state = scalingRuleService.calculateScalingState(rule, load, clusterId);
         switch (state) {
             case REQUIRES_SCALING_OUT: 
