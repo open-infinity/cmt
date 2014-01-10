@@ -17,9 +17,9 @@ class oi3-oauth-rdbms::config {
 	}
 
 	# Oauth schema create scripts
-	file { "/opt/openinfinity/3.0.0/oauth/dbschema/oauth-schema.sql":
+	file { "/opt/openinfinity/3.0.0/oauth/dbschema/oauth2-schema.sql":
                 ensure => present,
-                source => "puppet:///modules/oi3-oauth-rdbms/oauth-schema.sql",
+                source => "puppet:///modules/oi3-oauth-rdbms/oauth2-schema.sql",
                 owner => "root",
                 group => "root",
 	      require => Class["oi3-rdbms::service"],
