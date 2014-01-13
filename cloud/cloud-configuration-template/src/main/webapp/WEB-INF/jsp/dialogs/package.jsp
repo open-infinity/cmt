@@ -45,10 +45,6 @@
 					<div id="dlg-package-value-id"></div>
 				</div>
 				<div class="dlg-input-container">
-					<div class="dlg-package-value-label">Type</div>
-					<input id="dlg-package-value-type" type='text' value='' />
-				</div>
-				<div class="dlg-input-container">
 					<div class="dlg-package-value-label">Name</div>
 					<input id="dlg-package-value-name" type='text' value='' />
 				</div>
@@ -63,8 +59,8 @@
 			</div>
 		</div>
 
-		<%-- Packages for package --%>
-		<div id="#dlg-package-upload-tab"></div>
+		<%-- Upload tab --%>
+		<div id="dlg-package-upload-tab"></div>
 
 	</div>
 </div>

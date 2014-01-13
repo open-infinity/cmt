@@ -45,10 +45,14 @@
 					<div class="dlg-module-value-label">Id</div>
 					<div id="dlg-module-value-id"></div>
 				</div>
+
+				<%--
 				<div class="dlg-input-container">
 					<div class="dlg-module-value-label">Type</div>
 					<input id="dlg-module-value-type" type='text' value='' />
 				</div>
+				--%>
+
 				<div class="dlg-input-container">
 					<div class="dlg-module-value-label">Name</div>
 					<input id="dlg-module-value-name" type='text' value='' />

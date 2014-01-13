@@ -1,20 +1,19 @@
 (function($) {
 
-    var dlg = window.app.dialog.pkg || {};
+    var dlg = window.app.dialog.package || {};
     var infoDlg = window.app.dialog.info;
     
     dlg.state = {};
     
     dlg.html = {};
-    dlg.html.idContainer = $($(".dlg-input-container", "#dlg-pkg-general-tab").first());
+    dlg.html.idContainer = $($(".dlg-input-container", "#dlg-package-general-tab").first());
     dlg.html.pkg = {};
-    dlg.html.pkg.id = $("#dlg-pkg-value-id");
-    dlg.html.pkg.type = $("#dlg-pkg-value-type");
-    dlg.html.pkg.name = $("#dlg-pkg-value-name");
-    dlg.html.pkg.version = $("#dlg-pkg-value-version");
-    dlg.html.pkg.description = $("#dlg-pkg-value-description");
-    dlg.html.tabs = $("#dlg-pkg-tabs");
-    dlg.html.self = $("#dlg-pkg");
+    dlg.html.pkg.id = $("#dlg-package-value-id");
+    dlg.html.pkg.name = $("#dlg-package-value-name");
+    dlg.html.pkg.version = $("#dlg-package-value-version");
+    dlg.html.pkg.description = $("#dlg-package-value-description");
+    dlg.html.tabs = $("#dlg-package-tabs");
+    dlg.html.self = $("#dlg-package");
 
     $.extend(dlg, {
 
@@ -24,16 +23,15 @@
 
         edit : function(id){
             $.ajax({
-                url: portletURL.url.pkg.getPkgURL + "&pkgId=" + id,
+                url: portletURL.url.package.getPackageURL + "&packageId=" + id,
                 dataType: "json"
                 }).done(function(data) {
                 	console.log(data);	
                 	dlg.html.pkg.id.text(data.id);
-                    dlg.html.pkg.type.val(data.type);
                     dlg.html.pkg.name.val(data.name);
                     dlg.html.pkg.version.val(data.version);
                     dlg.html.pkg.description.val(data.description);
-
+                    configureEventHandling();
                 }).fail(function(jqXHR, textStatus, errorThrown) {
                     console.log("Error fetching installation pkg");
             });
@@ -77,7 +75,7 @@
         height: 560 ,
         buttons: {
             "Submit changes": function() {
-                if (submitPkg(dlg.mode) === 0){
+                if (submitPackage(dlg.mode) === 0){
                     dlg.close();
                 }
             },
@@ -91,7 +89,6 @@
 
     function cleanUpDialog(that){
     	dlg.html.pkg.id.text("");
-        dlg.html.pkg.type.val("");
         dlg.html.pkg.name.val("");
         dlg.html.pkg.version.val("");
         dlg.html.pkg.description.val("");
@@ -105,10 +102,10 @@
 
     // Sending data to backend
 
-    function submitPkg(mode){
+    function submitPackage(mode){
         var err = 0;                  
         // get input data
-        var pkg = getPkg();
+        var pkg = getPackage();
 
         // validate input data
         if (!validateInput(pkg, packages, dlg.model.parameters)){
@@ -122,9 +119,9 @@
         outData.parameters = JSON.stringify(dlg.model.parameters);
 
         // send input data
-        console.log("Posting pkg parameters:" + outData.parameters);
+        console.log("Posting package parameters:" + outData.parameters);
         
-        $.post((mode == "edit") ? portletURL.url.pkg.editPkgURL : portletURL.url.pkg.createPkgURL, outData)
+        $.post((mode == "edit") ? portletURL.url.package.editPackageURL : portletURL.url.package.createPackageURL, outData)
         .done(function(){
             app.reloadPkgsTable();
         })
@@ -140,17 +137,17 @@
     function configureEventHandling(){
 
         // click and key press on pkg general input tags
-        bindInputClicksAndKeys();
+        //bindInputClicksAndKeys();
 
         bindGeneralAttributeInputClicks();
         // itemSelect events
         //itemSelectConfigureDragAndDrop();
 
         // parameter key-value events
-        bindParameterKeyClicks();
-        bindParameterNewKeyInputClicks();
-        bindParameterDeleteKeyClicks($(".dlg-pkg-list-item-delete-button", "#dlg-keys"));
-        bindParameterNewKeyClicks();
+        //bindParameterKeyClicks();
+        //bindParameterNewKeyInputClicks();
+        //bindParameterDeleteKeyClicks($(".dlg-pkg-list-item-delete-button", "#dlg-keys"));
+        //bindParameterNewKeyClicks();
 
         // TODO: ouch, this is not nice ->refactor
         // Double clicks for mini info dialog
@@ -185,7 +182,7 @@
             clearStyleForErrorInput(0, $(this));
         });
     }
-
+  /*
     function bindParameterKeyClicks(){
         $("input", ".key", "#dlg-keys").bind( "click",  function(){
             clearStyleForErrorInput(0, $(this));
@@ -349,7 +346,8 @@
             storeValueToDom(tpl.value, null, dlg.html.parameterValuesList, null);
         });
     }
-
+*/
+    /*
     function unbindKeyHandlers(){
         $("input", ".key", "#dlg-keys").unbind();
         findNewKeyInput().unbind();
@@ -364,8 +362,10 @@
         $(".dlg-pkg-list-item-delete-button").unbind();
         $(".dlg-pkg-new-value-button", "#dlg-values").unbind();
     }
+    */
 
     // TODO: use generalized showViewSelectedKey() instead this function
+    /*
     function showViewSelectedKeyInitial(data){
         var count = 0;
 
@@ -455,7 +455,7 @@
                 lastChild.data("index", -1);
             }
     }
-
+    */
     function storeNewItemToDom(htmlTemplate, value, list){
         list.append(htmlTemplate);
         list.find("li:last-child").text(value);
@@ -469,6 +469,7 @@
         }
     }
 
+/*
     // Model management functions
 
     function updateModel(){
@@ -515,40 +516,26 @@
         }
         return err;
     }
+*/
 
+/*
     function isSelectedKeyInModel(){
         for(var key in dlg.model.parameters){
             if (key === dlg.state.selectedKey) return true;
         }
         return false;
     }
+*/
 
-    // Utility functions
-    /*
-    function isPosInt(obj){
-        return (obj !== "" && typeof obj !== 'undefined' && !isNaN(obj) && (Math.round(obj) == obj) && obj > 0) ? true : false;
-    }
-    */
-    /*
-    function getDependencies(){
-        var selectedItems = [];
-            var arrayOfLis = dlg.html.selectedDependeesList.find("li");
-        for (var i = 0; i < arrayOfLis.length; i++){
-            selectedItems.push($(arrayOfLis[i]).data("config").id);
-        }
-        return selectedItems;
-    }
-    */
-    function getPkg(){
+    function getPackage(){
         var e = {};
         e.id = (dlg.mode == "edit") ? parseInt(dlg.html.pkg.id.text(), 10) : -1;
-        e.type = dlg.html.pkg.type.val();
         e.name = dlg.html.pkg.name.val();
         e.version = dlg.html.pkg.version.val();
         e.description = dlg.html.pkg.description.val();
         return e;
     }
-
+/*
     function getParameterValue(li){
         var value = null;
         var valueInput = li.find("input.dlg-value-value");
@@ -567,7 +554,7 @@
     function findNewValueInput(){
         return $(".dlg-pkg-new-value-button").parent().find("input");
     }
-
+*/
     // Alerts
 
     function alertPostFailure(mode, textStatus, errorThrown){
@@ -599,10 +586,6 @@
         if (!isPosInt(pkg.id) && dlg.mode == "edit") {
             res = false;
             console.log("err.internalError");
-        }
-        else if (!isPosInt(pkg.type)){
-            res = false;
-            alertWrongInput(dlg.html.pkg.type, err.mustBePositiveInteger);
         }
         else if (pkg.name === ""){
             res = false;

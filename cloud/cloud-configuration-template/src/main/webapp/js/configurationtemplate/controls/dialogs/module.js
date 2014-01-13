@@ -15,7 +15,7 @@
     dlg.html.idContainer = $($(".dlg-input-container", "#dlg-module-general-tab").first());
     dlg.html.module = {};
     dlg.html.module.id = $("#dlg-module-value-id");
-    dlg.html.module.type = $("#dlg-module-value-type");
+    //dlg.html.module.type = $("#dlg-module-value-type");
     dlg.html.module.name = $("#dlg-module-value-name");
     dlg.html.module.version = $("#dlg-module-value-version");
     dlg.html.module.description = $("#dlg-module-value-description");
@@ -39,7 +39,7 @@
                 }).done(function(data) {
                 	console.log(data);	
                 	dlg.html.module.id.text(data.id);
-                    dlg.html.module.type.val(data.type);
+                    //dlg.html.module.type.val(data.type);
                     dlg.html.module.name.val(data.name);
                     dlg.html.module.version.val(data.version);
                     dlg.html.module.description.val(data.description);
@@ -94,7 +94,7 @@
 
         close : function(){
             // cleanup dialog html elements
-        	cleanUpDialog(dlg.html.self);
+        	cleanUpDialog();
             // clear error styles
 
             // close jQuery dialog
@@ -124,15 +124,18 @@
 
     // Cleanup
 
-    function cleanUpDialog(that){
+    function cleanUpDialog(){
     	dlg.html.packages.itemselect("destroy");
     	dlg.html.module.id.text("");
-        dlg.html.module.type.val("");
+        //dlg.html.module.type.val("");
         dlg.html.module.name.val("");
         dlg.html.module.version.val("");
         dlg.html.module.description.val("");
+        dlg.html.keyName.text("");
         delete dlg.model.parameters;
         dlg.state.selectedKey = null;
+        dlg.html.parameterKeysList.empty();
+        dlg.html.parameterValuesList.empty();
         
         // clear error styles
         $.each(dlg.html.self.find("input"), function(index, value){
@@ -151,19 +154,19 @@
             var module = getModule();
             var packages = dlg.html.packages.itemselect("getVal");
 
-            // validate input data
+            // validate input
             if (!validateInput(module, packages, dlg.model.parameters)){
                 return;
             }
 
-            // serialize input data
+            // serialize data
             var outData = {};
             outData.module = JSON.stringify(module);
             outData.packages = JSON.stringify(packages);
             outData.parameters = JSON.stringify(dlg.model.parameters);
 
-            // send input data
-            console.log("Posting module parameters:" + outData.parameters);
+            // send data
+            console.log("Post data" + outData);
             
             $.post((mode == "edit") ? portletURL.url.module.editModuleURL : portletURL.url.module.createModuleURL, outData)
             .done(function(){
@@ -587,7 +590,7 @@
     function getModule(){
         var e = {};
         e.id = (dlg.mode == "edit") ? parseInt(dlg.html.module.id.text(), 10) : -1;
-        e.type = dlg.html.module.type.val();
+        //e.type = dlg.html.module.type.val();
         e.name = dlg.html.module.name.val();
         e.version = dlg.html.module.version.val();
         e.description = dlg.html.module.description.val();
@@ -645,10 +648,12 @@
             res = false;
             console.log("err.internalError");
         }
+        /*
         else if (!isPosInt(module.type)){
             res = false;
             alertWrongInput(dlg.html.module.type, err.mustBePositiveInteger);
         }
+        */
         else if (module.name === ""){
             res = false;
             alertWrongInput(dlg.html.module.name, err.emptyItem);

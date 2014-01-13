@@ -46,7 +46,7 @@ public class ParameterKeyRepositoryJdbcImpl implements ParameterKeyRepository {
 
     private static final String FIND_BY_NAME_SQL = "select * from parameter_key_tbl where name = ?";
 
-    private static final String DELETE_SQL = "delete from parameter_key_tbl where moduleId = ?";
+    private static final String DELETE_SQL = "delete from parameter_key_tbl where module_id = ?";
 
     private JdbcTemplate jdbcTemplate;
 

@@ -46,7 +46,7 @@ public class InstallationModuleRepositoryJdbcImpl implements InstallationModuleR
 
     private static final String DELETE_SQL = "delete from installation_module_tbl where id = ?";
 
-    private static final String UPDATE_SQL = "update installation_module_tbl set name = ?, version = ?, description = ?";
+    private static final String UPDATE_SQL = "update installation_module_tbl set name = ?, version = ?, description = ? where id = ?";
 
     private static final String GET_ALL_SQL = "select * from installation_module_tbl";
 
@@ -81,7 +81,7 @@ public class InstallationModuleRepositoryJdbcImpl implements InstallationModuleR
 
     @Override
     public void update(InstallationModule installationModule) {
-        jdbcTemplate.update(UPDATE_SQL, installationModule.getName(), installationModule.getVersion(), installationModule.getDescription());
+        jdbcTemplate.update(UPDATE_SQL, installationModule.getName(), installationModule.getVersion(), installationModule.getDescription(), installationModule.getId());
     }
 
     @Override
