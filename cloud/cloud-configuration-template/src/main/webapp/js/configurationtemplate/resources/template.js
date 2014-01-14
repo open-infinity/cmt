@@ -5,19 +5,21 @@ var tpl = {
     			<div></div>\
     		</li>",
     		
-    key : "<li class='ui-state-default key dlg-module-key-value-list-item'>\
-    	      <div class='dlg-module-parameter-key-name'>\
-    		      <input class='dlg-key-name' type='text'/>\
-    		  </div>\
-    		  <div class='dlg-module-list-item-button dlg-module-list-item-delete-button'>-</div>\
+    key : "<li class='key dlg-module-key-value-list-item'>\
+    	      <div class='dlg-module-kv-item-container'>\
+                  <div class='dlg-module-parameter-input-container'>\
+                      <input class='dlg-key-name' type='text'/>\
+                  </div>\
+                  <div class='dlg-module-list-item-button dlg-module-list-item-delete-button'></div>\
+        	  </div>\
     	   </li>",
     	   
-    value : "<li class='ui-state-default dlg-module-key-value-list-item'>\
-    		     <div>\
-    		         <div class='dlg-module-parameter-value-value'>\
-    		         	<input class='dlg-value-value' type='text'/>\
-	         		 </div>\
+    value : "<li class='dlg-module-key-value-list-item'>\
+    		     <div class='dlg-module-kv-item-container'>\
+                         <div class='dlg-module-parameter-input-container'>\
+                            <input class='dlg-value-value' type='text'/>\
+                         </div>\
+                     <div class='dlg-module-list-item-button dlg-module-list-item-delete-button'></div>\
          		 </div>\
-         		 <div class='dlg-module-list-item-button dlg-module-list-item-delete-button'>-</div>\
      		</li>"
 };

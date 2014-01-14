@@ -42,27 +42,27 @@
 		<div id="dlg-module-general-tab">
 			<div id="dlg-module-fields" class="dlg-tab-items-container">
 				<div class="dlg-input-container">
-					<div class="dlg-module-value-label">Id</div>
+					<div class="dlg-value-label">Id</div>
 					<div id="dlg-module-value-id"></div>
 				</div>
 
 				<%--
 				<div class="dlg-input-container">
-					<div class="dlg-module-value-label">Type</div>
+					<div class="dlg-value-label">Type</div>
 					<input id="dlg-module-value-type" type='text' value='' />
 				</div>
 				--%>
 
 				<div class="dlg-input-container">
-					<div class="dlg-module-value-label">Name</div>
+					<div class="dlg-value-label">Name</div>
 					<input id="dlg-module-value-name" type='text' value='' />
 				</div>
 				<div class="dlg-input-container">
-					<div class="dlg-module-value-label">Version</div>
+					<div class="dlg-value-label">Version</div>
 					<input id="dlg-module-value-version" type='text' value='' />
 				</div>
 				<div class="dlg-input-container">
-					<div class="dlg-module-value-label">Description</div>
+					<div class="dlg-value-label">Description</div>
 					<textarea id="dlg-module-value-description" rows="3" cols="40"></textarea>
 				</div>
 			</div>
@@ -105,7 +105,7 @@
 				<div class="dlg-list-panel-container dlg-tab-item">
 					<div id="dlg-list-keys-container"
 						class="dlg-list-panel-container-title">Keys</div>
-					<div id="dlg-keys" class="dlg-item-list-container">
+					<div id="dlg-keys" class="dlg-module-item-list-container">
 						<ul></ul>
 					</div>
 				</div>
@@ -114,7 +114,7 @@
 					<div class="dlg-list-panel-container-title">
 						Values for key:<span id="dlg-module-key-name"></span>
 					</div>
-					<div id="dlg-values" class="dlg-item-list-container">
+					<div id="dlg-values" class="dlg-module-item-list-container">
 						<ul></ul>
 					</div>
 				</div>
