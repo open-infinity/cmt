@@ -27,8 +27,8 @@ import lombok.Data;
  * The cron fields follow the common cron syntax, used in
  * Unix Cron, CrontTrigger of Quartz Scheduler and Spring Batch.
  * 
- * @see http://en.wikipedia.org/wiki/Cron#CRON_expression
- * @see http://quartz-scheduler.org/documentation/quartz-2.2.x/tutorials/crontrigger
+ * @see <a href="http://en.wikipedia.org/wiki/Cron#CRON_expression">Cron expressions</a>
+ * @see <a href="http://quartz-scheduler.org/documentation/quartz-2.2.x/tutorials/crontrigger">Quartz CronTrigger</a>
  *
  * @author Timo Saarinen
  */
