@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
+import org.openinfinity.cloud.application.backup.CloudBackup;
 import org.openinfinity.cloud.domain.Key;
 import org.openinfinity.cloud.service.administrator.KeyService;
 import org.openinfinity.cloud.util.ssh.SSHGateway;
@@ -61,10 +62,9 @@ public class RemoteMachineCommand implements Command {
 		logger.trace("backup");
 		
 		// Decide the filename
-		File package_file = new File(job.getLocalPackageDirectory(),
-				"instance" + job.getToasInstanceId() + "-"
-						+ job.getUsername() + "@" + job.getHostname()
-						+ "-backup.tar.xz");
+		File package_file = new File("cluster-" + job.getStorageCluster().getClusterId() + "-"
+				+ job.getLogicalMachineName() + "-backup.tar.xz");
+		
 		logger.debug("Local filename for backup will be " + package_file);
 
 		// The command to be executed in the remote host
@@ -154,12 +154,12 @@ public class RemoteMachineCommand implements Command {
 			// Decided authentication method
 			Key private_ssh_key = null;
 			if (job.getPassword() == null) {
-				if (job.getToasInstanceId() != -1) {
+				if (job.getVirtualCluster().getToasInstanceId() != -1) {
 					private_ssh_key = getPrivateSshKey();
 					if (private_ssh_key == null) {
 						throw new BackupException(
 								"KeyService returned null for instance id "
-										+ job.getToasInstanceId()
+										+ job.getVirtualCluster().getToasInstanceId()
 										+ ". Does the instance really exist?");
 					}
 				} else {
@@ -197,11 +197,11 @@ public class RemoteMachineCommand implements Command {
 	 */
 	private Key getPrivateSshKey() throws BackupException {
 		// Get private key from Key service
-		if (job.getToasInstanceId() != -1) {
+		if (job.getVirtualCluster().getToasInstanceId() != -1) {
 			logger.trace("Getting SSH private key from KeyService");
-			KeyService keyService = (KeyService) job.context
+			KeyService keyService = (KeyService) CloudBackup.getInstance().getContext()
 					.getBean("keyService");
-			return keyService.getKeyByInstanceId(job.getToasInstanceId());
+			return keyService.getKeyByInstanceId(job.getVirtualCluster().getToasInstanceId());
 		} else {
 			return null;
 		}

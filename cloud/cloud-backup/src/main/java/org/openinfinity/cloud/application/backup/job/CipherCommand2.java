@@ -14,6 +14,7 @@ import java.security.Security;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.openinfinity.cloud.application.backup.CloudBackup;
 import org.openinfinity.core.crypto.CryptoSupport;
 
 import com.sun.jna.Native.ffi_callback;
@@ -64,7 +65,7 @@ public class CipherCommand2 implements Command {
 		logger.trace("cipher");
 
 		// Initiate the oicore crypto module
-		CryptoSupport crypto = (CryptoSupport)job.context.getBean("cryptoSupport");
+		CryptoSupport crypto = (CryptoSupport)CloudBackup.getInstance().getContext().getBean("cryptoSupport");
 
 		// Input file
 		File plainFile = job.getLocalBackupFile();
@@ -136,7 +137,7 @@ public class CipherCommand2 implements Command {
 		logger.trace("decipher");
 
 		// Initiate the oicore crypto module
-		CryptoSupport crypto = (CryptoSupport)job.context.getBean("cryptoSupport");
+		CryptoSupport crypto = (CryptoSupport)CloudBackup.getInstance().getContext().getBean("cryptoSupport");
 
 		// Input file
 		File cipherFile = job.getLocalBackupFile();

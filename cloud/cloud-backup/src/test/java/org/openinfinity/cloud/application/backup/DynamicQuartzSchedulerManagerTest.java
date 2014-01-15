@@ -45,11 +45,16 @@ public class DynamicQuartzSchedulerManagerTest {
 		Assert.assertNotNull(dynamicQuartzSchedulerManager);
 		
 		testJobRunCount = 0;
-		dynamicQuartzSchedulerManager.addJob("test-job", new TestJob(), "* * * * * ?");
+		dynamicQuartzSchedulerManager.addJob("test-job", "test-group", new TestJob(), "* * * * * ?");
 
 		// Wait until the test jobs are run
-		while (testJobRunCount < 2) {
-			Thread.sleep(1000);
+		while (true) {
+			synchronized(runCountLockObject) {
+				if (testJobRunCount >= 2) {
+					break;
+				}
+			}
+			Thread.sleep(500);
 		}
 		
 		Assert.assertEquals(2, testJobRunCount);

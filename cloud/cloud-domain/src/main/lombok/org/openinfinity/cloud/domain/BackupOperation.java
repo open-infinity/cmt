@@ -37,16 +37,17 @@ public class BackupOperation {
 	private Date updated;
 	
 	/**
-	 * The related backup rule. The id is the primary key of backup_rule_tbl.
-	 */
-	@NotScript
-	private int backupRuleId;
-
-	/**
-	 * Target cluster id. If this is null, the one in backup_rule_tbl will be used.
+	 * Target cluster id.
 	 */
 	@NotScript
 	private int targetClusterId;
+	
+	/**
+	 * Source cluster id. In case of partial restore this is expected to be null.
+	 * In case of full restore, this have to be supplied.
+	 */
+	@NotScript
+	private int sourceClusterId;
 	
 	/**
 	 * Operation state: 'requested', 'in-progress', 'succeeded', 'failed'. 

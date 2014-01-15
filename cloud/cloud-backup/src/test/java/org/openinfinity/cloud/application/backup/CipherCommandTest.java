@@ -66,7 +66,7 @@ public class CipherCommandTest {
 
 	@Test
 	public void testCipherCommand1() throws Exception {
-		ClusterInfo cluster = new ClusterInfo(12345);
+		ClusterInfo cluster = new ClusterInfo(12345, 6789);
 		
 		// Cipher
 		{
@@ -170,14 +170,14 @@ public class CipherCommandTest {
 
 	private class TestBackupInstanceJob extends InstanceBackupJob {
 		public TestBackupInstanceJob(ClusterInfo c) throws BackupException {
-			super(c, applicationContext);
+			super(c, 1234);
 			commands.clear();
 		}
 	}
 
 	private class TestRestoreInstanceJob extends InstanceRestoreJob {
 		public TestRestoreInstanceJob(ClusterInfo c) throws BackupException {
-			super(c, applicationContext);
+			super(c, 1234);
 			commands.clear();
 		}
 	}

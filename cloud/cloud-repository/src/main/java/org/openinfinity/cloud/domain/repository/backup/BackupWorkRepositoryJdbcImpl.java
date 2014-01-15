@@ -28,8 +28,8 @@ public class BackupWorkRepositoryJdbcImpl implements BackupWorkRepository {
 	public static final String COLUMN_OPERATION = "operation";
 	public static final String COLUMN_UPDATED = "update_time";
 	public static final String COLUMN_CREATED = "create_time";
-	public static final String COLUMN_BACKUP_RULE_ID = "backup_rule_id";
 	public static final String COLUMN_TARGET_CLUSTER_ID = "target_cluster_id";
+	public static final String COLUMN_SOURCE_CLUSTER_ID = "source_cluster_id";
 	public static final String COLUMN_STATE = "state";
 
 	private JdbcTemplate jdbcTemplate;
@@ -48,22 +48,37 @@ public class BackupWorkRepositoryJdbcImpl implements BackupWorkRepository {
 	}
 
 	public void writeBackupOperation(BackupOperation op) {
-		if (op.getBackupRuleId() == -1) {
+		if (op.getId() == -1) {
 			jdbcTemplate.update("INSERT INTO " + TABLE_BACKUP_OPERATION + " ("
-					+ COLUMN_OPERATION + ", " + COLUMN_UPDATED + ", "
-					+ COLUMN_CREATED + ", " + COLUMN_BACKUP_RULE_ID + ", "
-					+ COLUMN_TARGET_CLUSTER_ID + ", " + COLUMN_STATE
+					+ COLUMN_OPERATION + ", " 
+					+ COLUMN_UPDATED + ", "
+					+ COLUMN_CREATED + ", " 
+					+ COLUMN_TARGET_CLUSTER_ID + ", "
+					+ COLUMN_SOURCE_CLUSTER_ID + ", " 
+					+ COLUMN_STATE
 					+ ") VALUES (?, ?, ?, ?, ?, ?)",
-					new Object[] { op.getOperation(), new java.util.Date(),
-							new java.util.Date(), op.getBackupRuleId(), });
+					new Object[] { 
+						op.getOperation(), 
+						new java.util.Date(),
+						new java.util.Date(), 
+						op.getTargetClusterId(), 
+						op.getSourceClusterId(),
+						op.getState()
+						});
 		} else {
 			jdbcTemplate.update("UPDATE " + TABLE_BACKUP_OPERATION + " SET "
-					+ COLUMN_OPERATION + " = ?, " + COLUMN_UPDATED + " = ?, "
-					+ COLUMN_BACKUP_RULE_ID + " = ?, "
-					+ COLUMN_TARGET_CLUSTER_ID + " = ?, " + COLUMN_STATE
+					+ COLUMN_OPERATION + " = ?, " 
+					+ COLUMN_UPDATED + " = ?, "
+					+ COLUMN_TARGET_CLUSTER_ID + " = ?, " 
+					+ COLUMN_SOURCE_CLUSTER_ID + " = ?, " 
+					+ COLUMN_STATE
 					+ " = ?, " + ") WHERE " + COLUMN_ID + " = ?", new Object[] {
-					op.getOperation(), op.getUpdated(), op.getBackupRuleId(),
-					op.getTargetClusterId(), op.getState(), op.getId() });
+					op.getOperation(), 
+					op.getUpdated(),
+					op.getTargetClusterId(), 
+					op.getSourceClusterId(), 
+					op.getState(), 
+					op.getId() });
 		}
 	}
 
@@ -95,8 +110,8 @@ public class BackupWorkRepositoryJdbcImpl implements BackupWorkRepository {
 			op.setId(rs.getInt(COLUMN_ID));
 			op.setOperation(rs.getString(COLUMN_OPERATION));
 			op.setUpdated(rs.getDate(COLUMN_UPDATED));
-			op.setBackupRuleId(rs.getInt(COLUMN_BACKUP_RULE_ID));
 			op.setTargetClusterId(rs.getInt(COLUMN_TARGET_CLUSTER_ID));
+			op.setSourceClusterId(rs.getInt(COLUMN_SOURCE_CLUSTER_ID));
 			op.setState(rs.getString(COLUMN_STATE));
 			return op;
 		}

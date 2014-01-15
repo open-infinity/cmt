@@ -9,8 +9,8 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  * @author Timo Saarinen
  */
 public class InstanceDeleteJob extends InstanceJob {
-	public InstanceDeleteJob(ClassPathXmlApplicationContext context) throws BackupException {
-		this.context = context;
+	public InstanceDeleteJob(ClusterInfo cluster, int machineId) throws BackupException {
+		super(cluster, cluster, machineId);
 		
 		commands.add(new StorageCommand(this));
 	}

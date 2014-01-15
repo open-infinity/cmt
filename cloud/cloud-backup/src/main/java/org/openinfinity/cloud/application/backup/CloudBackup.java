@@ -15,7 +15,7 @@ import org.openinfinity.cloud.service.administrator.MachineService;
 import org.openinfinity.cloud.service.backup.BackupService;
 import org.openinfinity.cloud.service.backup.RestoreInfo;
 import org.openinfinity.cloud.domain.repository.backup.*;
-import org.springframework.stereotype.Component; 
+import org.springframework.stereotype.Component;
 import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -28,68 +28,60 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 public class CloudBackup {
 	private Logger logger = Logger.getLogger(CloudBackup.class);
 
-	@Autowired
 	private InstanceService instanceService;
-
-	@Autowired
 	private ClusterService clusterService;
-
-	@Autowired
 	private MachineService machineService;
-
-	@Autowired
 	private BackupService backupService;
-
-	@Autowired
 	private BackupWorkRepository backupWorkRepository;
 
 	private ClassPathXmlApplicationContext context;
 	private DynamicQuartzSchedulerManager dynamicQuartzSchedulerManager;
 
-	public CloudBackup(ClassPathXmlApplicationContext context) {
+	private CloudBackup(ClassPathXmlApplicationContext context) {
 		this.context = context;
 		dynamicQuartzSchedulerManager = (DynamicQuartzSchedulerManager) context
 				.getBean("dynamicQuartzSchedulerManager");
 	}
 
 	/**
-	 * Analyze failed cluster.
-	 * 
-	 * @return Object for Worker about the approach.
+	 * Returns backup instance.
 	 */
-	public RestoreInfo analyze() {
-		throw new RuntimeException("UNIMPLEMENTED"); // TODO
+	public static CloudBackup getInstance() {
+		if (cloudBackupInstance == null) {
+			cloudBackupInstance = new CloudBackup(
+					new ClassPathXmlApplicationContext(
+							"/cloud-backup-context.xml"));
+		}
+		return cloudBackupInstance;
 	}
+
+	private static CloudBackup cloudBackupInstance = null;
 
 	/**
 	 * Reads initial instance data from the database and creates schedulable
 	 * jobs based on that.
 	 */
 	public void initialize() {
+		context.start();
+
 		try {
-			// FIXME: make autowiring work
 			if (instanceService == null) {
-				logger.debug("Instance service not autowired");
 				instanceService = (InstanceService) context
 						.getBean("instanceService");
 			}
 			if (clusterService == null) {
-				logger.debug("Cluster service not autowired");
 				clusterService = (ClusterService) context
 						.getBean("clusterService");
 			}
 			if (machineService == null) {
-				logger.debug("Machine service not autowired");
 				machineService = (MachineService) context
 						.getBean("machineService");
 			}
 			if (backupService == null) {
-				logger.debug("Backup service not autowired");
 				backupService = (BackupService) context
 						.getBean("backupService");
 			}
 			if (backupWorkRepository == null) {
-				logger.debug("Backup repostiory not autowired");
 				backupWorkRepository = (BackupWorkRepository) context
 						.getBean("backupWorkRepository");
 			}
@@ -105,41 +97,40 @@ public class CloudBackup {
 				Instance instance = instanceService.getInstance(cluster_id);
 				if (instance != null) {
 					Cluster cluster = clusterService.getCluster(cluster_id);
-					List<BackupRule> rules = backupService
-							.getClusterBackupRules(cluster_id);
+					List<BackupRule> rules = backupService.getClusterBackupRules(cluster_id);
 
 					// Iterate all the cluster in instance
-					ClusterInfo clusterInfo = new ClusterInfo(
-							cluster.getInstanceId());
+					ClusterInfo clusterInfo = new ClusterInfo(cluster_id, cluster.getInstanceId());
 
 					// Iterate all the machines in cluster
 					for (Machine machine : machineService
 							.getMachinesInCluster(cluster.getId())) {
-						InstanceJob job = new InstanceBackupJob(clusterInfo,
-								context);
-						job.setJobName(("" + machine.getType()).toUpperCase()
-								+ ":" + machine.getDnsName());
-						job.setToasInstanceId(instance.getInstanceId());
-						job.setHostname(machine.getDnsName());
-						job.setVirtualMachineInstanceId("" + machine.getId());
-						job.setUsername(machine.getUserName());
+						InstanceJob job = new InstanceBackupJob(clusterInfo, machine.getId());
 						job.setLocalPackageDirectory("/var/tmp"); // TODO
 						Date d = new Date(System.currentTimeMillis() + 3000L);
 
-						// FIXME: real schedule
-						dynamicQuartzSchedulerManager.addJob(job.getJobName(),
-								job, "" + d.getSeconds() + " " + d.getMinutes()
-										+ " * * * ?");
+						for (BackupRule rule : backupService.getClusterBackupRules(cluster_id)) {
+							// Schedule backup
+							String cron_String = "0" + rule.getCronMinutes() + " " 
+									+ rule.getCronHours() + " "
+									+ rule.getCronDayOfMonth() + " "
+									+ rule.getCronMonth() + " "
+									+ rule.getCronYear() + " "
+									+ rule.getCronDayOfWeek();
+							dynamicQuartzSchedulerManager.addJob(
+									job.getJobName(), 
+									"cluster-" + cluster_id,
+									job, cron_String);
+						}
 					}
 				} else {
 					throw new BackupException("No instance to backup!");
 				}
 			}
 
-			// Start database poller
+			// Schedule database poller
 			dynamicQuartzSchedulerManager.addJob("backup-operation-poller",
-					BackupOperationPollerJob.getInstance(backupWorkRepository, this),
-					"0 * * * * ?");
+					"common", BackupOperationPollerJob.getInstance(this), "*/20 * * * * ?");
 
 			// TODO: restore (but not here)
 
@@ -160,17 +151,33 @@ public class CloudBackup {
 			logger.info("Stopping Quartz Scheduler");
 			dynamicQuartzSchedulerManager.stop();
 			logger.info("Quartz Scheduler stopped");
+
+			context.close();
 		} catch (SchedulerException e) {
 			e.printStackTrace();
 		}
 	}
 
-	private class TestJob {
-		public TestJob() {
-		}
+	/**
+	 * Returns application context.
+	 */
+	public ClassPathXmlApplicationContext getContext() {
+		return context;
+	}
 
-		public void run() {
-			logger.info("Test job started");
-		}
+	public InstanceService getInstanceService() {
+		return instanceService;
+	}
+
+	public ClusterService getClusterService() {
+		return clusterService;
+	}
+
+	public MachineService getMachineService() {
+		return machineService;
+	}
+	
+	public BackupWorkRepository getBackupWorkRepository() {
+		return backupWorkRepository;
 	}
 }

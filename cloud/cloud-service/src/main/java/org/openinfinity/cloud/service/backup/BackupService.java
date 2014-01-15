@@ -7,41 +7,42 @@ import org.openinfinity.cloud.domain.BackupRule;
 
 /**
  * This class takes care of two different functions:
- * 1) direct backup and restore
- * 2) managing backup scheduling rules
+ * 1) direct backup and restore (with BackupOperation objects)
+ * 2) managing backup scheduling rules (with BackupRule objects)
  * 
  * @author Timo Saarinen
  */
 public interface BackupService {
 	/**
-	 * Run cluster backup now. This is needed for manual backups only.
-	 * @param clusterId
-	 */
-	public void backupCluster(int clusterId);
-	
-	/**
-	 * Analyzes the given cluster restore need based on the content of the 
-	 * given cluster info. The restore approach will be filled in the object.
+	 * Reads new backup operations, that are newer than the given operation.
+	 * If the id is -1, all will be retrieved
 	 * 
-	 * @param info
+	 * @param id Id or -1
 	 */
-	public void analyze(RestoreInfo info);
-	
-	/**
-	 * Restores backup of the old cluster to the new cluster..
-	 * 
-	 * @param oldCluster
-	 * @param newCluster
-	 */
-	public void fullRestore(int oldClusterId, int newClusterId);
+	public List<BackupOperation> readBackupOperationsAfter(int id);
 
 	/**
-	 * Repairs the given cluster based on the cluster info. It's expected, 
-	 * that the caller sets new machine ids in the info. 
+	 * Writes backup operation object to database. Either updates an existing one
+	 * or inserts a new one, depending on case.
 	 * 
-	 * @param info
+	 * @param op Object to be written
 	 */
-	public void partialRestore(RestoreInfo info);
+	public void writeBackupOperation(BackupOperation op);
+	
+	/**
+	 * Reads backup operation object from database.
+	 * 
+	 * @param Backup op id
+	 */
+	public BackupOperation readBackupOperation(int id);
+
+	/**
+	 * Removes the given backup operation from the database.
+	 * 
+	 * @param op The operation to be removed
+	 * @return
+	 */
+	public boolean deleteBackupOperation(BackupOperation op);
 
 	// -----------------------------------------------------------------------
 
