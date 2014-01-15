@@ -1,5 +1,7 @@
-(function($) {
 
+//TODO: Make a standalone widget or integrate with itemselect widget
+
+(function($) {
     var dlg = window.app.dialog.info || {};
     dlg.self = $("#dlg-info");
 

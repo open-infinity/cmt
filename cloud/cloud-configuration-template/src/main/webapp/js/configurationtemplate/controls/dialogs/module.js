@@ -44,6 +44,10 @@
                     dlg.html.module.version.val(data.version);
                     dlg.html.module.description.val(data.description);
 
+                    // Update dialog title
+                    var newTitle = "Edit module " +  dlg.html.module.name.val() + "-" + dlg.html.module.version.val();
+                    dlg.html.self.dialog("option", "title", newTitle);
+
                 }).fail(function(jqXHR, textStatus, errorThrown) {
                     console.log("Error fetching installation module");
             });
@@ -293,7 +297,7 @@
             if (index > -1) {
                 values.splice(index, 1);
                 }
-        $(this).parent().remove();
+        $(this).parents("li").remove();
         });
     }
 
@@ -301,7 +305,7 @@
         items.bind( "click", function(){
 
             // update SelectedKeyView
-            var parent = $(this).parent();
+            var parent = $(this).parents("li");
             var input = parent.find("input");
             var keyName =  input.val();
             if (input.hasClass("dlg-key-name")){
@@ -318,7 +322,7 @@
         $(".dlg-module-new-key-button").bind( "click", function(){
 
             // fetch the new key
-            var keyInput = $(this).parent("li").find("input");
+            var keyInput = $(this).parents("li").find("input");
             var key = keyInput.val();
             if (key === "" || key == msg.addNewKey){
                 alertWrongInput(keyInput, err.emptyKey);
@@ -357,7 +361,7 @@
             }
 
             // update view
-            $(this).parent().remove();
+            $(this).parents("li").remove();
             dlg.html.parameterValuesList.empty();
             dlg.html.keyName.text(key);
             storeKeyToDom(tpl.key, key, dlg.html.parameterKeysList).find("input").focus();
@@ -376,7 +380,7 @@
     function bindParameterNewValueClick(items){
         items.bind( "click", function(){
 
-            var value = getParameterValue($(this).parent("li"));
+            var value = getParameterValue($(this).parents("li"));
             if (value === null) {
                 console.log("Error reading parameters");
                 return;
@@ -392,7 +396,7 @@
             }
 
             // create and remove items
-            $(this).parent("li").remove();
+            $(this).parents("li").remove();
             storeValueToDom(tpl.value, value, dlg.html.parameterValuesList, dlg.model.parameters[dlg.state.selectedKey].length -1);
             storeValueToDom(tpl.value, null, dlg.html.parameterValuesList, null);
         });
@@ -477,7 +481,7 @@
         }
         else {
             lastChild.find(".dlg-key-name").val(msg.addNewKey).css("color", "silver");
-            lastChild.find(".dlg-module-list-item-button").text("+").addClass("dlg-module-new-key-button").removeClass("dlg-module-list-item-delete-button").removeClass("key");
+            lastChild.find(".dlg-module-list-item-button").addClass("dlg-module-new-key-button").removeClass("dlg-module-list-item-delete-button").removeClass("key");
         }
         return lastChild;
     }
@@ -494,7 +498,7 @@
                 // create a new value item
                 lastChild.find(".dlg-value-value").val(msg.addNewValue).css("color", "silver");
                 var addButton = lastChild.find(".dlg-module-list-item-button");
-                addButton.text("+").addClass("dlg-module-new-value-button").removeClass("dlg-module-list-item-delete-button");
+                addButton.addClass("dlg-module-new-value-button").removeClass("dlg-module-list-item-delete-button");
 
                 // bind events for new value item
                 bindParameterInputClick(lastChild.find("input"));

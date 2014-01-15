@@ -42,14 +42,14 @@
 		<div id="dlg-edit-template-template-tab">
 			<div id="edit-template-fields" class="dlg-tab-items-container">
 				<div class="dlg-edit-template-template-label-container">
-					<span>Template Id:</span> <span id="dlg-edit-template-id-value"></span>
+					<span class="dlg-value-label">Template Id</span> <span id="dlg-edit-template-id-value"></span>
 				</div>
 				<div class="dlg-edit-template-template-label-container">
-					<div id="dlg-edit-template-name">Template name</div>
+					<div id="dlg-edit-template-name" class="dlg-value-label">Template name</div>
 					<input type='text' value='' />
 				</div>
 				<div class="dlg-edit-template-template-label-container">
-					<div id="template-description">Template description</div>
+					<div id="template-description" class="dlg-value-label">Template description</div>
 					<textarea rows="8" cols="68"></textarea>
 				</div>
 			</div>
