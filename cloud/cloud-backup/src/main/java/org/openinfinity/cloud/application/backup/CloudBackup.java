@@ -91,48 +91,8 @@ public class CloudBackup {
 			dynamicQuartzSchedulerManager.start();
 			logger.info("Quartz Scheduler started");
 
-			// Read instance information from the database
-			List<Integer> cluster_ids = backupService.getBackupClusters();
-			for (int cluster_id : cluster_ids) {
-				Instance instance = instanceService.getInstance(cluster_id);
-				if (instance != null) {
-					Cluster cluster = clusterService.getCluster(cluster_id);
-					List<BackupRule> rules = backupService.getClusterBackupRules(cluster_id);
-
-					// Iterate all the cluster in instance
-					ClusterInfo clusterInfo = new ClusterInfo(cluster_id, cluster.getInstanceId());
-
-					// Iterate all the machines in cluster
-					for (Machine machine : machineService
-							.getMachinesInCluster(cluster.getId())) {
-						InstanceJob job = new InstanceBackupJob(clusterInfo, machine.getId());
-						job.setLocalPackageDirectory("/var/tmp"); // TODO
-						Date d = new Date(System.currentTimeMillis() + 3000L);
-
-						for (BackupRule rule : backupService.getClusterBackupRules(cluster_id)) {
-							// Schedule backup
-							String cron_String = "0" + rule.getCronMinutes() + " " 
-									+ rule.getCronHours() + " "
-									+ rule.getCronDayOfMonth() + " "
-									+ rule.getCronMonth() + " "
-									+ rule.getCronYear() + " "
-									+ rule.getCronDayOfWeek();
-							dynamicQuartzSchedulerManager.addJob(
-									job.getJobName(), 
-									"cluster-" + cluster_id,
-									job, cron_String);
-						}
-					}
-				} else {
-					throw new BackupException("No instance to backup!");
-				}
-			}
-
-			// Schedule database poller
-			dynamicQuartzSchedulerManager.addJob("backup-operation-poller",
-					"common", BackupOperationPollerJob.getInstance(this), "*/20 * * * * ?");
-
-			// TODO: restore (but not here)
+			// Read backup rules from the database and add needed jobs
+			updateBackupClusters(-1);
 
 			logger.debug("Intialize completed and the scheduler started successfully.");
 		} catch (SchedulerException e) {
@@ -143,6 +103,57 @@ public class CloudBackup {
 		}
 	}
 
+	/**
+	 * Adds, updates or deletes backup jobs based on backup rules found in the database.
+	 * 
+	 * @param target_cluster_id The cluster backup rules to be refreshed, or -1 for all. 
+	 */
+	public void updateBackupClusters(int target_cluster_id) throws Exception {
+		// First, clear all jobs from the scheduler
+		// TODO: more advanced way based on the target_cluster_id parameter (if not -1)
+		dynamicQuartzSchedulerManager.deleteAlljobs();
+		
+		// Read instance information from the database
+		List<Integer> cluster_ids = backupService.getBackupClusters();
+		for (int cluster_id : cluster_ids) {
+			Instance instance = instanceService.getInstance(cluster_id);
+			if (instance != null) {
+				Cluster cluster = clusterService.getCluster(cluster_id);
+				List<BackupRule> rules = backupService.getClusterBackupRules(cluster_id);
+
+				// Iterate all the cluster in instance
+				ClusterInfo clusterInfo = new ClusterInfo(cluster_id, cluster.getInstanceId());
+
+				// Iterate all the machines in cluster
+				for (Machine machine : machineService
+						.getMachinesInCluster(cluster.getId())) {
+					InstanceJob job = new InstanceBackupJob(clusterInfo, machine.getId());
+					job.setLocalPackageDirectory("/var/tmp"); // TODO
+
+					for (BackupRule rule : rules) {
+						// Schedule backup job
+						String cron_String = "0" + rule.getCronMinutes() + " " 
+								+ rule.getCronHours() + " "
+								+ rule.getCronDayOfMonth() + " "
+								+ rule.getCronMonth() + " "
+								+ rule.getCronYear() + " "
+								+ rule.getCronDayOfWeek();
+						dynamicQuartzSchedulerManager.addJob(
+								job.getJobName(), 
+								"cluster-" + cluster_id,
+								job, cron_String);
+					}
+				}
+			} else {
+				throw new BackupException("No instance to backup!");
+			}
+		}
+		
+		// Schedule database poller
+		dynamicQuartzSchedulerManager.addJob("backup-operation-poller",
+				"common", BackupOperationPollerJob.getInstance(this), "*/20 * * * * ?");
+	}
+	
 	/**
 	 * Unschedule and remove all jobs.
 	 */

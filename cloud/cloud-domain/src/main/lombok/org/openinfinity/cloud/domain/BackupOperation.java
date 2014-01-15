@@ -25,10 +25,15 @@ public class BackupOperation {
 	private int id;
 
 	/**
-	 * Operation name: 'backup', 'full-restore', 'partial-restore'.
+	 * Operation name: 'backup', 'full-restore', 'partial-restore', 'refresh-schedules'.
 	 */
 	@NotScript
 	private String operation;
+	
+	public static final String BACKUP = "backup";
+	public static final String FULL_RESTORE = "rull-restore";
+	public static final String PARTIAL_RESTORE = "partial-restore";
+	public static final String REFRESH_SCHEDULES = "refresh-schedules";
 
 	/**
 	 * Time, when the operation was updated last time.
@@ -55,6 +60,11 @@ public class BackupOperation {
 	@NotScript
 	private String state;
 
+	public static final String REQUESTED = "requested";
+	public static final String IN_PROGRESS = "in-progress";
+	public static final String SUCCEEDED = "succeeded";
+	public static final String FAILED = "failed";
+	
 //	/**
 //	 * Mapping from old IP addresses to new ones. This map have to be filled,
 //	 * if one or more cluster nodes have been replaced.

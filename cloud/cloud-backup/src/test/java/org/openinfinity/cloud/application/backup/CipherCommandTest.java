@@ -12,6 +12,7 @@ import org.apache.log4j.Logger;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.openinfinity.cloud.application.backup.job.*;
+import org.openinfinity.cloud.service.administrator.MachineService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.test.context.ContextConfiguration;

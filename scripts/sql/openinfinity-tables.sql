@@ -366,12 +366,16 @@ CONSTRAINT `cluster_id` FOREIGN KEY (`cluster_id`) REFERENCES `cluster_tbl` (`cl
 
 CREATE TABLE `backup_operation_tbl` (
 `backup_operation_id` int(11) NOT NULL AUTO_INCREMENT,
-`operation` ENUM('backup', 'full-restore', 'partial-restore') NOT NULL,
-`create_time` datetime DEFAULT NULL,
-`update_time` datetime DEFAULT NULL,
+`operation` ENUM('backup', 'full-restore', 'partial-restore', 'refresh-schedules') NOT NULL,
+`create_time` datetime NULL,
+`update_time` datetime NULL,
 `target_cluster_id` int(11) NOT NULL,
 `source_cluster_id` int(11),
-`state` ENUM('requested', 'in-progress', 'succeeded', 'failed') NOT NULL,
+`state` ENUM('requested', 'in-progress', 'succeeded', 'failed') NOT NULL DEFAULT 'requested',
 PRIMARY KEY (`backup_operation_id`)
 );
+CREATE TRIGGER `backup_operation_tbl_INSERT` BEFORE INSERT ON `backup_operation_tbl`
+    FOR EACH ROW SET NEW.create_time = IFNULL(NEW.create_time, NOW()), NEW.update_time = IFNULL(NEW.update_time, NOW());
+CREATE TRIGGER `backup_operation_tbl_UPDATE` BEFORE UPDATE ON `backup_operation_tbl`
+    FOR EACH ROW SET NEW.update_time = IFNULL(NEW.update_time, NOW());
 
