@@ -9,22 +9,32 @@ import java.util.TreeSet;
 import org.apache.log4j.Logger;
 
 /**
- * Keeps track of InstanceJob objects and cluster backup initialization and finalization.
+ * Keeps track of ClusterJob objects and cluster backup initialization and finalization.
  * 
  * @author Timo Saarinen
  */
 public class ClusterInfo implements ClusterSyncOperations {
 	private Logger logger = Logger.getLogger(ClusterInfo.class);
 	
-	private int clusterId;	
+	private int clusterId;
+	
+	private int toasInstanceId;
 	
 	/**
 	 * List of instance jobs, that are making backup/restore
 	 */
 	private Set<InstanceJob> instanceJobsOnProgress = new HashSet<InstanceJob>();
 
-	public ClusterInfo(int id) {
-		this.clusterId = id;
+	public ClusterInfo(int cluster_id, int toas_instance_id) {
+		this.clusterId = cluster_id;
+		this.toasInstanceId = toas_instance_id;
+	}
+
+	/**
+	 * Returns cluster id.
+	 */
+	public int getClusterId() {
+		return clusterId;
 	}
 	
 	/**
@@ -67,5 +77,9 @@ public class ClusterInfo implements ClusterSyncOperations {
 				new RemoteMachineClusterCommand(job, AFTER_RESTORE).execute();
 			}
 		}
+	}
+
+	public int getToasInstanceId() {
+		return toasInstanceId;
 	}
 }

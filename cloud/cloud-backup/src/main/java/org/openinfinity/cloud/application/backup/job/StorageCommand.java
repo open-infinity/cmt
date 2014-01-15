@@ -12,6 +12,7 @@ import java.util.Map;
 import javax.naming.Context;
 
 import org.apache.log4j.Logger;
+import org.openinfinity.cloud.application.backup.CloudBackup;
 import org.openinfinity.cloud.domain.repository.deployer.BucketRepository;
 import org.openinfinity.core.util.IOUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +38,7 @@ public class StorageCommand implements Command {
 
 	public void execute() throws Exception {
 		if (bucketRepository == null)
-			bucketRepository = (BucketRepository) job.context.getBean("jetS3Repository");
+			bucketRepository = (BucketRepository) CloudBackup.getInstance().getContext().getBean("jetS3Repository");
 		
 		if (job instanceof InstanceBackupJob) {
 			store();
@@ -83,10 +84,8 @@ public class StorageCommand implements Command {
 		// Upload the package to S3 repository as a bucket
 		FileInputStream fis = new FileInputStream(job.getLocalBackupFile());
 		Map<String, String> metadataMap = new HashMap<String, String>();
-		metadataMap.put("toasInstanceId", "" + job.getToasInstanceId());
 		metadataMap.put("hostname", job.getHostname());
 		metadataMap.put("username", job.getUsername());
-		metadataMap.put("virtualMachineId", job.getVirtualMachineInstanceId());
 		metadataMap.put("filename", job.getLocalBackupFile().getName());
 		logger.info("Storing the backup to S3 repository: name=" + getBucketNameForJob() 
 				+ " key=" + getBucketKeyForJob());
@@ -113,9 +112,8 @@ public class StorageCommand implements Command {
 		logger.trace("restore");
 
 		// Decide local package filename
-		String package_filename = "instance" + job.getToasInstanceId() + "-"
-				+ job.getUsername() + "@" + job.getHostname()
-				+ "-backup.tar.xz";
+		String package_filename = "cluster" + job.getStorageCluster().getClusterId() + "-"
+				+ job.getLogicalMachineName() + "-backup.tar.xz";
 		job.setLocalBackupFile(new File(job.getLocalPackageDirectory(), package_filename));
 		
 		// Download package file from S3 repository
@@ -141,10 +139,10 @@ public class StorageCommand implements Command {
 	}
 
 	private String getBucketNameForJob() {
-		return BUCKET_ROOT_NAME + "/instance_" + job.getToasInstanceId();
+		return BUCKET_ROOT_NAME + "/cluster-" + job.getStorageCluster().getClusterId();
 	}
 	
 	private String getBucketKeyForJob() {
-		return "vm_" + job.getVirtualMachineInstanceId();
+		return job.getLogicalMachineName();
 	}
 }

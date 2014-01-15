@@ -1,5 +1,6 @@
 package org.openinfinity.cloud.application.backup.job;
 
+import org.openinfinity.cloud.service.administrator.MachineService;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
@@ -9,11 +10,17 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  * @author Timo Saarinen
  */
 public class InstanceRestoreJob extends InstanceJob {
-	public InstanceRestoreJob(ClusterInfo clustter, ClassPathXmlApplicationContext context) throws BackupException {
-		assert context != null;
-		this.cluster = cluster;
-		this.context = context;
+	public InstanceRestoreJob(ClusterInfo cluster, int machineId) throws BackupException {
+		super(cluster, cluster, machineId);
 		
+		commands.add(new StorageCommand(this));
+		commands.add(new CipherCommand(this));
+		commands.add(new RemoteMachineCommand(this));
+	}
+	
+	public InstanceRestoreJob(ClusterInfo target_cluster, ClusterInfo source_cluster, int machineId) throws BackupException {
+		super(target_cluster, source_cluster, machineId);
+
 		commands.add(new StorageCommand(this));
 		commands.add(new CipherCommand(this));
 		commands.add(new RemoteMachineCommand(this));

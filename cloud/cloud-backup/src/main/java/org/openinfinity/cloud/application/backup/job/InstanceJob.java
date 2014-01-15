@@ -1,12 +1,18 @@
 package org.openinfinity.cloud.application.backup.job;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.openinfinity.cloud.application.backup.CloudBackup;
+import org.openinfinity.cloud.domain.Machine;
+import org.openinfinity.cloud.service.administrator.MachineService;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -20,7 +26,7 @@ import com.amazonaws.services.identitymanagement.model.GetAccountSummaryRequest;
  * 
  * @author Timo Saarinen
  */
-abstract public class InstanceJob implements ApplicationContextAware {
+abstract public class InstanceJob {
 	private Logger logger = Logger.getLogger(InstanceJob.class);
 
 	/**
@@ -36,7 +42,7 @@ abstract public class InstanceJob implements ApplicationContextAware {
 	/**
 	 * Unix username
 	 */
-	private String username;
+	private String username = "root";
 	
 	/**
 	 * Virtual machine SSH port number.
@@ -49,14 +55,16 @@ abstract public class InstanceJob implements ApplicationContextAware {
 	private String password;
 
 	/**
-	 * Eucalyptus instance id.
+	 * Logical name, which is used for mapping virtual machines on 
+	 * full cluster restore. This is supposed to be something like
+	 * loadbalancer, member2, configserver, etc. 
 	 */
-	private String virtualMachineInstanceId;
+	private String logicalMachineName;
 	
 	/**
 	 * Directory, where the package is to be stored in the local host.
 	 */
-	private String localPackageDirectory;
+	private String localPackageDirectory = "/var/tmp";
 
 	/**
 	 * File object representing location of the local file. This is set by Command class subclasses.
@@ -64,27 +72,54 @@ abstract public class InstanceJob implements ApplicationContextAware {
 	private File localBackupFile;
 	
 	/**
-	 * TOAS instance id.
-	 */
-	private int toasInstanceId = -1;
-	
-	/**
-	 * The default constructor.
-	 */
-	public InstanceJob() {
-	}
-
-	protected ClassPathXmlApplicationContext context;
-	
-	/**
 	 * List of commands to run.
 	 */
 	protected List<Command> commands = new LinkedList<Command>();
 	
 	/**
+	 * Existing cluster, where data is read from and written to.
 	 * Object taking care of cluster synchronization.
 	 */
-	protected ClusterInfo cluster;
+	protected ClusterInfo virtualCluster;
+	
+	/**
+	 * Cluster identity, when storing/restoring the backup. 
+	 * Object taking care of cluster synchronization.
+	 */
+	protected ClusterInfo storageCluster;
+	
+	/**
+	 * The default constructor.
+	 */
+	public InstanceJob(ClusterInfo target_cluster, ClusterInfo source_cluster, int machineId) {
+		MachineService machineService = CloudBackup.getInstance().getMachineService();
+		if (machineService != null) {
+			Machine machine = machineService.getMachine(machineId);
+			this.hostname = machine.getDnsName();
+			this.username = machine.getUserName();
+			logger.warn("machineService is null");
+		}
+		this.virtualCluster = target_cluster;
+		this.storageCluster = source_cluster;
+		this.logicalMachineName = decideLogicalHostname(machineId);
+		this.setJobName(logicalMachineName);
+	}
+
+	/**
+	 * Make storage file name for this cluster.
+	 */
+	public String makeStorageFilename() {
+		return makeStorageFilename(storageCluster);
+	}
+	
+	/**
+	 * Make storage file name for given cluster.
+	 */
+	public String makeStorageFilename(ClusterInfo cluster) {
+		if (cluster == null) throw new BackupException("Cluster info not set");
+		if (logicalMachineName == null) throw new BackupException("Logical machine name not set");
+		return "cluster-" + cluster.getClusterId() + "-" + logicalMachineName;
+	}
 	
 	/**
 	 * Needed by Quartz Scheduler.
@@ -94,7 +129,7 @@ abstract public class InstanceJob implements ApplicationContextAware {
 		List<Command> finished_commands = new LinkedList<Command>();
 		try {
 			// Cluster synchronization
-			cluster.start(this);
+			virtualCluster.start(this);
 			
 			// Execute the commands
 			for (Command cmd : commands) {
@@ -124,23 +159,59 @@ abstract public class InstanceJob implements ApplicationContextAware {
 			// It would be pointless to throw anything at this point
 		} finally {
 			// Cluster synchronization
-			cluster.finish(this);
+			virtualCluster.finish(this);
 		}
 	}
 
 	/**
-	 * Returns instance email address. This is needed by GPG encryption/decryption.
-	 * @throws BackupException if TOAS instance id is not available
-	 * @return Email address, which can be used by GPG.
+	 * Decide logical machine name, which is used on store and restore
 	 */
-	public String getInstanceEmail() throws BackupException {
-		if (toasInstanceId != -1) {
-			return "toas-instance-" + toasInstanceId + "@tieto.com";
-		} else {
-			throw new BackupException("Can't generate instance email address, because TOAS instance id is not available."); 
+	private static String decideLogicalHostname(int machineId) {
+		if (CloudBackup.getInstance().getMachineService() == null) return "test";
+
+		// Get Machine
+		MachineService machineService = CloudBackup.getInstance().getMachineService();
+		Machine machine = machineService.getMachine(machineId);
+
+		// We use machine type as base
+		String machine_type = machine.getType();
+		
+		// Get cluster machine list and ensure, that it's ordered by machine id
+		Collection<Machine> machines_unordered = machineService.getMachinesInCluster(machine.getClusterId());
+		Set<Machine> machines = new TreeSet<Machine>(new Comparator<Machine>() {
+			public int compare(Machine m1, Machine m2) {
+				if (m1.getId() < m2.getId()) return -1;
+				if (m1.getId() > m2.getId()) return 1;
+				return 0;
+			}
+			
+			public boolean equals(Object o) {
+				if (o != null)
+					return (this.getClass().equals(o.getClass()));
+				else
+					return false;
+			}
+		});
+		for (Machine m : machines_unordered) {
+			// Add only machines of same type
+			if (m.getType().equals(machine.getType())) {
+				machines.add(m);
+			}
 		}
+		
+		// Find machine number
+		int num = 1;
+		for (Machine m : machines) {
+			if (m.getId() == machine.getId()) {
+				break;
+			}
+			num++;
+		}
+
+		// Combine machine type and order number
+		return machine_type + "-" + num;
 	}
-	
+
 	// ---- Getters & Setters ----------------------------------------------------------------------
 	public String getPassword() {
 		return password;
@@ -172,12 +243,6 @@ abstract public class InstanceJob implements ApplicationContextAware {
 	public void setLocalPackageDirectory(String localPackageDirectory) {
 		this.localPackageDirectory = localPackageDirectory;
 	}
-	public int getToasInstanceId() {
-		return toasInstanceId;
-	}
-	public void setToasInstanceId(int toasInstanceId) {
-		this.toasInstanceId = toasInstanceId;
-	}
 	public int getPort() {
 		return port;
 	}
@@ -190,27 +255,29 @@ abstract public class InstanceJob implements ApplicationContextAware {
 	public void setLocalBackupFile(File localBackupFile) {
 		this.localBackupFile = localBackupFile;
 	}
-	public String getVirtualMachineInstanceId() {
-		return virtualMachineInstanceId;
-	}
-	public void setVirtualMachineInstanceId(String virtualMachineInstanceId) {
-		this.virtualMachineInstanceId = virtualMachineInstanceId;
-	}
-	public ClusterInfo getCluster() {
-		return cluster;
-	}
-	public void setCluster(ClusterInfo cluster) {
-		this.cluster = cluster;
-	}
 
-	@Override
-	public void setApplicationContext(ApplicationContext context) {
-		logger.trace("setApplicationContext(" + context + ")");
-		this.context = (ClassPathXmlApplicationContext) context;
-	}
-	
 	@Override
 	public String toString() {
 		return jobName;
+	}
+
+	public String getLogicalMachineName() {
+		return logicalMachineName;
+	}
+
+	public ClusterInfo getVirtualCluster() {
+		return virtualCluster;
+	}
+
+	public void setVirtualCluster(ClusterInfo virtualCluster) {
+		this.virtualCluster = virtualCluster;
+	}
+
+	public ClusterInfo getStorageCluster() {
+		return storageCluster;
+	}
+
+	public void setStorageCluster(ClusterInfo storageCluster) {
+		this.storageCluster = storageCluster;
 	}
 }

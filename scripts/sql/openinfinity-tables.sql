@@ -369,11 +369,9 @@ CREATE TABLE `backup_operation_tbl` (
 `operation` ENUM('backup', 'full-restore', 'partial-restore') NOT NULL,
 `create_time` datetime DEFAULT NULL,
 `update_time` datetime DEFAULT NULL,
-`backup_rule_id` int(11) NOT NULL,
-`target_cluster_id` int(11),
+`target_cluster_id` int(11) NOT NULL,
+`source_cluster_id` int(11),
 `state` ENUM('requested', 'in-progress', 'succeeded', 'failed') NOT NULL,
-PRIMARY KEY (`backup_operation_id`),
-FOREIGN KEY (`backup_rule_id`) REFERENCES backup_rule_tbl(backup_rule_id) ON DELETE CASCADE,
-CONSTRAINT `backup_rule_id` FOREIGN KEY (`backup_rule_id`) REFERENCES `backup_rule_tbl` (`backup_rule_id`)
+PRIMARY KEY (`backup_operation_id`)
 );
 

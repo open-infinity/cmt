@@ -4,32 +4,37 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.openinfinity.cloud.domain.BackupOperation;
 import org.openinfinity.cloud.domain.BackupRule;
 import org.openinfinity.cloud.domain.repository.backup.BackupRuleRepository;
+import org.openinfinity.cloud.domain.repository.backup.BackupWorkRepository;
 
 @Service("backupService")
 public class BackupServiceImpl implements BackupService {
 
 	@Autowired
+	private BackupWorkRepository backupWorkRepository;
+
+	@Autowired
 	private BackupRuleRepository backupRuleRepository;
-	
-	public void backupCluster(int clusterId) {
-		throw new RuntimeException("UNIMPLEMENTED"); // TODO
-	}
-	
-	public void analyze(RestoreInfo info) {
-		throw new RuntimeException("UNIMPLEMENTED"); // TODO
-	}
-	
-	public void fullRestore(int oldClusterId, int newClusterId) {
-		throw new RuntimeException("UNIMPLEMENTED"); // TODO
+
+	public List<BackupOperation> readBackupOperationsAfter(int id) {
+		return backupWorkRepository.readBackupOperationsAfter(id);
 	}
 
-	public void partialRestore(RestoreInfo info) {
-		throw new RuntimeException("UNIMPLEMENTED"); // TODO
+	public void writeBackupOperation(BackupOperation op) {
+		backupWorkRepository.writeBackupOperation(op);
 	}
 	
-	// --------------------------------------------------------------
+	public BackupOperation readBackupOperation(int id) {
+		return backupWorkRepository.readBackupOperation(id);
+	}
+
+	public boolean deleteBackupOperation(BackupOperation op) {
+		return backupWorkRepository.deleteBackupOperation(op);
+	}
+
+	// ------------------------------------------------------------------------
 	
 	public List<Integer> getBackupClusters() {
 		return backupRuleRepository.getBackupClusters();
