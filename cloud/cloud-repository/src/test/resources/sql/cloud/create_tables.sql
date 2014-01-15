@@ -390,7 +390,7 @@ CREATE TABLE `installation_module_tbl` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(30) NOT NULL,
   `version` varchar(30) NOT NULL,
-  `description` varchar(30) NOT NULL,
+  `description` varchar(256) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
@@ -400,7 +400,7 @@ CREATE TABLE `installation_package_tbl` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(30) NOT NULL,
   `version` varchar(30) NOT NULL,
-  `description` varchar(30) NOT NULL,
+  `description` varchar(256) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 

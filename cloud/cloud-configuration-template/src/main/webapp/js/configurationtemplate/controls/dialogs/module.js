@@ -135,7 +135,7 @@
         dlg.html.module.name.val("");
         dlg.html.module.version.val("");
         dlg.html.module.description.val("");
-        dlg.html.keyName.text("");
+        dlg.html.keyName.text("N/A");
         delete dlg.model.parameters;
         dlg.state.selectedKey = null;
         dlg.html.parameterKeysList.empty();
@@ -170,8 +170,10 @@
             outData.parameters = JSON.stringify(dlg.model.parameters);
 
             // send data
-            console.log("Post data" + outData);
-            
+            console.log("Post data module" + outData.module);
+            console.log("Post data packages" + outData.packages);
+            console.log("Post data key-value parameters" + outData.parameters);
+
             $.post((mode == "edit") ? portletURL.url.module.editModuleURL : portletURL.url.module.createModuleURL, outData)
             .done(function(){
                 app.reloadModulesTable();

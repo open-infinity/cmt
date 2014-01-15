@@ -59,7 +59,7 @@
 				</div>
 				<div class="dlg-input-container">
 					<div class="dlg-element-value-label">Description</div>
-					<textarea id="dlg-element-value-description" rows="3" cols="40"></textarea>
+					<textarea rows="3" cols="40" class="dlg-item-description"></textarea>
 				</div>
 				<div class="dlg-input-container">
 					<div class="dlg-element-value-label">MinMachines</div>

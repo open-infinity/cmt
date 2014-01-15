@@ -41,7 +41,7 @@
 		<div id="dlg-package-general-tab">
 			<div id="dlg-package-fields" class="dlg-tab-items-container">
 				<div class="dlg-input-container">
-					<div class="dlg-package-value-label">Id</div>
+					<div class="dlg-value-label">Id</div>
 					<div id="dlg-package-value-id"></div>
 				</div>
 				<div class="dlg-input-container">
@@ -54,7 +54,7 @@
 				</div>
 				<div class="dlg-input-container">
 					<div class="dlg-value-label">Description</div>
-					<textarea id="dlg-package-value-description" rows="3" cols="40"></textarea>
+					<textarea id="dlg-package-value-description" rows="3" cols="40" class="dlg-item-description"></textarea>
 				</div>
 			</div>
 		</div>

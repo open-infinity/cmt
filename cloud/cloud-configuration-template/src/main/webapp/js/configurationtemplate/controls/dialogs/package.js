@@ -108,22 +108,20 @@
         var pkg = getPackage();
 
         // validate input data
-        if (!validateInput(pkg, packages, dlg.model.parameters)){
+        if (!validateInput(pkg)){
             return;
         }
 
         // serialize input data
         var outData = {};
-        outData.pkg = JSON.stringify(pkg);
-        outData.packages = JSON.stringify(packages);
-        outData.parameters = JSON.stringify(dlg.model.parameters);
+        outData.package = JSON.stringify(pkg);
 
         // send input data
-        console.log("Posting package parameters:" + outData.parameters);
+        console.log("Posting package:" + outData.package);
         
         $.post((mode == "edit") ? portletURL.url.package.editPackageURL : portletURL.url.package.createPackageURL, outData)
         .done(function(){
-            app.reloadPkgsTable();
+            app.reloadPackagesTable();
         })
         .fail(function(jqXHR, textStatus, errorThrown) {
             alertPostFailure(dlg.mode, textStatus, errorThrown);

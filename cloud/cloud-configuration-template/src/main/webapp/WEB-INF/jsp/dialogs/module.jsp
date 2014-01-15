@@ -63,7 +63,7 @@
 				</div>
 				<div class="dlg-input-container">
 					<div class="dlg-value-label">Description</div>
-					<textarea id="dlg-module-value-description" rows="3" cols="40"></textarea>
+					<textarea id="dlg-module-value-description" rows="3" cols="40" class="dlg-item-description"></textarea>
 				</div>
 			</div>
 		</div>

@@ -92,7 +92,7 @@
         },
         getVal : function(){
             var selectedIndices = [];
-                var lis = this.find("li", "ul:first");
+                var lis = this.find("ul:first").find("li");
             for (var i = 0; i < lis.length; i++){
                 selectedIndices.push($(lis[i]).data("config").id);
             }

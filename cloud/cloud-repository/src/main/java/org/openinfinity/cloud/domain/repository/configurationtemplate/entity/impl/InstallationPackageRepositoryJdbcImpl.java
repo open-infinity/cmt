@@ -45,7 +45,7 @@ public class InstallationPackageRepositoryJdbcImpl implements InstallationPackag
 
     private static final String DELETE_SQL = "delete from installation_package_tbl where id = ?";
 
-    private static final String UPDATE_SQL = "update installation_package_tbl set name = ?, version = ?, description = ?";
+    private static final String UPDATE_SQL = "update installation_package_tbl set name = ?, version = ?, description = ? where id = ?";
 
     private static final String GET_ALL_SQL = "select * from installation_package_tbl";
 
@@ -80,7 +80,7 @@ public class InstallationPackageRepositoryJdbcImpl implements InstallationPackag
 
     @Override
     public void update(InstallationPackage installationPackage) {
-        jdbcTemplate.update(UPDATE_SQL, installationPackage.getName(), installationPackage.getVersion(), installationPackage.getDescription());
+        jdbcTemplate.update(UPDATE_SQL, installationPackage.getName(), installationPackage.getVersion(), installationPackage.getDescription(), installationPackage.getId());
     }
 
     @Override

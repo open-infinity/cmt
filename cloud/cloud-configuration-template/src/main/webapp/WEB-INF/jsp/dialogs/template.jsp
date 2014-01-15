@@ -50,7 +50,7 @@
 				</div>
 				<div class="dlg-edit-template-template-label-container">
 					<div id="template-description" class="dlg-value-label">Template description</div>
-					<textarea rows="8" cols="68"></textarea>
+					<textarea rows="8" cols="68" class="dlg-item-description"></textarea>
 				</div>
 			</div>
 		</div>

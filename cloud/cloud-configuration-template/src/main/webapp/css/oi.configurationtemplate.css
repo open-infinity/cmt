@@ -2,7 +2,7 @@
 
 /* All dialogs */
 .dlg-tab-items-container{width:560px;height:300px;margin-bottom:15px;padding:10px;border-width:0px;font-family:Verdana,Arial,sans-serif;font-size:13px;font-style:normal;font-weight:bold;}
-.dlg-tab-item{height:300px;float:left;border-style:solid;border-width:1px;border-color:#C4C4C4;}
+.dlg-tab-item{height:300px;float:left;border-style:solid;border-width:1px;border-color:#C4C4C4;border-radius: 7px;}
 .dlg-arrows-img{width:150px; border-width:0px}
 .dlg-list-panel-container{width:200px;}
 .dlg-list-panel-container-title{margin: 10px 0px 8px 10px;font-size:12px;font-weight:bold}
@@ -13,6 +13,7 @@
 input[type="text"].dlg-error-input{border-color:red;border-radius:2px;margin-left:-1px;}
 .dlg-input-container{margin:0 0 7px 0;}
 .dlg-value-label{width: 130px;float: left;}
+.dlg-item-description{width: 168px;}
 
 /* Template edit/create dialog */
 .dlg-edit-template-list-panel-container{width:200px;}
@@ -37,7 +38,7 @@ input[type="text"].dlg-error-input{border-color:red;border-radius:2px;margin-lef
 /*#dlg-dependency-selection-container{height:300px;}*/
 .dlg-element-parameter-key-name{width:110px;float:left}
 .dlg-element-list-item-button{width:18px;margin-left:20px;display:inline-block;border-style:solid;border-width:1px;border-color:#c4c4c4;text-align:center;border-radius:15px;background-color:#EEEEEE;font-weight:bold;}
-#dlg-element-value-description{width:168px}
+/*#dlg-element-value-description{width:168px} */
 #dlg-list-values-container{width:200px;margin-left:150px;}
 #dlg-list-values-container li{width:175px;padding: 5px 0 5px 5px}
 #dlg-list-values-container .list-item-column{width:135px}
@@ -64,7 +65,7 @@ input[type="text"].dlg-error-input{border-color:red;border-radius:2px;margin-lef
 #dlg-keys-values-container li.dlg-element-key-value-list-item{border-width:0;background:white};
 #dlg-element-key-name{padding-left:10px;font-weight:normal;}
 input[type="text"].dlg-key-name, input[type="text"].dlg-value-type, input[type="text"].dlg-value-value{width:90%; padding:2px}
-#dlg-module-key-name{margin-left:5px;}
+#dlg-module-key-name{margin-left:5px;width:50px;display:inline-block;text-align:center;border-radius:7px;margin-left:28px;border-color:rgb(0, 0, 0);border-width:2px;border-style:solid}
 /* TODO: Make a standalone widget for info or integrate with itemselect widget  to avoid duplication of classes*/
 /* the lines below are the same as dlg-item-list-container */
 .dlg-module-item-list-container ul{height:250px;width:200px;overflow-y:auto;float:left;list-style-type:none;margin:0;padding:0;margin-bottom:10px;}
