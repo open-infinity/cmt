@@ -68,22 +68,32 @@ public class CloudBackup {
 			if (instanceService == null) {
 				instanceService = (InstanceService) context
 						.getBean("instanceService");
+				if (instanceService == null)
+					throw new BackupException("instanceService is null!");
 			}
 			if (clusterService == null) {
 				clusterService = (ClusterService) context
 						.getBean("clusterService");
+				if (clusterService == null)
+					throw new BackupException("clusterService is null!");
 			}
 			if (machineService == null) {
 				machineService = (MachineService) context
 						.getBean("machineService");
+				if (machineService == null)
+					throw new BackupException("machineService is null!");
 			}
 			if (backupService == null) {
 				backupService = (BackupService) context
 						.getBean("backupService");
+				if (backupService == null)
+					throw new BackupException("backupService is null!");
 			}
 			if (backupWorkRepository == null) {
 				backupWorkRepository = (BackupWorkRepository) context
 						.getBean("backupWorkRepository");
+				if (backupWorkRepository == null)
+					throw new BackupException("backupWorkRepository is null!");
 			}
 
 			// Start the scheduler
@@ -127,7 +137,7 @@ public class CloudBackup {
 				// Iterate all the machines in cluster
 				for (Machine machine : machineService
 						.getMachinesInCluster(cluster.getId())) {
-					InstanceJob job = new InstanceBackupJob(clusterInfo, machine.getId());
+					InstanceJob job = new InstanceBackupJob(clusterInfo, machine.getId(), null);
 					job.setLocalPackageDirectory("/var/tmp"); // TODO
 
 					for (BackupRule rule : rules) {
@@ -181,6 +191,8 @@ public class CloudBackup {
 	}
 
 	public ClusterService getClusterService() {
+		if (clusterService == null)
+			logger.warn("Returning clusterService == null");
 		return clusterService;
 	}
 

@@ -171,14 +171,14 @@ public class CipherCommandTest {
 
 	private class TestBackupInstanceJob extends InstanceBackupJob {
 		public TestBackupInstanceJob(ClusterInfo c) throws BackupException {
-			super(c, 1234);
+			super(c, 1234, null);
 			commands.clear();
 		}
 	}
 
 	private class TestRestoreInstanceJob extends InstanceRestoreJob {
 		public TestRestoreInstanceJob(ClusterInfo c) throws BackupException {
-			super(c, 1234);
+			super(c, 1234, null);
 			commands.clear();
 		}
 	}

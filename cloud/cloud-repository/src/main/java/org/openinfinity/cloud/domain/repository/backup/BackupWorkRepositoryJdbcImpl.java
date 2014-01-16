@@ -31,6 +31,8 @@ public class BackupWorkRepositoryJdbcImpl implements BackupWorkRepository {
 	public static final String COLUMN_TARGET_CLUSTER_ID = "target_cluster_id";
 	public static final String COLUMN_SOURCE_CLUSTER_ID = "source_cluster_id";
 	public static final String COLUMN_STATE = "state";
+	public static final String COLUMN_DESCRIPTION = "description";
+	public static final int COLUMN_DESCRIPTION_MAXLEN = 100;
 
 	private JdbcTemplate jdbcTemplate;
 
@@ -55,15 +57,17 @@ public class BackupWorkRepositoryJdbcImpl implements BackupWorkRepository {
 					+ COLUMN_CREATED + ", " 
 					+ COLUMN_TARGET_CLUSTER_ID + ", "
 					+ COLUMN_SOURCE_CLUSTER_ID + ", " 
-					+ COLUMN_STATE
-					+ ") VALUES (?, ?, ?, ?, ?, ?)",
+					+ COLUMN_STATE + ", "
+					+ COLUMN_DESCRIPTION
+					+ ") VALUES (?, ?, ?, ?, ?, ?, ?)",
 					new Object[] { 
 						op.getOperation(), 
 						new java.util.Date(),
 						new java.util.Date(), 
-						op.getTargetClusterId(), 
-						op.getSourceClusterId(),
-						op.getState()
+						op.getTargetClusterId() == -1 ? null : op.getTargetClusterId(), 
+						op.getSourceClusterId() == -1 ? null : op.getSourceClusterId(), 
+						op.getState(),
+						limit(op.getDescription(), COLUMN_DESCRIPTION_MAXLEN)
 						});
 		} else {
 			jdbcTemplate.update("UPDATE " + TABLE_BACKUP_OPERATION + " SET "
@@ -71,13 +75,15 @@ public class BackupWorkRepositoryJdbcImpl implements BackupWorkRepository {
 					+ COLUMN_UPDATED + " = ?, "
 					+ COLUMN_TARGET_CLUSTER_ID + " = ?, " 
 					+ COLUMN_SOURCE_CLUSTER_ID + " = ?, " 
-					+ COLUMN_STATE
-					+ " = ?, " + ") WHERE " + COLUMN_ID + " = ?", new Object[] {
+					+ COLUMN_STATE + " = ?,"
+					+ COLUMN_DESCRIPTION + " = ? "
+					+ "WHERE " + COLUMN_ID + " = ?", new Object[] {
 					op.getOperation(), 
 					op.getUpdated(),
-					op.getTargetClusterId(), 
-					op.getSourceClusterId(), 
+					op.getTargetClusterId() == -1 ? null : op.getTargetClusterId(), 
+					op.getSourceClusterId() == -1 ? null : op.getSourceClusterId(), 
 					op.getState(), 
+					limit(op.getDescription(), COLUMN_DESCRIPTION_MAXLEN),
 					op.getId() });
 		}
 	}
@@ -110,10 +116,34 @@ public class BackupWorkRepositoryJdbcImpl implements BackupWorkRepository {
 			op.setId(rs.getInt(COLUMN_ID));
 			op.setOperation(rs.getString(COLUMN_OPERATION));
 			op.setUpdated(rs.getDate(COLUMN_UPDATED));
-			op.setTargetClusterId(rs.getInt(COLUMN_TARGET_CLUSTER_ID));
-			op.setSourceClusterId(rs.getInt(COLUMN_SOURCE_CLUSTER_ID));
+			if (rs.getString(COLUMN_TARGET_CLUSTER_ID) != null) {
+				op.setTargetClusterId(rs.getInt(COLUMN_TARGET_CLUSTER_ID));
+			} else {
+				op.setTargetClusterId(-1);
+			}
+			if (rs.getString(COLUMN_SOURCE_CLUSTER_ID) != null) {
+				op.setSourceClusterId(rs.getInt(COLUMN_SOURCE_CLUSTER_ID));
+			} else {
+				op.setSourceClusterId(-1);
+			}
 			op.setState(rs.getString(COLUMN_STATE));
+			op.setDescription(rs.getString(COLUMN_DESCRIPTION));
 			return op;
+		}
+	}
+	
+	/**
+	 * Limit string length.
+	 */
+	private static String limit(String s, int maxlen) {
+		if (s != null) {
+			if (s.length() > maxlen) {
+				return s.substring(0, maxlen);
+			} else {
+				return s;
+			}
+		} else {
+			return null;
 		}
 	}
 }

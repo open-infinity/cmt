@@ -372,7 +372,10 @@ CREATE TABLE `backup_operation_tbl` (
 `target_cluster_id` int(11) NOT NULL,
 `source_cluster_id` int(11),
 `state` ENUM('requested', 'in-progress', 'succeeded', 'failed') NOT NULL DEFAULT 'requested',
-PRIMARY KEY (`backup_operation_id`)
+`description` varchar(100),
+PRIMARY KEY (`backup_operation_id`),
+FOREIGN KEY (`target_cluster_id`) REFERENCES cluster_tbl(cluster_id) ON DELETE CASCADE,
+FOREIGN KEY (`source_cluster_id`) REFERENCES cluster_tbl(cluster_id) ON DELETE CASCADE
 );
 CREATE TRIGGER `backup_operation_tbl_INSERT` BEFORE INSERT ON `backup_operation_tbl`
     FOR EACH ROW SET NEW.create_time = IFNULL(NEW.create_time, NOW()), NEW.update_time = IFNULL(NEW.update_time, NOW());

@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javax.validation.ReportAsSingleViolation;
+
 import org.apache.log4j.Logger;
 import org.openinfinity.cloud.application.backup.CloudBackup;
 import org.openinfinity.cloud.domain.Machine;
@@ -89,9 +91,15 @@ abstract public class InstanceJob {
 	protected ClusterInfo storageCluster;
 	
 	/**
+	 * After the job is completed the listener will be informed.
+	 */
+	private ResultListener listener;
+	
+	/**
 	 * The default constructor.
 	 */
-	public InstanceJob(ClusterInfo target_cluster, ClusterInfo source_cluster, int machineId) {
+	public InstanceJob(ClusterInfo target_cluster, ClusterInfo source_cluster, int machineId, ResultListener listener) {
+		this.listener = listener;
 		MachineService machineService = CloudBackup.getInstance().getMachineService();
 		if (machineService != null) {
 			Machine machine = machineService.getMachine(machineId);
@@ -136,9 +144,13 @@ abstract public class InstanceJob {
 				logger.debug("Executing " + cmd.getClass().getSimpleName());
 				cmd.execute();
 				finished_commands.add(cmd);
+				if (listener != null) listener.report(true, null);
 			}
 			logger.debug("All commands executed successfully.");
 		} catch (Exception e) {
+			// Inform listener
+			if (listener != null) listener.report(false, e.getMessage());
+			
 			// One of the commands failed. Use the finished list to undo the action.
 			if (finished_commands.size() > 0) {
 				logger.error("Job " + jobName + " failed. Trying undo. " + e.getMessage(), e);
@@ -212,6 +224,13 @@ abstract public class InstanceJob {
 		return machine_type + "-" + num;
 	}
 
+	/**
+	 * Class for resulting status callbacks.
+	 */
+	public interface ResultListener {
+		public void report(boolean success, String description);
+	}
+	
 	// ---- Getters & Setters ----------------------------------------------------------------------
 	public String getPassword() {
 		return password;

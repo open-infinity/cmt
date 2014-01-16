@@ -45,14 +45,14 @@ public class BackupOperation {
 	 * Target cluster id.
 	 */
 	@NotScript
-	private int targetClusterId;
+	private int targetClusterId = -1;
 	
 	/**
 	 * Source cluster id. In case of partial restore this is expected to be null.
 	 * In case of full restore, this have to be supplied.
 	 */
 	@NotScript
-	private int sourceClusterId;
+	private int sourceClusterId = -1;
 	
 	/**
 	 * Operation state: 'requested', 'in-progress', 'succeeded', 'failed'. 
@@ -60,6 +60,12 @@ public class BackupOperation {
 	@NotScript
 	private String state;
 
+	/**
+	 * Operation state description.
+	 */
+	@NotScript
+	private String description;
+	
 	public static final String REQUESTED = "requested";
 	public static final String IN_PROGRESS = "in-progress";
 	public static final String SUCCEEDED = "succeeded";
