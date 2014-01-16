@@ -218,18 +218,17 @@ public class TemplateController extends AbstractController{
     @Authenticated
     @ResourceMapping(EDIT_TEMPLATE)
     public void editTemplate(ResourceRequest request, ResourceResponse response,
-                             @RequestParam("templateId") int templateId,
-                             @RequestParam("templateName") String templateName,
-                             @RequestParam("templateDescription") String templateDescription,
-                             @RequestParam("elementsSelected") String elementsSelected,
-                             @RequestParam("organizationsSelected") String organizationsSelected
-    ) {
+                             @RequestParam("id") int id,
+                             @RequestParam("name") String name,
+                             @RequestParam("description") String description,
+                             @RequestParam("elements") String elements,
+                             @RequestParam("organizations") String organizations) {
         try {
             User user = liferayService.getUser(request, response);
             if (user == null) return;
 
             ObjectMapper mapper = new ObjectMapper();
-            configurationTemplateService.update(new ConfigurationTemplate(templateId, templateName, templateDescription), mapper.readValue(elementsSelected, List.class), mapper.readValue(organizationsSelected, List.class));
+            configurationTemplateService.update(new ConfigurationTemplate(id, name, description), mapper.readValue(elements, List.class), mapper.readValue(organizations, List.class));
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -239,16 +238,15 @@ public class TemplateController extends AbstractController{
     @Authenticated
     @ResourceMapping(CREATE_TEMPLATE)
     public void createTemplate(ResourceRequest request, ResourceResponse response,
-                             @RequestParam("templateName") String templateName,
-                             @RequestParam("templateDescription") String templateDescription,
-                             @RequestParam("elementsSelected") String elementsSelected,
-                             @RequestParam("organizationsSelected") String organizationsSelected
-    ) {
+                               @RequestParam("name") String name,
+                               @RequestParam("description") String description,
+                               @RequestParam("elements") String elements,
+                               @RequestParam("organizations") String organizations) {
         try {
             User user = liferayService.getUser(request, response);
             if (user == null) return;
             ObjectMapper mapper = new ObjectMapper();
-            configurationTemplateService.create(new ConfigurationTemplate(templateName, templateDescription), mapper.readValue(elementsSelected, List.class), mapper.readValue(organizationsSelected, List.class));
+            configurationTemplateService.create(new ConfigurationTemplate(name, description), mapper.readValue(elements, List.class), mapper.readValue(organizations, List.class));
         } catch (Exception e) {
             e.printStackTrace();
             response.setProperty(ResourceResponse.HTTP_STATUS_CODE, HttpCodes.HTTP_ERROR_CODE_SERVER_ERROR);

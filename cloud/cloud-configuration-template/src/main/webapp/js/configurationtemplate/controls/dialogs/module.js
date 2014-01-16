@@ -15,7 +15,6 @@
     dlg.html.idContainer = $($(".dlg-input-container", "#dlg-module-general-tab").first());
     dlg.html.module = {};
     dlg.html.module.id = $("#dlg-module-value-id");
-    //dlg.html.module.type = $("#dlg-module-value-type");
     dlg.html.module.name = $("#dlg-module-value-name");
     dlg.html.module.version = $("#dlg-module-value-version");
     dlg.html.module.description = $("#dlg-module-value-description");
@@ -29,7 +28,20 @@
     $.extend(dlg, {
 
         create : function(){
-
+            $.ajax({
+                    url: portletURL.url.module.getAllPackagesURL,
+                    dataType: "json"})
+            .done(function(data){
+                dlg.model.parameters = dataKeyValues[0];
+                console.log("received parameters:" + dlg.model.parameters);
+                dlg.html.packages.itemselect("init", data);
+                configureEventHandling();
+                })
+            .fail(function(jqXHR, textStatus, errorThrown) {
+                console.log("Error fetching items for dialog");
+                });
+            dlg.mode = "create";
+            dlg.open();
         },
 
         edit : function(id){
@@ -39,7 +51,6 @@
                 }).done(function(data) {
                 	console.log(data);	
                 	dlg.html.module.id.text(data.id);
-                    //dlg.html.module.type.val(data.type);
                     dlg.html.module.name.val(data.name);
                     dlg.html.module.version.val(data.version);
                     dlg.html.module.description.val(data.description);
@@ -77,11 +88,11 @@
         open : function(){
             var title;
             if (dlg.mode == "edit"){
-                //dlg.html.idContainer.show();
+                dlg.html.idContainer.show();
                 title = "Edit module";
             }
             else if (dlg.mode == "create"){
-                //dlg.html.idContainer.hide();
+                dlg.html.idContainer.hide();
                 title = "Create new module";
             }
             else{
@@ -97,13 +108,8 @@
         },
 
         close : function(){
-            // cleanup dialog html elements
         	cleanUpDialog();
-            // clear error styles
-
-            // close jQuery dialog
             dlg.html.self.dialog("close");
-
         }
     });
 
@@ -131,7 +137,6 @@
     function cleanUpDialog(){
     	dlg.html.packages.itemselect("destroy");
     	dlg.html.module.id.text("");
-        //dlg.html.module.type.val("");
         dlg.html.module.name.val("");
         dlg.html.module.version.val("");
         dlg.html.module.description.val("");
@@ -195,10 +200,7 @@
 
         // click and key press on module general input tags
         bindInputClicksAndKeys();
-
         bindGeneralAttributeInputClicks();
-        // itemSelect events
-        //itemSelectConfigureDragAndDrop();
 
         // parameter key-value events
         bindParameterKeyClicks();
@@ -210,29 +212,6 @@
         // Double clicks for mini info dialog
         infoDlg.bind();
     }
-
-/*
-    function populatePackages(data){
-        try{
-            var selectedIndices = [];
-
-            $.each(data.selected, function(index, value){
-               storeDependeesToDom(tpl.dependee, value, dlg.html.selectedDependeesList);
-               selectedIndices.push(value.id);
-            });
-
-            $.each(data.available, function(index, value){
-               if (selectedIndices.indexOf(value.id) == -1){
-                   storeDependeesToDom(tpl.dependee, value, dlg.html.availableDependeesList);
-               }
-            });
-        }
-        catch(err){
-            console.log(err.message);
-        }
-    }
-
-    */
 
     function bindGeneralAttributeInputClicks(){
         $("input","#dlg-module-general-tab").bind( "click",  function(){
@@ -343,9 +322,6 @@
                         alertWrongInput(keyInput, err.keyAlreadyExists);
                         exists = true;
                     }
-                    //else{
-                    //    dlg.model.parameters[key] = [];
-                    //}
                 });
                 if (exists === true) {
                     return;
@@ -581,16 +557,6 @@
     /*
     function isPosInt(obj){
         return (obj !== "" && typeof obj !== 'undefined' && !isNaN(obj) && (Math.round(obj) == obj) && obj > 0) ? true : false;
-    }
-    */
-    /*
-    function getDependencies(){
-        var selectedItems = [];
-            var arrayOfLis = dlg.html.selectedDependeesList.find("li");
-        for (var i = 0; i < arrayOfLis.length; i++){
-            selectedItems.push($(arrayOfLis[i]).data("config").id);
-        }
-        return selectedItems;
     }
     */
     function getModule(){

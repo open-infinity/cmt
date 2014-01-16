@@ -24,16 +24,21 @@
     dlg.html.tabs = $("#dlg-element-tabs");
 
     // Selection widget
-    dlg.html.selectionWidget = {};
-    dlg.html.selectionWidget.dependencies = $("#dlg-element-dependencies-tab").find(".dlg-item-selection-container");
-    dlg.html.selectionWidget.modules = $("#dlg-element-modules-tab").find(".dlg-item-selection-container");
+    //dlg.html.selectionWidget = {};
+    //dlg.html.selectionWidget.dependencies = $("#dlg-element-dependencies-tab").find(".dlg-item-selection-container");
+    //dlg.html.selectionWidget.modules = $("#dlg-element-modules-tab").find(".dlg-item-selection-container");
+
+    // Item select widget for modules
+    dlg.html.dependees = $("#dlg-element-dependees-item-select");
+    dlg.html.modules = $("#dlg-element-modules-item-select");
+
 
     // Selection widget internals
     // TODO: remove this once the widget is isolated
-    dlg.html.selectionWidget.selectedDependeesList = dlg.html.selectionWidget.dependencies.find(".dlg-item-list-container").first().find("ul");
-    dlg.html.selectionWidget.availableDependeesList = dlg.html.selectionWidget.dependencies.find(".dlg-item-list-container").last().find("ul");
-    dlg.html.selectionWidget.selectedModulesList = dlg.html.selectionWidget.modules.find(".dlg-item-list-container").first().find("ul");
-    dlg.html.selectionWidget.availableModulesList = dlg.html.selectionWidget.modules.find(".dlg-item-list-container").last().find("ul");
+    //dlg.html.selectionWidget.selectedDependeesList = dlg.html.selectionWidget.dependencies.find(".dlg-item-list-container").first().find("ul");
+    //dlg.html.selectionWidget.availableDependeesList = dlg.html.selectionWidget.dependencies.find(".dlg-item-list-container").last().find("ul");
+    //dlg.html.selectionWidget.selectedModulesList = dlg.html.selectionWidget.modules.find(".dlg-item-list-container").first().find("ul");
+    //dlg.html.selectionWidget.availableModulesList = dlg.html.selectionWidget.modules.find(".dlg-item-list-container").last().find("ul");
 
     //dlg.html.availableDependeesList = $("ul", "#dlg-element-available-dependees");
 
@@ -42,7 +47,7 @@
     dlg.html.elem.type = $("#dlg-element-value-type");
     dlg.html.elem.name = $("#dlg-element-value-name");
     dlg.html.elem.version = $("#dlg-element-value-version");
-    dlg.html.elem.description = $("#dlg-element-value-description");
+    dlg.html.elem.description = $("#dlg-element-general-tab").find("textarea");
     dlg.html.elem.minMachines = $("#dlg-element-value-min-machines");
     dlg.html.elem.maxMachines = $("#dlg-element-value-max-machines");
     dlg.html.elem.replicated = $("#dlg-element-replicated-radio");
@@ -52,6 +57,25 @@
     $.extend(dlg, {
 
 		create : function(){
+		$.when(
+                $.ajax({
+                    url: portletURL.url.element.getAllDependenciesURL,
+                    dataType: "json"
+                }),
+                $.ajax({
+                    url: portletURL.url.element.getAllModulesURL,
+                    dataType: "json"
+                }))
+                .done(function(dataDependencies, dataModules){
+                    // TODO : this function belongs to selectionWidget
+                    //updateSelectionWidget(dataDependencies[0], tpl.item, dlg.html.selectionWidget.selectedDependeesList, dlg.html.selectionWidget.availableDependeesList);
+                    //updateSelectionWidget(dataModules[0], tpl.item, dlg.html.selectionWidget.selectedModulesList, dlg.html.selectionWidget.availableModulesList);
+                    dlg.html.dependees.itemselect("init", dataDependencies[0]);
+                    dlg.html.modules.itemselect("init", dataModules[0]);
+                    configureEventHandling();
+                    })
+                .fail(function(jqXHR, textStatus, errorThrown) {
+                    console.log("Error fetching items for dialog");});
 		    dlg.mode = "create";
 			dlg.open();
 		},
@@ -83,15 +107,6 @@
                 }).fail(function(jqXHR, textStatus, errorThrown) {
                     console.log("Error fetching element");
             });
-            dlg.mode = "edit";
-            dlg.open(id);
-        },
-
-        open : function(id){
-			if (dlg.mode !== "create" && dlg.mode != "edit") {
-				console.log("Invalid dialog mode: " + dlg.mode);
-				return;
-			}
             $.when(
                     $.ajax({
                         url: portletURL.url.element.getDependenciesURL + "&elementId=" + id,
@@ -101,16 +116,25 @@
                         url: portletURL.url.element.getModulesForElementURL + "&elementId=" + id,
                         dataType: "json"
                     }))
-            .done(function(dataDependencies, dataModules){
-                // TODO : this function belongs to selectionWidget
-                updateSelectionWidget(dataDependencies[0], tpl.item, dlg.html.selectionWidget.selectedDependeesList, dlg.html.selectionWidget.availableDependeesList);
-                updateSelectionWidget(dataModules[0], tpl.item, dlg.html.selectionWidget.selectedModulesList, dlg.html.selectionWidget.availableModulesList);
-                configureEventHandling();
-                })
-            .fail(function(jqXHR, textStatus, errorThrown) {
-                console.log("Error fetching items for dialog");
-                });
-            
+                    .done(function(dataDependencies, dataModules){
+                        // TODO : this function belongs to selectionWidget
+                        //updateSelectionWidget(dataDependencies[0], tpl.item, dlg.html.selectionWidget.selectedDependeesList, dlg.html.selectionWidget.availableDependeesList);
+                        //updateSelectionWidget(dataModules[0], tpl.item, dlg.html.selectionWidget.selectedModulesList, dlg.html.selectionWidget.availableModulesList);
+                        dlg.html.dependees.itemselect("init", dataDependencies[0]);
+                        dlg.html.modules.itemselect("init", dataModules[0]);
+                        configureEventHandling();
+                        })
+                    .fail(function(jqXHR, textStatus, errorThrown) {
+                        console.log("Error fetching items for dialog");});
+            dlg.mode = "edit";
+            dlg.open(id);
+        },
+
+        open : function(){
+			if (dlg.mode !== "create" && dlg.mode != "edit") {
+				console.log("Invalid dialog mode: " + dlg.mode);
+				return;
+			}
             var title = "";
             if (dlg.mode == "edit"){
                 dlg.html.idContainer.show();
@@ -134,29 +158,35 @@
         },
 
         close : function(){
-            // cleanup dialog html elements
-            dlg.html.self.find(".dlg-item-list-container").find("ul").empty();
-            dlg.html.elem.id.text("");
-            dlg.html.elem.type.val("");
-            dlg.html.elem.version.val("");
-            dlg.html.elem.name.val("");
-            dlg.html.elem.description.val("");
-            dlg.html.elem.minMachines.val("");
-            dlg.html.elem.maxMachines.val("");
-            dlg.html.elem.replicated.find("input").first().prop('checked', false);
-            dlg.html.elem.replicated.find("input").last().prop('checked', true);
-            dlg.html.elem.minReplicationMachines.val("");
-            dlg.html.elem.maxReplicationMachines.val("");
-
-            // clear error styles
-            $.each(dlg.html.self.find("input"), function(index, value){
-                clearStyleForErrorInput(index, $(value));
-            });
-
-            // close jQuery dialog
+            cleanUpDialog();
             dlg.html.self.dialog("close");
         }
     });
+
+
+    // Cleanup
+
+    function cleanUpDialog(){
+        //dlg.html.self.find(".dlg-item-list-container").find("ul").empty();
+        dlg.html.dependees.itemselect("destroy");
+        dlg.html.modules.itemselect("destroy");
+        dlg.html.elem.id.text("");
+        dlg.html.elem.type.val("");
+        dlg.html.elem.version.val("");
+        dlg.html.elem.name.val("");
+        dlg.html.elem.description.val("");
+        dlg.html.elem.minMachines.val("");
+        dlg.html.elem.maxMachines.val("");
+        dlg.html.elem.replicated.find("input").first().prop('checked', false);
+        dlg.html.elem.replicated.find("input").last().prop('checked', true);
+        dlg.html.elem.minReplicationMachines.val("");
+        dlg.html.elem.maxReplicationMachines.val("");
+
+        // clear error styles
+        $.each(dlg.html.self.find("input"), function(index, value){
+            clearStyleForErrorInput(index, $(value));
+        });
+    }
 
     // initialize dialog
     dlg.html.self.dialog({
@@ -183,8 +213,12 @@
         var err = 0;
 
         // get input data
-        var dependees = getSelectionWidgetItems(dlg.html.selectionWidget.selectedDependeesList);
-        var modules = getSelectionWidgetItems(dlg.html.selectionWidget.selectedModulesList);
+        //var dependees = getSelectionWidgetItems(dlg.html.selectionWidget.selectedDependeesList);
+        var dependees = dlg.html.dependees.itemselect("getVal");
+
+        //var modules = getSelectionWidgetItems(dlg.html.selectionWidget.selectedModulesList);
+        var modules = dlg.html.modules.itemselect("getVal");
+
         var element = getElement();
 
         // validate input data
@@ -214,44 +248,15 @@
     // Events handling
 
     function configureEventHandling(){
-        configureDragAndDrop();
-        bindDependencyListItemClicks();
+        //configureDragAndDrop();
+        //bindDependencyListItemClicks();
         bindInputClicksAndKeys();
         infoDlg.bind();
         bindRadioChange();
     }
-/*
-    function configureDragAndDrop(){
-        $(".dlg-list-panel-container", "#dlg-dependency-selection-container").droppable({
-            activeClass: "ui-state-highlight",
-            drop: function (event, ui) {
-                var list = $(this).find("ul");
-                var selected = $(this).siblings().find("li.ui-state-highlight");
-                if (selected.length > 1) {
-                    moveMultipleElements(list, selected);
-                } else {
-                    moveSingleElement(ui.draggable, list);
-                }
-            },
-            tolerance: "touch"
-        });
-        $("li", "#dlg-dependency-selection-container").draggable({
-            revert: "invalid",
-            containment: "document",
-            helper: "clone",
-            cursor: "move",
-            scroll: true,
-            drag: function (event, ui) {
-                var helper = ui.helper;
-                var selected = $(this).parent().find("li.ui-state-highlight", "ul");
-                if (selected.length > 2) {
-                    $(helper).html(selected.length - 1 + " items");
-                }
-            }
-        });
-    }
-*/
+
     //dlg-element-tabs
+    /*
 	function configureDragAndDrop(){
 		dlg.html.self.find(".dlg-list-panel-container").droppable({
 			activeClass: "ui-state-highlight",
@@ -281,14 +286,15 @@
             }
         });
     }
-
+    */
+    /*
     function bindDependencyListItemClicks(){
          $("li", ".dlg-item-selection-container").
             click(function(){
                 $(this).toggleClass("ui-state-highlight");
          });
     }
-
+    */
     function bindGeneralAttributeInputClicks(){
         $("input","#dlg-element-general-tab").bind( "click",  function(){
             clearStyleForErrorInput(0, $(this));
@@ -323,6 +329,7 @@
         }
     }
 
+/*
     function updateSelectionWidget(data, template, listSelected, listAvailable){
         var selectedIndices = [];
         $.each(data.selected, function(index, value){
@@ -335,16 +342,8 @@
             }
         });
     }
-    
-/*
-    function storeDependeesToDom(htmlTemplate, value, list){
-        list.append(htmlTemplate);
-        lastChild.find(".dlg-element-dependee-name").text(value.name.substring(0, 17));
-        var lastChild = list.find("li:last-child");
-        lastChild.find(".dlg-element-dependee-version").text(value.version.substring(0, 5));
-        lastChild.data("config", value);
-    }
-*/
+  */
+  /*
     // TODO:fixme
     function storeItemToDom(htmlTemplate, value, list){
         list.append(htmlTemplate);
@@ -353,25 +352,25 @@
         lastChild.find("div").last().text(value.version.substring(0, 5));
         lastChild.data("config", value);
     }
-    
+    */
     // Style handling functions
-
+   /*
     function moveMultipleElements(list, selected) {
         $(selected).each(function () {
             $(this).appendTo(list).removeClass("ui-state-highlight").fadeIn();
         });
     }
-
+     */
     function clearStyleForErrorInput(index, item){
         if (item.hasClass("dlg-error-input")){
             item.removeClass("dlg-error-input");
         }
     }
-
+   /*
     function moveSingleElement(elem, list) {
         elem.appendTo(list).removeClass("ui-state-highlight").fadeIn();
     }
-
+     */
     // Utility functions
 
     function isPosInt(obj){
@@ -388,7 +387,7 @@
         return selectedItems;
     }
     */
-
+    /*
     function getSelectionWidgetItems(widget){
             var selectedItems = [];
                 var arrayOfLis = widget.find("li");
@@ -397,7 +396,7 @@
             }
             return selectedItems;
         }
-
+     */
     function getElement(){
         var e = {};
         e.id = (dlg.mode == "edit") ? parseInt(dlg.html.elem.id.text(), 10) : -1;

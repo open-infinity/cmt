@@ -46,15 +46,15 @@
 				</div>
 				<div class="dlg-input-container">
 					<div class="dlg-value-label">Name</div>
-					<input id="dlg-package-value-name" type='text' value='' />
+					<input id="dlg-package-value-name" type='text' value='' class ='dlg-input'/>
 				</div>
 				<div class="dlg-input-container">
 					<div class="dlg-value-label">Version</div>
-					<input id="dlg-package-value-version" type='text' value='' />
+					<input id="dlg-package-value-version" type='text' value='' class ='dlg-input'/>
 				</div>
 				<div class="dlg-input-container">
 					<div class="dlg-value-label">Description</div>
-					<textarea id="dlg-package-value-description" rows="3" cols="40" class="dlg-item-description"></textarea>
+					<textarea id="dlg-package-value-description" rows="3" cols="40" class="dlg-input"></textarea>
 				</div>
 			</div>
 		</div>

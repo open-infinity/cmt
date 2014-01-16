@@ -40,6 +40,7 @@ import org.springframework.web.portlet.bind.annotation.ResourceMapping;
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -59,6 +60,7 @@ public class ModuleController extends AbstractController{
 
 	private static final String GET_MODULE = "getModule";
 	private static final String GET_PACKAGES_FOR_MODULE = "getPackagesForModule";
+	private static final String GET_ALL_PACKAGES = "getAllPackages";
 	private static final String GET_PARAMETER_KEYS_AND_VALUES = "getParameterKeysAndValues";
 	private static final String EDIT_MODULE = "editModule";
     private static final String DELETE_MODULE = "deleteModule";
@@ -122,6 +124,18 @@ public class ModuleController extends AbstractController{
     }
 
     @Authenticated
+    @ResourceMapping(GET_ALL_PACKAGES)
+    public void getPackages(ResourceRequest request, ResourceResponse response) throws Exception {
+        try {
+            Collection<InstallationPackage> availableItems = packageService.loadAll();
+            Collection<InstallationPackage> selectedItems = new ArrayList<InstallationPackage>();
+            SerializerUtil.jsonSerialize(response.getWriter(), new CollectionsContainer<InstallationPackage>(availableItems, selectedItems));
+        } catch (Exception e) {
+            ExceptionUtil.throwSystemException(e);
+        }
+    }
+
+    @Authenticated
     @ResourceMapping(EDIT_MODULE)
     public void editModule(ResourceRequest request, ResourceResponse response,
                             @RequestParam("module") String moduleData,
@@ -143,35 +157,6 @@ public class ModuleController extends AbstractController{
             response.setProperty(ResourceResponse.HTTP_STATUS_CODE, HttpCodes.HTTP_ERROR_CODE_SERVER_ERROR);
         }
     }
-
-    /*
-    @ResourceMapping(CREATE_MODULE)
-    public void createModule(ResourceRequest request, ResourceResponse response,
-                            @RequestParam("module") String moduleData,
-                            @RequestParam("dependencies") String dependenciesData,
-                            @RequestParam("parameters") String parametersData
-    ) {
-        try {
-            User user = liferayService.getUser(request, response);
-            if (user == null) return;
-
-            ObjectMapper mapper = new ObjectMapper();
-            InstallationModule module = mapper.readValue(moduleData, InstallationModule.class);
-            Collection<Integer> dependenciesList = mapper.readValue(dependenciesData, Collection.class);
-            Map<String, Collection<String>> keyValueMap = mapper.readValue(parametersData, new TypeReference<Map<String, Collection<String>>>(){});
-
-            LOG.debug("InstallationModule:" + module);
-            LOG.debug("dependenciesList:" + dependenciesList);
-            LOG.debug("Map kv:" + keyValueMap);
-
-            moduleService.create(module, dependenciesList, keyValueMap);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            response.setProperty(ResourceResponse.HTTP_STATUS_CODE, HttpCodes.HTTP_ERROR_CODE_SERVER_ERROR);
-        }
-    }
-    */
 
     @Authenticated
     @ResourceMapping(CREATE_MODULE)

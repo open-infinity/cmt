@@ -60,8 +60,8 @@ public class ElementController extends AbstractController{
 
     private static final String CREATE_ELEMENT = "createElement";private static final String GET_ELEMENT = "getElement";
 	private static final String GET_DEPENDENCIES = "getDependencies";
-	private static final String GET_ALL_DEPENDENCIES = "getAllAvailableDependencies";
-    private static final String GET_ALL_MODULES = "getAllAvailableModules";
+	private static final String GET_ALL_DEPENDENCIES = "getAllDependencies";
+    private static final String GET_ALL_MODULES = "getAlModules";
     private static final String GET_MODULES_FOR_ELEMENT = "getModulesForElement";
     private static final String EDIT_ELEMENT = "editElement";
     private static final String DELETE_ELEMENT = "deleteElement";

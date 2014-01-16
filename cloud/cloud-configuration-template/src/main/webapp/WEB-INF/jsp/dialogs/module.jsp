@@ -45,25 +45,17 @@
 					<div class="dlg-value-label">Id</div>
 					<div id="dlg-module-value-id"></div>
 				</div>
-
-				<%--
-				<div class="dlg-input-container">
-					<div class="dlg-value-label">Type</div>
-					<input id="dlg-module-value-type" type='text' value='' />
-				</div>
-				--%>
-
 				<div class="dlg-input-container">
 					<div class="dlg-value-label">Name</div>
-					<input id="dlg-module-value-name" type='text' value='' />
+					<input id="dlg-module-value-name" type='text' value='' class ='dlg-input'/>
 				</div>
 				<div class="dlg-input-container">
 					<div class="dlg-value-label">Version</div>
-					<input id="dlg-module-value-version" type='text' value='' />
+					<input id="dlg-module-value-version" type='text' value='' class ='dlg-input'/>
 				</div>
 				<div class="dlg-input-container">
 					<div class="dlg-value-label">Description</div>
-					<textarea id="dlg-module-value-description" rows="3" cols="40" class="dlg-item-description"></textarea>
+					<textarea id="dlg-module-value-description" rows="3" cols="40" class="dlg-input"></textarea>
 				</div>
 			</div>
 		</div>
@@ -71,32 +63,6 @@
 		<%-- Packages for module --%>
 		<div id="dlg-module-packages-tab">
 		    <div id="dlg-module-packages-item-select" class='dlg-tab-items-container'></div>
-		    <%--
-			<div id="dlg-package-selection-container" class="dlg-tab-items-container">
-				<div class="dlg-list-panel-container dlg-tab-item">
-					<div class="dlg-list-panel-container-title">Dependees</div>
-					<div class="dlg-list-panel-container-columns">
-						<div class="list-item-column">Platform</div>
-						<div>Version</div>
-					</div>
-					<div id="dlg-module-selected-dependees"	class="dlg-item-list-container">
-						<ul></ul>
-					</div>
-				</div>
-				<div class="dlg-arrows-img dlg-tab-item"></div>
-				<div class="dlg-list-panel-container dlg-tab-item">
-					<div class="dlg-list-panel-container-title">All</div>
-					<div class="dlg-list-panel-container-columns">
-						<div class="list-item-column">Platform</div>
-						<div>Version</div>
-					</div>
-					<div id="dlg-module-available-dependees"
-						class="dlg-item-list-container">
-						<ul></ul>
-					</div>
-				</div>
-			</div>
-			--%>
 		</div>
 
 		<%-- Keys and values for module  --%>

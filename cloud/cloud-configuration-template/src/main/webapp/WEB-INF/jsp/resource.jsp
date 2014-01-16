@@ -32,8 +32,8 @@ portletURL.initialize({
        	createElementURL : '<portlet:resourceURL id="createElement"/>',
     	getElementURL : '<portlet:resourceURL id="getElement"/>',
     	getElementsURL : '<portlet:resourceURL id="getElements"/>',
-    	getAllAvailableDependenciesURL : '<portlet:resourceURL id="getAllAvailableDependencies"/>',
-    	getAllAvailableModulesURL : '<portlet:resourceURL id="getAllAvailableModules"/>',
+    	getAllDependenciesURL : '<portlet:resourceURL id="getAllDependencies"/>',
+    	getAllModulesURL : '<portlet:resourceURL id="getAllModules"/>',
     	getModulesForElementURL : '<portlet:resourceURL id="getModulesForElement"/>',
     	getDependenciesURL : '<portlet:resourceURL id="getDependencies"/>',
     	editElementURL : '<portlet:resourceURL id="editElement"/>',
@@ -44,6 +44,7 @@ portletURL.initialize({
     	getModuleURL : '<portlet:resourceURL id="getModule"/>',
     	getModulesURL : '<portlet:resourceURL id="getModules"/>',
     	getPackagesForModuleURL : '<portlet:resourceURL id="getPackagesForModule"/>',
+    	getAllPackagesURL : '<portlet:resourceURL id="getAllPackages"/>',
     	getParameterKeysAndValuesURL : '<portlet:resourceURL id="getParameterKeysAndValues"/>',
     	editModuleURL : '<portlet:resourceURL id="editModule"/>',
         deleteModuleURL : '<portlet:resourceURL id="deleteModule"/>'
