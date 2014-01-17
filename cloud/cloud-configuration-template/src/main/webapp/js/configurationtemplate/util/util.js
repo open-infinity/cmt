@@ -34,3 +34,29 @@ function isPosInt(obj){
     return (obj !== "" && typeof obj !== 'undefined' && !isNaN(obj) && (Math.round(obj) == obj) && obj > 0) ? true : false;
 }
 
+// Alerts
+
+function alertPostFailure(mode, textStatus, errorThrown){
+    alert("Server error at template" + mode + ", text status:" + textStatus + " " + "errorThrown:" + errorThrown);
+}
+
+function alertWrongInput(item, msg){
+    alert(msg);
+    item.addClass("dlg-error-input");
+
+    // open the tab with erroneous item and focus on it
+    var inTemplateTab = (item.parents("#dlg-edit-template-template-tab")).length > 0;
+    var inElementTab = (item.parents("#dlg-element-general-tab")).length > 0;
+    var inModuleTab = (item.parents("#dlg-module-general-tab")).length > 0;
+    var inPackageTab = (item.parents("#dlg-package-general-tab")).length > 0;
+
+    if (inTemplateTab || inElementTab || inModuleTab || inPackageTab){
+        dlg.html.tabs.tabs('select', 0);
+    }
+    else{
+        dlg.html.tabs.tabs('select', 2);
+    }
+
+    item.focus();
+}
+

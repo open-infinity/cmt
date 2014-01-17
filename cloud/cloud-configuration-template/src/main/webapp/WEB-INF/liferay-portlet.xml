@@ -14,7 +14,7 @@
 		<header-portlet-javascript>/js/plugins/jquery.jqGrid.min.js</header-portlet-javascript>
         <header-portlet-javascript>/js/configurationtemplate/app/init.js</header-portlet-javascript>
         <header-portlet-javascript>/js/configurationtemplate/resources/message.js</header-portlet-javascript>
-        <header-portlet-javascript>/js/configurationtemplate/resources/template.js</header-portlet-javascript>
+        <header-portlet-javascript>/js/configurationtemplate/resources/htmltemplate.js</header-portlet-javascript>
 		<header-portlet-javascript>/js/configurationtemplate/util/util.js</header-portlet-javascript>
 		<header-portlet-javascript>/js/configurationtemplate/controls/widgets/itemselect.js</header-portlet-javascript>
 		<header-portlet-javascript>/js/configurationtemplate/app/main.js</header-portlet-javascript>

@@ -33,6 +33,8 @@ public interface InstallationModuleService extends AbstractCrudServiceInterface<
 
     void update(InstallationModule module, Collection<Integer> packages, Map<String, Collection<String>> keyValuesMap);
 
+    void create(InstallationModule module, Collection<Integer> packages, Map<String, Collection<String>> parameters);
+
     Collection<InstallationModule> loadModules(int elementId);
 
     /*

@@ -162,12 +162,19 @@ public class ModuleController extends AbstractController{
     @ResourceMapping(CREATE_MODULE)
     public void createModule(ResourceRequest request, ResourceResponse response,
                               @RequestParam("module") String moduleData,
-                              @RequestParam("dependencies") String dependenciesData){
+                              @RequestParam("packages") String packagesData,
+                              @RequestParam("parameters") String parametersData){
         try {
-            //if (liferayService.getUser(request, response) == null) return;
             ObjectMapper mapper = new ObjectMapper();
-            //moduleService.create(mapper.readValue(moduleData, InstallationModule.class), mapper.readValue(dependenciesData, Collection.class));
+            InstallationModule module = mapper.readValue(moduleData, InstallationModule.class);
+            Collection<Integer> packages = mapper.readValue(packagesData, Collection.class);
+            Map<String, Collection<String>> keyValuesMap = mapper.readValue(parametersData, new TypeReference<Map<String, Collection<String>>>(){});
 
+            LOG.debug("InstallationModule:" + module);
+            LOG.debug("dependenciesList:" + packages);
+            LOG.debug("Map kv:" + keyValuesMap);
+
+            moduleService.create(module, packages, keyValuesMap);
         } catch (Exception e) {
             e.printStackTrace();
             response.setProperty(ResourceResponse.HTTP_STATUS_CODE, HttpCodes.HTTP_ERROR_CODE_SERVER_ERROR);

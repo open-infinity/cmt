@@ -67,9 +67,9 @@
         <table id="modules-grid"> </table>
         <div id="modules-grid-pager"> </div>
         <div class="ui-button-bar">
-            <button id="edit-modules">Edit</button>
-            <button id="new-modules">New</button>
-            <button id="delete-modules">Delete</button>
+            <button id="edit-module">Edit</button>
+            <button id="new-module">New</button>
+            <button id="delete-module">Delete</button>
         </div>
     </div>
 
@@ -77,9 +77,9 @@
         <table id="packages-grid"> </table>
         <div id="packages-grid-pager"> </div>
         <div class="ui-button-bar">
-            <button id="edit-packages">Edit</button>
-            <button id="new-packages">New</button>
-            <button id="delete-packages">Delete</button>
+            <button id="edit-package">Edit</button>
+            <button id="new-package">New</button>
+            <button id="delete-package">Delete</button>
         </div>
     </div>
 </div>

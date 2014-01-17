@@ -61,6 +61,15 @@ public class InstallationModuleServiceImpl implements InstallationModuleService 
     }
 
     @Override
+    public void create(InstallationModule module, Collection<Integer> packages, Map<String, Collection<String>> parameters) {
+        moduleRepository.create(module);
+        for(Integer o : packages){
+            modulePackageRepository.create(new ModuleToPackage(module.getId(), o.intValue()));
+        }
+        storeKeysAndValues(parameters, module);
+    }
+
+    @Override
     public void update(InstallationModule obj) {
     }
 

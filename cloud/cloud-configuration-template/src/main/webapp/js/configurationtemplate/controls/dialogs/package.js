@@ -18,7 +18,8 @@
     $.extend(dlg, {
 
         create : function(){
-
+            dlg.mode = "create";
+            dlg.open();
         },
 
         edit : function(id){
@@ -42,10 +43,13 @@
         open : function(){
             var title;
             if (dlg.mode == "edit"){
-                title = "Edit pkg";
+                title = "Edit package";
+                dlg.html.idContainer.show();
+
             }
             else if (dlg.mode == "create"){
-                title = "Create new pkg";
+                title = "Create new package";
+                dlg.html.idContainer.hide();
             }
             else{
                 console.log("Unexpected mode for dialog.");
@@ -109,7 +113,7 @@
 
         // validate input data
         if (!validateInput(pkg)){
-            return;
+            return 1;
         }
 
         // serialize input data
@@ -454,10 +458,6 @@
             }
     }
     */
-    function storeNewItemToDom(htmlTemplate, value, list){
-        list.append(htmlTemplate);
-        list.find("li:last-child").text(value);
-    }
 
     // Style handling functions
 

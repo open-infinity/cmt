@@ -2,15 +2,15 @@
 
     var dlg = window.app.dialog.module || {};
     var infoDlg = window.app.dialog.info;
-    
+
     dlg.mode =  null;
-    
+
     dlg.model = {};
     dlg.model.parameters = null;
-    
+
     dlg.state = {};
     dlg.state.selectedKey = null;
-    
+
     dlg.html = {};
     dlg.html.idContainer = $($(".dlg-input-container", "#dlg-module-general-tab").first());
     dlg.html.module = {};
@@ -32,9 +32,10 @@
                     url: portletURL.url.module.getAllPackagesURL,
                     dataType: "json"})
             .done(function(data){
-                dlg.model.parameters = dataKeyValues[0];
-                console.log("received parameters:" + dlg.model.parameters);
+                console.log("received parameters:" + data);
                 dlg.html.packages.itemselect("init", data);
+                dlg.model.parameters = {};
+                showViewSelectedKeyInitial(dlg.model.parameters);
                 configureEventHandling();
                 })
             .fail(function(jqXHR, textStatus, errorThrown) {
@@ -49,7 +50,7 @@
                 url: portletURL.url.module.getModuleURL + "&moduleId=" + id,
                 dataType: "json"
                 }).done(function(data) {
-                	console.log(data);	
+                	console.log(data);
                 	dlg.html.module.id.text(data.id);
                     dlg.html.module.name.val(data.name);
                     dlg.html.module.version.val(data.version);
@@ -145,7 +146,7 @@
         dlg.state.selectedKey = null;
         dlg.html.parameterKeysList.empty();
         dlg.html.parameterValuesList.empty();
-        
+
         // clear error styles
         $.each(dlg.html.self.find("input"), function(index, value){
             clearStyleForErrorInput(index, $(value));
@@ -156,7 +157,7 @@
     // Sending data to backend
 
     function submitModule(mode){
-        var err = 0;                  
+        var err = 0;
         if (updateModel() === 0){
 
             // get input data
@@ -222,6 +223,7 @@
     function bindParameterKeyClicks(){
         $("input", ".key", "#dlg-keys").bind( "click",  function(){
             clearStyleForErrorInput(0, $(this));
+
             // do nothing if selected key remains the same
             if (dlg.state.selectedKey == $(this).parents("li").data("keyName")){
                 return;
@@ -312,7 +314,7 @@
 
             dlg.state.selectedKey = key;
 
-            // store the new key into model
+            // Store the new key into model
 
             // check if the key already exists in the model, and add the key if it does not already exist
             var exists = false;
@@ -399,24 +401,26 @@
     function showViewSelectedKeyInitial(data){
         var count = 0;
 
-        // show all keys. Show values only for for the first key.
-        $.each(data, function(parameterKey, parameterValues){
+        if (data !== null){
 
-            // show values for the first key, which will be selected by default.
-            if (count++ === 0){
-                var htmlKey = storeKeyToDom(tpl.key, parameterKey, dlg.html.parameterKeysList);
-                // display values for key
-                dlg.state.selectedKey = parameterKey;
-                $.each(parameterValues, function(index, parameterValue){
-                    storeValueToDom(tpl.value, parameterValue, dlg.html.parameterValuesList, index);
-                });
-                dlg.html.keyName.text(parameterKey);
-            }
-            else{
-                storeKeyToDom(tpl.key, parameterKey, dlg.html.parameterKeysList);
-            }
-        });
+            // show all keys. Show values only for for the first key.
+            $.each(data, function(parameterKey, parameterValues){
 
+                // show values for the first key, which will be selected by default.
+                if (count++ === 0){
+                    var htmlKey = storeKeyToDom(tpl.key, parameterKey, dlg.html.parameterKeysList);
+                    // display values for key
+                    dlg.state.selectedKey = parameterKey;
+                    $.each(parameterValues, function(index, parameterValue){
+                        storeValueToDom(tpl.value, parameterValue, dlg.html.parameterValuesList, index);
+                    });
+                    dlg.html.keyName.text(parameterKey);
+                }
+                else{
+                    storeKeyToDom(tpl.key, parameterKey, dlg.html.parameterKeysList);
+                }
+            });
+        }
         // Store "new item" rows to DOM
         storeKeyToDom(tpl.key, null, dlg.html.parameterKeysList);
         storeValueToDom(tpl.value, null, dlg.html.parameterValuesList, null);
@@ -554,15 +558,10 @@
     }
 
     // Utility functions
-    /*
-    function isPosInt(obj){
-        return (obj !== "" && typeof obj !== 'undefined' && !isNaN(obj) && (Math.round(obj) == obj) && obj > 0) ? true : false;
-    }
-    */
+
     function getModule(){
         var e = {};
         e.id = (dlg.mode == "edit") ? parseInt(dlg.html.module.id.text(), 10) : -1;
-        //e.type = dlg.html.module.type.val();
         e.name = dlg.html.module.name.val();
         e.version = dlg.html.module.version.val();
         e.description = dlg.html.module.description.val();
@@ -588,28 +587,6 @@
         return $(".dlg-module-new-value-button").parent().find("input");
     }
 
-    // Alerts
-
-    function alertPostFailure(mode, textStatus, errorThrown){
-        alert("Server error at template" + mode + ", text status:" + textStatus + " " + "errorThrown:" + errorThrown);
-    }
-
-    function alertWrongInput(item, msg){
-        alert(msg);
-        item.addClass("dlg-error-input");
-
-        // open the tab with erroneous item and focus on it
-        var inModuleTab = (item.parents("#dlg-module-general-tab")).length > 0;
-        if (inModuleTab){
-            dlg.html.tabs.tabs('select', 0);
-        }
-        else{
-            dlg.html.tabs.tabs('select', 2);
-        }
-
-        item.focus();
-    }
-
     // Validation
 
     function validateInput(module, packages, parameters){
@@ -618,14 +595,8 @@
         // validate module
         if (!isPosInt(module.id) && dlg.mode == "edit") {
             res = false;
-            console.log("err.internalError");
+            console.log(err.internalError);
         }
-        /*
-        else if (!isPosInt(module.type)){
-            res = false;
-            alertWrongInput(dlg.html.module.type, err.mustBePositiveInteger);
-        }
-        */
         else if (module.name === ""){
             res = false;
             alertWrongInput(dlg.html.module.name, err.emptyItem);
@@ -634,7 +605,7 @@
             res = false;
             alertWrongInput(dlg.html.module.version, err.emptyItem);
         }
-        
+
         if (res === true){
             res = validateItems(packages);
             // TODO validate parameters
@@ -642,6 +613,5 @@
 
         return res;
     }
-
 
 })(jQuery);

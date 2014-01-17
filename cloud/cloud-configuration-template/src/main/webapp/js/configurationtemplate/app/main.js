@@ -275,19 +275,19 @@ jQuery(function($){
 
         bindEventHandlers: function(){
             // Templates
-            app.editTemplateButton.bind( "click", app.editTableRow(app.templatesTable, app.dialog.template));
-            app.newTemplateButton.bind( "click", app.createTemplate);
-            app.deleteTemplateButton.bind( "click", app.deleteTemplate);
+            app.editTemplateButton.bind("click", app.editTableRow(app.templatesTable, app.dialog.template));
+            app.newTemplateButton.bind("click", app.createTemplate);
+            app.deleteTemplateButton.bind("click", app.deleteTemplate);
 
             // Elements
-            app.editElementButton.bind( "click", app.editTableRow(app.elementsTable, app.dialog.element));
-            app.newElementButton.bind( "click", app.create(app.dialog.element));
-            app.deleteElementButton.bind( "click", app.deleteElement);
+            app.editElementButton.bind("click", app.editTableRow(app.elementsTable, app.dialog.element));
+            app.newElementButton.bind("click", app.create(app.dialog.element));
+            app.deleteElementButton.bind("click", app.deleteElement);
 
             // Modules
-            app.editModuleButton.bind( "click", app.editTableRow(app.modulesTable, app.dialog.module));
-            app.newModuleButton.bind( "click", app.create(app.dialog.module));
-            app.deleteModuleButton.bind( "click", app.deleteModule);
+            app.editModuleButton.bind("click", app.editTableRow(app.modulesTable, app.dialog.module));
+            app.newModuleButton.bind("click", app.create(app.dialog.module));
+            app.deleteModuleButton.bind("click", app.deleteModule);
 
             // Packages
             app.editPackageButton.bind( "click", app.editTableRow(app.packagesTable, app.dialog.package));

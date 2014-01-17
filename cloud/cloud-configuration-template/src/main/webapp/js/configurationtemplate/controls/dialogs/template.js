@@ -83,13 +83,18 @@
 
         open : function(mode){
             dlg.mode = mode;
-            var title = "Create new template";
+            var title = "";
             if (mode == "edit"){
                 dlg.html.idContainer.show();
                 title = "Edit template";
             }
+            else if (mode == "create"){
+                title = "Create new template";
+                dlg.html.idContainer.hide();
+            }
             else{
                 console.log("Unexpected mode for dialog.");
+                return;
             }
             dlg.html.self.dialog("option", "title", title);
             dlg.html.tabs.tabs({active: 1});
@@ -112,18 +117,14 @@
             "Submit changes": function() {
                 submitTemplate(dlg.mode);
                 cleanUpDialog($(this));
-                //$(this).hide();
                 $(this).dialog( "close" );
             },
             Cancel: function() {
                 cleanUpDialog($(this));
-                //$(this).hide();
                 $(this).dialog( "close" );
             }
         }
     });
-
-    // Helper functions
 
     function cleanUpDialog(){
         dlg.html.elements.itemselect("destroy");
@@ -135,11 +136,15 @@
 
     function submitTemplate(mode){
         var outData = {};
-        outData.id = parseInt(dlg.html.template.id.text());
-        outData.name = dlg.html.template.name.val();
-        outData.description = dlg.html.template.description.val();
-        outData.elements = JSON.stringify(dlg.html.elements.itemselect("getVal"));
-        outData.organizations = JSON.stringify(dlg.html.organizations.itemselect("getVal"));
+        var template = getTemplate();
+        var elements = dlg.html.elements.itemselect("getVal");
+        var organizations = dlg.html.organizations.itemselect("getVal");
+        if (!validateInput(template, elements, organizations)){
+            return;
+        }
+        outData.template = JSON.stringify(template);
+        outData.elements = JSON.stringify(elements);
+        outData.organizations = JSON.stringify(organizations);
 
         $.post((mode == "edit") ? portletURL.url.template.editTemplateURL : portletURL.url.template.createTemplateURL, outData)
         .done(function(){
@@ -152,6 +157,32 @@
 
     function alertPostFailure(mode, textStatus, errorThrown){
         alert("Server error at template" + mode + ", text status:" + textStatus + " " + "errorThrown:" + errorThrown);
+    }
+
+    function validateInput(template, elements, organizations){
+            var res = true;
+
+            if (!isPosInt(template.id) && dlg.mode == "edit") {
+                res = false;
+                console.log(err.internalError);
+            }
+            else if (template.name === ""){
+                res = false;
+                alertWrongInput(dlg.html.template.name, err.emptyItem);
+            }
+
+            return res;
+    }
+
+
+    // Utility functions
+
+    function getTemplate(){
+        var e = {};
+        e.id = (dlg.mode == "edit") ? parseInt(dlg.html.template.id.text(), 10) : -1;
+        e.name = dlg.html.template.name.val();
+        e.description = dlg.html.template.description.val();
+        return e;
     }
 
 })(jQuery);

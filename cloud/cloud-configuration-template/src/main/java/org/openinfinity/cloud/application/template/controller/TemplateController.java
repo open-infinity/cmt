@@ -112,7 +112,6 @@ public class TemplateController extends AbstractController{
         if (abstractCoreException.isInformativeLevelExceptionMessagesIncluded())
             modelAndView.addObject("informativeLevelExceptions", abstractCoreException.getInformativeLevelExceptionIds());
 
-        // TODO, what's this stuff? :vbartoni
         @SuppressWarnings("unchecked")
         Map<String, Object> userInfo =
                 (Map<String, Object>) renderRequest.getAttribute(ActionRequest.USER_INFO);
@@ -218,17 +217,15 @@ public class TemplateController extends AbstractController{
     @Authenticated
     @ResourceMapping(EDIT_TEMPLATE)
     public void editTemplate(ResourceRequest request, ResourceResponse response,
-                             @RequestParam("id") int id,
-                             @RequestParam("name") String name,
-                             @RequestParam("description") String description,
-                             @RequestParam("elements") String elements,
-                             @RequestParam("organizations") String organizations) {
+                             @RequestParam("template") String templateData,
+                             @RequestParam("elements") String elementData,
+                             @RequestParam("organizations") String organizationData) {
         try {
             User user = liferayService.getUser(request, response);
             if (user == null) return;
-
             ObjectMapper mapper = new ObjectMapper();
-            configurationTemplateService.update(new ConfigurationTemplate(id, name, description), mapper.readValue(elements, List.class), mapper.readValue(organizations, List.class));
+            ConfigurationTemplate template = mapper.readValue(templateData, ConfigurationTemplate.class);
+            configurationTemplateService.update(new ConfigurationTemplate(template.getId(), template.getName(), template.getDescription()), mapper.readValue(elementData, List.class), mapper.readValue(organizationData, List.class));
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -238,15 +235,15 @@ public class TemplateController extends AbstractController{
     @Authenticated
     @ResourceMapping(CREATE_TEMPLATE)
     public void createTemplate(ResourceRequest request, ResourceResponse response,
-                               @RequestParam("name") String name,
-                               @RequestParam("description") String description,
-                               @RequestParam("elements") String elements,
-                               @RequestParam("organizations") String organizations) {
+                               @RequestParam("template") String templateData,
+                               @RequestParam("elements") String elementData,
+                               @RequestParam("organizations") String organizationData) {
         try {
             User user = liferayService.getUser(request, response);
             if (user == null) return;
             ObjectMapper mapper = new ObjectMapper();
-            configurationTemplateService.create(new ConfigurationTemplate(name, description), mapper.readValue(elements, List.class), mapper.readValue(organizations, List.class));
+            ConfigurationTemplate template = mapper.readValue(templateData, ConfigurationTemplate.class);
+            configurationTemplateService.create(new ConfigurationTemplate(template.getName(), template.getDescription()), mapper.readValue(elementData, List.class), mapper.readValue(organizationData, List.class));
         } catch (Exception e) {
             e.printStackTrace();
             response.setProperty(ResourceResponse.HTTP_STATUS_CODE, HttpCodes.HTTP_ERROR_CODE_SERVER_ERROR);

@@ -1,58 +1,43 @@
 /**
  * TODO
- * -generalize item selection view
- * -generalize item selection events
- * -generalize item selection fetching data
- * -validate modules
+ * -generalize item selection view [done]
+ * -generalize item selection events [done]
+ * -generalize item selection fetching data [done]
+ * -validate modules [done]
+ * -combo box for element types
+ * -sliders for element machine size
+ * -radio button for element with jQuery
+ * -more information id dialog title (item name etc)
+ * -UI sexyfication
+ * -packages design [uploads?] and finalization
 
  * Server side
  * -optimize edits
- * -available items can  not contain self
+ * -available items can not contain self [done]
  * -auth aspect
  */
 (function($) {
 
     var app = window.app || {};
-    var dlg = window.app.dialog.element || {};
     var infoDlg = window.app.dialog.info;
-
+    var dlg = window.app.dialog.element || {};
     dlg.mode =  null;
-
     dlg.html = {};
     dlg.html.idContainer = $($(".dlg-input-container", "#dlg-element-general-tab").first());
     dlg.html.self = $("#dlg-element");
     dlg.html.tabs = $("#dlg-element-tabs");
-
-    // Selection widget
-    //dlg.html.selectionWidget = {};
-    //dlg.html.selectionWidget.dependencies = $("#dlg-element-dependencies-tab").find(".dlg-item-selection-container");
-    //dlg.html.selectionWidget.modules = $("#dlg-element-modules-tab").find(".dlg-item-selection-container");
-
-    // Item select widget for modules
     dlg.html.dependees = $("#dlg-element-dependees-item-select");
     dlg.html.modules = $("#dlg-element-modules-item-select");
-
-
-    // Selection widget internals
-    // TODO: remove this once the widget is isolated
-    //dlg.html.selectionWidget.selectedDependeesList = dlg.html.selectionWidget.dependencies.find(".dlg-item-list-container").first().find("ul");
-    //dlg.html.selectionWidget.availableDependeesList = dlg.html.selectionWidget.dependencies.find(".dlg-item-list-container").last().find("ul");
-    //dlg.html.selectionWidget.selectedModulesList = dlg.html.selectionWidget.modules.find(".dlg-item-list-container").first().find("ul");
-    //dlg.html.selectionWidget.availableModulesList = dlg.html.selectionWidget.modules.find(".dlg-item-list-container").last().find("ul");
-
-    //dlg.html.availableDependeesList = $("ul", "#dlg-element-available-dependees");
-
-    dlg.html.elem = {};
-    dlg.html.elem.id = $("#dlg-element-value-id");
-    dlg.html.elem.type = $("#dlg-element-value-type");
-    dlg.html.elem.name = $("#dlg-element-value-name");
-    dlg.html.elem.version = $("#dlg-element-value-version");
-    dlg.html.elem.description = $("#dlg-element-general-tab").find("textarea");
-    dlg.html.elem.minMachines = $("#dlg-element-value-min-machines");
-    dlg.html.elem.maxMachines = $("#dlg-element-value-max-machines");
-    dlg.html.elem.replicated = $("#dlg-element-replicated-radio");
-    dlg.html.elem.minReplicationMachines = $("#dlg-element-value-min-repl-machines");
-    dlg.html.elem.maxReplicationMachines = $("#dlg-element-value-max-repl-machines");
+    dlg.html.id = $("#dlg-element-value-id");
+    dlg.html.type = $("#dlg-element-value-type");
+    dlg.html.name = $("#dlg-element-value-name");
+    dlg.html.version = $("#dlg-element-value-version");
+    dlg.html.description = $("#dlg-element-general-tab").find("textarea");
+    dlg.html.minMachines = $("#dlg-element-value-min-machines");
+    dlg.html.maxMachines = $("#dlg-element-value-max-machines");
+    dlg.html.replicated = $("#dlg-element-replicated-radio");
+    dlg.html.minReplicationMachines = $("#dlg-element-value-min-repl-machines");
+    dlg.html.maxReplicationMachines = $("#dlg-element-value-max-repl-machines");
 
     $.extend(dlg, {
 
@@ -67,9 +52,6 @@
                     dataType: "json"
                 }))
                 .done(function(dataDependencies, dataModules){
-                    // TODO : this function belongs to selectionWidget
-                    //updateSelectionWidget(dataDependencies[0], tpl.item, dlg.html.selectionWidget.selectedDependeesList, dlg.html.selectionWidget.availableDependeesList);
-                    //updateSelectionWidget(dataModules[0], tpl.item, dlg.html.selectionWidget.selectedModulesList, dlg.html.selectionWidget.availableModulesList);
                     dlg.html.dependees.itemselect("init", dataDependencies[0]);
                     dlg.html.modules.itemselect("init", dataModules[0]);
                     configureEventHandling();
@@ -85,25 +67,25 @@
                 url: portletURL.url.element.getElementURL + "&elementId=" + id,
                 dataType: "json"
                 }).done(function(data) {
-                    dlg.html.elem.id.text(data.id);
-                    dlg.html.elem.type.val(data.type);
-                    dlg.html.elem.name.val(data.name);
-                    dlg.html.elem.version.val(data.version);
-                    dlg.html.elem.description.val(data.description);
-                    dlg.html.elem.minMachines.val(data.minMachines);
-                    dlg.html.elem.maxMachines.val(data.maxMachines);
+                    dlg.html.id.text(data.id);
+                    dlg.html.type.val(data.type);
+                    dlg.html.name.val(data.name);
+                    dlg.html.version.val(data.version);
+                    dlg.html.description.val(data.description);
+                    dlg.html.minMachines.val(data.minMachines);
+                    dlg.html.maxMachines.val(data.maxMachines);
                     if (data.replicated === true){
-                        dlg.html.elem.replicated.find("input").first().prop('checked', true);
-                        dlg.html.elem.replicated.find("input").last().prop('checked', false);
+                        dlg.html.replicated.find("input").first().prop('checked', true);
+                        dlg.html.replicated.find("input").last().prop('checked', false);
                         toggleReplicatedMachinesInput("true");
                     }
                     else{
-                        dlg.html.elem.replicated.find("input").first().prop('checked', false);
-                        dlg.html.elem.replicated.find("input").last().prop('checked', true);
+                        dlg.html.replicated.find("input").first().prop('checked', false);
+                        dlg.html.replicated.find("input").last().prop('checked', true);
                         toggleReplicatedMachinesInput("false");
                     }
-                    dlg.html.elem.minReplicationMachines.val(data.minReplicationMachines);
-                    dlg.html.elem.maxReplicationMachines.val(data.maxReplicationMachines);
+                    dlg.html.minReplicationMachines.val(data.minReplicationMachines);
+                    dlg.html.maxReplicationMachines.val(data.maxReplicationMachines);
                 }).fail(function(jqXHR, textStatus, errorThrown) {
                     console.log("Error fetching element");
             });
@@ -117,9 +99,6 @@
                         dataType: "json"
                     }))
                     .done(function(dataDependencies, dataModules){
-                        // TODO : this function belongs to selectionWidget
-                        //updateSelectionWidget(dataDependencies[0], tpl.item, dlg.html.selectionWidget.selectedDependeesList, dlg.html.selectionWidget.availableDependeesList);
-                        //updateSelectionWidget(dataModules[0], tpl.item, dlg.html.selectionWidget.selectedModulesList, dlg.html.selectionWidget.availableModulesList);
                         dlg.html.dependees.itemselect("init", dataDependencies[0]);
                         dlg.html.modules.itemselect("init", dataModules[0]);
                         configureEventHandling();
@@ -146,7 +125,7 @@
             }
 
             // set default value to  radio box
-            dlg.html.elem.replicated.find("input").last().prop('checked', true);
+            dlg.html.replicated.find("input").last().prop('checked', true);
             toggleReplicatedMachinesInput("false");
 
             // open dialog
@@ -167,20 +146,19 @@
     // Cleanup
 
     function cleanUpDialog(){
-        //dlg.html.self.find(".dlg-item-list-container").find("ul").empty();
         dlg.html.dependees.itemselect("destroy");
         dlg.html.modules.itemselect("destroy");
-        dlg.html.elem.id.text("");
-        dlg.html.elem.type.val("");
-        dlg.html.elem.version.val("");
-        dlg.html.elem.name.val("");
-        dlg.html.elem.description.val("");
-        dlg.html.elem.minMachines.val("");
-        dlg.html.elem.maxMachines.val("");
-        dlg.html.elem.replicated.find("input").first().prop('checked', false);
-        dlg.html.elem.replicated.find("input").last().prop('checked', true);
-        dlg.html.elem.minReplicationMachines.val("");
-        dlg.html.elem.maxReplicationMachines.val("");
+        dlg.html.id.text("");
+        dlg.html.type.val("");
+        dlg.html.version.val("");
+        dlg.html.name.val("");
+        dlg.html.description.val("");
+        dlg.html.minMachines.val("");
+        dlg.html.maxMachines.val("");
+        dlg.html.replicated.find("input").first().prop('checked', false);
+        dlg.html.replicated.find("input").last().prop('checked', true);
+        dlg.html.minReplicationMachines.val("");
+        dlg.html.maxReplicationMachines.val("");
 
         // clear error styles
         $.each(dlg.html.self.find("input"), function(index, value){
@@ -213,12 +191,8 @@
         var err = 0;
 
         // get input data
-        //var dependees = getSelectionWidgetItems(dlg.html.selectionWidget.selectedDependeesList);
         var dependees = dlg.html.dependees.itemselect("getVal");
-
-        //var modules = getSelectionWidgetItems(dlg.html.selectionWidget.selectedModulesList);
         var modules = dlg.html.modules.itemselect("getVal");
-
         var element = getElement();
 
         // validate input data
@@ -248,53 +222,11 @@
     // Events handling
 
     function configureEventHandling(){
-        //configureDragAndDrop();
-        //bindDependencyListItemClicks();
         bindInputClicksAndKeys();
         infoDlg.bind();
         bindRadioChange();
     }
 
-    //dlg-element-tabs
-    /*
-	function configureDragAndDrop(){
-		dlg.html.self.find(".dlg-list-panel-container").droppable({
-			activeClass: "ui-state-highlight",
-			drop: function (event, ui) {
-                var list = $(this).find("ul");
-                var selected = $(this).siblings().find("li.ui-state-highlight");
-                if (selected.length > 1) {
-                    moveMultipleElements(list, selected);
-                } else {
-                    moveSingleElement(ui.draggable, list);
-                }
-            },
-            tolerance: "touch"
-        });
-        $("li", ".dlg-item-selection-container").draggable({
-            revert: "invalid",
-            containment: "document",
-            helper: "clone",
-            cursor: "move",
-            scroll: true,
-            drag: function (event, ui) {
-                var helper = ui.helper;
-                var selected = $(this).parent().find("li.ui-state-highlight", "ul");
-                if (selected.length > 2) {
-                    $(helper).html(selected.length - 1 + " items");
-                }
-            }
-        });
-    }
-    */
-    /*
-    function bindDependencyListItemClicks(){
-         $("li", ".dlg-item-selection-container").
-            click(function(){
-                $(this).toggleClass("ui-state-highlight");
-         });
-    }
-    */
     function bindGeneralAttributeInputClicks(){
         $("input","#dlg-element-general-tab").bind( "click",  function(){
             clearStyleForErrorInput(0, $(this));
@@ -312,103 +244,45 @@
     }
 
     function bindRadioChange(){
-        dlg.html.elem.replicated.find("input").on('change', function(){
-            var replicated = dlg.html.elem.replicated.find('input[name=dlg-element-replicated-radio]:checked').val();
+        dlg.html.replicated.find("input").on('change', function(){
+            var replicated = dlg.html.replicated.find('input[name=dlg-element-replicated-radio]:checked').val();
             toggleReplicatedMachinesInput(replicated);
         });
     }
 
     function toggleReplicatedMachinesInput(replicated){
         if (replicated === "false"){
-          dlg.html.elem.minReplicationMachines.parent().hide();
-          dlg.html.elem.maxReplicationMachines.parent().hide();
+          dlg.html.minReplicationMachines.parent().hide();
+          dlg.html.maxReplicationMachines.parent().hide();
         }
         else{
-          dlg.html.elem.minReplicationMachines.parent().show();
-          dlg.html.elem.maxReplicationMachines.parent().show();
+          dlg.html.minReplicationMachines.parent().show();
+          dlg.html.maxReplicationMachines.parent().show();
         }
     }
-
-/*
-    function updateSelectionWidget(data, template, listSelected, listAvailable){
-        var selectedIndices = [];
-        $.each(data.selected, function(index, value){
-            storeItemToDom(template, value, listSelected);
-            selectedIndices.push(value.id);
-        });
-        $.each(data.available, function(index, value){
-            if (selectedIndices.indexOf(value.id) == -1){
-                storeItemToDom(template, value, listAvailable);
-            }
-        });
-    }
-  */
-  /*
-    // TODO:fixme
-    function storeItemToDom(htmlTemplate, value, list){
-        list.append(htmlTemplate);
-        var lastChild = list.find("li:last-child");
-        lastChild.find("div").first().text(value.name.substring(0, 17));
-        lastChild.find("div").last().text(value.version.substring(0, 5));
-        lastChild.data("config", value);
-    }
-    */
-    // Style handling functions
-   /*
-    function moveMultipleElements(list, selected) {
-        $(selected).each(function () {
-            $(this).appendTo(list).removeClass("ui-state-highlight").fadeIn();
-        });
-    }
-     */
     function clearStyleForErrorInput(index, item){
         if (item.hasClass("dlg-error-input")){
             item.removeClass("dlg-error-input");
         }
     }
-   /*
-    function moveSingleElement(elem, list) {
-        elem.appendTo(list).removeClass("ui-state-highlight").fadeIn();
-    }
-     */
     // Utility functions
 
     function isPosInt(obj){
         return (obj !== "" && typeof obj !== 'undefined' && !isNaN(obj) && (Math.round(obj) == obj) && obj > 0) ? true : false;
     }
 
-    /*
-    function getDependencies(){
-        var selectedItems = [];
-            var arrayOfLis = dlg.html.selectedDependeesList.find("li");
-        for (var i = 0; i < arrayOfLis.length; i++){
-            selectedItems.push($(arrayOfLis[i]).data("config").id);
-        }
-        return selectedItems;
-    }
-    */
-    /*
-    function getSelectionWidgetItems(widget){
-            var selectedItems = [];
-                var arrayOfLis = widget.find("li");
-            for (var i = 0; i < arrayOfLis.length; i++){
-                selectedItems.push($(arrayOfLis[i]).data("config").id);
-            }
-            return selectedItems;
-        }
-     */
     function getElement(){
         var e = {};
-        e.id = (dlg.mode == "edit") ? parseInt(dlg.html.elem.id.text(), 10) : -1;
-        e.type = dlg.html.elem.type.val();
-        e.name = dlg.html.elem.name.val();
-        e.version = dlg.html.elem.version.val();
-        e.description = dlg.html.elem.description.val();
-        e.minMachines = dlg.html.elem.minMachines.val();
-        e.maxMachines = dlg.html.elem.maxMachines.val();
-        e.replicated = dlg.html.elem.replicated.find('input[name=dlg-element-replicated-radio]:checked').val();
-        e.minReplicationMachines = dlg.html.elem.minReplicationMachines.val();
-        e.maxReplicationMachines = dlg.html.elem.maxReplicationMachines.val();
+        e.id = (dlg.mode == "edit") ? parseInt(dlg.html.id.text(), 10) : -1;
+        e.type = dlg.html.type.val();
+        e.name = dlg.html.name.val();
+        e.version = dlg.html.version.val();
+        e.description = dlg.html.description.val();
+        e.minMachines = dlg.html.minMachines.val();
+        e.maxMachines = dlg.html.maxMachines.val();
+        e.replicated = dlg.html.replicated.find('input[name=dlg-element-replicated-radio]:checked').val();
+        e.minReplicationMachines = dlg.html.minReplicationMachines.val();
+        e.maxReplicationMachines = dlg.html.maxReplicationMachines.val();
         return e;
     }
 
@@ -439,50 +313,49 @@
     function validateInput(element, dependees, modules){
         var res = true;
 
-        // validate element
         if (!isPosInt(element.id) && dlg.mode == "edit") {
             res = false;
             console.log("err.internalError");
         }
         else if (!isPosInt(element.type)){
             res = false;
-            alertWrongInput(dlg.html.elem.type, err.mustBePositiveInteger);
+            alertWrongInput(dlg.html.type, err.mustBePositiveInteger);
         }
         else if (element.name === ""){
             res = false;
-            alertWrongInput(dlg.html.elem.name, err.emptyItem);
+            alertWrongInput(dlg.html.name, err.emptyItem);
         }
         else if (element.version === ""){
             res = false;
-            alertWrongInput(dlg.html.elem.version, err.emptyItem);
+            alertWrongInput(dlg.html.version, err.emptyItem);
         }
         else if (!isPosInt(element.minMachines)){
             res = false;
-            alertWrongInput(dlg.html.elem.minMachines, err.mustBePositiveInteger);
+            alertWrongInput(dlg.html.minMachines, err.mustBePositiveInteger);
         }
         else if (!isPosInt(element.maxMachines)){
             res = false;
-            alertWrongInput(dlg.html.elem.maxMachines, err.mustBePositiveInteger);
+            alertWrongInput(dlg.html.maxMachines, err.mustBePositiveInteger);
         }
         else if (element.minMachines >= element.maxMachines){
             res = false;
-            alertWrongInput(dlg.html.elem.maxMachines, err.invalidMachineRange);
+            alertWrongInput(dlg.html.maxMachines, err.invalidMachineRange);
         }
         else if (element.replicated !== 'false' && element.replicated !== 'true'){
             res = false;
-            alertWrongInput(dlg.html.elem.replicated, err.mustBeBoolean);
+            alertWrongInput(dlg.html.replicated, err.mustBeBoolean);
         }
         else if (!isPosInt(element.minReplicationMachines) && element.replicated === 'true'){
             res = false;
-            alertWrongInput(dlg.html.elem.minReplicationMachines, err.mustBePositiveInteger);
+            alertWrongInput(dlg.html.minReplicationMachines, err.mustBePositiveInteger);
         }
         else if (!isPosInt(element.maxReplicationMachines) && element.replicated === 'true'){
             res = false;
-            alertWrongInput(dlg.html.elem.maxReplicationMachines, err.mustBePositiveInteger);
+            alertWrongInput(dlg.html.maxReplicationMachines, err.mustBePositiveInteger);
         }
         else if (element.minReplicationMachines >= element.maxReplicationMachines && element.replicated === 'true') {
             res = false;
-            alertWrongInput(dlg.html.elem.maxReplicationMachines, err.invalidMachineRange);
+            alertWrongInput(dlg.html.maxReplicationMachines, err.invalidMachineRange);
         }
 
         if (res === true){
