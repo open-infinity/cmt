@@ -23,6 +23,7 @@ import org.openinfinity.cloud.domain.configurationtemplate.relation.ModuleToPack
 import org.openinfinity.cloud.domain.repository.configurationtemplate.entity.api.InstallationModuleRepository;
 import org.openinfinity.cloud.domain.repository.configurationtemplate.entity.api.ParameterKeyRepository;
 import org.openinfinity.cloud.domain.repository.configurationtemplate.entity.api.ParameterValueRepository;
+import org.openinfinity.cloud.domain.repository.configurationtemplate.relation.api.ElementToModuleRepository;
 import org.openinfinity.cloud.domain.repository.configurationtemplate.relation.api.ModuleToPackageRepository;
 import org.openinfinity.cloud.service.configurationtemplate.entity.api.InstallationModuleService;
 import org.openinfinity.core.annotation.Log;
@@ -47,7 +48,10 @@ public class InstallationModuleServiceImpl implements InstallationModuleService 
     InstallationModuleRepository moduleRepository;
 
     @Autowired
-    ModuleToPackageRepository modulePackageRepository;
+    ModuleToPackageRepository moduleToPackageRepository;
+
+    @Autowired
+    ElementToModuleRepository elementToModuleRepository;
 
     @Autowired
     ParameterKeyRepository keyRepository;
@@ -64,7 +68,7 @@ public class InstallationModuleServiceImpl implements InstallationModuleService 
     public void create(InstallationModule module, Collection<Integer> packages, Map<String, Collection<String>> parameters) {
         moduleRepository.create(module);
         for(Integer o : packages){
-            modulePackageRepository.create(new ModuleToPackage(module.getId(), o.intValue()));
+            moduleToPackageRepository.create(new ModuleToPackage(module.getId(), o.intValue()));
         }
         storeKeysAndValues(parameters, module);
     }
@@ -76,20 +80,11 @@ public class InstallationModuleServiceImpl implements InstallationModuleService 
     @Override
     public void update(InstallationModule module, Collection<Integer> packages, Map<String, Collection<String>> parameters) {
         moduleRepository.update(module);
-
-        // Delete packages, then put new packages to database
-        modulePackageRepository.deleteByModule(module.getId());
+        moduleToPackageRepository.deleteByModule(module.getId());
         for(Integer o : packages){
-            modulePackageRepository.create(new ModuleToPackage(module.getId(), o.intValue()));
+            moduleToPackageRepository.create(new ModuleToPackage(module.getId(), o.intValue()));
         }
-
-        // Delete values for each key, then delete keys
-        for(ParameterKey key : keyRepository.loadAllForModule(module.getId())){
-            valueRepository.deleteByKeyId(key.getId());
-        }
-        keyRepository.deleteByModuleId(module.getId());
-
-        // Store new parameters
+        deleteKeysAndValues(module.getId());
         storeKeysAndValues(parameters, module);
     }
 
@@ -114,6 +109,9 @@ public class InstallationModuleServiceImpl implements InstallationModuleService 
 
     @Override
     public void delete(BigInteger id) {
+        moduleToPackageRepository.deleteByModule(id.intValue());
+        deleteKeysAndValues(id.intValue());
+        elementToModuleRepository.deleteByModule(id.intValue());
         moduleRepository.delete(id);
     }
 
@@ -125,5 +123,12 @@ public class InstallationModuleServiceImpl implements InstallationModuleService 
                 valueRepository.create(new ParameterValue(key.getId(), value));
             }
         }
+    }
+
+    private void deleteKeysAndValues(int moduleId){
+        for(ParameterKey key : keyRepository.loadAllForModule(moduleId)){
+            valueRepository.deleteByKeyId(key.getId());
+        }
+        keyRepository.deleteByModuleId(moduleId);
     }
 }

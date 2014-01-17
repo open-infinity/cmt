@@ -185,8 +185,8 @@ public class ModuleController extends AbstractController{
     @ResourceMapping(DELETE_MODULE)
     public void deleteModule(ResourceRequest request, ResourceResponse response, @RequestParam("id") int moduleId) throws Exception {
         try {
-//            if (liferayService.getUser(request, response) == null) return;
-           // moduleService.delete(moduleId);
+//          if (liferayService.getUser(request, response) == null) return;
+            moduleService.delete(BigInteger.valueOf(moduleId));
         } catch (Exception e) {
             ExceptionUtil.throwSystemException(e);
         }

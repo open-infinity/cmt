@@ -18,6 +18,7 @@ package org.openinfinity.cloud.service.configurationtemplate.entity.impl;
 import org.apache.log4j.Logger;
 import org.openinfinity.cloud.domain.configurationtemplate.entity.InstallationPackage;
 import org.openinfinity.cloud.domain.repository.configurationtemplate.entity.api.InstallationPackageRepository;
+import org.openinfinity.cloud.domain.repository.configurationtemplate.relation.api.ModuleToPackageRepository;
 import org.openinfinity.cloud.service.configurationtemplate.entity.api.InstallationPackageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,6 +38,9 @@ public class InstallationPackageServiceImpl implements InstallationPackageServic
 
     @Autowired
     InstallationPackageRepository packageRepository;
+
+    @Autowired
+    ModuleToPackageRepository moduleToPackageRepository;
 
     @Override
     public InstallationPackage create(InstallationPackage obj) {
@@ -64,12 +68,14 @@ public class InstallationPackageServiceImpl implements InstallationPackageServic
     }
 
     @Override
-    public void delete(InstallationPackage obj) {
-        packageRepository.delete(obj);
+    public void delete(InstallationPackage installationPackage) {
+        moduleToPackageRepository.deleteByPackage(installationPackage.getId());
+        packageRepository.delete(installationPackage);
     }
 
     @Override
     public void delete(BigInteger id) {
+        moduleToPackageRepository.deleteByPackage(id.intValue());
         packageRepository.delete(id);
     }
 }
