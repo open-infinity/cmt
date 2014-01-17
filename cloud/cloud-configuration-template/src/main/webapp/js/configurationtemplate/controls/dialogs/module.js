@@ -205,7 +205,8 @@
 
         // parameter key-value events
         bindParameterKeyClicks();
-        bindParameterNewKeyInputClicks();
+        bindParameterNewKeyInputClicks(findNewKeyInput());
+        bindParameterNewValueInputClicks(findNewValueInput());
         bindParameterDeleteKeyClicks($(".dlg-module-list-item-delete-button", "#dlg-keys"));
         bindParameterNewKeyClicks();
 
@@ -242,15 +243,20 @@
         });
     }
 
-    function bindParameterNewKeyInputClicks(){
-        bindParameterInputClick(findNewKeyInput());
-        bindParameterInputClick(findNewValueInput());
-    }
-
-    function bindParameterInputClick(items){
+    function bindParameterNewKeyInputClicks(items){
         items.bind("click", function(){
             var val =  $(this).val();
-            if (val === "" || val == msg.addNewKey || val == msg.addNewValue ){
+            if (val === "" || val == msg.addNewKey){
+                $(this).val("").css("color", "black");
+            }
+            clearStyleForErrorInput(0, $(this));
+        });
+    }
+
+    function bindParameterNewValueInputClicks(items){
+        items.bind("click", function(){
+            var val =  $(this).val();
+            if (val === "" || val == msg.addNewValue){
                 $(this).val("").css("color", "black");
             }
             clearStyleForErrorInput(0, $(this));
@@ -347,11 +353,13 @@
             storeKeyToDom(tpl.key, key, dlg.html.parameterKeysList).find("input").focus();
             storeKeyToDom(tpl.key, null, dlg.html.parameterKeysList);
             storeValueToDom(tpl.value, null, dlg.html.parameterValuesList, null);
+            $("#dlg-list-values-container").find(".dlg-list-panel-container-title").show();
 
             // re-bind events
             unbindKeyHandlers();
             bindParameterKeyClicks();
-            bindParameterNewKeyInputClicks();
+            bindParameterNewKeyInputClicks(findNewKeyInput());
+            bindParameterNewValueInputClicks(findNewValueInput());
             bindParameterDeleteClicks($(".dlg-module-list-item-delete-button"));
             bindParameterNewKeyClicks();
         });
@@ -401,7 +409,7 @@
     function showViewSelectedKeyInitial(data){
         var count = 0;
 
-        if (data !== null){
+        if (data !== null && !$.isEmptyObject(data)){
 
             // show all keys. Show values only for for the first key.
             $.each(data, function(parameterKey, parameterValues){
@@ -416,14 +424,21 @@
                     });
                     dlg.html.keyName.text(parameterKey);
                 }
-                else{
+                else {
                     storeKeyToDom(tpl.key, parameterKey, dlg.html.parameterKeysList);
                 }
             });
+             // Store "new item" rows to DOM
+            storeKeyToDom(tpl.key, null, dlg.html.parameterKeysList);
+            storeValueToDom(tpl.value, null, dlg.html.parameterValuesList, null);
+            $("#dlg-list-values-container").find(".dlg-list-panel-container-title").show();
+            $("dlg-values").show();
         }
-        // Store "new item" rows to DOM
-        storeKeyToDom(tpl.key, null, dlg.html.parameterKeysList);
-        storeValueToDom(tpl.value, null, dlg.html.parameterValuesList, null);
+        else{
+            $("#dlg-list-values-container").find(".dlg-list-panel-container-title").hide();
+            $("dlg-values").hide();
+            storeKeyToDom(tpl.key, null, dlg.html.parameterKeysList);
+        }
     }
 
     function showViewSelectedKey(key){
@@ -444,11 +459,15 @@
         });
         // Key not in model
         if (!found){
-            dlg.html.keyName.text("");
+            $("#dlg-list-values-container").find(".dlg-list-panel-container-title").hide();
+            $("dlg-values").hide();
         }
-
-        // add rows for creation of new values to ValuesView
-        storeValueToDom(tpl.value, null, dlg.html.parameterValuesList, null);
+        else{
+            // add rows for creation of new values to ValuesView
+            storeValueToDom(tpl.value, null, dlg.html.parameterValuesList, null);
+            $("#dlg-list-values-container").find(".dlg-list-panel-container-title").show();
+            $("dlg-values").show();
+        }
 
         // store state
         dlg.state.selectedKey = key.val();
@@ -483,7 +502,7 @@
                 addButton.addClass("dlg-module-new-value-button").removeClass("dlg-module-list-item-delete-button");
 
                 // bind events for new value item
-                bindParameterInputClick(lastChild.find("input"));
+                bindParameterNewValueInputClicks(lastChild.find("input"));
                 bindParameterNewValueClick(addButton);
 
                 lastChild.data("index", -1);
