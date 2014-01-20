@@ -10,7 +10,7 @@
 	   	<relativePath>..</relativePath>    	
 	</parent>
 	
-	<artifactId>cloud-common-web</artifactId>
+	<artifactId>cloud-common</artifactId>
 
 	 <build>
 		<resources>

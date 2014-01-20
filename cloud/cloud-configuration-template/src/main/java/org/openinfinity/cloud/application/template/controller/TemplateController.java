@@ -20,10 +20,10 @@ import com.liferay.portal.model.Organization;
 import com.liferay.portal.model.User;
 import org.apache.log4j.Logger;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.openinfinity.cloud.annotation.Authenticated;
 import org.openinfinity.cloud.application.template.serialization.ConfigurationElementContainer;
 import org.openinfinity.cloud.application.template.serialization.OrganizationContainer;
-import org.openinfinity.cloud.comon.web.LiferayService;
+import org.openinfinity.cloud.common.web.LiferayService;
+import org.openinfinity.cloud.common.annotation.Authenticated;
 import org.openinfinity.cloud.domain.configurationtemplate.entity.ConfigurationElement;
 import org.openinfinity.cloud.domain.configurationtemplate.entity.ConfigurationTemplate;
 import org.openinfinity.cloud.domain.configurationtemplate.relation.TemplateToOrganization;
@@ -125,8 +125,6 @@ public class TemplateController extends AbstractController{
     @ResourceMapping(GET_TEMPLATE)
     public void getTemplate(ResourceRequest request, ResourceResponse response, @RequestParam("templateId") int templateId) throws Exception {
         try {
-            User user = liferayService.getUser(request, response);
-            if (user == null) return;
             SerializerUtil.jsonSerialize(response.getWriter(), configurationTemplateService.load(BigInteger.valueOf(templateId)));
         } catch (Exception e) {
             ExceptionUtil.throwSystemException(e);
@@ -137,8 +135,6 @@ public class TemplateController extends AbstractController{
     @ResourceMapping(DELETE_TEMPLATE)
     public void deleteTemplate(ResourceRequest request, ResourceResponse response, @RequestParam("id") int templateId) throws Exception {
         try {
-            User user = liferayService.getUser(request, response);
-            if (user == null) return;
             configurationTemplateService.delete(BigInteger.valueOf(templateId));
         } catch (Exception e) {
             ExceptionUtil.throwSystemException(e);
@@ -149,8 +145,6 @@ public class TemplateController extends AbstractController{
     @ResourceMapping(GET_ELEMENTS_FOR_TEMPLATE)
     public void getElementsForTemplate(ResourceRequest request, ResourceResponse response, @RequestParam("templateId") int templateId) throws Exception {
         try {
-            User user = liferayService.getUser(request, response);
-            if (user == null) return;
             SerializerUtil.jsonSerialize(response.getWriter(), new ConfigurationElementContainer(configurationElementService.loadAll(), configurationElementService.loadAllForTemplate(templateId)));
 
         } catch (Exception e) {
@@ -163,15 +157,12 @@ public class TemplateController extends AbstractController{
     public void getAllAvailableElements(ResourceRequest request, ResourceResponse response) throws Exception {
         try {
             LOG.debug("ENTER getAllAvailableElements");
-            User user = liferayService.getUser(request, response);
-            if (user == null) return;
             SerializerUtil.jsonSerialize(response.getWriter(), new ConfigurationElementContainer(configurationElementService.loadAll(), new ArrayList<ConfigurationElement>()));
         } catch (Exception e) {
             ExceptionUtil.throwSystemException(e);
         }
     }
 
-    @Authenticated
     @ResourceMapping(GET_ORGANIZATIONS_FOR_TEMPLATE)
     public void getOrganizationsForTemplate(ResourceRequest request, ResourceResponse response, @RequestParam("templateId") int templateId) throws Exception {
         try {
@@ -195,7 +186,6 @@ public class TemplateController extends AbstractController{
         }
     }
 
-    @Authenticated
     @ResourceMapping(GET_ALL_ORGANIZATIONS)
     public void getAllOrganizations(ResourceRequest request, ResourceResponse response) throws Exception {
         try {
@@ -221,8 +211,6 @@ public class TemplateController extends AbstractController{
                              @RequestParam("elements") String elementData,
                              @RequestParam("organizations") String organizationData) {
         try {
-            User user = liferayService.getUser(request, response);
-            if (user == null) return;
             ObjectMapper mapper = new ObjectMapper();
             ConfigurationTemplate template = mapper.readValue(templateData, ConfigurationTemplate.class);
             configurationTemplateService.update(new ConfigurationTemplate(template.getId(), template.getName(), template.getDescription()), mapper.readValue(elementData, List.class), mapper.readValue(organizationData, List.class));
@@ -239,8 +227,6 @@ public class TemplateController extends AbstractController{
                                @RequestParam("elements") String elementData,
                                @RequestParam("organizations") String organizationData) {
         try {
-            User user = liferayService.getUser(request, response);
-            if (user == null) return;
             ObjectMapper mapper = new ObjectMapper();
             ConfigurationTemplate template = mapper.readValue(templateData, ConfigurationTemplate.class);
             configurationTemplateService.create(new ConfigurationTemplate(template.getName(), template.getDescription()), mapper.readValue(elementData, List.class), mapper.readValue(organizationData, List.class));

@@ -2,8 +2,8 @@ package org.openinfinity.cloud.application.template.controller;
 
 import com.liferay.portal.model.User;
 import org.apache.log4j.Logger;
-import org.openinfinity.cloud.annotation.Authenticated;
-import org.openinfinity.cloud.comon.web.LiferayService;
+import org.openinfinity.cloud.common.annotation.Authenticated;
+import org.openinfinity.cloud.common.web.LiferayService;
 import org.openinfinity.cloud.domain.configurationtemplate.entity.ConfigurationElement;
 import org.openinfinity.cloud.domain.configurationtemplate.entity.ConfigurationTemplate;
 import org.openinfinity.cloud.domain.configurationtemplate.entity.InstallationModule;

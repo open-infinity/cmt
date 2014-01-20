@@ -1,4 +1,4 @@
-package org.openinfinity.cloud.annotation;
+package org.openinfinity.cloud.common.annotation;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;

@@ -18,7 +18,7 @@ package org.openinfinity.cloud.application.template.controller;
 
 import org.apache.log4j.Logger;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.openinfinity.cloud.annotation.Authenticated;
+import org.openinfinity.cloud.common.annotation.Authenticated;
 import org.openinfinity.cloud.domain.configurationtemplate.entity.InstallationPackage;
 import org.openinfinity.cloud.service.configurationtemplate.entity.api.InstallationPackageService;
 import org.openinfinity.cloud.util.http.HttpCodes;

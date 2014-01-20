@@ -16,11 +16,9 @@
 
 package org.openinfinity.cloud.application.admin.controller;
 
-import javax.portlet.RenderRequest;
-import javax.portlet.RenderResponse;
-
+import com.liferay.portal.model.User;
 import org.apache.log4j.Logger;
-import org.openinfinity.cloud.comon.web.LiferayService;
+import org.openinfinity.cloud.common.web.LiferayService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
@@ -28,7 +26,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.portlet.bind.annotation.RenderMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.liferay.portal.model.User;
+import javax.portlet.RenderRequest;
+import javax.portlet.RenderResponse;
 
 /**
  * Controller for edit requests

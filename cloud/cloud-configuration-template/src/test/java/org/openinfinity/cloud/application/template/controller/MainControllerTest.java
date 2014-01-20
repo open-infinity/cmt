@@ -9,7 +9,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.openinfinity.cloud.comon.web.LiferayService;
+import org.openinfinity.cloud.common.web.LiferayService;
 import org.openinfinity.core.util.ExceptionUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.portlet.MockResourceRequest;

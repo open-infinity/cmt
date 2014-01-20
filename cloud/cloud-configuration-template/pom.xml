@@ -326,7 +326,7 @@
 		</dependency>
 		<dependency>
             <groupId>org.openinfinity</groupId>
-            <artifactId>cloud-common-web</artifactId>
+            <artifactId>cloud-common</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
 		<dependency>

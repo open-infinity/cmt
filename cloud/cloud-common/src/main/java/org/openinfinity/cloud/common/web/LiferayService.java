@@ -1,4 +1,4 @@
-package org.openinfinity.cloud.comon.web;
+package org.openinfinity.cloud.common.web;
 
 import com.liferay.portal.model.Organization;
 import com.liferay.portal.model.User;

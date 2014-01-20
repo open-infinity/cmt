@@ -16,26 +16,16 @@
 
 package org.openinfinity.cloud.application.admin.controller;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-
-import javax.portlet.ResourceRequest;
-import javax.portlet.ResourceResponse;
-
+import com.amazonaws.auth.AWSCredentials;
+import com.amazonaws.services.ec2.model.Instance;
+import com.amazonaws.services.ec2.model.Reservation;
 import org.apache.log4j.Logger;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.openinfinity.cloud.common.web.LiferayService;
 import org.openinfinity.cloud.domain.Cluster;
 import org.openinfinity.cloud.domain.Key;
 import org.openinfinity.cloud.domain.Machine;
-import org.openinfinity.cloud.service.administrator.ClusterService;
-import org.openinfinity.cloud.service.administrator.EC2Wrapper;
-import org.openinfinity.cloud.service.administrator.InstanceService;
-import org.openinfinity.cloud.service.administrator.KeyService;
-import org.openinfinity.cloud.service.administrator.MachineService;
-import org.openinfinity.cloud.comon.web.LiferayService;
+import org.openinfinity.cloud.service.administrator.*;
 import org.openinfinity.cloud.util.AdminException;
 import org.openinfinity.cloud.util.serialization.JsonDataWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,9 +36,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.portlet.bind.annotation.ResourceMapping;
 
-import com.amazonaws.auth.AWSCredentials;
-import com.amazonaws.services.ec2.model.Instance;
-import com.amazonaws.services.ec2.model.Reservation;
+import javax.portlet.ResourceRequest;
+import javax.portlet.ResourceResponse;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Controller for handling Machine related CloudAdmin requests
@@ -133,7 +127,7 @@ public class MachineController {
 			
 		} 
 	}
-	
+
 	@ResourceMapping("keyList")
 	public void getKeys(ResourceRequest request, ResourceResponse response) throws IOException {
 		LOG.info("Inside getKeylist in the machine controller");

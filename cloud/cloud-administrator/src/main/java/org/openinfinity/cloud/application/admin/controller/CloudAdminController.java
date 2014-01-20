@@ -16,30 +16,17 @@
 
 package org.openinfinity.cloud.application.admin.controller;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import javax.portlet.RenderRequest;
-import javax.portlet.RenderResponse;
-import javax.portlet.ResourceRequest;
-import javax.portlet.ResourceResponse;
-
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.model.Organization;
+import com.liferay.portal.model.User;
+import com.liferay.portal.service.OrganizationLocalServiceUtil;
+import com.liferay.portal.service.UserLocalServiceUtil;
 import org.apache.log4j.Logger;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.openinfinity.cloud.domain.AvailabilityZone;
-import org.openinfinity.cloud.domain.CloudProvider;
-import org.openinfinity.cloud.domain.Cluster;
-import org.openinfinity.cloud.domain.ClusterType;
-import org.openinfinity.cloud.domain.Instance;
-import org.openinfinity.cloud.domain.Job;
-import org.openinfinity.cloud.domain.Key;
+import org.openinfinity.cloud.common.web.LiferayService;
+import org.openinfinity.cloud.domain.*;
 import org.openinfinity.cloud.service.administrator.*;
-import org.openinfinity.cloud.comon.web.LiferayService;
 import org.openinfinity.cloud.util.AdminException;
 import org.openinfinity.cloud.util.collection.ListUtil;
 import org.openinfinity.cloud.util.http.HttpCodes;
@@ -54,12 +41,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.portlet.bind.annotation.RenderMapping;
 import org.springframework.web.portlet.bind.annotation.ResourceMapping;
 
-import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.model.Organization;
-import com.liferay.portal.model.User;
-import com.liferay.portal.service.OrganizationLocalServiceUtil;
-import com.liferay.portal.service.UserLocalServiceUtil;
+import javax.portlet.RenderRequest;
+import javax.portlet.RenderResponse;
+import javax.portlet.ResourceRequest;
+import javax.portlet.ResourceResponse;
+import java.io.IOException;
+import java.util.*;
 
 /**
  * Controller for handling CloudAdmin requests

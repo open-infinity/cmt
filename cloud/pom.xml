@@ -25,7 +25,7 @@
 		<module>cloud-utils</module>
 		<module>cloud-repository</module>
 		<module>cloud-service</module>
-		<module>cloud-common-web</module>
+		<module>cloud-common</module>
 		<module>cloud-autoscaler</module>
 		<module>cloud-deployer</module>
 		<module>cloud-deployer-batch</module>

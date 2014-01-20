@@ -2,7 +2,7 @@ package org.openinfinity.cloud.util;
 
 import com.liferay.portal.model.Organization;
 import com.liferay.portal.model.User;
-import org.openinfinity.cloud.comon.web.LiferayService;
+import org.openinfinity.cloud.common.web.LiferayService;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.ResourceResponse;

@@ -1,53 +1,31 @@
 package org.openinfinity.cloud.application.admin.controller;
 
-import java.util.LinkedList;
-import java.util.List;
-
-import javax.portlet.ResourceRequest;
-import javax.portlet.ResourceResponse;
-
+import com.liferay.portal.model.User;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.openinfinity.cloud.common.web.LiferayService;
+import org.openinfinity.cloud.domain.Job;
+import org.openinfinity.cloud.domain.ScalingRule;
+import org.openinfinity.cloud.service.administrator.ClusterService;
+import org.openinfinity.cloud.service.administrator.JobService;
+import org.openinfinity.cloud.service.scaling.ScalingRuleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.mock.web.portlet.MockResourceRequest;
 import org.springframework.mock.web.portlet.MockResourceResponse;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.web.bind.annotation.RequestParam;
 
-import com.amazonaws.auth.AWSCredentials;
-import com.liferay.portal.model.User;
-
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import java.util.LinkedList;
+import java.util.List;
 
 import static org.junit.Assert.*;
-
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-
-import static org.mockito.Mockito.*;
-
-import org.openinfinity.cloud.service.administrator.AuthorizationRoutingService;
-import org.openinfinity.cloud.service.administrator.ClusterService;
-import org.openinfinity.cloud.service.administrator.InstanceService;
-import org.openinfinity.cloud.service.administrator.JobService;
-import org.openinfinity.cloud.service.administrator.MachineService;
-import org.openinfinity.cloud.comon.web.LiferayService;
-import org.openinfinity.cloud.service.scaling.ScalingRuleService;
-import org.openinfinity.cloud.application.admin.controller.ClusterController;
-import org.openinfinity.cloud.domain.Cluster;
-import org.openinfinity.cloud.domain.Job;
-import org.openinfinity.cloud.domain.ScalingRule;
-import org.openinfinity.core.util.ExceptionUtil;
+import static org.mockito.Mockito.when;
 
 /**
  * Tests for ClusterController

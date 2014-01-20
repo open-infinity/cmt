@@ -68,7 +68,7 @@ input[type="text"].dlg-error-input{border-color:red;border-radius:2px;margin-lef
 #dlg-keys-values-container li.dlg-element-key-value-list-item{border-width:0;background:white};
 #dlg-element-key-name{padding-left:10px;font-weight:normal;}
 input[type="text"].dlg-key-name, input[type="text"].dlg-value-type, input[type="text"].dlg-value-value{width:90%; padding:2px}
-#dlg-module-key-name{margin-left:5px;width:50px;display:inline-block;text-align:center;border-radius:7px;margin-left:28px;border-color:rgb(0, 0, 0);border-width:2px;border-style:solid}
+#dlg-module-key-name{width:50px;display:inline-block;text-align:center;margin-left:28px;}
 /* TODO: Make a standalone widget for info or integrate with itemselect widget  to avoid duplication of classes*/
 /* the lines below are the same as dlg-item-list-container */
 .dlg-module-item-list-container ul{height:250px;width:200px;overflow-y:auto;float:left;list-style-type:none;margin:0;padding:0;margin-bottom:10px;}

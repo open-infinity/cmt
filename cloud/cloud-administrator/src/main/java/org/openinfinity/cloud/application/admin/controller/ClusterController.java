@@ -16,31 +16,12 @@
 
 package org.openinfinity.cloud.application.admin.controller;
 
-import java.io.IOException;
-import java.sql.Timestamp;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.HashMap;
-
-import javax.portlet.ResourceRequest;
-import javax.portlet.ResourceResponse;
+import com.amazonaws.auth.AWSCredentials;
+import com.liferay.portal.model.User;
 import org.apache.log4j.Logger;
-import org.openinfinity.cloud.domain.AuthorizationRoute;
-import org.openinfinity.cloud.domain.Cluster;
-import org.openinfinity.cloud.domain.ElasticIP;
-import org.openinfinity.cloud.domain.Instance;
-import org.openinfinity.cloud.domain.Job;
-import org.openinfinity.cloud.domain.Machine;
-import org.openinfinity.cloud.domain.ScalingRule;
-import org.openinfinity.cloud.service.administrator.AuthorizationRoutingService;
-import org.openinfinity.cloud.service.administrator.ClusterService;
-import org.openinfinity.cloud.service.administrator.EC2Wrapper;
-import org.openinfinity.cloud.service.administrator.InstanceService;
-import org.openinfinity.cloud.service.administrator.JobService;
-import org.openinfinity.cloud.service.administrator.MachineService;
-import org.openinfinity.cloud.comon.web.LiferayService;
+import org.openinfinity.cloud.common.web.LiferayService;
+import org.openinfinity.cloud.domain.*;
+import org.openinfinity.cloud.service.administrator.*;
 import org.openinfinity.cloud.service.scaling.ScalingRuleService;
 import org.openinfinity.cloud.util.http.HttpCodes;
 import org.openinfinity.cloud.util.serialization.JsonDataWrapper;
@@ -55,8 +36,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.portlet.bind.annotation.ResourceMapping;
 
-import com.amazonaws.auth.AWSCredentials;
-import com.liferay.portal.model.User;
+import javax.portlet.ResourceRequest;
+import javax.portlet.ResourceResponse;
+import java.io.IOException;
+import java.sql.Timestamp;
+import java.util.*;
 
 /**
  * Controller for handling Cluster related CloudAdmin requests
