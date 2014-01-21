@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  * @author Vedran Bartonicek
- * @version 1.2.1 
+ * @version 1.2.2
  * @since 1.2.1
  */
 
@@ -22,31 +22,31 @@
 
 // Creation 
 
-function createPlatformSelectAccordion(element, clusterTypes, machineTypes, identificationPrefix){
-	populateAccordion(element, clusterTypes, machineTypes, identificationPrefix);
-	element.accordion.accordion({collapsible: true, autoHeight:false, heightStyle: "content", active:false});
+function createPlatformSelectAccordion(container, elements, machineTypes, identificationPrefix){
+	populateAccordion(container, elements, machineTypes, identificationPrefix);
+	$("#cloudTypesSelectionAccordion").accordion({collapsible: true, autoHeight:false, heightStyle: "content", active:false});
 	
 	// Events 
 	
-	element.accordion.find(".togglePlatformSelectionRow :radio").change(function(e){
+	$("#cloudTypesSelectionAccordion").find(".togglePlatformSelectionRow :radio").change(function(e){
 		handlePlatformSelectionChange($(this), identificationPrefix);
 	});	
 	
-	element.accordion.find(".toggleEbsRow :radio").change(function(e) {
+	$("#cloudTypesSelectionAccordion").find(".toggleEbsRow :radio").change(function(e) {
 		handleEbsSelectionChange($(this));
 	});
 
-	element.accordion.find(".machineSizeRow :radio").change(function(e) {
+	$("#cloudTypesSelectionAccordion").find(".machineSizeRow :radio").change(function(e) {
 		handleMachineSizeChange($(this));
 	});	 	
 }
 
-function populateAccordion(element, clusterTypes, machineTypes, identificationPrefix){
-	for(var i = 0; i < clusterTypes.length; i++){
+function populateAccordion(container, elements, machineTypes, identificationPrefix){
+	for(var i = 0; i < elements.length; i++){
 		var template = $("#clusterConfigurationTemplate");
 		var header = template.find(".clusterTypeConfigurationHeader").clone();
 		var body = template.find(".clusterTypeConfigurationBody").clone();	
-		if(clusterTypes[i].replicated == true){
+		if(elements[i].replicated == true){
 			var replicationClusterSizeRow = template.find(".clusterTypeConfigurationBody .clusterSizeRow").clone();
 			var replicationMachineSizeRow = $("#clusterConfigurationTemplate .clusterTypeConfigurationBody .machineSizeRow").clone();		
 			replicationClusterSizeRow.attr('class', 'replicationClusterSizeRow configRow').find("label").html("Repl. cluster size");
@@ -54,9 +54,9 @@ function populateAccordion(element, clusterTypes, machineTypes, identificationPr
 			replicationMachineSizeRow.find('.radioButton').attr('class', 'replicationRadio radioButton');	
 			body.find(".machineSizeRow").after(replicationMachineSizeRow).after(replicationClusterSizeRow);
 		}				
-		header.find(".clusterTypeTitle").html(clusterTypes[i].title);
+		header.find(".clusterTypeTitle").html(elements[i].description);
 
-        // Inserts machine types into body before element ids and names are set 
+        // Inserts machine types into body before element ids and names are set
 		var machineTypeRadio = body.find('.machineSizeRow .radioButton');
 		for (var mt = 0; mt < machineTypes.length; ++mt) {
 			var machineTypeInstanceId = 'machineSizeRadio' + machineTypes[mt].name + '_';
@@ -66,43 +66,43 @@ function populateAccordion(element, clusterTypes, machineTypes, identificationPr
 				attr({'for': machineTypeInstanceId}).html(machineTypes[mt].name).appendTo(machineTypeRadio);
 		}
 		// Prepares element ids and names
-		body.attr('id', identificationPrefix + clusterTypes[i].name).find('[type="radio"]').each(function () {
+		body.attr('id', identificationPrefix + elements[i].name).find('[type="radio"]').each(function () {
 			var attribute = '';
 			if($(this).parent().hasClass('replicationRadio')){
 				attribute = 'replication_';
 			}
-			setIdentificationAttributes($(this), clusterTypes[i].name, identificationPrefix, attribute);
+			setIdentificationAttributes($(this), elements[i].name, identificationPrefix, attribute);
 		});
 		
 		// Set default value for button set display
-		element.dialog.find(".radioButton").buttonset();
+		container.dialog.find(".radioButton").buttonset();
         if (cloudadmin.resource.machineTypes.length > 0)
-        	element.dialog.find(".valueDisplayButtonSet").text(cloudadmin.resource.machineTypes[0].specification);
+        	container.dialog.find(".valueDisplayButtonSet").text(cloudadmin.resource.machineTypes[0].specification);
         
         // Set all platforms to be unselected by default - UI elements dimming 
-        dimAccordionElements(element.accordion);
+        dimAccordionElements($("#cloudTypesSelectionAccordion"));
         
-		body.data('clusterConfiguration', cloudadmin.resource.clusterTypes[i]);
-		element.accordion.append(header);
-		element.accordion.append(body);
-		dimAccordionElements(element.accordion);
+		body.data('clusterConfiguration', cloudadmin.resource.elements[i]);
+		$("#cloudTypesSelectionAccordion").append(header);
+		$("#cloudTypesSelectionAccordion").append(body);
+		dimAccordionElements($("#cloudTypesSelectionAccordion"));
 	} 
 }
 
-function setIdentificationAttributes(element, clusterName, idPrefix, optionalAttribute){
-	element.attr('id', idPrefix + optionalAttribute + element.attr('id') + clusterName);
-	element.attr('name', idPrefix + optionalAttribute + element.attr('name') + clusterName);
-	var label = element.next("label");
+function setIdentificationAttributes(item, clusterName, idPrefix, optionalAttribute){
+	item.attr('id', idPrefix + optionalAttribute + item.attr('id') + clusterName);
+	item.attr('name', idPrefix + optionalAttribute + item.attr('name') + clusterName);
+	var label = item.next("label");
 	label.attr('for', idPrefix + optionalAttribute + label.attr('for') + clusterName);
 }
 
 
 // Event handlers
 
-function handlePlatformSelectionChange(element, prefix) {
+function handlePlatformSelectionChange(item, prefix) {
 	var requiredClusterType = null;
 	var dependentPlatformContainer = null;
-	var grandpa = element.parents(".ui-accordion-content");
+	var grandpa = item.parents(".ui-accordion-content");
 	var dependency = grandpa.data('clusterConfiguration').dependency;	
 	
 	if  (dependency != -1) {
@@ -110,8 +110,8 @@ function handlePlatformSelectionChange(element, prefix) {
 		dependentPlatformContainer = $("#" +  prefix + requiredClusterType.name);
 	}
 	
-	if (element.attr("id").indexOf("togglePlatformRadioOn") != -1) {
-		toggleGrandunclesClass(element, "select", 0);
+	if (item.attr("id").indexOf("togglePlatformRadioOn") != -1) {
+		toggleGrandunclesClass(item, "select", 0);
 		if  (dependency != -1) {
 			var radioPlatformOn = dependentPlatformContainer.find('input[id*="togglePlatformRadioOn_"]');
 			radioPlatformOn.attr('checked',true).button("refresh");
@@ -119,16 +119,16 @@ function handlePlatformSelectionChange(element, prefix) {
 			dependentPlatformContainer.find('.togglePlatformSelectionRow :radio').attr("disabled", true).button("refresh");
 		}
 	}
-	else if (element.attr("id").indexOf("togglePlatformRadioOff") !=  -1) {
-		toggleGrandunclesClass(element, "unselect", 0);
+	else if (item.attr("id").indexOf("togglePlatformRadioOff") !=  -1) {
+		toggleGrandunclesClass(item, "unselect", 0);
 		if  (dependency != -1){		
 			// Check if some other platform also depends on the "dependent platform"
 			var myId = grandpa.data('clusterConfiguration').id;
 			var found = false;
-			for(var i = 0; i < cloudadmin.resource.clusterTypes.length; i++){
-				if (cloudadmin.resource.clusterTypes[i].dependency == dependency  &&
-					cloudadmin.resource.clusterTypes[i].id != myId){
-					 if  ($('#' + prefix + 'togglePlatformRadioOn_' + cloudadmin.resource.clusterTypes[i].name).attr('checked')) {
+			for(var i = 0; i < cloudadmin.resource.elements.length; i++){
+				if (cloudadmin.resource.elements[i].dependency == dependency  &&
+					cloudadmin.resource.elements[i].id != myId){
+					 if  ($('#' + prefix + 'togglePlatformRadioOn_' + cloudadmin.resource.elements[i].name).attr('checked')) {
 						found  = true;
 						break;
 					} else continue;
@@ -139,15 +139,15 @@ function handlePlatformSelectionChange(element, prefix) {
 				attr("disabled", false).button("refresh");
 		}
 	}
-	element.siblings().attr('checked',false).button("refresh");
-	element.attr('checked',true).button("refresh");		
+	item.siblings().attr('checked',false).button("refresh");
+	item.attr('checked',true).button("refresh");
 }	
 
-function handleEbsSelectionChange(element){
-	var sliderRow = element.parent().parent().next();
+function handleEbsSelectionChange(item){
+	var sliderRow = item.parent().parent().next();
 	var jqSlider = sliderRow.find(".jq_slider");
 	
-	if (element.attr("id").indexOf("toggleEbsRadioOff") !=  -1) {
+	if (item.attr("id").indexOf("toggleEbsRadioOff") !=  -1) {
 		sliderRow.fadeTo(500, ".5");
 		jqSlider.slider({ disabled: true});		
 	}
@@ -157,30 +157,30 @@ function handleEbsSelectionChange(element){
 	}
 }
 
-function handleMachineSizeChange(element){
-	element.parent().next().text(cloudadmin.resource.machineTypes[element.attr("value")].specification);
+function handleMachineSizeChange(item){
+	item.parent().next().text(cloudadmin.resource.machineTypes[item.attr("value")].specification);
 }
 
 
 // Helper functions
 
-function dimAccordionElements(element){
-	element.find(".jq_slider").slider({ disabled: true }).css("opacity", "1");
-	element.find(".clusterSizeRow").css("opacity", ".5");
-	element.find(".configRow").css("opacity", ".5");	
-	element.find(".ebsSizeRow").css("opacity", ".5");
+function dimAccordionElements(item){
+	item.find(".jq_slider").slider({ disabled: true }).css("opacity", "1");
+	item.find(".clusterSizeRow").css("opacity", ".5");
+	item.find(".configRow").css("opacity", ".5");
+	item.find(".ebsSizeRow").css("opacity", ".5");
 } 
 
 function findClusterTypeById(clusterId) {
-	var matchedTypes = $.grep(cloudadmin.resource.clusterTypes, function(obj) {
+	var matchedTypes = $.grep(cloudadmin.resource.elements, function(obj) {
 		return obj.id == clusterId;	
 	});
 	if (matchedTypes.length != 0)
 		return matchedTypes[0];
 }
 
-function toggleGrandunclesClass(element, mode, delay){
-	var grandpa = element.parents(".ui-accordion-content");
+function toggleGrandunclesClass(item, mode, delay){
+	var grandpa = item.parents(".ui-accordion-content");
 	var granduncle = grandpa.prev();
 	if(mode === "select"){
 		granduncle.addClass("platformSelected",delay).removeClass("platformNotSelected");
@@ -217,35 +217,35 @@ function disableGrandpaElements(grandpa){
 }
 
 function prepareRequestParameters(outData, dc){
-	var clusters = cloudadmin.resource.clusterTypes;
-	for(var i = 0; i < clusters.length; i++){
-		outData[clusters[i].name]				  	= "false";
-		outData[clusters[i].name + "clustersize"] 	= 0;
-		outData[clusters[i].name + "machinesize"] 	= 0;
-		outData[clusters[i].name + "esb"] 		  	= "false";
-		outData[clusters[i].name + "volumesize"]  	= 0;
+	var elements = cloudadmin.resource.elements;
+	for(var i = 0; i < elements.length; i++){
+		outData[elements[i].name]				  	= "false";
+		outData[elements[i].name + "elementsize"] 	= 0;
+		outData[elements[i].name + "machinesize"] 	= 0;
+		outData[elements[i].name + "esb"] 		  	= "false";
+		outData[elements[i].name + "volumesize"]  	= 0;
 	}
 	outData["instanceid"] = dc.instanceId;
-	for(var i = 0; i < clusters.length; i++){
-		if($('#' + dc.idPrefix + "togglePlatformRadioOn_" + clusters[i].name).attr('checked')){
-			outData[clusters[i].name] = "true";
-			outData[clusters[i].name + "clustersize"] = 
-				$('#' + dc.idPrefix + clusters[i].name + ' .clusterSizeRow .jq_slider').parent().next().text();
-			outData[clusters[i].name + "machinesize"] = machineSize(dc.idPrefix, clusters[i].name, 1);
+	for(var i = 0; i < elements.length; i++){
+		if($('#' + dc.idPrefix + "togglePlatformRadioOn_" + elements[i].name).attr('checked')){
+			outData[elements[i].name] = "true";
+			outData[elements[i].name + "elementsize"] = 
+				$('#' + dc.idPrefix + elements[i].name + ' .elementsizeRow .jq_slider').parent().next().text();
+			outData[elements[i].name + "machinesize"] = machineSize(dc.idPrefix, elements[i].name, 1);
 			
-			if (clusters[i].replicated == true){
-				outData[clusters[i].name + "replclustersize"] = $('#' + dc.idPrefix + clusters[i].name + 
-					' .replicationClusterSizeRow .jq_slider').parent().next().text();
-				outData[clusters[i].name + "replmachinesize"] = machineSize(dc.idPrefix, clusters[i].name, 2);
+			if (elements[i].replicated == true){
+				outData[elements[i].name + "replelementsize"] = $('#' + dc.idPrefix + elements[i].name + 
+					' .replicationelementsizeRow .jq_slider').parent().next().text();
+				outData[elements[i].name + "replmachinesize"] = machineSize(dc.idPrefix, elements[i].name, 2);
 			}
-			if($('#' + dc.idPrefix + "imageTypeEphemeral_" + clusters[i].name).attr('checked')){
-				outData[clusters[i].name + "imagetype"] = "0";
+			if($('#' + dc.idPrefix + "imageTypeEphemeral_" + elements[i].name).attr('checked')){
+				outData[elements[i].name + "imagetype"] = "0";
 			}
 			else
-				outData[clusters[i].name + "imagetype"] = "1";
-			if($('#' + dc.idPrefix + "toggleEbsRadioOn_" + clusters[i].name).attr('checked')){
-				outData[clusters[i].name + "esbvolumesize"] = 
-					$('#' + dc.idPrefix + clusters[i].name + ' .ebsSizeRow .jq_slider').parent().next().text();
+				outData[elements[i].name + "imagetype"] = "1";
+			if($('#' + dc.idPrefix + "toggleEbsRadioOn_" + elements[i].name).attr('checked')){
+				outData[elements[i].name + "esbvolumesize"] = 
+					$('#' + dc.idPrefix + elements[i].name + ' .ebsSizeRow .jq_slider').parent().next().text();
 			}
 		}
 	}

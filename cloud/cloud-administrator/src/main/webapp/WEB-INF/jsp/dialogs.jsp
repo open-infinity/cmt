@@ -16,11 +16,11 @@
 		<label for="cloudType" class="subtitleLabel"><fmt:message key="cloud.instancedialog.title.cloud" /></label>
 		<select id="cloudSelect" class="instanceConfigurationSelect">
 			<option selected></option>
-			<%-- <option value="amazon">Amazon</option> --%>
-			<%-- <option value="eucalyptus">Eucalyptus</option>--%>
 		</select>
 		<label for="zoneName" class="subtitleLabel"><fmt:message key="cloud.instancedialog.title.zone" /></label>
 		<select id="zoneSelect" class="instanceConfigurationSelect"></select>
+		<label for="template" class="subtitleLabel"><fmt:message key="cloud.instancedialog.title.template" /></label>
+        <select id="templateSelect" class="instanceConfigurationSelect"></select>
 	</div>
 	<div class="subtitleLabel"><fmt:message key = "cloud.instancedialog.title.available"/></div>
 	<p style ="font-size:.9em" class="instanceConfigurationValidateTips"><fmt:message key = "cloud.instancedialog.info.selectServices"/></p>

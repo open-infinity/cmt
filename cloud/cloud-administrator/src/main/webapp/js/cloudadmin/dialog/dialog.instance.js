@@ -24,6 +24,7 @@
 (function($) {
 	console.log("initializing cloudadmin.dialog.instance");
 	var cloudadmin = window.cloudadmin || {};
+	cloudadmin.resource.elements = {};
 	$.extend(cloudadmin.dialog, {
 		cid : {},
 		instanceObj : {},
@@ -48,40 +49,87 @@
 			// Initialize accordion once the data from CMT DB arrives
 			$.when(
 				$.ajax({dataType: "json", url: portletURL.url.instance.getCloudProvidersURL}),
-				$.ajax({dataType: "json", url: portletURL.url.instance.getClusterTypesURL}),
-				$.ajax({dataType: "json", url: portletURL.url.instance.getMachineTypesURL}))
-				.done(function(resultCloudProviders, resultClusterTypes, resultMachineTypes) {
-											
+				$.ajax({dataType: "json", url: portletURL.url.instance.getMachineTypesURL}),
+				$.ajax({dataType: "json", url: portletURL.url.instance.getTemplatesURL}))
+				.done(function(resultCloudProviders, resultMachineTypes, resultTemplates) {
+
 					var cloudProviders = cloudadmin.resource.cloudProviders = resultCloudProviders[0];
-					var clusterTypes = cloudadmin.resource.clusterTypes = resultClusterTypes[0];
 					var machineTypes = cloudadmin.resource.machineTypes = resultMachineTypes[0];
-						
-					var cloudSelect = dc.dialog.find("#cloudSelect");
+					var templates = cloudadmin.resource.templates = resultTemplates[0];
+
+					var cloudSelect = $("#cloudSelect");
 					$.each(cloudProviders, function(index, provider) {
 						cloudSelect.append("<option value='" + provider.id + "'>" + provider.name + "</option>");
-					});			
+					});
 
-					createPlatformSelectAccordion(dc, clusterTypes, machineTypes, dc.idPrefix);
-									
+                    // Get templates and populate the templates combo box
+                    var templateSelect = $("#templateSelect");
+                    $.each(templates, function(index, t) {
+                        templateSelect.append("<option value='" + t.id + "'>" + t.name + "</option>");
+                    });
+
+                    // Get elements for selected template
+                    var url = portletURL.url.instance.getElementsForTemplateURL + "&templateId=" + templates[0].id;
+                    $.getJSON(url, function(data) {
+                        dc.accordion.empty();
+                        cloudadmin.resource.elements = data;
+                        createPlatformSelectAccordion(dc, data, machineTypes, dc.idPrefix);
+                    });
+
+					//createPlatformSelectAccordion(dc, clusterTypes, machineTypes, templates, dc.idPrefix);
+
+
+                    // Events
+
+                    // Update zones on cloudSelect change
 					cloudSelect.change(function() {
 						var cloudId = $('#cloudSelect option:selected').val();
 						if (!cloudId) { 
 							$("#zoneSelect").html('<option selected></option>');
 							return;
 						} 
-						var url = portletURL.url.instance.getCloudZonesURL+"&cloud="+cloudId+"&rnd="+Math.random();
-						var options = '';
-					
+						var url = portletURL.url.instance.getCloudZonesURL+"&cloud="+cloudId;
 						$.getJSON(url, function(data) {
 							$.each(data, function(index, zone) {
-								options += '<option value="'+zone.name+'">'+zone.name+'</option>';
+                                templateSelect.append("<option value='" + zone.name + "'>" + zone.name + "</option>");
 							});
-							$("#zoneSelect").html(options);
 						});
 					});
-					
+
+                    // Update elements on template change
+                    templateSelect.change(function() {
+                        var templateId = $('#templateSelect option:selected').val();
+                        if (!templateId) {
+                            return;
+                        }
+                        var url = portletURL.url.instance.getElementsForTemplateURL + "&templateId=" + templateId;
+                        $.getJSON(url, function(data) {
+                            cloudadmin.resource.elements = data;
+                            if (jQuery.isEmptyObject(data)){
+                                console.log("Unable to populate UI - configuration elements not available");
+                            }
+                            else{
+                                dc.accordion.empty();
+                                createPlatformSelectAccordion(dc, data, machineTypes, dc.idPrefix);
+                            }
+                        });
+                    });
+
+					// TODO: check this out
 					cloudadmin.dialog.initAddServiceDialog();
 			    });
+
+			    // Get templates and populate services based on available templates
+			    /*
+                $.getJSON(portletURL.url.instance.getTemplatesURL, function(data) {
+                    var options = '';
+                    $.each(data, function(index, template) {
+                        options += '<option value="'+template.name+'">'+template.name+'</option>';
+                    });
+                    var templateSelect = $("#templateSelect");
+                    templateSelect.html(options);
+                });
+                */
 		},
 		
 		// This function is called when dialog is already created. It is called from instances page, 
@@ -91,16 +139,16 @@
 		createNewInstance: function() {
 			
 			$("#instanceName").val('');
-			var clusters = cloudadmin.resource.clusterTypes;
-			for(var i = 0; i < clusters.length; i++){
-				var selectorName = '#' + clusters[i].name;
+			var elements = cloudadmin.resource.elements;
+			for(var i = 0; i < elements.length; i++){
+				var selectorName = '#' + elements[i].name;
 				$(selectorName + ' .clusterSizeRow .jq_slider')
 					.slider({
-						min: clusters[i].minMachines,
-						max: clusters[i].maxMachines,
-						values: [clusters[i].minMachines],
+						min: elements[i].minMachines,
+						max: elements[i].maxMachines,
+						values: [elements[i].minMachines],
 						slide: function(event, ui) {$(this).parent().next().text(ui.values[0]);}})
-					.parent().next().text(clusters[i].minMachines);	
+					.parent().next().text(elements[i].minMachines);
 				$(selectorName + ' .ebsSizeRow .jq_slider')
 					.slider({
 						min: 1,
@@ -109,14 +157,14 @@
 						step: 10,
 						slide: function(event, ui) {$(this).parent().next().text(ui.values[0]);}})
 					.parent().next().text(1);
-				if(clusters[i].replicated == true){
+				if(elements[i].replicated == true){
 					$(selectorName + ' .replicationClusterSizeRow .jq_slider')
 						.slider({
-							max:clusters[i].maxReplicationMachines,
-							min:clusters[i].minReplicationMachines,
-							values: [clusters[i].minReplicationMachines],
+							max:elements[i].maxReplicationMachines,
+							min:elements[i].minReplicationMachines,
+							values: [elements[i].minReplicationMachines],
 							slide: function(event, ui) {$(this).parent().next().text(ui.values[0]);}})
-						.parent().next().text(clusters[i].minReplicationMachines);
+						.parent().next().text(elements[i].minReplicationMachines);
 				}	
 				// accordion header
 				$(selectorName).prev().addClass("platformNotSelected").removeClass("platformSelected");
@@ -140,7 +188,7 @@
 			// Create instance-button
 			this.instanceAddButtons[dialogRes.resource.instance.create] = function() {
 				var outData = {};	
-				clusters = cloudadmin.resource.clusterTypes;
+				elements = cloudadmin.resource.elements;
 				if (!validateField($("#instanceName"))) return;
 				if (!validateField($("#cloudSelect"))) return;
 				if (!validateField($("#zoneSelect"))) return;
@@ -148,44 +196,48 @@
 				outData["instancename"] = $("#instanceName").val();
 				outData["cloudtype"] = $("#cloudSelect").val();
 				outData["zone"] = $("#zoneSelect").val();
+				outData["template"] = $("#templateSelect").val();
 				
 				// init outData
-				for(var i = 0; i < clusters.length; i++){
-					outData[clusters[i].name]				  	= "false";
-					outData[clusters[i].name + "clustersize"] 	= 0;
-					outData[clusters[i].name + "machinesize"] 	= 0;
-					outData[clusters[i].name + "esb"] 		  	= "false";
-					outData[clusters[i].name + "volumesize"]  	= 0;
+				for(var i = 0; i < elements.length; i++){
+					outData[elements[i].name]				  	= "false";
+					outData[elements[i].name + "clustersize"] 	= 0;
+					outData[elements[i].name + "machinesize"] 	= 0;
+					outData[elements[i].name + "esb"] 		  	= "false";
+					outData[elements[i].name + "volumesize"]  	= 0;
 				}
-				for(var i = 0; i < clusters.length; i++){
-					if($('#' + "togglePlatformRadioOn_" + clusters[i].name).attr('checked')){
-						outData[clusters[i].name] = "true";
+				for(i = 0; i < elements.length; i++){
+					if($('#' + "togglePlatformRadioOn_" + elements[i].name).attr('checked')){
+						outData[elements[i].name] = "true";
 						// TODO: There is a bug somewhere, values can't be read from slider correctly as documented in jQuery API docs, 
 						// workaround is used
 						// should be like this: 
 						// outData[clusters[i].name + "clustersize"] 	= $('#' + clusters[i].name + ' .clusterSizeRow .jq_slider').slider("value");
-						outData[clusters[i].name + "clustersize"] = $('#' + clusters[i].name + ' .clusterSizeRow .jq_slider').parent().next().text();
-						outData[clusters[i].name + "machinesize"] = machineSize("", clusters[i].name, 1);
-						if (clusters[i].replicated == true){
-							outData[clusters[i].name + "replclustersize"] = $('#' + clusters[i].name + ' .replicationClusterSizeRow .jq_slider').parent().next().text();
-							outData[clusters[i].name + "replmachinesize"] = machineSize("", clusters[i].name, 2);
+						outData[elements[i].name + "clustersize"] = $('#' + elements[i].name + ' .clusterSizeRow .jq_slider').parent().next().text();
+						outData[elements[i].name + "machinesize"] = machineSize("", elements[i].name, 1);
+						if (elements[i].replicated == true){
+							outData[elements[i].name + "replclustersize"] = $('#' + elements[i].name + ' .replicationClusterSizeRow .jq_slider').parent().next().text();
+							outData[elements[i].name + "replmachinesize"] = machineSize("", elements[i].name, 2);
 						}
-						if($('#' + "imageTypeEphemeral_" + clusters[i].name).attr('checked')){
-							outData[clusters[i].name + "imagetype"] = "0";
+						if($('#' + "imageTypeEphemeral_" + elements[i].name).attr('checked')){
+							outData[elements[i].name + "imagetype"] = "0";
 						}
 						else
-							outData[clusters[i].name + "imagetype"] = "1";
-						if($('#' + "toggleEbsRadioOn_" + clusters[i].name).attr('checked')){
-							outData[clusters[i].name + "esbvolumesize"] = $('#' + clusters[i].name + ' .ebsSizeRow .jq_slider').parent().next().text();
+							outData[elements[i].name + "imagetype"] = "1";
+						if($('#' + "toggleEbsRadioOn_" + elements[i].name).attr('checked')){
+							outData[elements[i].name + "esbvolumesize"] = $('#' + elements[i].name + ' .ebsSizeRow .jq_slider').parent().next().text();
 						}
 					}
 				}
+				/*
 				$.ajax({
 					type: 'POST',
 					url: portletURL.url.instance.addInstanceURL,
 					data: outData,
 					dataType: 'json'
 				});
+				*/
+				console.log("Sending data (nat!):" + outData);
 				$("#cloudTypesSelectionAccordion").accordion("option", "active", false);
 				$(this).trigger("instancetable.refresh").dialog("close");
 			};

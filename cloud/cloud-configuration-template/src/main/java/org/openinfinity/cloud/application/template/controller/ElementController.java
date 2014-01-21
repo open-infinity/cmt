@@ -55,7 +55,8 @@ import java.util.Collection;
 @RequestMapping("VIEW")
 public class ElementController extends AbstractController{
 
-    private static final String CREATE_ELEMENT = "createElement";private static final String GET_ELEMENT = "getElement";
+    private static final String CREATE_ELEMENT = "createElement";
+    private static final String GET_ELEMENT = "getElement";
 	private static final String GET_DEPENDENCIES_FOR_ELEMENT = "getDependencies";
 	private static final String GET_ALL_DEPENDENCIES = "getAllDependencies";
     private static final String GET_ALL_MODULES = "getAllModules";

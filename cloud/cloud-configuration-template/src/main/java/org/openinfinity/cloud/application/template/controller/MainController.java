@@ -61,8 +61,8 @@ public class MainController extends AbstractController{
     @ResourceMapping(GET_ELEMENTS)
     public void getElements(ResourceRequest request, ResourceResponse response, @RequestParam("page") int page, @RequestParam("rows") int rows) throws Exception {
         try {
-            List<ConfigurationElement> templates = (List<ConfigurationElement>)elementService.loadAll();
-            createOnePageResponse(response, templates, page, rows);
+            List<ConfigurationElement> elements = (List<ConfigurationElement>)elementService.loadAll();
+            createOnePageResponse(response, elements, page, rows);
         }
         catch (Exception e) {
             ExceptionUtil.throwSystemException(e);

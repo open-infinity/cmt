@@ -66,12 +66,12 @@
 					}
 				}
 			});
-			createPlatformSelectAccordion(dc, cloudadmin.resource.clusterTypes, cloudadmin.resource.machineTypes, dc.idPrefix);
+			createPlatformSelectAccordion(dc, cloudadmin.resource.elements, cloudadmin.resource.machineTypes, dc.idPrefix);
 			cloudadmin.dialog.addServiceDialog = dc;	
 		},
 		
 		addNewService: function(dc) {	
-			var clusters = cloudadmin.resource.clusterTypes;
+			var clusters = cloudadmin.resource.elements;
 			for(var i = 0; i < clusters.length; i++){
 				var selectorName = '#' + dc.idPrefix + clusters[i].name;
 				$(selectorName + ' .clusterSizeRow .jq_slider')

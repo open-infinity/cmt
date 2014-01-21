@@ -31,9 +31,7 @@ jQuery(function($) {
 	var cloudadmin = window.cloudadmin || {};
 	
 	// After this, no need to add random at URL end
-	$.ajaxSetup({
-		  cache: false
-		});
+	$.ajaxSetup({cache: false});
 	
 	cloudadmin = {	
 			

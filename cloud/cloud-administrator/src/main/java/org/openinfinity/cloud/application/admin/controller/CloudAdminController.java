@@ -24,9 +24,14 @@ import com.liferay.portal.service.OrganizationLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import org.apache.log4j.Logger;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.openinfinity.cloud.common.annotation.Authenticated;
 import org.openinfinity.cloud.common.web.LiferayService;
 import org.openinfinity.cloud.domain.*;
+import org.openinfinity.cloud.domain.configurationtemplate.entity.ConfigurationElement;
+import org.openinfinity.cloud.domain.configurationtemplate.entity.ConfigurationTemplate;
 import org.openinfinity.cloud.service.administrator.*;
+import org.openinfinity.cloud.service.configurationtemplate.entity.api.ConfigurationElementService;
+import org.openinfinity.cloud.service.configurationtemplate.entity.api.ConfigurationTemplateService;
 import org.openinfinity.cloud.util.AdminException;
 import org.openinfinity.cloud.util.collection.ListUtil;
 import org.openinfinity.cloud.util.http.HttpCodes;
@@ -102,6 +107,12 @@ public class CloudAdminController {
 	@Autowired
 	@Qualifier("availabilityZoneService")
 	private AvailabilityZoneService zoneService;
+
+    @Autowired
+    private ConfigurationTemplateService templateService;
+
+    @Autowired
+    private ConfigurationElementService elementService;
 	
 	@RenderMapping
 	public String showView(RenderRequest request, RenderResponse response) {
@@ -408,7 +419,40 @@ public class CloudAdminController {
         List<String> userOrgNames = liferayService.getOrganizationNames(user);
         SerializerUtil.jsonSerialize(response.getWriter(), machineTypeService.getMachineTypes(userOrgNames));
 	}
-	
+
+    @ResourceMapping("getTemplates")
+    public void getTemplates(ResourceRequest request, ResourceResponse response) throws Exception {
+        LOG.debug("getTemplates()");
+        User user = liferayService.getUser(request, response);
+        if (user == null) return;
+
+        List<Long> organizationIds = liferayService.getOrganizationIds(user);
+        List<ConfigurationTemplate> templates = templateService.loadAllForOrganizations(organizationIds);
+
+        try {
+            SerializerUtil.jsonSerialize(response.getWriter(), templates);
+        } catch (Exception e) {
+            LOG.error("Could not send json coded list of the templates");
+            response.setProperty(ResourceResponse.HTTP_STATUS_CODE, "421");
+            response.getWriter().write("Error locating templates.");
+        }
+    }
+
+    @Authenticated
+    @ResourceMapping("getElementsForTemplate")
+    public void getElementsForTemplate(ResourceRequest request, ResourceResponse response,
+                                       @RequestParam("templateId") int templateId) throws Exception {
+        LOG.debug("getElementsForTemplate()");
+        List<ConfigurationElement> elements = (List<ConfigurationElement>)elementService.loadAllForTemplate(templateId);
+        try {
+            SerializerUtil.jsonSerialize(response.getWriter(), elements);
+        } catch (Exception e) {
+            LOG.error("Could not send json coded list of the elements");
+            response.setProperty(ResourceResponse.HTTP_STATUS_CODE, "421");
+            response.getWriter().write("Error locating elements.");
+        }
+    }
+
 	// Helper functions
 	
 	private void checkPlatformExistance(Collection<Integer> clusterTypes, int type) throws AdminException{
