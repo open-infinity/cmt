@@ -22,8 +22,8 @@ import org.apache.log4j.Logger;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.openinfinity.cloud.application.template.serialization.ConfigurationElementContainer;
 import org.openinfinity.cloud.application.template.serialization.OrganizationContainer;
-import org.openinfinity.cloud.common.web.LiferayService;
 import org.openinfinity.cloud.common.annotation.Authenticated;
+import org.openinfinity.cloud.common.web.LiferayService;
 import org.openinfinity.cloud.domain.configurationtemplate.entity.ConfigurationElement;
 import org.openinfinity.cloud.domain.configurationtemplate.entity.ConfigurationTemplate;
 import org.openinfinity.cloud.domain.configurationtemplate.relation.TemplateToOrganization;
@@ -32,23 +32,20 @@ import org.openinfinity.cloud.service.configurationtemplate.entity.api.Configura
 import org.openinfinity.cloud.service.configurationtemplate.relation.api.TemplateToOrganizationService;
 import org.openinfinity.cloud.util.http.HttpCodes;
 import org.openinfinity.cloud.util.serialization.SerializerUtil;
-import org.openinfinity.core.exception.AbstractCoreException;
-import org.openinfinity.core.exception.ApplicationException;
-import org.openinfinity.core.exception.BusinessViolationException;
-import org.openinfinity.core.exception.SystemException;
 import org.openinfinity.core.util.ExceptionUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.portlet.ModelAndView;
-import org.springframework.web.portlet.bind.annotation.RenderMapping;
 import org.springframework.web.portlet.bind.annotation.ResourceMapping;
 
-import javax.portlet.*;
+import javax.portlet.ResourceRequest;
+import javax.portlet.ResourceResponse;
 import java.math.BigInteger;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Spring portlet controller for handling Configuration Template requests.
@@ -90,43 +87,13 @@ public class TemplateController extends AbstractController{
     @Autowired
     private TemplateToOrganizationService organizationService;
 
-    @RenderMapping
-    public String showView(RenderRequest request, RenderResponse response) {
-        User user = liferayService.getUser(request);
-        if (user == null) {
-            LOG.debug("User = null");
-            response.setProperty(ResourceResponse.HTTP_STATUS_CODE, HttpCodes.HTTP_ERROR_CODE_USER_NOT_LOGGED_IN);
-            return "notlogged";
-        }
-        return "main";
-    }
-
-    // TODO -> to some util class? :vbartoni
-    @ExceptionHandler({ApplicationException.class, BusinessViolationException.class, SystemException.class})
-    public ModelAndView handleException(RenderRequest renderRequest, RenderResponse renderResponse, AbstractCoreException abstractCoreException) {
-        ModelAndView modelAndView = new ModelAndView("error");
-        if (abstractCoreException.isErrorLevelExceptionMessagesIncluded())
-            modelAndView.addObject("errorLevelExceptions", abstractCoreException.getErrorLevelExceptionIds());
-        if (abstractCoreException.isWarningLevelExceptionMessagesIncluded())
-            modelAndView.addObject("warningLevelExceptions", abstractCoreException.getWarningLevelExceptionIds());
-        if (abstractCoreException.isInformativeLevelExceptionMessagesIncluded())
-            modelAndView.addObject("informativeLevelExceptions", abstractCoreException.getInformativeLevelExceptionIds());
-
-        @SuppressWarnings("unchecked")
-        Map<String, Object> userInfo =
-                (Map<String, Object>) renderRequest.getAttribute(ActionRequest.USER_INFO);
-        if (userInfo == null)
-            return new ModelAndView("error");
-
-        return modelAndView;
-    }
-
     @Authenticated
     @ResourceMapping(GET_TEMPLATE)
     public void getTemplate(ResourceRequest request, ResourceResponse response, @RequestParam("templateId") int templateId) throws Exception {
         try {
             SerializerUtil.jsonSerialize(response.getWriter(), configurationTemplateService.load(BigInteger.valueOf(templateId)));
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             ExceptionUtil.throwSystemException(e);
         }
     }
@@ -136,7 +103,8 @@ public class TemplateController extends AbstractController{
     public void deleteTemplate(ResourceRequest request, ResourceResponse response, @RequestParam("id") int templateId) throws Exception {
         try {
             configurationTemplateService.delete(BigInteger.valueOf(templateId));
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             ExceptionUtil.throwSystemException(e);
         }
     }
@@ -146,8 +114,8 @@ public class TemplateController extends AbstractController{
     public void getElementsForTemplate(ResourceRequest request, ResourceResponse response, @RequestParam("templateId") int templateId) throws Exception {
         try {
             SerializerUtil.jsonSerialize(response.getWriter(), new ConfigurationElementContainer(configurationElementService.loadAll(), configurationElementService.loadAllForTemplate(templateId)));
-
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             ExceptionUtil.throwSystemException(e);
         }
     }
@@ -158,7 +126,8 @@ public class TemplateController extends AbstractController{
         try {
             LOG.debug("ENTER getAllAvailableElements");
             SerializerUtil.jsonSerialize(response.getWriter(), new ConfigurationElementContainer(configurationElementService.loadAll(), new ArrayList<ConfigurationElement>()));
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             ExceptionUtil.throwSystemException(e);
         }
     }
@@ -180,8 +149,8 @@ public class TemplateController extends AbstractController{
                 }
             }
             SerializerUtil.jsonSerialize(response.getWriter(), organizationContainer.construct(organizations, selectedOrganizations));
-
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             ExceptionUtil.throwSystemException(e);
         }
     }
@@ -193,7 +162,8 @@ public class TemplateController extends AbstractController{
             if (user == null) return;
             List<Organization> organizations = liferayService.getOrganizations(user);
             SerializerUtil.jsonSerialize(response.getWriter(), organizationContainer.construct(organizations, new ArrayList<Organization>()));
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             ExceptionUtil.throwSystemException(e);
         }
     }
@@ -215,7 +185,8 @@ public class TemplateController extends AbstractController{
             ConfigurationTemplate template = mapper.readValue(templateData, ConfigurationTemplate.class);
             configurationTemplateService.update(new ConfigurationTemplate(template.getId(), template.getName(), template.getDescription()), mapper.readValue(elementData, List.class), mapper.readValue(organizationData, List.class));
 
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             e.printStackTrace();
             response.setProperty(ResourceResponse.HTTP_STATUS_CODE, HttpCodes.HTTP_ERROR_CODE_SERVER_ERROR);
         }
@@ -230,7 +201,8 @@ public class TemplateController extends AbstractController{
             ObjectMapper mapper = new ObjectMapper();
             ConfigurationTemplate template = mapper.readValue(templateData, ConfigurationTemplate.class);
             configurationTemplateService.create(new ConfigurationTemplate(template.getName(), template.getDescription()), mapper.readValue(elementData, List.class), mapper.readValue(organizationData, List.class));
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             e.printStackTrace();
             response.setProperty(ResourceResponse.HTTP_STATUS_CODE, HttpCodes.HTTP_ERROR_CODE_SERVER_ERROR);
         }

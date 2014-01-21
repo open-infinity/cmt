@@ -25,7 +25,6 @@ import org.springframework.web.portlet.bind.annotation.ResourceMapping;
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -58,20 +57,14 @@ public class MainController extends AbstractController{
 
     private static final Logger LOG = Logger.getLogger(MainController.class.getName());
 
-    // TODO: these functions are the same. Generalization needed.
-
     @Authenticated
     @ResourceMapping(GET_ELEMENTS)
     public void getElements(ResourceRequest request, ResourceResponse response, @RequestParam("page") int page, @RequestParam("rows") int rows) throws Exception {
         try {
-            Collection<ConfigurationElement> templates = elementService.loadAll();
-            int records = templates.size();
-            int mod = records % rows;
-            int totalPages = records / rows;
-            if (mod > 0) totalPages++;
-            List<ConfigurationElement> onePage = ListUtil.sliceList(page, rows, new LinkedList<ConfigurationElement>(templates));
-            SerializerUtil.jsonSerialize(response.getWriter(), new JsonDataWrapper(page, totalPages, records, onePage));
-        } catch (Exception e) {
+            List<ConfigurationElement> templates = (List<ConfigurationElement>)elementService.loadAll();
+            createOnePageResponse(response, templates, page, rows);
+        }
+        catch (Exception e) {
             ExceptionUtil.throwSystemException(e);
         }
     }
@@ -80,18 +73,13 @@ public class MainController extends AbstractController{
     public void getTemplates(ResourceRequest request, ResourceResponse response, @RequestParam("page") int page, @RequestParam("rows") int rows)
             throws Exception {
         try {
-            LOG.debug("ENTER getTemplatesForUser, page=" + page + ",rows=" + rows);
             User user = liferayService.getUser(request, response);
             if (user == null) return;
             List<Long> organizationIds = liferayService.getOrganizationIds(user);
             List<ConfigurationTemplate> templates = templateService.loadAllForOrganizations(organizationIds);
-            int records = templates.size();
-            int mod = records % rows;
-            int totalPages = records / rows;
-            if (mod > 0) totalPages++;
-            List<ConfigurationTemplate> onePage = ListUtil.sliceList(page, rows, new LinkedList<ConfigurationTemplate>(templates));
-            SerializerUtil.jsonSerialize(response.getWriter(), new JsonDataWrapper(page, totalPages, records, onePage));
-        } catch (Exception e) {
+            createOnePageResponse(response, templates, page, rows);
+        }
+        catch (Exception e) {
             ExceptionUtil.throwSystemException(e);
         }
     }
@@ -100,21 +88,10 @@ public class MainController extends AbstractController{
     @ResourceMapping(GET_MODULES)
     public void getModules(ResourceRequest request, ResourceResponse response, @RequestParam("page") int page, @RequestParam("rows") int rows) throws Exception {
         try {
-            LOG.debug("ENTER getTemplatesForUser, page=" + page + ",rows=" + rows);
-            Collection<InstallationModule> modules = moduleService.loadAll();
-            LOG.debug("modules=" + modules);
-
-            int records = modules.size();
-            int mod = records % rows;
-            int totalPages = records / rows;
-            if (mod > 0) totalPages++;
-            List<InstallationModule> onePage = ListUtil.sliceList(page, rows, new LinkedList<InstallationModule>(modules));
-            LOG.debug("onePage=" + onePage);
-
-            SerializerUtil.jsonSerialize(response.getWriter(), new JsonDataWrapper(page, totalPages, records, onePage));
-            LOG.debug("EXIT");
-
-        } catch (Exception e) {
+            List<InstallationModule> modules = (List<InstallationModule>)moduleService.loadAll();
+            createOnePageResponse(response, modules, page, rows);
+        }
+        catch (Exception e) {
             ExceptionUtil.throwSystemException(e);
         }
     }
@@ -123,28 +100,18 @@ public class MainController extends AbstractController{
     @ResourceMapping(GET_PACKAGES)
     public void getPackages(ResourceRequest request, ResourceResponse response, @RequestParam("page") int page, @RequestParam("rows") int rows) throws Exception {
         try {
-            LOG.debug("ENTER getTemplatesForUser, page=" + page + ",rows=" + rows);
-            Collection<InstallationPackage> packages = packageService.loadAll();
-            LOG.debug("packages=" + packages);
-
-            int records = packages.size();
-            int mod = records % rows;
-            int totalPages = records / rows;
-            if (mod > 0) totalPages++;
-            List<InstallationPackage> onePage = ListUtil.sliceList(page, rows, new LinkedList<InstallationPackage>(packages));
-            LOG.debug("onePage=" + onePage);
-
-            SerializerUtil.jsonSerialize(response.getWriter(), new JsonDataWrapper(page, totalPages, records, onePage));
-            LOG.debug("EXIT");
-
-        } catch (Exception e) {
+            List<InstallationPackage> packages =  (List<InstallationPackage>)packageService.loadAll();
+            createOnePageResponse(response, packages, page, rows);
+        }
+        catch (Exception e) {
             ExceptionUtil.throwSystemException(e);
         }
     }
 
-    // TODO: use me
-    // Slices a subset from list, the result fits into one jqGgrid page.
-    private <T> void sliceAndSerialize(ResourceResponse response, List<T> items, int page, int rows) throws IOException {
+    /*
+     * Slices a subset from list, the result fits into one jqGgrid page.
+     */
+    private <T> void createOnePageResponse(ResourceResponse response, List<T> items, int page, int rows) throws IOException {
         int records = items.size();
         int mod = records % rows;
         int totalPages = records / rows;

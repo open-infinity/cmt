@@ -85,10 +85,9 @@ public class ModuleController extends AbstractController{
     @ResourceMapping(GET_MODULE)
     public void getModule(ResourceRequest request, ResourceResponse response, @RequestParam("moduleId") int moduleId) throws Exception {
         try {
-            //User user = liferayService.getUser(request, response);
-            //if (user == null) return;
             SerializerUtil.jsonSerialize(response.getWriter(), moduleService.load(BigInteger.valueOf(moduleId)));
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             ExceptionUtil.throwSystemException(e);
         }
     }
@@ -98,15 +97,14 @@ public class ModuleController extends AbstractController{
     public void getParameterKeysAndValues(ResourceRequest request, ResourceResponse response, @RequestParam("moduleId") int moduleId) throws Exception {
         try {
             Map<String, Collection<String>> keyValuesMap = new LinkedHashMap<String, Collection<String>>();
-            //Collection<ParameterKey> keys = parameterKeyService.loadAll(moduleId);
             Collection<ParameterKey> keys = parameterKeyService.loadAllForModule(moduleId);
             for (ParameterKey key : keys){
                 Collection<String> values = parameterValueService.loadStringValuesForKey(key.getId());
-                LOG.debug("Key:" + key.getName() + "Value:" + values);
                 keyValuesMap.put(key.getName(), values);
             }
             SerializerUtil.jsonSerialize(response.getWriter(), keyValuesMap);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             ExceptionUtil.throwSystemException(e);
         }
     }
@@ -118,7 +116,8 @@ public class ModuleController extends AbstractController{
             Collection<InstallationPackage> availableItems = packageService.loadAll();
             Collection<InstallationPackage> selectedItems = packageService.loadByModule(moduleId);
             SerializerUtil.jsonSerialize(response.getWriter(), new CollectionsContainer<InstallationPackage>(availableItems, selectedItems));
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             ExceptionUtil.throwSystemException(e);
         }
     }
@@ -130,7 +129,8 @@ public class ModuleController extends AbstractController{
             Collection<InstallationPackage> availableItems = packageService.loadAll();
             Collection<InstallationPackage> selectedItems = new ArrayList<InstallationPackage>();
             SerializerUtil.jsonSerialize(response.getWriter(), new CollectionsContainer<InstallationPackage>(availableItems, selectedItems));
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             ExceptionUtil.throwSystemException(e);
         }
     }
@@ -146,13 +146,9 @@ public class ModuleController extends AbstractController{
             InstallationModule module = mapper.readValue(moduleData, InstallationModule.class);
             Collection<Integer> packages = mapper.readValue(packagesData, Collection.class);
             Map<String, Collection<String>> keyValuesMap = mapper.readValue(parametersData, new TypeReference<Map<String, Collection<String>>>(){});
-
-            LOG.debug("InstallationModule:" + module);
-            LOG.debug("dependenciesList:" + packages);
-            LOG.debug("Map kv:" + keyValuesMap);
-
             moduleService.update(module, packages, keyValuesMap);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             e.printStackTrace();
             response.setProperty(ResourceResponse.HTTP_STATUS_CODE, HttpCodes.HTTP_ERROR_CODE_SERVER_ERROR);
         }
@@ -169,13 +165,9 @@ public class ModuleController extends AbstractController{
             InstallationModule module = mapper.readValue(moduleData, InstallationModule.class);
             Collection<Integer> packages = mapper.readValue(packagesData, Collection.class);
             Map<String, Collection<String>> keyValuesMap = mapper.readValue(parametersData, new TypeReference<Map<String, Collection<String>>>(){});
-
-            LOG.debug("InstallationModule:" + module);
-            LOG.debug("dependenciesList:" + packages);
-            LOG.debug("Map kv:" + keyValuesMap);
-
             moduleService.create(module, packages, keyValuesMap);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             e.printStackTrace();
             response.setProperty(ResourceResponse.HTTP_STATUS_CODE, HttpCodes.HTTP_ERROR_CODE_SERVER_ERROR);
         }
@@ -185,7 +177,6 @@ public class ModuleController extends AbstractController{
     @ResourceMapping(DELETE_MODULE)
     public void deleteModule(ResourceRequest request, ResourceResponse response, @RequestParam("id") int moduleId) throws Exception {
         try {
-//          if (liferayService.getUser(request, response) == null) return;
             moduleService.delete(BigInteger.valueOf(moduleId));
         } catch (Exception e) {
             ExceptionUtil.throwSystemException(e);

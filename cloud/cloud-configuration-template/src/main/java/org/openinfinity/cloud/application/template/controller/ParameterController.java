@@ -87,10 +87,6 @@ public class ParameterController {
     public void loadClusters(ResourceResponse response, 
                              @RequestParam("organizationId") int organizationId)
                              throws Exception {    
-        
-        //List<ParameterKey> templatesList = parameterKeyService.getAll();
-        //Assert.notNull(templatesList);
-        //SerializerUtil.jsonSerialize(response.getWriter(), templatesList);
-    } 		
+    }
     
 }
