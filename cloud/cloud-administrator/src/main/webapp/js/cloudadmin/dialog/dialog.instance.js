@@ -17,7 +17,7 @@
  * @author Juha-Matti Sironen
  * @author Ilkka Leinonen
  * @author Vedran Bartonicek
- * @version 1.2.0 
+ * @version 1.2.2
  * @since 1.0.0
  */
 
@@ -25,16 +25,18 @@
 	console.log("initializing cloudadmin.dialog.instance");
 	var cloudadmin = window.cloudadmin || {};
 	cloudadmin.resource.elements = {};
+	cloudadmin.dialog.instance= {};
+
 	$.extend(cloudadmin.dialog, {
 		cid : {},
-		instanceObj : {},
+		//instanceObj : {},
 		instanceAddButtons : {},
 		instanceDeleteButtons : {},		
 		
 		// This function is called at dialog creation. It creates and initializes all the html and css elements 
 		// and defines event handling
 		initInstanceCreationDialog: function() {
-			var dc = new Object();
+			var dc = cloudadmin.dialog.instance = new Object();
 			dc.idPrefix = '';
 			dc.dialog = $("#addInstanceDialog");
 			dc.accordion = $("#cloudTypesSelectionAccordion");
@@ -71,7 +73,6 @@
                     // Get elements for selected template
                     var url = portletURL.url.instance.getElementsForTemplateURL + "&templateId=" + templates[0].id;
                     $.getJSON(url, function(data) {
-                        dc.accordion.empty();
                         cloudadmin.resource.elements = data;
                         createPlatformSelectAccordion(dc, data, machineTypes, dc.idPrefix);
                     });
@@ -91,7 +92,8 @@
 						var url = portletURL.url.instance.getCloudZonesURL+"&cloud="+cloudId;
 						$.getJSON(url, function(data) {
 							$.each(data, function(index, zone) {
-                                templateSelect.append("<option value='" + zone.name + "'>" + zone.name + "</option>");
+							    $("#zoneSelect").empty();
+                                $("#zoneSelect").append("<option value='" + zone.name + "'>" + zone.name + "</option>");
 							});
 						});
 					});
@@ -109,7 +111,7 @@
                                 console.log("Unable to populate UI - configuration elements not available");
                             }
                             else{
-                                dc.accordion.empty();
+                                //dc.accordion.empty();
                                 createPlatformSelectAccordion(dc, data, machineTypes, dc.idPrefix);
                             }
                         });
@@ -199,6 +201,7 @@
 				outData["template"] = $("#templateSelect").val();
 				
 				// init outData
+				/*
 				for(var i = 0; i < elements.length; i++){
 					outData[elements[i].name]				  	= "false";
 					outData[elements[i].name + "clustersize"] 	= 0;
@@ -209,10 +212,6 @@
 				for(i = 0; i < elements.length; i++){
 					if($('#' + "togglePlatformRadioOn_" + elements[i].name).attr('checked')){
 						outData[elements[i].name] = "true";
-						// TODO: There is a bug somewhere, values can't be read from slider correctly as documented in jQuery API docs, 
-						// workaround is used
-						// should be like this: 
-						// outData[clusters[i].name + "clustersize"] 	= $('#' + clusters[i].name + ' .clusterSizeRow .jq_slider').slider("value");
 						outData[elements[i].name + "clustersize"] = $('#' + elements[i].name + ' .clusterSizeRow .jq_slider').parent().next().text();
 						outData[elements[i].name + "machinesize"] = machineSize("", elements[i].name, 1);
 						if (elements[i].replicated == true){
@@ -229,6 +228,9 @@
 						}
 					}
 				}
+				*/
+
+                prepareRequestParameters(outData, dc);
 				/*
 				$.ajax({
 					type: 'POST',

@@ -29,9 +29,13 @@ import org.openinfinity.cloud.common.web.LiferayService;
 import org.openinfinity.cloud.domain.*;
 import org.openinfinity.cloud.domain.configurationtemplate.entity.ConfigurationElement;
 import org.openinfinity.cloud.domain.configurationtemplate.entity.ConfigurationTemplate;
+import org.openinfinity.cloud.domain.configurationtemplate.entity.InstallationModule;
+import org.openinfinity.cloud.domain.configurationtemplate.entity.ParameterKey;
+import org.openinfinity.cloud.serialization.ElementContainer;
+import org.openinfinity.cloud.serialization.ModuleContainer;
+import org.openinfinity.cloud.serialization.ParametersContainer;
 import org.openinfinity.cloud.service.administrator.*;
-import org.openinfinity.cloud.service.configurationtemplate.entity.api.ConfigurationElementService;
-import org.openinfinity.cloud.service.configurationtemplate.entity.api.ConfigurationTemplateService;
+import org.openinfinity.cloud.service.configurationtemplate.entity.api.*;
 import org.openinfinity.cloud.util.AdminException;
 import org.openinfinity.cloud.util.collection.ListUtil;
 import org.openinfinity.cloud.util.http.HttpCodes;
@@ -113,7 +117,16 @@ public class CloudAdminController {
 
     @Autowired
     private ConfigurationElementService elementService;
-	
+
+    @Autowired
+    private InstallationModuleService moduleService;
+
+    @Autowired
+    private ParameterKeyService parameterKeyService;
+
+    @Autowired
+    private ParameterValueService parameterValueService;
+
 	@RenderMapping
 	public String showView(RenderRequest request, RenderResponse response) {
 		User user = liferayService.getUser(request);
@@ -425,11 +438,9 @@ public class CloudAdminController {
         LOG.debug("getTemplates()");
         User user = liferayService.getUser(request, response);
         if (user == null) return;
-
-        List<Long> organizationIds = liferayService.getOrganizationIds(user);
-        List<ConfigurationTemplate> templates = templateService.loadAllForOrganizations(organizationIds);
-
         try {
+            List<Long> organizationIds = liferayService.getOrganizationIds(user);
+            List<ConfigurationTemplate> templates = templateService.loadAllForOrganizations(organizationIds);
             SerializerUtil.jsonSerialize(response.getWriter(), templates);
         } catch (Exception e) {
             LOG.error("Could not send json coded list of the templates");
@@ -438,14 +449,36 @@ public class CloudAdminController {
         }
     }
 
+    /**
+     * Gets ConfigurationElement, and InstallationModules and key-value parameters related to it
+     */
     @Authenticated
     @ResourceMapping("getElementsForTemplate")
     public void getElementsForTemplate(ResourceRequest request, ResourceResponse response,
                                        @RequestParam("templateId") int templateId) throws Exception {
         LOG.debug("getElementsForTemplate()");
-        List<ConfigurationElement> elements = (List<ConfigurationElement>)elementService.loadAllForTemplate(templateId);
+
+        // TODO: move the stuff below to service layer
         try {
-            SerializerUtil.jsonSerialize(response.getWriter(), elements);
+            Collection<ElementContainer> elementContainers = new ArrayList<ElementContainer>();
+
+            // For each element create and populate ElementContainer and add it to the list
+            for(ConfigurationElement e : elementService.loadAllForTemplate(templateId)){
+                Collection <ModuleContainer> moduleContainers = new ArrayList<ModuleContainer>();
+
+                // For each module create and populate ModuleContainer and add it to the list
+                for(InstallationModule m : moduleService.loadModules(e.getId())){
+                    Collection<ParametersContainer> parametersContainers = new ArrayList<ParametersContainer>();
+
+                    // For each key create and populate ParametersContainer and add it to the list
+                    for (ParameterKey pk : parameterKeyService.loadAllForModule(m.getId())){
+                        parametersContainers.add(new ParametersContainer(pk, parameterValueService.loadStringValuesForKey(pk.getId())));
+                    }
+                    moduleContainers.add(new ModuleContainer(m, parametersContainers));
+                }
+                elementContainers.add(new ElementContainer(e, elementService.loadDependeeIds(e.getId()), moduleContainers));
+            }
+            SerializerUtil.jsonSerialize(response.getWriter(), elementContainers);
         } catch (Exception e) {
             LOG.error("Could not send json coded list of the elements");
             response.setProperty(ResourceResponse.HTTP_STATUS_CODE, "421");

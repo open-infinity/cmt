@@ -30,16 +30,14 @@ import java.util.Collection;
  */
 public interface ConfigurationElementService extends AbstractCrudServiceInterface<ConfigurationElement> {
 
-    //ConfigurationElement load(int id);
-
     Collection<ConfigurationElement> loadAllForTemplate(int templateId);
 
     Collection<ConfigurationElement> loadDependees(int elementId);
 
-    //void update(ConfigurationElement element, Collection<Integer> dependencies, Map<String, Collection<String>> keyValues);
+    Collection<Integer> loadDependeeIds(int elementId);
+
     void update(ConfigurationElement element, Collection<Integer> dependencies, Collection<Integer> modules);
 
-    //void create(ConfigurationElement element, Collection<Integer> dependencies, Map<String, Collection<String>> parameters);
     void create(ConfigurationElement element, Collection<Integer> dependencies, Collection<Integer> modules);
 
 }

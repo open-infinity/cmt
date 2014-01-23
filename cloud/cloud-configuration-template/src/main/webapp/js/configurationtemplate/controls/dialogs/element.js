@@ -42,7 +42,7 @@
     $.extend(dlg, {
 
 		create : function(){
-		$.when(
+		    $.when(
                 $.ajax({
                     url: portletURL.url.element.getAllDependenciesURL,
                     dataType: "json"
