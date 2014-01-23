@@ -89,5 +89,15 @@ class oi3-backup::config {
 		require => File['/opt/openinfinity/3.0.0/backup'],
 	}
 	
+    # More sensitive version of CentOS's run-parts script
+	file {"/opt/openinfinity/3.0.0/backup/common/run-parts-e":
+		ensure => present,
+		owner => 'oiuser',
+		group => 'oiuser',
+		mode => 0777,
+		source => "puppet:///modules/oi3-backup/run-parts-e",
+		require => File['/opt/openinfinity/3.0.0/backup/common'],
+	}
+	
 }
 

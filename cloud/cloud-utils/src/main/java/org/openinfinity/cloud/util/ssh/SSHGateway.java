@@ -151,8 +151,8 @@ public class SSHGateway {
 	 * The SSH key can be read with KeyService and then converted to an expected form using
 	 * <code>Key.getSecret_key().getBytes()</code>.
 	 * 
-	 * @param privateKey 	SSH key to be used.
-	 * @param publicKey		Can be null.
+	 * @param privateKey 	SSH private key to be used
+	 * @param publicKey		Can be null
 	 * @param host     		Remote host ip address or hostname  
 	 * @param port			Remote SSH port
 	 * @param username		Remote host username
@@ -163,6 +163,7 @@ public class SSHGateway {
 	 * @param outFilename	Filename in local file system to be used in remote command's 
 	 * 						output stream. Can be null.
 	 * @return Exit status of the process or -1 if exit status is not available.
+	 * 
 	 * @author Timo Saarinen
 	 */
 	public static int executeRemoteCommandWithLocalFileStreams(byte[] privateKey, byte[] publicKey, String host, int port, String username, String password, String command, String inFilename, String outFilename) {

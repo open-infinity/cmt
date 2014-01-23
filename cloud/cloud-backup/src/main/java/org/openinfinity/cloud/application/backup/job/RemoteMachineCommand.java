@@ -59,7 +59,7 @@ public class RemoteMachineCommand implements Command {
 	 * Create and compress backup file.
 	 */
 	private void backup() throws Exception {
-		logger.trace("backup");
+		logger.info("Backup for " + job.getHostname() + " (" + job.getLogicalMachineName() + ")");
 		
 		// Decide the filename
 		File package_file = new File("cluster-" + job.getStorageCluster().getClusterId() + "-"
@@ -68,17 +68,24 @@ public class RemoteMachineCommand implements Command {
 		logger.debug("Local filename for backup will be " + package_file);
 
 		// The command to be executed in the remote host
-		String package_command = "/opt/openinfinity/3.0.0/backup/stream-backup"; // FIXME: non-hardcoded
+		String package_command = "/opt/openinfinity/3.0.0/backup/stream-backup"; // FIXME: non-hardcoded path
 
+		// Test that the backup file exists
+		int remote_exit_status1 = runRemoteCommand("touch " + package_command, null, "/dev/null");
+		if (remote_exit_status1 > 0) {
+			throw new BackupException(
+					"Remote backup scripts don't exist on host " + job.getHostname() + " (" + job.getLogicalMachineName() + ")");
+		}
+		
 		// Create and compress the backup package remotely
 		logger.info("Creating and compressing backup package in the remote host and saving it to "
 				+ package_file.getAbsolutePath() + " in local host");
-		int remote_exit_status = runRemoteCommand(package_command,
+		int remote_exit_status2 = runRemoteCommand(package_command,
 				null, package_file.getAbsolutePath());
-		if (remote_exit_status > 0) {
+		if (remote_exit_status2 > 0) {
 			throw new BackupException(
 					"Remote packaging command failed with return code "
-							+ remote_exit_status);
+							+ remote_exit_status2 + " on host " + job.getHostname() + " (" + job.getLogicalMachineName() + ")");
 		}
 
 		// Ensure integrity of the package
@@ -107,7 +114,7 @@ public class RemoteMachineCommand implements Command {
 	 * Extract the backup file to remote host.
 	 */
 	private void restore() throws Exception {
-		logger.trace("restore");
+		logger.info("Restore for " + job.getHostname() + " (" + job.getLogicalMachineName() + ")");
 		
 		// The backup file
 		File package_file = job.getLocalBackupFile();
@@ -115,14 +122,21 @@ public class RemoteMachineCommand implements Command {
 		// The comand to be execute in the remote host
 		String restore_command = "/opt/openinfinity/3.0.0/backup/stream-restore"; // FIXME: non-hardcoded
 
+		// Test that the backup file exists
+		int remote_exit_status1 = runRemoteCommand("touch " + restore_command, null, "/dev/null");
+		if (remote_exit_status1 > 0) {
+			throw new BackupException(
+					"Remote restore scripts don't exist on host " + job.getHostname() + " (" + job.getLogicalMachineName() + ")");
+		}
+		
 		// Stream the backup package to the remote host, where it's extracted
 		logger.info("Streaming the package file to remote host where it's extracted");
-		int remote_exit_status = runRemoteCommand(restore_command,
+		int remote_exit_status2 = runRemoteCommand(restore_command,
 				package_file.getAbsolutePath(), null);
-		if (remote_exit_status > 0) {
+		if (remote_exit_status2 > 0) {
 			throw new BackupException(
 					"Remote packaging command failed with return code "
-							+ remote_exit_status);
+							+ remote_exit_status2 + " on host " + job.getHostname() + " (" + job.getLogicalMachineName() + ")");
 		}
 				
 		// Finally delete the local backup file

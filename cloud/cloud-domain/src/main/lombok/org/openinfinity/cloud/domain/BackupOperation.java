@@ -31,7 +31,7 @@ public class BackupOperation {
 	private String operation;
 	
 	public static final String BACKUP = "backup";
-	public static final String FULL_RESTORE = "rull-restore";
+	public static final String FULL_RESTORE = "full-restore";
 	public static final String PARTIAL_RESTORE = "partial-restore";
 	public static final String REFRESH_SCHEDULES = "refresh-schedules";
 

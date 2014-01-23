@@ -8,11 +8,13 @@
 BACKUP_BASE_DIR=/opt/openinfinity/3.0.0/backup
 RESTORE_LOG=/var/log/cloud-restore_`date +"%Y-%m-%d_%H%M"`.log
 
+export PATH=$PATH:$BACKUP_BASE_DIR/common
+
 date &>$BACKUP_LOG
 
 # Run scripts before making backup
 if [ "$(ls -A $BACKUP_BASE_DIR/node-restore-before.d)" ] ; then
-    run-parts $BACKUP_BASE_DIR/node-restore-before.d &>>$RESTORE_LOG || exit 1
+    run-parts-e $BACKUP_BASE_DIR/node-restore-before.d &>>$RESTORE_LOG || exit 1
 fi
 
 # Execute the backup command in root dir
@@ -23,7 +25,7 @@ cd $OLD_DIR
 
 # Run scripts after backup
 if [ "$(ls -A $BACKUP_BASE_DIR/node-restore-after.d)" ] ; then
-    run-parts $BACKUP_BASE_DIR/node-restore-after.d &>>$RESTORE_LOG || exit 1
+    run-parts-e $BACKUP_BASE_DIR/node-restore-after.d &>>$RESTORE_LOG || exit 1
 fi
 
 date &>>$BACKUP_LOG

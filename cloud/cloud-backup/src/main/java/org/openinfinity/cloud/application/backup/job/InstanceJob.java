@@ -144,8 +144,8 @@ abstract public class InstanceJob {
 				logger.debug("Executing " + cmd.getClass().getSimpleName());
 				cmd.execute();
 				finished_commands.add(cmd);
-				if (listener != null) listener.report(true, null);
 			}
+			if (listener != null) listener.report(true, null);
 			logger.debug("All commands executed successfully.");
 		} catch (Exception e) {
 			// Inform listener

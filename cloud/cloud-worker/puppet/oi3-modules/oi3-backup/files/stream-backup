@@ -9,11 +9,13 @@ BACKUP_BASE_DIR=/opt/openinfinity/3.0.0/backup
 EXCLUDES_FILE=/tmp/merged-exclude-rules
 BACKUP_LOG=/var/log/cloud-backup.log
 
+export PATH=$PATH:$BACKUP_BASE_DIR/common
+
 date &>$BACKUP_LOG
 
 # Run scripts before making backup
 if [ "$(ls -A $BACKUP_BASE_DIR/node-backup-before.d)" ] ; then
-    run-parts $BACKUP_BASE_DIR/node-backup-before.d &>>$BACKUP_LOG || exit 1
+    run-parts-e $BACKUP_BASE_DIR/node-backup-before.d &>>$BACKUP_LOG || exit 1
 fi
 
 # Combine include rules into one file
@@ -39,7 +41,7 @@ cd $OLD_DIR
 
 # Run scripts after backup
 if [ "$(ls -A $BACKUP_BASE_DIR/node-backup-after.d)" ] ; then
-    run-parts $BACKUP_BASE_DIR/node-backup-after.d &>>$BACKUP_LOG || exit 1
+    run-parts-e $BACKUP_BASE_DIR/node-backup-after.d &>>$BACKUP_LOG || exit 1
 fi
 
 # Clean up

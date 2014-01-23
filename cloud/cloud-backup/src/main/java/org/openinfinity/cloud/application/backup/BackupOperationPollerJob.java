@@ -208,16 +208,16 @@ public class BackupOperationPollerJob {
 						op.setState(BackupOperation.SUCCEEDED);
 						op.setDescription(null);
 						backup.getBackupWorkRepository().writeBackupOperation(op);
-						logger.trace("JobResultSaver.report: all succeeded, saved");
+						logger.trace("JobResultSaver.report: all succeeded, saved (count=" + count + ", succeeded=" + succeeded + " failed=" + failed + ")");
 					} else {
-						logger.trace("JobResultSaver.report: this succeeeded, waiting for others (" + (count - succeeded - failed) + ")");
+						logger.trace("JobResultSaver.report: this succeeeded, waiting for others (count=" + count + ", succeeded=" + succeeded + " failed=" + failed + ")");
 					}
 				} else {
 					failed++;
 					op.setState(BackupOperation.FAILED);
 					op.setDescription(description);
 					backup.getBackupWorkRepository().writeBackupOperation(op);
-					logger.trace("JobResultSaver.report: failed saved");
+					logger.trace("JobResultSaver.report: failed saved (count=" + count + ", succeeded=" + succeeded + " failed=" + failed + ")");
 				}
 			} catch (Exception e) {
 				logger.warn(e);

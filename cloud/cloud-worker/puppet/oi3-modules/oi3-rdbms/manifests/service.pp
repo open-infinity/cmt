@@ -15,7 +15,7 @@ class oi3-rdbms::service {
 
         exec { "create-backup-user":
                 unless => "/usr/bin/mysql -ubackup -ptoasbackup",
-                command => "/usr/bin/mysql -uroot -p${mysql_password} -e \"grant show databases, select, lock tables, reload on *.* to backup@localhost identified by 'toasbackup'; flush privileges;\"",
+                command => "/usr/bin/mysql -uroot -p${mysql_password} -e \"grant show databases, select, lock tables, reload, create, drop, delete, insert, alter on *.* to backup@localhost identified by 'toasbackup'; flush privileges;\"",
                 require => exec["set-mariadb-password"],
         }
 }
