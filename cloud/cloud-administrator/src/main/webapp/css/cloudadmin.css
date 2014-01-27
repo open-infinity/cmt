@@ -325,8 +325,8 @@ col.data {
 	margin: 0 .2em 0 .2em;}
 
 
-#addInstanceDialog .clusterTypeConfigurationHeader, #addInstanceDialog .platformNotSelected,
-#addServicesDialog .clusterTypeConfigurationHeader, #addServicesDialog .platformNotSelected{
+#addInstanceDialog .accordionHeader, #addInstanceDialog .platformNotSelected,
+#addServicesDialog .accordionHeader, #addServicesDialog .platformNotSelected{
 	outline: none;
 	color: #4F4F4F;
 	border: 1px solid white;
@@ -401,6 +401,24 @@ col.data {
 }
 
 .addInstanceDialogError{margin-bottom:1em;}
+
+.parameterSelectInstruction{margin: 0 0 0 1.5em;display: inline-block;font-size: .9em}
+
+.parameterKey{width: 6em;float:left;font-size: .9em}
+
+.parameterValue{display:inline-block;font-size: .9em;opacity: 0.5}
+
+.parametersRadio{float:left}
+
+.parameterKeySelectRadio{float:left;margin-right:6em}
+
+.parameterRow{margin-bottom: 0.5em;}
+
+.parametersSelectionRow{;margin-top: 1.1em;}
+
+.modulesAccordionRow{margin: 0 0 0 15em;}
+
+.moduleTitle{font-size:0.9em}
 
 /* Pimpping the query range slider */
 /* Clear unwanted inherited styles */
@@ -485,8 +503,8 @@ col.data {
 #addInstanceDialog .togglePlatformSelectionRow{position:relative;}
 #addServicesDialog .togglePlatformSelectionRow{position:relative;}
 
-#addInstanceDialog .clusterTypeConigurationBody{position:relative;border: 1px solid #E9E9E9;}
-#addServicesDialog .clusterTypeConigurationBody{position:relative;border: 1px solid #E9E9E9;}
+#addInstanceDialog .elementConigurationBody{position:relative;border: 1px solid #E9E9E9;}
+#addServicesDialog .elementConigurationBody{position:relative;border: 1px solid #E9E9E9;}
 
 #addInstanceDialog .clusterSizeRow{position:relative;margin-top: 1.1em;}
 #addServicesDialog .clusterSizeRow{position:relative;margin-top: 1.1em;}

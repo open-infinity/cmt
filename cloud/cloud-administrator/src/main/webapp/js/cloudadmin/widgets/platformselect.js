@@ -47,77 +47,85 @@ function createPlatformSelectAccordion(container, data, machineTypes, identifica
 function populateAccordion(container, data, machineTypes, identificationPrefix){
 	for(var i = 0; i < data.length; i++){
 		var template = $("#clusterConfigurationTemplate");
-		var header = template.find(".clusterTypeConfigurationHeader").clone();
-		var body = template.find(".clusterTypeConfigurationBody").clone();
+		var header = template.find(".accordionHeader").clone();
+		var body = template.find(".elementConfigurationBody").clone();
 		if(data[i].element.replicated === true){
-			var replicationClusterSizeRow = template.find(".clusterTypeConfigurationBody .clusterSizeRow").clone();
-			var replicationMachineSizeRow = $("#clusterConfigurationTemplate .clusterTypeConfigurationBody .machineSizeRow").clone();		
+			var replicationClusterSizeRow = template.find(".elementConfigurationBody .clusterSizeRow").clone();
+			var replicationMachineSizeRow = $("#clusterConfigurationTemplate .elementConfigurationBody .machineSizeRow").clone();
 			replicationClusterSizeRow.attr('class', 'replicationClusterSizeRow configRow').find("label").html("Repl. cluster size");
 			replicationMachineSizeRow.attr('class', 'machineSizeRow configRow replicationMachine');
 			replicationMachineSizeRow.find('.radioButton').attr('class', 'replicationRadio radioButton');	
 			body.find(".machineSizeRow").after(replicationMachineSizeRow).after(replicationClusterSizeRow);
 		}				
-		header.find(".clusterTypeTitle").html(data[i].element.description);
+		header.find(".elementTitle").html(data[i].element.description);
 
-        // Inserts machine types radio into body before element ids and names are set
+        // Inserts "machine types" radio into body before element ids and names are set
 		var machineTypeRadio = body.find('.machineSizeRow .radioButton');
 		for (var mt = 0; mt < machineTypes.length; ++mt) {
 			var machineTypeInstanceId = 'machineSizeRadio' + machineTypes[mt].name + '_';
-			$('#machineTypeTemplate').children('[type="radio"]').clone().
-				attr({id: machineTypeInstanceId, value: machineTypes[mt].id}).appendTo(machineTypeRadio);
-			$('#machineTypeTemplate').children('label').clone().
-				attr({'for': machineTypeInstanceId}).html(machineTypes[mt].name).appendTo(machineTypeRadio);
+			$('#machineTypeTemplate').children('[type="radio"]').clone().attr({id: machineTypeInstanceId, value: machineTypes[mt].id}).appendTo(machineTypeRadio);
+			$('#machineTypeTemplate').children('label').clone().attr({'for': machineTypeInstanceId}).html(machineTypes[mt].name).appendTo(machineTypeRadio);
 		}
-        var modulesAccordion = body.find(".modulesAccordion");
+
+        // Prepares element ids and names for accordion body radio buttons
+        body.attr('id', identificationPrefix + data[i].element.id).find('[type="radio"]').each(function () {
+            var attribute = '';
+            if($(this).parent().hasClass('replicationRadio')){
+                attribute = 'replication_';
+            }
+            setIdentificationAttributes($(this), identificationPrefix, attribute, data[i].element.name);
+        });
+
         // For each module : insert module accordion html
-
-        /*
-        <div id="modulesAccordionTemplate" class="template">
-            <h3 class ="modulesAccordionHeader">
-                <label class ="moduleTitle"></label>
-            </h3>
-            <div class="modulesAccordionRow">
-                <label class="parameterTitleLabel">Keys</label>
-                <div class="parameterRadioButton"></div>
-                <label class="parameterTitleLabel">Value for key</label>
-                <div class="parameterValue"></div>
-            </div>
-        </div>
-        */
-
+        var modulesAccordion = body.find(".modulesAccordion");
         for(var j = 0; j < data[i].modules.length; j++){
 
             // insert accordion segment template
-            // var segment = $("#modulesAccordionTemplate").clone().appendTo(modulesAccordion);
+            var moduleAccordionHeader = $("#modulesAccordionTemplate").find(".accordionHeader").clone().appendTo(modulesAccordion);
+            var moduleAccordionBody = $("#modulesAccordionTemplate").find(".modulesAccordionBody").clone().appendTo(modulesAccordion);
 
-            var moduleAccordionHeader = $("#modulesAccordionTemplate").find(".modulesAccordionHeader").clone().appendTo(modulesAccordion);
-            var moduleAccordionBody = $("#modulesAccordionTemplate").find(".modulesAccordionRow").clone().appendTo(modulesAccordion);
-
-            // populate template with modules
+            // set module title
             var moduleTitle = data[j].modules[j].module.name + "-" + data[j].modules[j].module.version;
             moduleAccordionHeader.find(".moduleTitle").text(moduleTitle);
 
             // for each module insert parameter keys into  a radio button
-            var parameterRadioButton = moduleAccordionBody.find(".parameterRadioButton");
-            var parameterTemplate = $('#parameterKeyTemplate');
             for(var k = 0; k < data[i].modules[j].parameters.length; k++){
-                var keyId = 'keySelectRadio' + data[i].modules[j].parameters[k].key.name + '_';
-                parameterTemplate.children('[type="radio"]').clone().attr({id: keyId, value: data[i].modules[j].parameters[k].key.id}).appendTo(parameterRadioButton);
-                parameterTemplate.children('label').clone().attr({'for': keyId}).html(data[i].modules[j].parameters[k].key.name).appendTo(parameterRadioButton);
+
+                 // create a "Off-On" radio button for key selection
+                 var parameterRow = $("#parameterTemplate").find(".parameterRow").clone();
+                 //var radioButton = parameterRow.find(".radioButton").clone();
+                 var radioButton = parameterRow.find(".radioButton");
+                 var identifier = data[i].element.id + "_" + data[i].modules[j].module.id + "_" + data[i].modules[j].parameters[k].key.id;
+                 setIdentificationAttributes(radioButton.find("#toggleKeyOn_"), "", "", identifier);
+                 setIdentificationAttributes(radioButton.find("#toggleKeyOff_"), "", "", identifier);
+                 //radioButton.appendTo(moduleAccordionBody);
+
+                 // create and populate Parameter Key
+                 var parameterKey = parameterRow.find(".parameterKey");
+                 //parameterKey.text(data[i].modules[j].parameters[k].key.name).appendTo(moduleAccordionBody);
+                 parameterKey.text(data[i].modules[j].parameters[k].key.name);
+
+                 // create and populate Parameter Value for a Parameter Key
+                 var parameterValue = parameterRow.find(".parameterValue");
+                 var value = "";
+                 for (var l = 0; l < data[i].modules[j].parameters[k].values.length; l++){
+                    if (value === ""){
+                        value = data[i].modules[j].parameters[k].values[0];
+                    }
+                    else{
+                        value += ":" + data[i].modules[j].parameters[k].values[0];
+                    }
+                 }
+                 //parameterValue.text(value).appendTo(moduleAccordionBody);
+                 parameterValue.text(value);
+                 parameterRow.appendTo(moduleAccordionBody);
             }
+
         }
 
-        // Prepares element ids and names
-		body.attr('id', identificationPrefix + data[i].element.id).find('[type="radio"]').each(function () {
-			var attribute = '';
-			if($(this).parent().hasClass('replicationRadio')){
-				attribute = 'replication_';
-			}
-			setIdentificationAttributes($(this), data[i].element.name, identificationPrefix, attribute);
-		});
-
         // Set default value for MachineType buttonset display
-		container.dialog.find(".radioButton").buttonset();
+		//container.dialog.find(".radioButton").buttonset();
+		//container.dialog.find(".radioButton", "parametersRow").buttonset();
         if (cloudadmin.resource.machineTypes.length > 0)
         	container.dialog.find(".valueDisplayButtonSet").text(cloudadmin.resource.machineTypes[0].specification);
 
@@ -134,14 +142,15 @@ function populateAccordion(container, data, machineTypes, identificationPrefix){
 		container.accordion.append(header);
 		container.accordion.append(body);
 		dimAccordionElements(container.accordion);
-	} 
+	}
+	container.dialog.find(".radioButton").buttonset();
 }
 
-function setIdentificationAttributes(item, clusterName, idPrefix, optionalAttribute){
-	item.attr('id', idPrefix + optionalAttribute + item.attr('id') + clusterName);
-	item.attr('name', idPrefix + optionalAttribute + item.attr('name') + clusterName);
+function setIdentificationAttributes(item, prefix, optionalAttribute, identifier){
+	item.attr('id', item.attr('id') + prefix + optionalAttribute + identifier);
+	item.attr('name', item.attr('name') + prefix + optionalAttribute + identifier);
 	var label = item.next("label");
-	label.attr('for', idPrefix + optionalAttribute + label.attr('for') + clusterName);
+	label.attr('for', label.attr('for') + prefix + optionalAttribute + identifier);
 }
 
 
@@ -153,22 +162,19 @@ function handlePlatformSelectionChange(item, prefix) {
 	var grandpa = item.parents(".ui-accordion-content");
 	var dependees = grandpa.data('clusterConfiguration').dependees;
 
-	for (var = 0; i < dependees.length; i ++){
+	for (var i = 0; i < dependees.length; i ++){
             dependeeElement = findElementById(dependees);
-            dependeeElementContainer = $("#" +  prefix + requiredElement.element.name);
+            dependeeElementContainer = $("#" +  prefix + dependees[i]);
 
         if (item.attr("id").indexOf("togglePlatformRadioOn") != -1) {
             toggleGrandunclesClass(item, "select", 0);
-            if  (dependency != -1) {
-                var radioPlatformOn = dependentPlatformContainer.find('input[id*="togglePlatformRadioOn_"]');
-                radioPlatformOn.attr('checked',true).button("refresh");
-                toggleGrandunclesClass(radioPlatformOn, "select", 0);
-                dependentPlatformContainer.find('.togglePlatformSelectionRow :radio').attr("disabled", true).button("refresh");
-            }
+            var radioPlatformOn = dependeeElementContainer.find('input[id*="togglePlatformRadioOn_"]');
+            radioPlatformOn.attr('checked',true).button("refresh");
+            toggleGrandunclesClass(radioPlatformOn, "select", 0);
+            dependeeElementContainer.find('.togglePlatformSelectionRow :radio').attr("disabled", true).button("refresh");
         }
         else if (item.attr("id").indexOf("togglePlatformRadioOff") !=  -1) {
             toggleGrandunclesClass(item, "unselect", 0);
-            if  (dependency != -1){
                 // Check if some other platform also depends on the "dependent platform"
                 var myId = grandpa.data('clusterConfiguration').id;
                 var found = false;
@@ -182,9 +188,8 @@ function handlePlatformSelectionChange(item, prefix) {
                     }
                 }
                 // Enable manual selection of dependent platform in case no other dependencies were found
-                if (!found ) dependentPlatformContainer.find('.togglePlatformSelectionRow :radio').
+                if (!found ) dependeeElementContainer.find('.togglePlatformSelectionRow :radio').
                     attr("disabled", false).button("refresh");
-            }
         }
     }
 	item.siblings().attr('checked',false).button("refresh");

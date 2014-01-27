@@ -25,7 +25,7 @@
 	console.log("initializing cloudadmin.dialog.instance");
 	var cloudadmin = window.cloudadmin || {};
 	cloudadmin.resource.elements = {};
-	cloudadmin.dialog.instance= {};
+	cloudadmin.dialog.instance = {};
 
 	$.extend(cloudadmin.dialog, {
 		cid : {},

@@ -5,10 +5,10 @@
 
 <%-- Cluster settings template, used in instance creation dialog --%>
 <div id="clusterConfigurationTemplate" class="template">
-	<h3 class ="clusterTypeConfigurationHeader platformNotSelected">
-		<label class ="clusterTypeTitle"></label>
+	<h3 class ="accordionHeader platformNotSelected">
+		<label class ="elementTitle"></label>
 	</h3>
-	<div class="clusterTypeConfigurationBody">
+	<div class="elementConfigurationBody">
 		<div class="togglePlatformSelectionRow">
 			<label class="platformLabel instanceCreationLabel">Select platform</label>
 			<div class="radioButton">
@@ -56,39 +56,44 @@
 			</div>
 			<div class="valueDisplay valueDisplaySlider"></div>
 		</div>
-		<div class="parametersRow">
+		<div class="parametersSelectionRow">
             <label class="parametersLabel instanceCreationLabel">Parameters</label>
-            <div class="radioButton">
+            <div class="radioButton parametersRadio">
                 <input type="radio" id="toggleParamatersOn_" name="toggleParamaters_" />
                 <label for="toggleParamatersOn_"> On </label>
                 <input type="radio" id="toggleParamatersOff_" name="toggleParamaters_" checked="checked"/>
                 <label for="toggleParamatersOff_"> Off </label>
             </div>
+            <div class="parameterSelectInstruction">Select parameters for installation modules</div>
         </div>
-        <div class="modulesAccordion" class="modulesRow">
+        <div class="modulesAccordionRow">
+            <div class="modulesAccordion"></div>
         </div>
-
-
 	</div>
 </div>
 
 <%-- template for module accordion element --%>
 <div id="modulesAccordionTemplate" class="template">
-    <h3 class ="modulesAccordionHeader">
+    <h3 class ="accordionHeader">
         <label class ="moduleTitle"></label>
     </h3>
-    <div class="modulesAccordionRow">
-        <label class="parameterTitleLabel">Keys</label>
-        <div class="parameterRadioButton"></div>
-        <div class="parameterTitleLabel">Value for key</div>
-         <div class="parameterValue"></div>
-    </div>
+    <div class="modulesAccordionBody"></div>
 </div>
 
-<%-- template for parameter keys button --%>
-<div id="parameterKeyTemplate" class="template">
-    <input type="radio" id="parameterKeyRadio" name="parameterKeyRadio_" value=""/>
-    <label for="parameterKeyRadio"></label>
+<%-- template for parameter row --%>
+<div id="parameterTemplate" class="template">
+    <div class="parameterRow">
+        <%--<div class="parameterKeyTitle">Keys</div>
+        <div class="parameterValueTitle">Values</div>--%>
+        <div class="parameterKey"></div>
+        <div class="radioButton parameterKeySelectRadio">
+            <input type="radio" id="toggleKeyOn_" name="toggleKey_" />
+            <label for="toggleKeyOn_">On</label>
+            <input type="radio" id="toggleKeyOff_" name="toggleKey_" checked="checked"/>
+            <label for="toggleKeyOff_">Off</label>
+        </div>
+        <div class="parameterValue"></div>
+    </div>
 </div>
 
 <%-- template for single machine type button --%>
