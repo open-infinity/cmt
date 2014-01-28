@@ -20,6 +20,8 @@
 
 // TODO: Make a truly stand-alone widget for this
 
+var configurationElementPrefix = "configurationElement_";
+
 // Creation 
 
 function createPlatformSelectAccordion(container, data, machineTypes, identificationPrefix){
@@ -41,7 +43,11 @@ function createPlatformSelectAccordion(container, data, machineTypes, identifica
 
 	container.accordion.find(".machineSizeRow :radio").change(function(e) {
 		handleMachineSizeChange($(this));
-	});	 	
+	});
+
+	container.accordion.find(".toggleParametersRow :radio").change(function(e) {
+		handleParametersSelectionChange($(this));
+	});
 }
 
 function populateAccordion(container, data, machineTypes, identificationPrefix){
@@ -68,16 +74,16 @@ function populateAccordion(container, data, machineTypes, identificationPrefix){
 		}
 
         // Prepares element ids and names for accordion body radio buttons
-        body.attr('id', identificationPrefix + data[i].element.id).find('[type="radio"]').each(function () {
+        body.attr('id', configurationElementPrefix + data[i].element.id).find('[type="radio"]').each(function () {
             var attribute = '';
             if($(this).parent().hasClass('replicationRadio')){
                 attribute = 'replication_';
             }
-            setIdentificationAttributes($(this), identificationPrefix, attribute, data[i].element.name);
+            setIdentificationAttributes($(this), identificationPrefix, attribute, data[i].element.id);
         });
 
         // For each module : insert module accordion html
-        var modulesAccordion = body.find(".modulesAccordion");
+        var modulesAccordion = body.find(".modulesAccordionRow").hide();
         for(var j = 0; j < data[i].modules.length; j++){
 
             // insert accordion segment template
@@ -135,6 +141,9 @@ function populateAccordion(container, data, machineTypes, identificationPrefix){
         //if (cloudadmin.resource.machineTypes.length > 0)
         //    container.dialog.find(".parameterValue").text(data[i].modules[j].parameters[0].key.name);
 
+        // Hide parameter selection instruction text
+        $(".parameterSelectInstruction").hide();
+
         // Set all platforms to be unselected by default - UI elements dimming
         dimAccordionElements($("#cloudTypesSelectionAccordion"));
         
@@ -157,84 +166,76 @@ function setIdentificationAttributes(item, prefix, optionalAttribute, identifier
 // Event handlers
 
 function handlePlatformSelectionChange(item, prefix) {
-	var requiredElement = null;
-	var dependentPlatformContainer = null;
-	var grandpa = item.parents(".ui-accordion-content");
-	var dependees = grandpa.data('clusterConfiguration').dependees;
 
-	for (var i = 0; i < dependees.length; i ++){
-            dependeeElement = findElementById(dependees);
-            dependeeElementContainer = $("#" +  prefix + dependees[i]);
+	// grab data from accordion segment's model (data)
+	var data = item.parents(".ui-accordion-content").data('clusterConfiguration');
 
-        if (item.attr("id").indexOf("togglePlatformRadioOn") != -1) {
-            toggleGrandunclesClass(item, "select", 0);
-            var radioPlatformOn = dependeeElementContainer.find('input[id*="togglePlatformRadioOn_"]');
-            radioPlatformOn.attr('checked',true).button("refresh");
-            toggleGrandunclesClass(radioPlatformOn, "select", 0);
-            dependeeElementContainer.find('.togglePlatformSelectionRow :radio').attr("disabled", true).button("refresh");
-        }
-        else if (item.attr("id").indexOf("togglePlatformRadioOff") !=  -1) {
-            toggleGrandunclesClass(item, "unselect", 0);
-                // Check if some other platform also depends on the "dependent platform"
-                var myId = grandpa.data('clusterConfiguration').id;
-                var found = false;
-                for(var i = 0; i < cloudadmin.resource.elements.length; i++){
-                    if (cloudadmin.resource.elements[i].element.dependency === dependency  &&
-                        cloudadmin.resource.elements[i].element.id != myId){
-                         if  ($('#' + prefix + 'togglePlatformRadioOn_' + cloudadmin.resource.elements[i].element.name).attr('checked')) {
-                            found  = true;
-                            break;
-                        } else continue;
-                    }
+    // handle selecting platform
+    if (item.attr("id").indexOf("togglePlatformRadioOn") != -1) {
+        handlePlatformSelection(item, data);
+    }
+
+    // handle deselecting platform
+    else if (item.attr("id").indexOf("togglePlatformRadioOff") !=  -1) {
+        handlePlatformDeselection(item, data);
+    }
+
+    // handle invalid state
+    else{
+        throw("Internal error. Radio button on unknown state.");
+    }
+}
+
+function handlePlatformSelection(item, data){
+    togglePlatformSelection(item, "select", 0);
+    for (var i = 0; i < data.dependees.length; i ++){
+        var accordionSegment = fetchDependeeAccordionSegment(data.dependees[i]);
+
+        // Make the dependee accordion segment selected
+        var radioPlatformOn = accordionSegment.find('input[id*="togglePlatformRadioOn_"]');
+        radioPlatformOn.attr('checked',true).button("refresh");
+        togglePlatformSelection(radioPlatformOn, "select", 0);
+
+        // Disable button, so that it is not possible to deselect the dependee platform
+        accordionSegment.find('.togglePlatformSelectionRow :radio').attr("disabled", true).button("refresh");
+    }
+}
+
+function handlePlatformDeselection(item, data){
+    togglePlatformSelection(item, "unselect", 0);
+    for (var i = 0; i < data.dependees.length; i ++){
+        var accordionSegment = fetchDependeeAccordionSegment(data.dependees[i]);
+
+        // check if some other platform also depends on the "dependent platform"
+        var found = false;
+        for(var j = 0; j < cloudadmin.resource.elements.length; j++){
+            for(var k = 0; k < cloudadmin.resource.elements[j].dependees.length; k++){
+                if (cloudadmin.resource.elements[j].element.id !== data.element.id && cloudadmin.resource.elements[j].dependees[k] === data.dependees[i]){
+                     if  ($('#' + prefix + 'togglePlatformRadioOn_' + cloudadmin.resource.elements[i].element.id).attr('checked')) {
+                        found  = true;
+                        break;
+                    } else continue;
                 }
-                // Enable manual selection of dependent platform in case no other dependencies were found
-                if (!found ) dependeeElementContainer.find('.togglePlatformSelectionRow :radio').
-                    attr("disabled", false).button("refresh");
+            }
+            if (found === true){
+                break;
+            }
+        }
+
+        // enable manual selection of dependent platform in case no other dependencies were found
+        if (!found ) {
+            accordionSegment.find('.togglePlatformSelectionRow :radio').attr("disabled", false).button("refresh");
         }
     }
-	item.siblings().attr('checked',false).button("refresh");
-	item.attr('checked',true).button("refresh");
+}
 
-	/*
-	if  (typeof dependees != 'undefined') {
-    		requiredElement = findElementById(dependees);
-    		dependentPlatformContainer = $("#" +  prefix + requiredElement.element.name);
-    	}
-
-    	if (item.attr("id").indexOf("togglePlatformRadioOn") != -1) {
-    		toggleGrandunclesClass(item, "select", 0);
-    		if  (dependency != -1) {
-    			var radioPlatformOn = dependentPlatformContainer.find('input[id*="togglePlatformRadioOn_"]');
-    			radioPlatformOn.attr('checked',true).button("refresh");
-    			toggleGrandunclesClass(radioPlatformOn, "select", 0);
-    			dependentPlatformContainer.find('.togglePlatformSelectionRow :radio').attr("disabled", true).button("refresh");
-    		}
-    	}
-    	else if (item.attr("id").indexOf("togglePlatformRadioOff") !=  -1) {
-    		toggleGrandunclesClass(item, "unselect", 0);
-    		if  (dependency != -1){
-    			// Check if some other platform also depends on the "dependent platform"
-    			var myId = grandpa.data('clusterConfiguration').id;
-    			var found = false;
-    			for(var i = 0; i < cloudadmin.resource.elements.length; i++){
-    				if (cloudadmin.resource.elements[i].element.dependency === dependency  &&
-    					cloudadmin.resource.elements[i].element.id != myId){
-    					 if  ($('#' + prefix + 'togglePlatformRadioOn_' + cloudadmin.resource.elements[i].element.name).attr('checked')) {
-    						found  = true;
-    						break;
-    					} else continue;
-    				}
-    			}
-    			// Enable manual selection of dependent platform in case no other dependencies were found
-    			if (!found ) dependentPlatformContainer.find('.togglePlatformSelectionRow :radio').
-    				attr("disabled", false).button("refresh");
-    		}
-    	}
-    	item.siblings().attr('checked',false).button("refresh");
-    	item.attr('checked',true).button("refresh");
-    	*/
-
-}	
+function fetchDependeeAccordionSegment(dependeeId){
+    var container = $("#" +  configurationElementPrefix + dependeeId);
+    if (container === null || typeof(container) === 'undefined'){
+        throw("Internal error. Referred jQuery object does not exist.");
+    }
+    return container;
+}
 
 function handleEbsSelectionChange(item){
 	var sliderRow = item.parent().parent().next();
@@ -254,6 +255,19 @@ function handleMachineSizeChange(item){
 	item.parent().next().text(cloudadmin.resource.machineTypes[item.attr("value")].specification);
 }
 
+/*
+ * Hides or shows  "parameterSelectInstruction" and module accordion
+ */
+function handleParametersSelectionChange(item){
+	if (item.attr("id").indexOf("toggleParamatersOff") !=  -1) {
+        item.parent().next().fadeTo(500, ".5");
+        item.parents(".toggleParametersRow").next().hide();
+    }
+    else{
+        item.parent().next().fadeTo(500, "1");
+        item.parents(".toggleParametersRow").next().show();
+    }
+}
 
 // Helper functions
 
@@ -262,7 +276,7 @@ function dimAccordionElements(item){
 	item.find(".clusterSizeRow").css("opacity", ".5");
 	item.find(".configRow").css("opacity", ".5");
 	item.find(".ebsSizeRow").css("opacity", ".5");
-} 
+}
 
 function findElementById(id) {
 	var matchedTypes = $.grep(cloudadmin.resource.elements, function(obj) {
@@ -272,13 +286,14 @@ function findElementById(id) {
 		return matchedTypes[0];
 }
 
-function toggleGrandunclesClass(item, mode, delay){
+function togglePlatformSelection(item, mode, delay){
+    if (item.length === 0 || typeof(item) === 'undefined') return;
 	var grandpa = item.parents(".ui-accordion-content");
 	var granduncle = grandpa.prev();
 	if(mode === "select"){
-		granduncle.addClass("platformSelected",delay).removeClass("platformNotSelected");
-		enableGrandpaElements(grandpa);}
-		
+		granduncle.addClass("platformSelected", delay).removeClass("platformNotSelected");
+		enableGrandpaElements(grandpa);
+    }
 	else  if (mode === "unselect"){
 		granduncle.addClass("platformNotSelected").removeClass("platformSelected",delay);
 		disableGrandpaElements(grandpa);
@@ -293,11 +308,11 @@ function enableGrandpaElements(grandpa){
 	grandpa.find(".machineSizeRow :radio").attr("disabled", false).button("refresh");
 	grandpa.find(".imageTypeRow :radio").attr("disabled", false).button("refresh");
 	grandpa.find(".toggleEbsRow :radio").attr("disabled", false).button("refresh");
-
-	if ($('#' + "toggleEbsRadioOn_" + grandpa.data('clusterConfiguration').name).attr('checked')){
-		grandpa.find(".ebsSizeRow").fadeTo(500, "1");	
-		grandpa.find(".jq_slider").slider({ disabled: false });	
+	if ($('#' + "toggleEbsRadioOn_" + grandpa.data('clusterConfiguration').element.id).attr('checked')){
+		grandpa.find(".ebsSizeRow").fadeTo(500, "1");
+		grandpa.find(".jq_slider").slider({ disabled: false });
 	}
+    grandpa.find(".toggleParametersRow :radio").attr("disabled", false).button("refresh");
 }
 
 function disableGrandpaElements(grandpa){
@@ -307,39 +322,40 @@ function disableGrandpaElements(grandpa){
 	grandpa.find(".machineSizeRow :radio").attr("disabled", true).button("refresh");
 	grandpa.find(".imageTypeRow :radio").attr("disabled", true).button("refresh");
 	grandpa.find(".toggleEbsRow :radio").attr("disabled", true).button("refresh");
+	grandpa.find(".toggleParametersRow :radio").attr("disabled", true).button("refresh");
 }
 
 function prepareRequestParameters(outData){
     var dc = cloudadmin.dialog.instance;
 	var elements = cloudadmin.resource.elements;
 	for(var i = 0; i < elements.length; i++){
-		outData[elements[i].element.name]				  	= "false";
-		outData[elements[i].element.name + "clustersize"] 	= 0;
-		outData[elements[i].element.name + "machinesize"] 	= 0;
-		outData[elements[i].element.name + "esb"] 		  	= "false";
-		outData[elements[i].element.name + "volumesize"]  	= 0;
+		outData[elements[i].element.id]				  	= "false";
+		outData[elements[i].element.id + "clustersize"] 	= 0;
+		outData[elements[i].element.id + "machinesize"] 	= 0;
+		outData[elements[i].element.id + "esb"] 		  	= "false";
+		outData[elements[i].element.id + "volumesize"]  	= 0;
 	}
 	//outData["instanceid"] = dc.instanceId;
 	for(i = 0; i < elements.length; i++){
-		if($('#' + dc.idPrefix + "togglePlatformRadioOn_" + elements[i].element.name).attr('checked')){
-			outData[elements[i].element.name] = "true";
-			outData[elements[i].element.name + "clustersize"] =
-				$('#' + dc.idPrefix + elements[i].element.name + ' .elementsizeRow .jq_slider').parent().next().text();
-			outData[elements[i].element.name + "machinesize"] = machineSize(dc.idPrefix, elements[i].element.name, 1);
+		if($('#' + dc.idPrefix + "togglePlatformRadioOn_" + elements[i].element.id).attr('checked')){
+			outData[elements[i].element.id] = "true";
+			outData[elements[i].element.id + "clustersize"] =
+				$('#' + dc.idPrefix + elements[i].element.id + ' .elementsizeRow .jq_slider').parent().next().text();
+			outData[elements[i].element.id + "machinesize"] = machineSize(dc.idPrefix, elements[i].element.id, 1);
 
 			if (elements[i].replicated === true){
-				outData[elements[i].element.name + "replelementsize"] = $('#' + dc.idPrefix + elements[i].element.name +
+				outData[elements[i].element.id + "replelementsize"] = $('#' + dc.idPrefix + elements[i].element.id +
 					' .replicationelementsizeRow .jq_slider').parent().next().text();
-				outData[elements[i].element.name + "replmachinesize"] = machineSize(dc.idPrefix, elements[i].element.name, 2);
+				outData[elements[i].element.id + "replmachinesize"] = machineSize(dc.idPrefix, elements[i].element.id, 2);
 			}
-			if($('#' + dc.idPrefix + "imageTypeEphemeral_" + elements[i].element.name).attr('checked')){
-				outData[elements[i].element.name + "imagetype"] = "0";
+			if($('#' + dc.idPrefix + "imageTypeEphemeral_" + elements[i].element.id).attr('checked')){
+				outData[elements[i].element.id + "imagetype"] = "0";
 			}
 			else
-				outData[elements[i].element.name + "imagetype"] = "1";
-			if($('#' + dc.idPrefix + "toggleEbsRadioOn_" + elements[i].element.name).attr('checked')){
-				outData[elements[i].element.name + "esbvolumesize"] =
-					$('#' + dc.idPrefix + elements[i].element.name + ' .ebsSizeRow .jq_slider').parent().next().text();
+				outData[elements[i].element.id + "imagetype"] = "1";
+			if($('#' + dc.idPrefix + "toggleEbsRadioOn_" + elements[i].element.id).attr('checked')){
+				outData[elements[i].element.id + "esbvolumesize"] =
+					$('#' + dc.idPrefix + elements[i].element.id + ' .ebsSizeRow .jq_slider').parent().next().text();
 			}
 		}
 	}

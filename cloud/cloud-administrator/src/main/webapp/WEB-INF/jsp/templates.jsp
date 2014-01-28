@@ -56,7 +56,7 @@
 			</div>
 			<div class="valueDisplay valueDisplaySlider"></div>
 		</div>
-		<div class="parametersSelectionRow">
+		<div class="toggleParametersRow configRow">
             <label class="parametersLabel instanceCreationLabel">Parameters</label>
             <div class="radioButton parametersRadio">
                 <input type="radio" id="toggleParamatersOn_" name="toggleParamaters_" />
