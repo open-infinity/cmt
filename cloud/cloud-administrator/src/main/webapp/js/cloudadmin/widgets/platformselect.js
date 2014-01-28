@@ -29,7 +29,7 @@ function createPlatformSelectAccordion(container, data, machineTypes, identifica
     container.accordion.empty();
 	populateAccordion(container, data, machineTypes, identificationPrefix);
 	container.accordion.accordion({collapsible: true, autoHeight:false, heightStyle: "content", active:false});
-	$(".modulesAccordion").accordion({collapsible: true, autoHeight:false, heightStyle: "content", active:false});
+	$(".modulesAccordion").accordion({collapsible: true, autoHeight:false, heightStyle: "content"});
     $(".modulesAccordionRow").fadeTo(0, ".5");
 
 	// Events 
