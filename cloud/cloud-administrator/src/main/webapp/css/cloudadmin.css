@@ -400,6 +400,12 @@ col.data {
 	margin: .3em 1em 0 2em;
 }
 
+.configSegment{width: 700px;border-color: rgb(218, 218, 218);border-style: solid; border-radius: 7px; padding: 1em; margin-top: 1em;}
+
+.platformConfig{width: 700px;}
+
+.cloudConfigRow{display:inline-block;float:left;margin-right:5em}
+
 .addInstanceDialogError{margin-bottom:1em;}
 
 .parameterSelectInstruction{margin: 0 0 0 1.5em;display: inline-block;font-size: .9em}
@@ -483,11 +489,11 @@ col.data {
 
 /* Template*/
 
-#addInstanceDialog .instanceConfigurationValidateTips{margin-bottom:12px;display:block;font-size: .9em;}
+#addInstanceDialog .instanceCreationInstructions{margin: 1em 0 2em 0.5em;display:block;font-size:.9em;}
 
-#addInstanceDialog .instanceName{display:block; margin-top:.2em;margin-bottom:12px; width:15em; padding: .3em .4em .3em .4em; height: 1em;} 
+#addInstanceDialog .instanceName{display:block; margin-top:.2em;margin-bottom:12px; width:8em; padding: .3em .4em .3em .4em; height: 1em;}
 
-#addInstanceDialog .instanceConfigurationSelect{ display:block; margin-bottom:12px; width:16.1em;padding: .2em 0 .2em 0;}
+#addInstanceDialog .instanceConfigurationSelect{ display:block; margin-bottom:12px; width:9em;padding: .2em 0 .2em 0;border-radius: 3px;}
 
 .addInstanceLabel{padding: 10px 0 0 100px;}
 

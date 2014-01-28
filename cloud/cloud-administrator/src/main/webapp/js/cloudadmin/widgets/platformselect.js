@@ -30,6 +30,7 @@ function createPlatformSelectAccordion(container, data, machineTypes, identifica
 	populateAccordion(container, data, machineTypes, identificationPrefix);
 	container.accordion.accordion({collapsible: true, autoHeight:false, heightStyle: "content", active:false});
 	$(".modulesAccordion").accordion({collapsible: true, autoHeight:false, heightStyle: "content", active:false});
+    $(".modulesAccordionRow").fadeTo(0, ".5");
 
 	// Events 
 	
@@ -83,7 +84,7 @@ function populateAccordion(container, data, machineTypes, identificationPrefix){
         });
 
         // For each module : insert module accordion html
-        var modulesAccordion = body.find(".modulesAccordionRow").hide();
+        var modulesAccordion = body.find(".modulesAccordion");
         for(var j = 0; j < data[i].modules.length; j++){
 
             // insert accordion segment template
@@ -142,7 +143,7 @@ function populateAccordion(container, data, machineTypes, identificationPrefix){
         //    container.dialog.find(".parameterValue").text(data[i].modules[j].parameters[0].key.name);
 
         // Hide parameter selection instruction text
-        $(".parameterSelectInstruction").hide();
+        $(".parameterSelectInstruction").fadeTo(0, ".5");;
 
         // Set all platforms to be unselected by default - UI elements dimming
         dimAccordionElements($("#cloudTypesSelectionAccordion"));
@@ -165,6 +166,43 @@ function setIdentificationAttributes(item, prefix, optionalAttribute, identifier
 
 // Event handlers
 
+function handleEbsSelectionChange(item){
+	var sliderRow = item.parent().parent().next();
+	var jqSlider = sliderRow.find(".jq_slider");
+
+	if (item.attr("id").indexOf("toggleEbsRadioOff") !=  -1) {
+		sliderRow.fadeTo(500, ".5");
+		jqSlider.slider({ disabled: true});
+	}
+	else{
+		sliderRow.fadeTo(500, "1");
+		jqSlider.slider({ disabled: false});
+	}
+}
+
+function handleMachineSizeChange(item){
+	item.parent().next().text(cloudadmin.resource.machineTypes[item.attr("value")].specification);
+}
+
+/*
+ * Hides or shows  "parameterSelectInstruction" and module accordion
+ */
+function handleParametersSelectionChange(item){
+
+    var parametersRow = item.parents(".toggleParametersRow").next();
+
+	if (item.attr("id").indexOf("toggleParametersOff") !==  -1) {
+        item.parent().next().fadeTo(500, ".5");
+        parametersRow.find(":radio").attr("disabled", true).button("refresh");
+        parametersRow.fadeTo(500, ".5");
+    }
+    else{
+        item.parent().next().fadeTo(500, "1");
+        parametersRow.fadeTo(500, "1");
+        parametersRow.find(":radio").attr("disabled", false).button("refresh");
+    }
+}
+
 function handlePlatformSelectionChange(item, prefix) {
 
 	// grab data from accordion segment's model (data)
@@ -172,12 +210,12 @@ function handlePlatformSelectionChange(item, prefix) {
 
     // handle selecting platform
     if (item.attr("id").indexOf("togglePlatformRadioOn") != -1) {
-        handlePlatformSelection(item, data);
+        doSelectPlatform(item, data);
     }
 
     // handle deselecting platform
     else if (item.attr("id").indexOf("togglePlatformRadioOff") !=  -1) {
-        handlePlatformDeselection(item, data);
+        doDeselectPlatform(item, data);
     }
 
     // handle invalid state
@@ -186,7 +224,7 @@ function handlePlatformSelectionChange(item, prefix) {
     }
 }
 
-function handlePlatformSelection(item, data){
+function doSelectPlatform(item, data){
     togglePlatformSelection(item, "select", 0);
     for (var i = 0; i < data.dependees.length; i ++){
         var accordionSegment = fetchDependeeAccordionSegment(data.dependees[i]);
@@ -201,7 +239,7 @@ function handlePlatformSelection(item, data){
     }
 }
 
-function handlePlatformDeselection(item, data){
+function doDeselectPlatform(item, data){
     togglePlatformSelection(item, "unselect", 0);
     for (var i = 0; i < data.dependees.length; i ++){
         var accordionSegment = fetchDependeeAccordionSegment(data.dependees[i]);
@@ -228,6 +266,50 @@ function handlePlatformDeselection(item, data){
         }
     }
 }
+function togglePlatformSelection(item, mode, delay){
+    if (item.length === 0 || typeof(item) === 'undefined') return;
+	var segment = item.parents(".ui-accordion-content");
+	var header = segment.prev();
+	if(mode === "select"){
+		header.addClass("platformSelected", delay).removeClass("platformNotSelected");
+		enablePlatformRows(segment);
+    }
+	else  if (mode === "unselect"){
+		header.addClass("platformNotSelected").removeClass("platformSelected",delay);
+		disablePlatformRows(segment);
+	}
+	return;
+}
+
+function enablePlatformRows(segment){
+	segment.find(".configRow").fadeTo(500, "1");
+	segment.find(".clusterSizeRow .jq_slider").slider({ disabled: false});
+	segment.find(".replicationClusterSizeRow  .jq_slider").slider({ disabled: false});
+	segment.find(".machineSizeRow :radio").attr("disabled", false).button("refresh");
+	segment.find(".imageTypeRow :radio").attr("disabled", false).button("refresh");
+	segment.find(".toggleEbsRow :radio").attr("disabled", false).button("refresh");
+	if ($('#' + "toggleEbsRadioOn_" + segment.data('clusterConfiguration').element.id).attr('checked')){
+		segment.find(".ebsSizeRow").fadeTo(500, "1");
+		segment.find(".jq_slider").slider({ disabled: false });
+	}
+	if ($('#' + "toggleParametersOn_" + segment.data('clusterConfiguration').element.id).attr('checked')){
+        segment.find(".modulesAccordionRow").fadeTo(500, "1");
+        segment.find(".modulesAccordionRow :radio").attr("disabled", false).button("refresh");
+    }
+    segment.find(".toggleParametersRow :radio").attr("disabled", false).button("refresh");
+}
+
+function disablePlatformRows(segment){
+	segment.find(".jq_slider").slider({ disabled: true});
+	segment.find(".configRow").fadeTo(500, ".5");
+	segment.find(".ebsSizeRow").fadeTo(500, ".5");
+	segment.find(".modulesAccordionRow").fadeTo(500, ".5");
+	segment.find(".machineSizeRow :radio").attr("disabled", true).button("refresh");
+	segment.find(".imageTypeRow :radio").attr("disabled", true).button("refresh");
+	segment.find(".toggleEbsRow :radio").attr("disabled", true).button("refresh");
+	segment.find(".toggleParametersRow :radio").attr("disabled", true).button("refresh");
+	segment.find(".modulesAccordionRow :radio").attr("disabled", true).button("refresh");
+}
 
 function fetchDependeeAccordionSegment(dependeeId){
     var container = $("#" +  configurationElementPrefix + dependeeId);
@@ -237,37 +319,6 @@ function fetchDependeeAccordionSegment(dependeeId){
     return container;
 }
 
-function handleEbsSelectionChange(item){
-	var sliderRow = item.parent().parent().next();
-	var jqSlider = sliderRow.find(".jq_slider");
-	
-	if (item.attr("id").indexOf("toggleEbsRadioOff") !=  -1) {
-		sliderRow.fadeTo(500, ".5");
-		jqSlider.slider({ disabled: true});		
-	}
-	else{
-		sliderRow.fadeTo(500, "1");
-		jqSlider.slider({ disabled: false});		
-	}
-}
-
-function handleMachineSizeChange(item){
-	item.parent().next().text(cloudadmin.resource.machineTypes[item.attr("value")].specification);
-}
-
-/*
- * Hides or shows  "parameterSelectInstruction" and module accordion
- */
-function handleParametersSelectionChange(item){
-	if (item.attr("id").indexOf("toggleParamatersOff") !=  -1) {
-        item.parent().next().fadeTo(500, ".5");
-        item.parents(".toggleParametersRow").next().hide();
-    }
-    else{
-        item.parent().next().fadeTo(500, "1");
-        item.parents(".toggleParametersRow").next().show();
-    }
-}
 
 // Helper functions
 
@@ -284,45 +335,6 @@ function findElementById(id) {
 	});
 	if (matchedTypes.length !== 0)
 		return matchedTypes[0];
-}
-
-function togglePlatformSelection(item, mode, delay){
-    if (item.length === 0 || typeof(item) === 'undefined') return;
-	var grandpa = item.parents(".ui-accordion-content");
-	var granduncle = grandpa.prev();
-	if(mode === "select"){
-		granduncle.addClass("platformSelected", delay).removeClass("platformNotSelected");
-		enableGrandpaElements(grandpa);
-    }
-	else  if (mode === "unselect"){
-		granduncle.addClass("platformNotSelected").removeClass("platformSelected",delay);
-		disableGrandpaElements(grandpa);
-	}
-	return;
-}
-
-function enableGrandpaElements(grandpa){
-	grandpa.find(".configRow").fadeTo(500, "1");
-	grandpa.find(".clusterSizeRow .jq_slider").slider({ disabled: false});	
-	grandpa.find(".replicationClusterSizeRow  .jq_slider").slider({ disabled: false});	
-	grandpa.find(".machineSizeRow :radio").attr("disabled", false).button("refresh");
-	grandpa.find(".imageTypeRow :radio").attr("disabled", false).button("refresh");
-	grandpa.find(".toggleEbsRow :radio").attr("disabled", false).button("refresh");
-	if ($('#' + "toggleEbsRadioOn_" + grandpa.data('clusterConfiguration').element.id).attr('checked')){
-		grandpa.find(".ebsSizeRow").fadeTo(500, "1");
-		grandpa.find(".jq_slider").slider({ disabled: false });
-	}
-    grandpa.find(".toggleParametersRow :radio").attr("disabled", false).button("refresh");
-}
-
-function disableGrandpaElements(grandpa){
-	grandpa.find(".jq_slider").slider({ disabled: true});		
-	grandpa.find(".configRow").fadeTo(500, ".5");
-	grandpa.find(".ebsSizeRow").fadeTo(500, ".5");	
-	grandpa.find(".machineSizeRow :radio").attr("disabled", true).button("refresh");
-	grandpa.find(".imageTypeRow :radio").attr("disabled", true).button("refresh");
-	grandpa.find(".toggleEbsRow :radio").attr("disabled", true).button("refresh");
-	grandpa.find(".toggleParametersRow :radio").attr("disabled", true).button("refresh");
 }
 
 function prepareRequestParameters(outData){

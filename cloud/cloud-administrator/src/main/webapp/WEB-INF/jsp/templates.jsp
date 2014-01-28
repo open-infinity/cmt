@@ -59,10 +59,10 @@
 		<div class="toggleParametersRow configRow">
             <label class="parametersLabel instanceCreationLabel">Parameters</label>
             <div class="radioButton parametersRadio">
-                <input type="radio" id="toggleParamatersOn_" name="toggleParamaters_" />
-                <label for="toggleParamatersOn_"> On </label>
-                <input type="radio" id="toggleParamatersOff_" name="toggleParamaters_" checked="checked"/>
-                <label for="toggleParamatersOff_"> Off </label>
+                <input type="radio" id="toggleParametersOn_" name="toggleParameters_" />
+                <label for="toggleParametersOn_"> On </label>
+                <input type="radio" id="toggleParametersOff_" name="toggleParameters_" checked="checked"/>
+                <label for="toggleParametersOff_"> Off </label>
             </div>
             <div class="parameterSelectInstruction">Select parameters for installation modules</div>
         </div>

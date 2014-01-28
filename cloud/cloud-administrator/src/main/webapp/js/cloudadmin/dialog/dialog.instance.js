@@ -43,7 +43,7 @@
 			dc.dialog.dialog({		
 				autoOpen : false,
 				height : 745,
-				width : 710,
+				width : 770,
 				modal : true,
 				buttons : cloudadmin.dialog.instanceAddButtons
 			});	
@@ -143,14 +143,14 @@
 			$("#instanceName").val('');
 			var elements = cloudadmin.resource.elements;
 			for(var i = 0; i < elements.length; i++){
-				var selectorName = '#' + elements[i].name;
+				var selectorName = '#' + configurationElementPrefix + elements[i].element.id;
 				$(selectorName + ' .clusterSizeRow .jq_slider')
 					.slider({
-						min: elements[i].minMachines,
-						max: elements[i].maxMachines,
-						values: [elements[i].minMachines],
+						min: elements[i].element.minMachines,
+						max: elements[i].element.maxMachines,
+						values: [elements[i].element.minMachines],
 						slide: function(event, ui) {$(this).parent().next().text(ui.values[0]);}})
-					.parent().next().text(elements[i].minMachines);
+					.parent().next().text(elements[i].element.minMachines);
 				$(selectorName + ' .ebsSizeRow .jq_slider')
 					.slider({
 						min: 1,
@@ -159,14 +159,14 @@
 						step: 10,
 						slide: function(event, ui) {$(this).parent().next().text(ui.values[0]);}})
 					.parent().next().text(1);
-				if(elements[i].replicated == true){
+				if(elements[i].element.replicated == true){
 					$(selectorName + ' .replicationClusterSizeRow .jq_slider')
 						.slider({
-							max:elements[i].maxReplicationMachines,
-							min:elements[i].minReplicationMachines,
-							values: [elements[i].minReplicationMachines],
+							max:elements[i].element.maxReplicationMachines,
+							min:elements[i].element.minReplicationMachines,
+							values: [elements[i].element.minReplicationMachines],
 							slide: function(event, ui) {$(this).parent().next().text(ui.values[0]);}})
-						.parent().next().text(elements[i].minReplicationMachines);
+						.parent().next().text(elements[i].element.minReplicationMachines);
 				}	
 				// accordion header
 				$(selectorName).prev().addClass("platformNotSelected").removeClass("platformSelected");
@@ -203,28 +203,28 @@
 				// init outData
 				/*
 				for(var i = 0; i < elements.length; i++){
-					outData[elements[i].name]				  	= "false";
-					outData[elements[i].name + "clustersize"] 	= 0;
-					outData[elements[i].name + "machinesize"] 	= 0;
-					outData[elements[i].name + "esb"] 		  	= "false";
-					outData[elements[i].name + "volumesize"]  	= 0;
+					outData[elements[i].element.name]				  	= "false";
+					outData[elements[i].element.name + "clustersize"] 	= 0;
+					outData[elements[i].element.name + "machinesize"] 	= 0;
+					outData[elements[i].element.name + "esb"] 		  	= "false";
+					outData[elements[i].element.name + "volumesize"]  	= 0;
 				}
 				for(i = 0; i < elements.length; i++){
-					if($('#' + "togglePlatformRadioOn_" + elements[i].name).attr('checked')){
-						outData[elements[i].name] = "true";
-						outData[elements[i].name + "clustersize"] = $('#' + elements[i].name + ' .clusterSizeRow .jq_slider').parent().next().text();
-						outData[elements[i].name + "machinesize"] = machineSize("", elements[i].name, 1);
-						if (elements[i].replicated == true){
-							outData[elements[i].name + "replclustersize"] = $('#' + elements[i].name + ' .replicationClusterSizeRow .jq_slider').parent().next().text();
-							outData[elements[i].name + "replmachinesize"] = machineSize("", elements[i].name, 2);
+					if($('#' + "togglePlatformRadioOn_" + elements[i].element.name).attr('checked')){
+						outData[elements[i].element.name] = "true";
+						outData[elements[i].element.name + "clustersize"] = $('#' + elements[i].element.name + ' .clusterSizeRow .jq_slider').parent().next().text();
+						outData[elements[i].element.name + "machinesize"] = machineSize("", elements[i].element.name, 1);
+						if (elements[i].element.replicated == true){
+							outData[elements[i].element.name + "replclustersize"] = $('#' + elements[i].element.name + ' .replicationClusterSizeRow .jq_slider').parent().next().text();
+							outData[elements[i].element.name + "replmachinesize"] = machineSize("", elements[i].element.name, 2);
 						}
-						if($('#' + "imageTypeEphemeral_" + elements[i].name).attr('checked')){
-							outData[elements[i].name + "imagetype"] = "0";
+						if($('#' + "imageTypeEphemeral_" + elements[i].element.name).attr('checked')){
+							outData[elements[i].element.name + "imagetype"] = "0";
 						}
 						else
-							outData[elements[i].name + "imagetype"] = "1";
-						if($('#' + "toggleEbsRadioOn_" + elements[i].name).attr('checked')){
-							outData[elements[i].name + "esbvolumesize"] = $('#' + elements[i].name + ' .ebsSizeRow .jq_slider').parent().next().text();
+							outData[elements[i].element.name + "imagetype"] = "1";
+						if($('#' + "toggleEbsRadioOn_" + elements[i].element.name).attr('checked')){
+							outData[elements[i].element.name + "esbvolumesize"] = $('#' + elements[i].element.name + ' .ebsSizeRow .jq_slider').parent().next().text();
 						}
 					}
 				}
