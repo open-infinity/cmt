@@ -4,5 +4,6 @@
 
 var cloudadmin = window.cloudadmin || {};
 cloudadmin.resource = {};
+cloudadmin.resource.elements = [];
 cloudadmin.dialog = {};
 

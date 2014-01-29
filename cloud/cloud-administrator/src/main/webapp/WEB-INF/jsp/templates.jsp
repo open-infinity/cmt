@@ -64,9 +64,9 @@
                 <input type="radio" id="toggleParametersOff_" name="toggleParameters_" checked="checked"/>
                 <label for="toggleParametersOff_"> Off </label>
             </div>
-            <div class="parameterSelectInstruction">Select parameters for installation modules</div>
         </div>
         <div class="modulesAccordionRow">
+            <div class="parameterSelectInstruction">Select parameters for installation modules</div>
             <div class="modulesAccordion"></div>
         </div>
 	</div>

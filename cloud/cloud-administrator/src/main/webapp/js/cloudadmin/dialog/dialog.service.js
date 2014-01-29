@@ -66,8 +66,13 @@
 					}
 				}
 			});
-			createPlatformSelectAccordion(dc, cloudadmin.resource.elements, cloudadmin.resource.machineTypes, dc.idPrefix);
-			cloudadmin.dialog.addServiceDialog = dc;	
+			if ($.isEmptyObject(cloudadmin.resource.elements)){
+                console.log("Unable to populate UI - configuration elements not available");
+            }
+            else{
+			    createPlatformSelectAccordion(dc, cloudadmin.resource, cloudadmin.resource.machineTypes, dc.idPrefix);
+            }
+			cloudadmin.dialog.addServiceDialog = dc;
 		},
 		
 		addNewService: function(dc) {	

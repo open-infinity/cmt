@@ -42,7 +42,7 @@ function resourceContainer(name) {
 	this.resource = null;
 	this.name = name;
 	
-	console.log("reourceContainer["+ this.name +"] created.");
+	console.log("resourceContainer["+ this.name +"] created.");
 	
 	this.setResource = function(data) {
 		console.log(this.name + ".setResource called.")

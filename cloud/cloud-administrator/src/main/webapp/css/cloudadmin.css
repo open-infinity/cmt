@@ -338,7 +338,7 @@ col.data {
 #addServicesDialog .valueDisplay{
 	display: inline-block;	
 	border-radius: 3px;
-	margin-left:2.1em;
+	margin-left:4.2em;
 	padding: 0.3em .5em 0 .5em;
 	background:whitesmoke;
 	height:1.5em;
@@ -400,21 +400,19 @@ col.data {
 	margin: .3em 1em 0 2em;
 }
 
-.configSegment{width: 700px;border-color: rgb(218, 218, 218);border-style: solid; border-radius: 7px; padding: 1em; margin-top: 1em;}
+.configSegment{width: 700px;border-color: rgb(218, 218, 218);border-width: 1px;border-style: solid; border-radius: 7px; padding: 1em; margin-top: 1em;}
 
 .platformConfig{width: 700px;}
 
-.cloudConfigRow{display:inline-block;float:left;margin-right:5em}
+.cloudConfigRow{display:inline-block;float:left;margin-right:4.5em}
 
 .addInstanceDialogError{margin-bottom:1em;}
 
-.parameterSelectInstruction{margin: 0 0 0 1.5em;display: inline-block;font-size: .9em}
+.parameterSelectInstruction{margin: 0.5em 0 0 1em;display: inline-block;font-size: .9em}
 
 .parameterKey{width: 6em;float:left;font-size: .9em}
 
 .parameterValue{display:inline-block;font-size: .9em;opacity: 0.5}
-
-.parametersRadio{float:left}
 
 .parameterKeySelectRadio{float:left;margin-right:6em}
 
@@ -422,7 +420,7 @@ col.data {
 
 .toggleParametersRow{;margin-top: 1.1em;}
 
-.modulesAccordionRow{margin: 0 0 0 15em;}
+.modulesAccordionRow{margin: 0 0 0 9em;}
 
 .moduleTitle{font-size:0.9em}
 
@@ -491,9 +489,9 @@ col.data {
 
 #addInstanceDialog .instanceCreationInstructions{margin: 1em 0 2em 0.5em;display:block;font-size:.9em;}
 
-#addInstanceDialog .instanceName{display:block; margin-top:.2em;margin-bottom:12px; width:8em; padding: .3em .4em .3em .4em; height: 1em;}
+#addInstanceDialog .instanceName{display:block; margin-top:.2em;margin-bottom:12px; width:10em; padding: .3em .4em .3em .4em; height: 1em;}
 
-#addInstanceDialog .instanceConfigurationSelect{ display:block; margin-bottom:12px; width:9em;padding: .2em 0 .2em 0;border-radius: 3px;}
+#addInstanceDialog .instanceConfigurationSelect{ display:block; margin-bottom:12px; width:11em;padding: .2em 0 .2em 0;border-radius: 3px;}
 
 .addInstanceLabel{padding: 10px 0 0 100px;}
 
