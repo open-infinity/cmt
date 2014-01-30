@@ -175,7 +175,7 @@ function initializeSliders(elements){
                 step: 10,
                 slide: function(event, ui) {$(this).parent().next().text(ui.values[0]);}})
             .parent().next().text(1);
-        if(elements[i].element.replicated == true){
+        if(elements[i].element.replicated === true){
             $(selector + ' .replicationClusterSizeRow .jq_slider')
                 .slider({
                     max:elements[i].element.maxReplicationMachines,
@@ -367,78 +367,90 @@ function dimAccordionElements(item){
 	item.find(".ebsSizeRow").css("opacity", ".5");
 }
 
-/*
-function findElementById(id, data) {
-	var matchedTypes = $.grep(data.elements, function(obj) {
-		return obj.element.id === id;
-	});
-	if (matchedTypes.length !== 0)
-		return matchedTypes[0];
-}
-*/
+function prepareRequestData(elements, outData, prefix){
+    for(i = 0; i < elements.length; i++){
+        if($('#' + prefix + "togglePlatformRadioOn_" + elements[i].element.id).attr('checked')){
 
-function getConfiguration(element, accordion){
-    ret = null;
-    return ret;
-}
+            // Configuration Element settings chosen by user
+            var configuration = {
+                element : elements[i].element.id,
+                clusterSize: 0,
+                machineSize: 0,
+                replication: {on: false, clusterSize: 0, machineSize: 0},
+                imageType: "ebs",
+                ebs: {on: false, size: 0},
+                parameters: {on: false, keys: []}
+            };
 
-function prepareRequestParameters(elements, accordion, outData){
-    for(var i = 0; i < elements.length; i++){
-        var elementConfiguration = getConfiguration(elements[i], accordion);
-        if (elementConfiguration !== null){
-            outData.elements.push(elementConfiguration);
+            // Cluster and machine size
+            configuration.clusterSize = $('#' + prefix + configurationElementPrefix + elements[i].element.id + ' .clusterSizeRow .jq_slider').parent().next().text();
+            configuration.machineSize = getMachineSize(prefix, configurationElementPrefix + elements[i].element.id, 1);
+
+            // Replication
+            if (elements[i].element.replicated === true){
+                configuration.replication.on = true;
+                configuration.replication.clusterSize = $('#' + prefix + configurationElementPrefix + elements[i].element.id +' .replicationClusterSizeRow .jq_slider').parent().next().text();
+                configuration.replication.machineSize = getMachineSize(prefix, configurationElementPrefix + elements[i].element.id, 2);
+            }
+
+            // Image type
+            if($('#' + prefix + "imageTypeEphemeral_" + elements[i].element.id).attr('checked')){
+                configuration.imageType = "ephemeral";
+            }
+
+            // EBS volume
+            if($('#' + prefix + "toggleEbsRadioOn_" + elements[i].element.id).attr('checked')){
+                configuration.ebs.on = true;
+                configuration.ebs.size = $('#' + prefix + configurationElementPrefix + elements[i].element.id + ' .ebsSizeRow .jq_slider').parent().next().text();
+            }
+
+            // Parameters
+            if($('#' + prefix + "toggleParametersOn_" + elements[i].element.id).attr('checked')){
+                configuration.parameters.on = true;
+
+                // For each element.module
+                for(j = 0; j < elements[i].modules.length; j++){
+
+                    // For each element.module.parameter
+                    for(k = 0; k < elements[i].modules[j].parameters.length; k++){
+
+                        // Read key selection
+                        var checked = ($('#' + prefix + "toggleKeyOn_" + elements[i].element.id + "_"  + elements[i].modules[j].module.id + "_" + elements[i].modules[j].parameters[k].key.id).attr('checked'));
+
+                        // Store key id,
+                        if (checked){
+                            configuration.parameters.keys.push(elements[i].modules[j].parameters[k].key.id);
+                        }
+                    }
+                }
+
+                // Push placeholder into empty array to make Spring Jackson parser happy
+                if (configuration.parameters.keys.length === 0){
+                    configuration.parameters.keys.push("-1");
+                }
+            }
+            else{
+
+                // Push placeholder into empty array to make Spring Jackson parser happy
+                configuration.parameters.keys.push("0");
+            }
+            outData.configurations.push(configuration);
         }
     }
-    return outData;
-
-    /*
-    var dc = cloudadmin.dialog.instance;
-	var elements = cloudadmin.resource.elements;
-	for(var i = 0; i < elements.length; i++){
-		outData[elements[i].element.id]				  	= "false";
-		outData[elements[i].element.id + "clustersize"] 	= 0;
-		outData[elements[i].element.id + "machinesize"] 	= 0;
-		outData[elements[i].element.id + "esb"] 		  	= "false";
-		outData[elements[i].element.id + "volumesize"]  	= 0;
-	}
-	//outData["instanceid"] = dc.instanceId;
-	for(i = 0; i < elements.length; i++){
-		if($('#' + dc.idPrefix + "togglePlatformRadioOn_" + elements[i].element.id).attr('checked')){
-			outData[elements[i].element.id] = "true";
-			outData[elements[i].element.id + "clustersize"] =
-				$('#' + dc.idPrefix + elements[i].element.id + ' .elementsizeRow .jq_slider').parent().next().text();
-			outData[elements[i].element.id + "machinesize"] = machineSize(dc.idPrefix, elements[i].element.id, 1);
-
-			if (elements[i].replicated === true){
-				outData[elements[i].element.id + "replelementsize"] = $('#' + dc.idPrefix + elements[i].element.id +
-					' .replicationelementsizeRow .jq_slider').parent().next().text();
-				outData[elements[i].element.id + "replmachinesize"] = machineSize(dc.idPrefix, elements[i].element.id, 2);
-			}
-			if($('#' + dc.idPrefix + "imageTypeEphemeral_" + elements[i].element.id).attr('checked')){
-				outData[elements[i].element.id + "imagetype"] = "0";
-			}
-			else
-				outData[elements[i].element.id + "imagetype"] = "1";
-			if($('#' + dc.idPrefix + "toggleEbsRadioOn_" + elements[i].element.id).attr('checked')){
-				outData[elements[i].element.id + "esbvolumesize"] =
-					$('#' + dc.idPrefix + elements[i].element.id + ' .ebsSizeRow .jq_slider').parent().next().text();
-			}
-		}
-	}
-	*/
-
 }
 
-function machineSize(prefix, clusterName, machineType){
+function getMachineSize(prefix, clusterName, machineType){
 	var ret = -1;
-	var rowClass = machineType === tr1 ? ".ordinaryMachine": ".replicationMachine";
+	var rowClass = machineType === 1 ? ".ordinaryMachine": ".replicationMachine";
 	$('#' + prefix + clusterName + ' ' +  rowClass + ' .radioButton input').each(function(){	
 		if ($(this).attr('checked')){
 			ret = $(this).attr("value");
+
+			// returning false from each() breaks the $.each() loop
 			return false;
 		}
 	});
-	if (ret === tr-1) throw "Machine size fetching failed";
+	if (ret === -1) throw "Machine size fetching failed";
 	return ret;
 }
 	

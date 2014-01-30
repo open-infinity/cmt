@@ -31,9 +31,7 @@ import org.openinfinity.cloud.domain.configurationtemplate.entity.ConfigurationE
 import org.openinfinity.cloud.domain.configurationtemplate.entity.ConfigurationTemplate;
 import org.openinfinity.cloud.domain.configurationtemplate.entity.InstallationModule;
 import org.openinfinity.cloud.domain.configurationtemplate.entity.ParameterKey;
-import org.openinfinity.cloud.serialization.ElementContainer;
-import org.openinfinity.cloud.serialization.ModuleContainer;
-import org.openinfinity.cloud.serialization.ParametersContainer;
+import org.openinfinity.cloud.serialization.*;
 import org.openinfinity.cloud.service.administrator.*;
 import org.openinfinity.cloud.service.configurationtemplate.entity.api.*;
 import org.openinfinity.cloud.util.AdminException;
@@ -391,6 +389,72 @@ public class CloudAdminController {
 			}
 		} 
 	}
+
+    @ResourceMapping("addEnvironment")
+    public void addEnvironment(ResourceRequest request, ResourceResponse response,
+                               @RequestParam("requestData") String requestData){
+        try{
+
+            LOG.error("addEnvironment() ENTER");
+
+            User user = liferayService.getUser(request, response);
+            if (user == null) throw new AdminException("User not logged in");
+
+            LOG.info("RequestData: " + requestData);
+
+            ObjectMapper mapper = new ObjectMapper();
+            /*
+            AddEnvironmentParametersContainer environmentParams = mapper.readValue(requestData, AddEnvironmentParametersContainer.class);
+            LOG.debug("Environment parameters: " + environmentParams);
+
+            EnvironmentDataContainer environment = environmentParams.getEnvironment();
+            Instance i = new Instance();
+            i.setName(environment.getName());
+            i.setUserId((int)user.getUserId());
+            i.setZone(environment.getZone());
+
+            long[] orgIds = user.getOrganizationIds();
+            if (orgIds.length > 0) i.setOrganizationid(orgIds[0]);
+
+            i.setCloudType(environment.getType());
+            i.setStatus("Starting");
+            */
+
+            //instanceService.addInstance(i);
+
+            /*
+            jobService.addJob(parseNewServiceRequestParams(
+                    new Job("create_instance", i.getInstanceId(), i.getCloudType(), JobService.CLOUD_JOB_CREATED),
+                    configurations));
+            */
+
+            /*
+            Instance i = new Instance();
+            i.setName(pm.get("instancename"));
+            i.setUserId((int)user.getUserId());
+            i.setZone(pm.get("zone"));
+
+            long[] orgIds = user.getOrganizationIds();
+            if (orgIds.length > 0) i.setOrganizationid(orgIds[0]);
+
+            i.setCloudType(Integer.parseInt(pm.get("cloudtype")));
+            i.setStatus("Starting");
+            instanceService.addInstance(i);
+
+            jobService.addJob(parseNewServiceRequestParams(
+                    new Job("create_instance", i.getInstanceId(), i.getCloudType(), JobService.CLOUD_JOB_CREATED),
+                    pm));
+            */
+        } catch (Exception e) {
+            LOG.error("Error setting up the instance: "+e.getMessage(), e);
+            response.setProperty(ResourceResponse.HTTP_STATUS_CODE, "421");
+            try {
+                response.getWriter().write(e.getMessage());
+            } catch (IOException ioe) {
+                LOG.error("Error while writing the http reply: "+ioe.getMessage());
+            }
+        }
+    }
 	
 	@ResourceMapping("availableClusters")
 	public void instanceContent(ResourceRequest request, ResourceResponse response, @RequestParam("instanceId") int instanceId) throws Exception {

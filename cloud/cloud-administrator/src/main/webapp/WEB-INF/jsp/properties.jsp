@@ -52,7 +52,10 @@ portletURL.initialize({
     service: {
     	newServiceURL : 			'<portlet:resourceURL id="newService"/>',
     	getAvailableServicesURL : 	'<portlet:resourceURL id="getAvailableServices"/>'
-    }
+    },
+    environment: {
+        	addEnvironmentURL : 			'<portlet:resourceURL id="addEnvironment"/>',
+        }
 });
 
 dialogRes.setResource({
