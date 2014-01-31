@@ -373,24 +373,24 @@ function prepareRequestData(elements, outData, prefix){
 
             // Configuration Element settings chosen by user
             var configuration = {
-                element : elements[i].element.id,
-                clusterSize: 0,
-                machineSize: 0,
-                replication: {on: false, clusterSize: 0, machineSize: 0},
+                element : {id: elements[i].element.id, name: elements[i].element.name, type: elements[i].element.type},
+                cluster: {size: 0},
+                machine: {size: 0},
+                replication: {on: false, cluster: {size: 0}, machine: {size: 0}},
                 imageType: "ebs",
                 ebs: {on: false, size: 0},
                 parameters: {on: false, keys: []}
             };
 
             // Cluster and machine size
-            configuration.clusterSize = $('#' + prefix + configurationElementPrefix + elements[i].element.id + ' .clusterSizeRow .jq_slider').parent().next().text();
-            configuration.machineSize = getMachineSize(prefix, configurationElementPrefix + elements[i].element.id, 1);
+            configuration.cluster.size = $('#' + prefix + configurationElementPrefix + elements[i].element.id + ' .clusterSizeRow .jq_slider').parent().next().text();
+            configuration.machine.size = getMachineSize(prefix, configurationElementPrefix + elements[i].element.id, 1);
 
             // Replication
             if (elements[i].element.replicated === true){
                 configuration.replication.on = true;
-                configuration.replication.clusterSize = $('#' + prefix + configurationElementPrefix + elements[i].element.id +' .replicationClusterSizeRow .jq_slider').parent().next().text();
-                configuration.replication.machineSize = getMachineSize(prefix, configurationElementPrefix + elements[i].element.id, 2);
+                configuration.replication.cluster.size = $('#' + prefix + configurationElementPrefix + elements[i].element.id +' .replicationClusterSizeRow .jq_slider').parent().next().text();
+                configuration.replication.machine.size = getMachineSize(prefix, configurationElementPrefix + elements[i].element.id, 2);
             }
 
             // Image type

@@ -217,18 +217,13 @@
 		},
 		
 		initAddInstanceDialogButtons: function() {
+
 			// Create instance-button
 			this.instanceAddButtons[dialogRes.resource.instance.create] = function() {
 				var outData = {};	
 				if (!validateField($("#instanceName"))) return;
 				if (!validateField($("#cloudSelect"))) return;
 				if (!validateField($("#zoneSelect"))) return;
-				/*
-				outData["instancename"] = $("#instanceName").val();
-				outData["cloudtype"] = $("#cloudSelect").val();
-				outData["zone"] = $("#zoneSelect").val();
-				outData["template"] = $("#templateSelect").val();
-				*/
 
 				outData.environment = {};
 				outData.environment.name = $("#instanceName").val();
@@ -236,51 +231,12 @@
 				outData.environment.zone = $("#zoneSelect").val();
 
                 outData.configurations = [];
-				// Initialize outData
-				/*
-				for(var i = 0; i < elements.length; i++){
-					outData[elements[i].element.name]				  	= "false";
-					outData[elements[i].element.name + "clustersize"] 	= 0;
-					outData[elements[i].element.name + "machinesize"] 	= 0;
-					outData[elements[i].element.name + "esb"] 		  	= "false";
-					outData[elements[i].element.name + "volumesize"]  	= 0;
-				}
-				for(i = 0; i < elements.length; i++){
-					if($('#' + "togglePlatformRadioOn_" + elements[i].element.name).attr('checked')){
-						outData[elements[i].element.name] = "true";
-						outData[elements[i].element.name + "clustersize"] = $('#' + elements[i].element.name + ' .clusterSizeRow .jq_slider').parent().next().text();
-						outData[elements[i].element.name + "machinesize"] = machineSize("", elements[i].element.name, 1);
-						if (elements[i].element.replicated == true){
-							outData[elements[i].element.name + "replclustersize"] = $('#' + elements[i].element.name + ' .replicationClusterSizeRow .jq_slider').parent().next().text();
-							outData[elements[i].element.name + "replmachinesize"] = machineSize("", elements[i].element.name, 2);
-						}
-						if($('#' + "imageTypeEphemeral_" + elements[i].element.name).attr('checked')){
-							outData[elements[i].element.name + "imagetype"] = "0";
-						}
-						else
-							outData[elements[i].element.name + "imagetype"] = "1";
-						if($('#' + "toggleEbsRadioOn_" + elements[i].element.name).attr('checked')){
-							outData[elements[i].element.name + "esbvolumesize"] = $('#' + elements[i].element.name + ' .ebsSizeRow .jq_slider').parent().next().text();
-						}
-					}
-				}
-                */
-                //elements, outData, prefix
-                //prepareRequestParameters(outData, dialog);
                 prepareRequestData(cloudadmin.resource.elements, outData, cloudadmin.dialog.instance.idPrefix);
                 if (outData.configurations.length === 0){
 
                      // Push placeholder into empty array to make Spring Jackson parser happy
                     outData.configurations.push(0);
                 }
-				/*
-				$.ajax({
-					type: 'POST',
-					url: portletURL.url.instance.addInstanceURL,
-					data: outData,
-					dataType: 'json'
-				});
-				*/
 
 				// In this way the controller will receive parameter "requestData", which is a Json formatted outData
                 var data = {};
