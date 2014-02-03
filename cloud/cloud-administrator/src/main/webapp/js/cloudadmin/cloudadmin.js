@@ -306,8 +306,9 @@ var instanceManager = {
 			
 			// Add services button
 			$template.find(".add-services").button().click(function() {
-				cloudadmin.dialog.addServiceDialog.instanceId = instanceId;
- 				cloudadmin.dialog.addNewService(cloudadmin.dialog.addServiceDialog);
+				//cloudadmin.dialog.addServiceDialog.instanceId = instanceId;
+				cloudadmin.dialog.initAddServiceDialog();
+ 				cloudadmin.dialog.addNewService(instanceId);
 			});
 			
 			//  View instance machines button
@@ -514,7 +515,7 @@ var instanceManager = {
 		
 		// Refresh the instanceview
 		refreshInstanceView: function (instanceId) {
-			 console.log("refreshInstanceView("+instanceId+") called");
+			 //console.log("refreshInstanceView("+instanceId+") called");
 			 instanceManager.updateInstanceClusters(instanceId);
 		},
 		

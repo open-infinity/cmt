@@ -24,10 +24,16 @@ var configurationElementPrefix = "configurationElement_";
 
 // Creation 
 
-function createPlatformSelectAccordion(dialog, data, machineTypes, identificationPrefix){
+function createPlatformSelectAccordion(dialog, data){
+
+    if($.isEmptyObject(data) || $.isEmptyObject(data.elements) || $.isEmptyObject(data.machineTypes)) {
+        console.log("Unable to populate UI - configuration elements not available");
+        return;
+    }
+
     dialog.accordion.accordion("destroy");
     dialog.accordion.empty();
-	populateAccordion(dialog, data, machineTypes, identificationPrefix);
+	populateAccordion(dialog, data);
 	dialog.accordion.accordion({collapsible: true, autoHeight:false, heightStyle: "content", active:false});
 	$(".modulesAccordion").accordion({collapsible: true, autoHeight:false, heightStyle: "content"});
     //$(".modulesAccordionRow").fadeTo(0, ".5");
@@ -36,7 +42,7 @@ function createPlatformSelectAccordion(dialog, data, machineTypes, identificatio
 	// Events 
 	
 	dialog.accordion.find(".togglePlatformSelectionRow :radio").change(function(e){
-		handlePlatformSelectionChange($(this), data, identificationPrefix);
+		handlePlatformSelectionChange($(this), data, dialog.identificationPrefix);
 	});	
 	
 	dialog.accordion.find(".toggleEbsRow :radio").change(function(e) {
@@ -52,7 +58,7 @@ function createPlatformSelectAccordion(dialog, data, machineTypes, identificatio
 	});
 }
 
-function populateAccordion(dialog, data, machineTypes, identificationPrefix){
+function populateAccordion(dialog, data){
 	for(var i = 0; i < data.elements.length; i++){
 		var template = $("#clusterConfigurationTemplate");
 		var header = template.find(".accordionHeader").clone();
@@ -69,19 +75,20 @@ function populateAccordion(dialog, data, machineTypes, identificationPrefix){
 
         // Inserts "machine types" radio into body before element ids and names are set
 		var machineTypeRadio = body.find('.machineSizeRow .radioButton');
-		for (var mt = 0; mt < machineTypes.length; ++mt) {
-			var machineTypeInstanceId = 'machineSizeRadio' + machineTypes[mt].name + '_';
-			$('#machineTypeTemplate').children('[type="radio"]').clone().attr({id: machineTypeInstanceId, value: machineTypes[mt].id}).appendTo(machineTypeRadio);
-			$('#machineTypeTemplate').children('label').clone().attr({'for': machineTypeInstanceId}).html(machineTypes[mt].name).appendTo(machineTypeRadio);
+		for (var mt = 0; mt < data.machineTypes.length; ++mt) {
+			var machineTypeInstanceId = 'machineSizeRadio' + data.machineTypes[mt].name + '_';
+			$('#machineTypeTemplate').children('[type="radio"]').clone().attr({id: machineTypeInstanceId, value: data.machineTypes[mt].id}).appendTo(machineTypeRadio);
+			$('#machineTypeTemplate').children('label').clone().attr({'for': machineTypeInstanceId}).html(data.machineTypes[mt].name).appendTo(machineTypeRadio);
 		}
 
         // Prepares element ids and names for accordion body radio buttons
-        body.attr('id', configurationElementPrefix + data.elements[i].element.id).find('[type="radio"]').each(function () {
+        body.attr('id', configurationElementPrefix + dialog.idPrefix + data.elements[i].element.id).find('[type="radio"]').each(function () {
             var attribute = '';
             if($(this).parent().hasClass('replicationRadio')){
                 attribute = 'replication_';
             }
-            setIdentificationAttributes($(this), identificationPrefix, attribute, data.elements[i].element.id);
+            //setIdentificationAttributes($(this), dialog.identificationPrefix, attribute, data.elements[i].element.id);
+            setIdentificationAttributes($(this), dialog.idPrefix, attribute, data.elements[i].element.id);
         });
 
         // For each module : insert module accordion html
@@ -93,7 +100,7 @@ function populateAccordion(dialog, data, machineTypes, identificationPrefix){
             var moduleAccordionBody = $("#modulesAccordionTemplate").find(".modulesAccordionBody").clone().appendTo(modulesAccordion);
 
             // Set module title
-            var moduleTitle = data.elements[j].modules[j].module.name + "-" + data.elements[j].modules[j].module.version;
+            var moduleTitle = data.elements[i].modules[j].module.name + "-" + data.elements[i].modules[j].module.version;
             moduleAccordionHeader.find(".moduleTitle").text(moduleTitle);
 
             // For each module insert parameter keys into  a radio button
@@ -146,7 +153,7 @@ function populateAccordion(dialog, data, machineTypes, identificationPrefix){
 	dialog.dialog.find(".radioButton").buttonset();
 
 	// Initialize UI elements
-    initializeSliders(data.elements);
+    initializeSliders(data, configurationElementPrefix + dialog.idPrefix);
     initializeButtons(data, dialog.dialog);
 }
 
@@ -157,16 +164,16 @@ function setIdentificationAttributes(item, prefix, optionalAttribute, identifier
 	label.attr('for', label.attr('for') + prefix + optionalAttribute + identifier);
 }
 
-function initializeSliders(elements){
-    for(var i = 0; i < elements.length; i++){
-        var selector = '#' + configurationElementPrefix + elements[i].element.id;
+function initializeSliders(data, identifier){
+    for(var i = 0; i < data.elements.length; i++){
+        var selector = '#' + identifier + data.elements[i].element.id;
         $(selector + ' .clusterSizeRow .jq_slider')
             .slider({
-                min: elements[i].element.minMachines,
-                max: elements[i].element.maxMachines,
-                values: [elements[i].element.minMachines],
+                min: data.elements[i].element.minMachines,
+                max: data.elements[i].element.maxMachines,
+                values: [data.elements[i].element.minMachines],
                 slide: function(event, ui) {$(this).parent().next().text(ui.values[0]);}})
-            .parent().next().text(elements[i].element.minMachines);
+            .parent().next().text(data.elements[i].element.minMachines);
         $(selector + ' .ebsSizeRow .jq_slider')
             .slider({
                 min: 1,
@@ -175,14 +182,14 @@ function initializeSliders(elements){
                 step: 10,
                 slide: function(event, ui) {$(this).parent().next().text(ui.values[0]);}})
             .parent().next().text(1);
-        if(elements[i].element.replicated === true){
+        if(data.elements[i].element.replicated === true){
             $(selector + ' .replicationClusterSizeRow .jq_slider')
                 .slider({
-                    max:elements[i].element.maxReplicationMachines,
-                    min:elements[i].element.minReplicationMachines,
-                    values: [elements[i].element.minReplicationMachines],
+                    max:data.elements[i].element.maxReplicationMachines,
+                    min:data.elements[i].element.minReplicationMachines,
+                    values: [data.elements[i].element.minReplicationMachines],
                     slide: function(event, ui) {$(this).parent().next().text(ui.values[0]);}})
-                .parent().next().text(elements[i].element.minReplicationMachines);
+                .parent().next().text(data.elements[i].element.minReplicationMachines);
         }
         // accordion header
         $(selector).prev().addClass("platformNotSelected").removeClass("platformSelected");
@@ -196,8 +203,8 @@ function initializeButtons(data, accordion){
     accordion.find('.toggleParametersRow input[id*="toggleParametersOff_"]').attr('checked',true).button("refresh");
     accordion.find('.parameterRow input[id*="toggleKeyOff_"]').attr('checked',true).button("refresh");
     if (data.machineTypes.length > 0) { // select first machine type and reset label if there are any machine types
-        $("#addInstanceDialog .valueDisplayButtonSet").text(data.machineTypes[0].specification);
-        $("#addInstanceDialog .machineSizeRow input:first-child").attr('checked',true).button("refresh");
+        accordion.find(".valueDisplayButtonSet").text(data.machineTypes[0].specification);
+        accordion.find(".machineSizeRow input:first-child").attr('checked',true).button("refresh");
     }
 }
 
@@ -264,7 +271,7 @@ function handlePlatformSelectionChange(item, data, prefix) {
 function doSelectPlatform(item, elementData){
     togglePlatformSelection(item, "select", 0);
     for (var i = 0; i < elementData.dependees.length; i ++){
-        var accordionSegment = fetchDependeeAccordionSegment(elementData.dependees[i]);
+        var accordionSegment = fetchDependeeAccordionSegment(elementData.dependees[i], elementData.idPrefix);
 
         // Make the dependee accordion segment selected
         var radioPlatformOn = accordionSegment.find('input[id*="togglePlatformRadioOn_"]');
@@ -279,7 +286,7 @@ function doSelectPlatform(item, elementData){
 function doDeselectPlatform(item, elementData, data){
     togglePlatformSelection(item, "unselect", 0);
     for (var i = 0; i < elementData.dependees.length; i ++){
-        var accordionSegment = fetchDependeeAccordionSegment(elementData.dependees[i]);
+        var accordionSegment = fetchDependeeAccordionSegment(elementData.dependees[i], elementData.idPrefix);
 
         // Check if some other platform also depends on the "dependent platform"
         var found = false;
@@ -349,8 +356,8 @@ function disablePlatformRows(segment){
 	segment.find(".modulesAccordionRow :radio").attr("disabled", true).button("refresh");
 }
 
-function fetchDependeeAccordionSegment(dependeeId){
-    var dialog = $("#" +  configurationElementPrefix + dependeeId);
+function fetchDependeeAccordionSegment(dependeeId, prefix){
+    var dialog = $("#" +  configurationElementPrefix + prefix + dependeeId);
     if (dialog === null || typeof(dialog) === 'undefined'){
         throw("Internal error. Referred jQuery object does not exist.");
     }
@@ -367,9 +374,9 @@ function dimAccordionElements(item){
 	item.find(".ebsSizeRow").css("opacity", ".5");
 }
 
-function prepareRequestData(elements, outData, prefix){
+function prepareRequestData(elements, outData, prefix, accordion){
     for(i = 0; i < elements.length; i++){
-        if($('#' + prefix + "togglePlatformRadioOn_" + elements[i].element.id).attr('checked')){
+        if($('#' + "togglePlatformRadioOn_" + prefix + elements[i].element.id).attr('checked')){
 
             // Configuration Element settings chosen by user
             var configuration = {
@@ -377,35 +384,35 @@ function prepareRequestData(elements, outData, prefix){
                 cluster: {size: 0},
                 machine: {size: 0},
                 replication: {on: false, cluster: {size: 0}, machine: {size: 0}},
-                imageType: "ebs",
+                imageType: 1,
                 ebs: {on: false, size: 0},
                 parameters: {on: false, keys: []}
             };
 
             // Cluster and machine size
-            configuration.cluster.size = $('#' + prefix + configurationElementPrefix + elements[i].element.id + ' .clusterSizeRow .jq_slider').parent().next().text();
-            configuration.machine.size = getMachineSize(prefix, configurationElementPrefix + elements[i].element.id, 1);
+            configuration.cluster.size = $('#' + configurationElementPrefix + prefix +elements[i].element.id + ' .clusterSizeRow .jq_slider').parent().next().text();
+            configuration.machine.size = getMachineSize(configurationElementPrefix + prefix + elements[i].element.id, 1);
 
             // Replication
             if (elements[i].element.replicated === true){
                 configuration.replication.on = true;
-                configuration.replication.cluster.size = $('#' + prefix + configurationElementPrefix + elements[i].element.id +' .replicationClusterSizeRow .jq_slider').parent().next().text();
-                configuration.replication.machine.size = getMachineSize(prefix, configurationElementPrefix + elements[i].element.id, 2);
+                configuration.replication.cluster.size = $('#' + configurationElementPrefix + prefix + elements[i].element.id +' .replicationClusterSizeRow .jq_slider').parent().next().text();
+                configuration.replication.machine.size = getMachineSize(configurationElementPrefix + prefix + elements[i].element.id, 2);
             }
 
             // Image type
-            if($('#' + prefix + "imageTypeEphemeral_" + elements[i].element.id).attr('checked')){
-                configuration.imageType = "ephemeral";
+            if($('#' + "imageTypeEphemeral_" + prefix + elements[i].element.id).attr('checked')){
+                configuration.imageType = 0;
             }
 
             // EBS volume
-            if($('#' + prefix + "toggleEbsRadioOn_" + elements[i].element.id).attr('checked')){
+            if($('#' + "toggleEbsRadioOn_" + prefix + elements[i].element.id).attr('checked')){
                 configuration.ebs.on = true;
-                configuration.ebs.size = $('#' + prefix + configurationElementPrefix + elements[i].element.id + ' .ebsSizeRow .jq_slider').parent().next().text();
+                configuration.ebs.size = $('#' + configurationElementPrefix + prefix + elements[i].element.id + ' .ebsSizeRow .jq_slider').parent().next().text();
             }
 
             // Parameters
-            if($('#' + prefix + "toggleParametersOn_" + elements[i].element.id).attr('checked')){
+            if($('#' + "toggleParametersOn_" + prefix + elements[i].element.id).attr('checked')){
                 configuration.parameters.on = true;
 
                 // For each element.module
@@ -415,7 +422,7 @@ function prepareRequestData(elements, outData, prefix){
                     for(k = 0; k < elements[i].modules[j].parameters.length; k++){
 
                         // Read key selection
-                        var checked = ($('#' + prefix + "toggleKeyOn_" + elements[i].element.id + "_"  + elements[i].modules[j].module.id + "_" + elements[i].modules[j].parameters[k].key.id).attr('checked'));
+                        var checked = ($('#' + "toggleKeyOn_" + prefix + elements[i].element.id + "_"  + elements[i].modules[j].module.id + "_" + elements[i].modules[j].parameters[k].key.id).attr('checked'));
 
                         // Store key id,
                         if (checked){
@@ -439,10 +446,10 @@ function prepareRequestData(elements, outData, prefix){
     }
 }
 
-function getMachineSize(prefix, clusterName, machineType){
+function getMachineSize(identifier, machineType){
 	var ret = -1;
 	var rowClass = machineType === 1 ? ".ordinaryMachine": ".replicationMachine";
-	$('#' + prefix + clusterName + ' ' +  rowClass + ' .radioButton input').each(function(){	
+	$('#' + identifier + ' ' +  rowClass + ' .radioButton input').each(function(){
 		if ($(this).attr('checked')){
 			ret = $(this).attr("value");
 

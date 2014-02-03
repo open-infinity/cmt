@@ -30,7 +30,7 @@
 		</div>
         <div>
             <label for="template" class="subtitleLabel"><fmt:message key="cloud.instancedialog.title.template" /></label>
-            <select id="templateSelect" class="instanceConfigurationSelect"></select>
+            <select class="templateSelect instanceConfigurationSelect"></select>
         </div>
 	</div>
 	<div class="configSegment">
@@ -47,6 +47,10 @@
 
 <%-- add service dialog --%>
 <div id="addServicesDialog" title="<fmt:message key="cloud.servicedialog.title.addNew" />">
+    <div>
+        <label for="template" class="subtitleLabel"><fmt:message key="cloud.instancedialog.title.template" /></label>
+        <select class="templateSelect instanceConfigurationSelect"></select>
+    </div>
     <div id="addServicesAccordion"></div>
 </div>
 

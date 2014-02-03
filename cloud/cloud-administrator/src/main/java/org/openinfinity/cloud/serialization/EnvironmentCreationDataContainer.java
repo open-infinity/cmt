@@ -22,15 +22,17 @@ import java.util.Collection;
  *  Container class for JSON data sent from client
  *
  *  Inner classes and members match the JSON data structure in the example below:
- *  var configuration = {
- *      element : {id: elements[i].element.id, name: elements[i].element.name, type: elements[i].element.type},
- *      cluster: {size: 0},
- *      machine: {size: 0},
- *      replication: {on: false, cluster: {size: 0}, machine: {size: 0}},
- *      imageType: "ebs",
- *      ebs: {on: false, size: 0},
- *      parameters: {on: false, keys: []}
- *  };
+ *  requestData:{
+ *      "environment": {"name":"a","type":"1","zone":"dev-pilvi1"},
+ *      "configurations":[{
+ *                          "element":{"id":1,"name":"ig","type":1},
+ *                          "cluster":{"size":"1"},
+ *                          "machine":{"size":"0"},
+ *                          "replication":{"on":false,"cluster":{"size":0},"machine":{"size":0}},
+ *                          "imageType":"ephemeral",
+ *                          "ebs":{"on":false,"size":0},
+ *                          "parameters":{"on":true,"keys":["-1"]}}]}
+ *
  *
  * @author Vedran Bartonicek
  * @version 1.2.2

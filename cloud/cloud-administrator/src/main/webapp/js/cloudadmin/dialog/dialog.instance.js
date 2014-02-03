@@ -24,7 +24,6 @@
 (function($) {
 	console.log("initializing cloudadmin.dialog.instance");
 	var cloudadmin = window.cloudadmin || {};
-	cloudadmin.resource.elements = {};
 	cloudadmin.dialog.instance = {};
 
 	$.extend(cloudadmin.dialog, {
@@ -91,7 +90,7 @@
 							    $("#zoneSelect").empty();
                                 $("#zoneSelect").append("<option value='" + zone.name + "'>" + zone.name + "</option>");
 							});
-						});
+						});                                                    createNewInstance
 					});
 
                     // Update elements on template change
@@ -112,10 +111,10 @@
                                 createPlatformSelectAccordion(instDlg, cloudadmin.resource, machineTypes, instDlg.idPrefix);
                                	$("#cloudTypesSelectionAccordion").fadeIn(500);
                             }
-                        });
+                        });        createNewInstance
                     });
 
-					// TODO: check this out
+					// TODO: check this out  addServiceDialog
 					//cloudadmin.dialog.initAddServiceDialog();
 			    });
 			    */
@@ -127,6 +126,7 @@
             instDlg.idPrefix = '';
             instDlg.dialog = $("#addInstanceDialog");
             instDlg.accordion = $("#cloudTypesSelectionAccordion");
+            instDlg.templateSelect = $(".templateSelect", instDlg.dialog);
 
             // Initialize accordion once the data from CMT DB arrives
             $.when(
@@ -144,9 +144,10 @@
                 });
 
                 // Get templates and populate the templates combo box
-                var templateSelect = $("#templateSelect").empty();
+                //var templateSelect = $("#templateSelect").empty();
+                instDlg.templateSelect.empty();
                 $.each(templates, function(index, t) {
-                    templateSelect.append("<option value='" + t.id + "'>" + t.name + "</option>");
+                    instDlg.templateSelect.append("<option value='" + t.id + "'>" + t.name + "</option>");
                 });
 
                 // Get elements for selected template
@@ -157,7 +158,7 @@
                         console.log("Unable to populate UI - configuration elements not available");
                     }
                     else{
-                        createPlatformSelectAccordion(instDlg, cloudadmin.resource, machineTypes, instDlg.idPrefix);
+                        createPlatformSelectAccordion(instDlg, cloudadmin.resource);
                     }
                 });
 
@@ -181,30 +182,26 @@
                 });
 
                 // Update elements on template change
-                templateSelect.change(function() {
-                    var templateId = $('#templateSelect option:selected').val();
+                instDlg.templateSelect.change(function() {
+                    var templateId = $('option:selected', instDlg.templateSelect).val();
                     if (!templateId) {
                         return;
                     }
                     var url = portletURL.url.instance.getElementsForTemplateURL + "&templateId=" + templateId;
                     $.getJSON(url, function(data) {
                         cloudadmin.resource.elements = data;
-                        if ($.isEmptyObject(data)){    value
+                        if ($.isEmptyObject(data)){
                             console.log("Unable to populate UI - configuration elements not available");
                             $("#cloudTypesSelectionAccordion").fadeOut(500);
                         }
                         else{
                             $("#cloudTypesSelectionAccordion").fadeOut(500);
-                            createPlatformSelectAccordion(instDlg, cloudadmin.resource, machineTypes, instDlg.idPrefix);
+                            createPlatformSelectAccordion(instDlg, cloudadmin.resource);
                             $("#cloudTypesSelectionAccordion").fadeIn(500);
                         }
                     });
                 });
-
-                // TODO: check this out
-                //cloudadmin.dialog.initAddServiceDialog();
             });
-
 
 			$("#instanceName").val('');
 			$("#cloudTypesSelectionAccordion").accordion("option", "active", false);
@@ -258,10 +255,13 @@
 				$(this).trigger("instancetable.refresh").dialog("close");
 			};
 
-			this.instanceAddButtons[dialogRes.resource.dialog.cancel] = function() {
+            /*
+                TODO= dialog kill
+			    this.instanceAddButtons[dialogRes.resource.dialog.cancel] = function() {
                 $("#cloudTypesSelectionAccordion").accordion("option", "active", false);
                 $(this).trigger("instancetable.refresh").dialog("close");
             };
+            */
 		},
 	
 		// Delete instance-button

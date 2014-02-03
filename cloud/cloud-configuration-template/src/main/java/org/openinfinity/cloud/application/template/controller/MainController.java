@@ -109,7 +109,7 @@ public class MainController extends AbstractController{
     }
 
     /*
-     * Slices a subset from list, the result fits into one jqGgrid page.
+     * Slices a subset from list, the result fits into one jqGrid page.
      */
     private <T> void createOnePageResponse(ResourceResponse response, List<T> items, int page, int rows) throws IOException {
         int records = items.size();
