@@ -3,9 +3,9 @@
 
 <%-- instance dialogs --%>
 <div id="addInstanceDialog" title="<fmt:message key="cloud.instancedialog.title.addNew" />">
-	<div class="instanceCreationInstructions">
-        <label style ="font-size:.9em;" class="instanceCreationInstructionsLine1"><fmt:message key="cloud.dialog.info.fillIn" /></label>
-        <label style ="font-size:.9em;" class="instanceCreationInstructionsLine2"><fmt:message key="cloud.dialog.info.allForm" /></label>
+	<div class="dialogInstructions">
+        <label class="dialogInstructionsLine1"><fmt:message key="cloud.dialog.info.fillIn" /></label>
+        <label class="dialogInstructionsLine2"><fmt:message key="cloud.dialog.info.allForm" /></label>
 	</div>
 	<div class="ui-state-error ui-corner-all addInstanceDialogError">
 		<p>
@@ -30,12 +30,12 @@
 		</div>
         <div>
             <label for="template" class="subtitleLabel"><fmt:message key="cloud.instancedialog.title.template" /></label>
-            <select class="templateSelect instanceConfigurationSelect"></select>
+            <select id="addInstanceTemplateSelect" class="templateSelect instanceConfigurationSelect"></select>
         </div>
 	</div>
 	<div class="configSegment">
         <div class="subtitleLabel"><fmt:message key = "cloud.instancedialog.title.available"/></div>
-        <p style ="font-size:.9em" class="instanceConfigurationValidateTips"><fmt:message key = "cloud.instancedialog.info.selectServices"/></p>
+        <p class="dialogInstructionsLine1"><fmt:message key = "cloud.instancedialog.info.selectServices"/></p>
         <div id="cloudTypesSelectionAccordion"></div>
     </div>
 </div>
@@ -47,11 +47,18 @@
 
 <%-- add service dialog --%>
 <div id="addServicesDialog" title="<fmt:message key="cloud.servicedialog.title.addNew" />">
-    <div>
+    <div class="dialogInstructions">
+        <label class="dialogInstructionsLine1"><fmt:message key="cloud.dialog.info.addService" /></label>
+	</div>
+    <div class="configSegment">
         <label for="template" class="subtitleLabel"><fmt:message key="cloud.instancedialog.title.template" /></label>
-        <select class="templateSelect instanceConfigurationSelect"></select>
+        <select id="addServicesTemplateSelect" class="templateSelect instanceConfigurationSelect"></select>
     </div>
-    <div id="addServicesAccordion"></div>
+    <div class="configSegment">
+        <div class="subtitleLabel"><fmt:message key = "cloud.instancedialog.title.available"/></div>
+        <p class="dialogInstructionsLine1"><fmt:message key = "cloud.instancedialog.info.selectServices"/></p>
+        <div id="addServicesAccordion"></div>
+    </div>
 </div>
 
 

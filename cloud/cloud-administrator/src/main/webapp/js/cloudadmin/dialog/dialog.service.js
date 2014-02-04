@@ -25,133 +25,30 @@
 	console.log("initializing cloudadmin.dialog.service");
     var cloudadmin = window.cloudadmin || {};
     cloudadmin.dialog.service = {};
-    //cloudadmin.resource = {};
-
-    //var cloudadmin = window.cloudadmin || {};
-    //var cloudadmin.dialog.service = {};
-	
 	$.extend(cloudadmin.dialog, {
-        /*
-		initAddServiceDialog: function () {
-			var dc = new Object();	
-			dc.dialog = $("#addServicesDialog");
-			dc.accordion = $("#addServicesAccordion");	
-			dc.idPrefix = 'sa_';
-			dc.instanceId = 0;
-			dc.dialog.dialog({
-				autoOpen: false,
-				resizable: true,
-				height: 590,
-				width: 620,
-				modal: true,
-				buttons: {
-					"Create cluster": function() {
-						var outData = {};	
-						prepareRequestParameters(outData, dc);					
-						
-						var request = $.ajax({
-							type: 'POST',
-							url: portletURL.url.service.newServiceURL + "&id=" + dc.instanceId,
-							data: outData,
-							dataType: 'json'
-						});
-						
-						request.fail(function(data, textStatus, jqXHR) {
-							  alert( "Unable to add service. Cluster type already exists for the instance.");
-							});
-						
-						request.success(function(data, textStatus, jqXHR) {
-							dc.accordion.accordion("option", "active", false);
-							dc.dialog.dialog("close");							
-						});
 
-					},
-					"Cancel": function() {
-						dc.accordion.accordion("option", "active", false);
-						dc.dialog.dialog("close");
-					}
-				}
-			});
-			if ($.isEmptyObject(cloudadmin.resource.elements)){
-                console.log("Unable to populate UI - configuration elements not available");
-            }
-            else{
-			    createPlatformSelectAccordion(dc, cloudadmin.resource, cloudadmin.resource.machineTypes, dc.idPrefix);
-            }
-			cloudadmin.dialog.addServiceDialog = dc;
-		},
-        */
-		/*
-		addNewService: function(dc) {	
-			var clusters = cloudadmin.resource.elements;
-			for(var i = 0; i < clusters.length; i++){
-				var selectorName = '#' + dc.idPrefix + clusters[i].name;
-				$(selectorName + ' .clusterSizeRow .jq_slider')
-					.slider({
-						min: clusters[i].minMachines,
-						max: clusters[i].maxMachines,
-						values: [clusters[i].minMachines],
-						slide: function(event, ui) {$(this).parent().next().text(ui.values[0]);}})
-					.parent().next().text(clusters[i].minMachines);	
-				$(selectorName + ' .ebsSizeRow .jq_slider')
-					.slider({
-						min: 1,
-						max: 1000,
-						values: [1],
-						step: 10,
-						slide: function(event, ui) {$(this).parent().next().text(ui.values[0]);}})
-					.parent().next().text(1);
-				if(clusters[i].replicated == true){
-					$(selectorName + ' .replicationClusterSizeRow .jq_slider')
-						.slider({
-							max:clusters[i].maxReplicationMachines,
-							min:clusters[i].minReplicationMachines,
-							values: [clusters[i].minReplicationMachines],
-							slide: function(event, ui) {$(this).parent().next().text(ui.values[0]);}})
-						.parent().next().text(clusters[i].minReplicationMachines);
-				}	
-				// accordion header
-				$(selectorName).prev().addClass("platformNotSelected").removeClass("platformSelected");
-			}
-			dc.accordion.accordion("option", "active", false);		
-			dc.accordion.find('.togglePlatformSelectionRow input[id*="togglePlatformRadioOff_"]').
-				attr('checked',true).button("refresh");
-			dc.accordion.find('.imageTypeRow input[id*="imageTypeEphemeral_"]').attr('checked',true).button("refresh");
-			dc.accordion.find('.toggleEbsRow input[id*="toggleEbsRadioOff_"]').attr('checked',true).button("refresh");
-			
-			// select first machine type and reset label 
-            if (cloudadmin.resource.machineTypes.length > 0) { 
-    			dc.accordion.find('.valueDisplayButtonSet').text(cloudadmin.resource.machineTypes[0].specification);
-    			dc.accordion.find('.machineSizeRow input:first-child').attr('checked',true).button("refresh");
-            }
+         addNewService: function(environmentId, cloudType, zone) {
+            o = cloudadmin.dialog.service;
+            o.dialog = $("#addServicesDialog");
+            o.accordion = $("#addServicesAccordion");
+            o.idPrefix = 'sa_';
+            o.templateSelect = $("#addServicesTemplateSelect");
+            o.oldTemplateVal = -1;
+            o.environmentId = environmentId;
+            o.cloudType = cloudType;
+            o.zone = zone;
 
-            dimAccordionElements(dc.accordion);
-            dc.dialog.dialog("open");
-		}
-		*/
-		initAddServiceDialog: function () {
-
-
-
-        },
-
-         addNewService: function(instanceId) {
-            var instDlg = cloudadmin.dialog.service;
-            instDlg.dialog = $("#addServicesDialog");
-            instDlg.accordion = $("#addServicesAccordion");
-            instDlg.idPrefix = 'sa_';
-            instDlg.instanceId = 0;
-
-            // Initialize accordion once the data from CMT DB arrives
-             $.when($.ajax({dataType: "json", url: portletURL.url.instance.getMachineTypesURL}),
+            // Initialize dialog once the data from CMT DB arrives
+            $.when($.ajax({dataType: "json", url: portletURL.url.instance.getMachineTypesURL}),
                     $.ajax({dataType: "json", url: portletURL.url.instance.getTemplatesURL})).done(function(resultMachineTypes, resultTemplates) {
                 var machineTypes = cloudadmin.resource.machineTypes = resultMachineTypes[0];
                 var templates = cloudadmin.resource.templates = resultTemplates[0];
 
                 // Get templates and populate the templates combo box
-                var templateSelect = $(".templateSelect", cloudadmin.dialog.service.dialog).empty();
+                o.templateSelect.empty();
+
                 $.each(templates, function(index, t) {
-                    templateSelect.append("<option value='" + t.id + "'>" + t.name + "</option>");
+                    o.templateSelect.append("<option value='" + t.id + "'>" + t.name + "</option>");
                 });
 
                 // Get elements for selected template
@@ -162,16 +59,20 @@
                         console.log("Unable to populate UI - configuration elements not available");
                     }
                     else{
-                        createPlatformSelectAccordion(instDlg, cloudadmin.resource);
+                        createPlatformSelectAccordion(o, cloudadmin.resource);
                     }
                 });
 
                 // Update elements on template change
-                templateSelect.change(function() {
-                    var templateId = $('option:selected', '.templateSelect', cloudadmin.dialog.service.dialog).val();
-                    if (!templateId) {
+                $("#addServicesTemplateSelect").change(function() {
+                    var templateId = $("#addServicesTemplateSelect").val();
+
+                    // fcking java script and jQuery
+                    if (!templateId || o.oldTemplateVal === templateId) {
                         return;
                     }
+                    o.oldTemplateVal = templateId;
+
                     var url = portletURL.url.instance.getElementsForTemplateURL + "&templateId=" + templateId;
                     $.getJSON(url, function(data) {
                         cloudadmin.resource.elements = data;
@@ -181,18 +82,14 @@
                         }
                         else{
                             $("#addServicesAccordion").fadeOut(500);
-                            createPlatformSelectAccordion(instDlg, cloudadmin.resource);
+                            createPlatformSelectAccordion(o, cloudadmin.resource);
                             $("#addServicesAccordion").fadeIn(500);
                         }
                     });
                 });
-
             });
 
             $("#addServicesAccordion").accordion("option", "active", false);
-
-            // reset cloud selection, fire also change event to update zone selection
-            $("#cloudSelect option").eq(0).attr("selected", "selected").trigger("change");
             dimAccordionElements($("#addServicesAccordion"));
             $("#addServicesDialog").dialog("open");
         }
@@ -206,7 +103,15 @@
         width : 770,
         buttons: {
             "Create service": function() {
-                var outData = {environment:{}, configurations:[]};
+                var outData = {
+                    environment:{
+                        id: cloudadmin.dialog.service.environmentId,
+                        type: cloudadmin.dialog.service.cloudType,
+                        zone: cloudadmin.dialog.service.zone
+                    },
+                    configurations:[]
+                };
+
                 prepareRequestData(cloudadmin.resource.elements, outData, cloudadmin.dialog.service.idPrefix);
                 if (outData.configurations.length === 0){
                     outData.configurations.push(0);
@@ -216,13 +121,12 @@
                 var data = {};
                 data.requestData = JSON.stringify(outData);
 
-                console.log("Sending data (nat!):" + JSON.stringify(outData));
-                /*
+                console.log("Sending json data:" + data.requestData);
 
                 var request = $.ajax({
                     type: 'POST',
-                    url: portletURL.url.service.newServiceURL + "&id=" + dc.instanceId,
-                    data: outData,
+                    url: portletURL.url.service.newService2URL,
+                    data: data,
                     dataType: 'json'
                 });
 
@@ -230,19 +134,15 @@
                   alert( "Unable to add service. Service already exists for the instance.");
                 });
 
-                request.success(function(data, textStatus, jqXHR) {
-                    dc.accordion.accordion("option", "active", false);
-                    dc.dialog.dialog("close");
-                });
-
-                */
-                $("#addServicesAccordion").accordion("option", "active", false);
-                $(this).trigger("instancetable.refresh").dialog("close");
+                $(this).dialog("close");
             },
             "Cancel": function() {
-                cloudadmin.dialog.service.accordion.accordion("option", "active", false);
-                cloudadmin.dialog.service.dialog.dialog("close");
+                $(this).dialog("close");
             }
+        },
+        beforeClose: function(event, ui){
+            deletePlatformSelectAccordion(cloudadmin.dialog.service.accordion);
         }
     });
+
 })(jQuery);

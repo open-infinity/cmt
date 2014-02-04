@@ -39,19 +39,29 @@ import java.util.Collection;
  * @since 1.2.2
  */
 
-public class EnvironmentCreationDataContainer {
+public class EnvironmentDataContainer {
 
     public static class EnvironmentData {
+        private int id;
         private String name;
         private int type;
         private String zone;
 
         public EnvironmentData(){};
 
-        public EnvironmentData(String name, int type, String zone) {
+        public EnvironmentData(int id, String name, int type, String zone) {
+            this.id = id;
             this.name = name;
             this.type = type;
             this.zone = zone;
+        }
+
+        public int getId() {
+            return id;
+        }
+
+        public void setId(int id) {
+            this.id = id;
         }
 
         public String getName() {
@@ -217,10 +227,10 @@ public class EnvironmentCreationDataContainer {
 
         public static class ReplicationDataContainer {
             private boolean on;
-            private EnvironmentCreationDataContainer.ConfigurationData.ClusterConfigurationData cluster;
-            private EnvironmentCreationDataContainer.ConfigurationData.MachineConfigurationData machine;
+            private EnvironmentDataContainer.ConfigurationData.ClusterConfigurationData cluster;
+            private EnvironmentDataContainer.ConfigurationData.MachineConfigurationData machine;
 
-            public ReplicationDataContainer(boolean on, EnvironmentCreationDataContainer.ConfigurationData.ClusterConfigurationData cluster, EnvironmentCreationDataContainer.ConfigurationData.MachineConfigurationData machine) {
+            public ReplicationDataContainer(boolean on, EnvironmentDataContainer.ConfigurationData.ClusterConfigurationData cluster, EnvironmentDataContainer.ConfigurationData.MachineConfigurationData machine) {
                 this.on = on;
                 this.cluster = cluster;
                 this.machine = machine;
@@ -237,19 +247,19 @@ public class EnvironmentCreationDataContainer {
                 this.on = on;
             }
 
-            public EnvironmentCreationDataContainer.ConfigurationData.ClusterConfigurationData getCluster() {
+            public EnvironmentDataContainer.ConfigurationData.ClusterConfigurationData getCluster() {
                 return cluster;
             }
 
-            public void setCluster(EnvironmentCreationDataContainer.ConfigurationData.ClusterConfigurationData cluster) {
+            public void setCluster(EnvironmentDataContainer.ConfigurationData.ClusterConfigurationData cluster) {
                 this.cluster = cluster;
             }
 
-            public EnvironmentCreationDataContainer.ConfigurationData.MachineConfigurationData getMachine() {
+            public EnvironmentDataContainer.ConfigurationData.MachineConfigurationData getMachine() {
                 return machine;
             }
 
-            public void setMachine(EnvironmentCreationDataContainer.ConfigurationData.MachineConfigurationData machine) {
+            public void setMachine(EnvironmentDataContainer.ConfigurationData.MachineConfigurationData machine) {
                 this.machine = machine;
             }
         }
@@ -339,11 +349,11 @@ public class EnvironmentCreationDataContainer {
     private EnvironmentData environment;
     private Collection<ConfigurationData> configurations;
 
-    public EnvironmentCreationDataContainer(){
+    public EnvironmentDataContainer(){
 
     };
 
-    public EnvironmentCreationDataContainer(EnvironmentData environment, Collection<ConfigurationData> configurations) {
+    public EnvironmentDataContainer(EnvironmentData environment, Collection<ConfigurationData> configurations) {
         this.environment = environment;
         this.configurations = configurations;
     }

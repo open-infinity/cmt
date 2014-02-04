@@ -487,7 +487,9 @@ col.data {
 
 /* Template*/
 
-#addInstanceDialog .instanceCreationInstructions{margin: 1em 0 2em 0.5em;display:block;font-size:.9em;}
+.dialogInstructions{margin: 1em 0 2em 0.5em;display:block;font-size:.9em;}
+
+dialogInstructionsLine1{font-size:.9em;}
 
 #addInstanceDialog .instanceName{display:block; margin-top:.2em;margin-bottom:12px; width:10em; padding: .3em .4em .3em .4em; height: 1em;}
 

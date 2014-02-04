@@ -22,7 +22,6 @@
 
 var configurationElementPrefix = "configurationElement_";
 
-// Creation 
 
 function createPlatformSelectAccordion(dialog, data){
 
@@ -56,6 +55,11 @@ function createPlatformSelectAccordion(dialog, data){
 	dialog.accordion.find(".toggleParametersRow :radio").change(function(e) {
 		handleParametersSelectionChange($(this));
 	});
+}
+
+function deletePlatformSelectAccordion(accordion){
+     accordion.accordion("destroy");
+     accordion.empty();
 }
 
 function populateAccordion(dialog, data){

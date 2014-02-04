@@ -285,41 +285,39 @@ var instanceManager = {
 
 				var instanceId = data.instanceId;
 				
-				instanceManager.createInstanceView(instanceId, tabName);
-				instanceManager.updateInstanceClusters(instanceId);
+				instanceManager.createInstanceView(data, tabName);
+				instanceManager.updateInstanceClusters(data.instanceId);
 			});
 		},
 		
 		// Create the instance view from the template (in instanceview.jsp)
-		createInstanceView: function (instanceId, tabName) {
+		createInstanceView: function (data, tabName) {
 			
-			var $template = $("#instanceviewtemplate").clone(true).attr("id","cloudadmincontent_"+instanceId);
+			var $template = $("#instanceviewtemplate").clone(true).attr("id","cloudadmincontent_"+ data.instanceId);
 			
 			$template.find("*").each(function () {
 				var uusi = this.getAttribute("id");
 				
 				if(uusi) {
-					uusi = uusi + "_" + instanceId;
+					uusi = uusi + "_" + data.instanceId;
 					this.setAttribute("id", uusi);
 				}
 			});
 			
 			// Add services button
 			$template.find(".add-services").button().click(function() {
-				//cloudadmin.dialog.addServiceDialog.instanceId = instanceId;
-				cloudadmin.dialog.initAddServiceDialog();
- 				cloudadmin.dialog.addNewService(instanceId);
+ 				cloudadmin.dialog.addNewService(data.instanceId, data.cloudType, data.zone);
 			});
 			
 			//  View instance machines button
 			$template.find(".view-machines").button().click(function() {			
-				cloudadmin.dialog.initMachineDialog(instanceId);
+				cloudadmin.dialog.initMachineDialog(data.instanceId);
 				$("#machineListDialog").dialog("open");
 			});
 
 			//  Get instance ssh-key button
 			$template.find(".get-key").button().click(function() {			
-				var url = portletURL.url.instance.getInstanceKeyURL+"&id=" + instanceId;
+				var url = portletURL.url.instance.getInstanceKeyURL+"&id=" + data.instanceId;
 				window.location.href = url;
 			});
 			

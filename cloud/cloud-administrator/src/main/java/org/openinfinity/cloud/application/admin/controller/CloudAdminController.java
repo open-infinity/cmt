@@ -32,7 +32,7 @@ import org.openinfinity.cloud.domain.configurationtemplate.entity.ConfigurationT
 import org.openinfinity.cloud.domain.configurationtemplate.entity.InstallationModule;
 import org.openinfinity.cloud.domain.configurationtemplate.entity.ParameterKey;
 import org.openinfinity.cloud.serialization.ElementContainer;
-import org.openinfinity.cloud.serialization.EnvironmentCreationDataContainer;
+import org.openinfinity.cloud.serialization.EnvironmentDataContainer;
 import org.openinfinity.cloud.serialization.ModuleContainer;
 import org.openinfinity.cloud.serialization.ParametersContainer;
 import org.openinfinity.cloud.service.administrator.*;
@@ -324,7 +324,8 @@ public class CloudAdminController {
 		}
 		SerializerUtil.jsonSerialize(response.getWriter(), serviceMap);
 	}
-	
+
+    /*
 	@ResourceMapping("newService")
     public void newService(ResourceRequest request, ResourceResponse response, @RequestParam Map<String, String> pm){
         try{            
@@ -344,6 +345,7 @@ public class CloudAdminController {
             }
         } 
     }
+    */
 
 	@ResourceMapping("deleteInstance")
 	public void deleteInstance(ResourceRequest request, ResourceResponse response, @RequestParam("id") int instanceId) throws Exception {
@@ -357,7 +359,8 @@ public class CloudAdminController {
 				new Job("delete_instance", instance.getInstanceId(), instance.getCloudType(), JobService.CLOUD_JOB_CREATED));	
 		}
 	}
-	
+
+    /*
 	@ResourceMapping("addInstance")
 	public void addInstance(ResourceRequest request, ResourceResponse response, @RequestParam Map<String, String> pm){
 		try{			
@@ -390,6 +393,7 @@ public class CloudAdminController {
 			}
 		} 
 	}
+	*/
 
     @ResourceMapping("addEnvironment")
     public void addEnvironment(ResourceRequest request, ResourceResponse response, @RequestParam("requestData") String requestData){
@@ -401,8 +405,8 @@ public class CloudAdminController {
 
             // Parse request parameters
             ObjectMapper mapper = new ObjectMapper();
-            EnvironmentCreationDataContainer data = mapper.readValue(requestData, EnvironmentCreationDataContainer.class);
-            EnvironmentCreationDataContainer.EnvironmentData envData = data.getEnvironment();
+            EnvironmentDataContainer data = mapper.readValue(requestData, EnvironmentDataContainer.class);
+            EnvironmentDataContainer.EnvironmentData envData = data.getEnvironment();
 
             // Create instance
             Instance i = new Instance();
@@ -437,9 +441,40 @@ public class CloudAdminController {
         }
     }
 
-    @ResourceMapping("newService2")
-    public void newService2(ResourceRequest request, ResourceResponse response, @RequestParam Map<String, String> pm){
+    @Authenticated
+    @ResourceMapping("newService")
+    public void newService(ResourceRequest request, ResourceResponse response, @RequestParam("requestData") String requestData){
         try{
+            LOG.info("requestData:" + requestData);
+
+            // Parse request parameters
+            ObjectMapper mapper = new ObjectMapper();
+            EnvironmentDataContainer data = mapper.readValue(requestData, EnvironmentDataContainer.class);
+            EnvironmentDataContainer.EnvironmentData envData = data.getEnvironment();
+
+            Job j = parseAddEnvironmentRequestParams(new Job("add_service", envData.getId(), envData.getType(), JobService.CLOUD_JOB_CREATED, envData.getZone()), data);
+
+            LOG.info("Job id:" + j.getJobId());
+            LOG.info("Job status:" + j.getJobStatus());
+            LOG.info("Job zone:" + j.getZone());
+            LOG.info("Job cloud:" + j.getCloud());
+            LOG.info("Job services:" + j.getServices());
+            LOG.info("Job extraData:" + j.getExtraData());
+            LOG.info("Job type:" + j.getJobType());
+
+            jobService.addJob(j);
+
+        } catch (Exception e) {
+            LOG.error("Error setting up the instance: "+e.getMessage(), e);
+            response.setProperty(ResourceResponse.HTTP_STATUS_CODE, "421");
+            try {
+                response.getWriter().write(e.getMessage());
+            } catch (IOException ioe) {
+                LOG.error("Error while writing the http reply: "+ioe.getMessage());
+            }
+        }/*
+        try{
+
             User user = liferayService.getUser(request, response);
             if (user == null) throw new AdminException("User not logged in");
 
@@ -455,6 +490,7 @@ public class CloudAdminController {
                 LOG.error("Error while writing the http reply: "+ioe.getMessage());
             }
         }
+    */
     }
 	
 	@ResourceMapping("availableClusters")
@@ -558,7 +594,8 @@ public class CloudAdminController {
 	        throw new AdminException("Cluster type already created for the instance"); 
 	    }
 	}
-	  
+
+    /*
     // TODO: Use Json for making better structure of data.
     // TODO: Use parseAddEnvironmentRequestParams() instead of me.
     // There are properties repeating for each machine.          
@@ -672,14 +709,14 @@ public class CloudAdminController {
 
         return job;
     }
-
-    private Job parseAddEnvironmentRequestParams(Job job, EnvironmentCreationDataContainer data) throws AdminException{
+    */
+    private Job parseAddEnvironmentRequestParams(Job job, EnvironmentDataContainer data) throws AdminException{
         Collection<Integer> instanceClusterTypes = clusterService.getClusterTypes(job.getInstanceId());
         boolean withEcmService = false;
         boolean withIgService = false;
         boolean dbExists = instanceClusterTypes.contains(new Integer(ClusterService.CLUSTER_TYPE_DATABASE));
 
-        for (EnvironmentCreationDataContainer.ConfigurationData confData : data.getConfigurations()){
+        for (EnvironmentDataContainer.ConfigurationData confData : data.getConfigurations()){
             int type = confData.getElement().getType();
             if (type == ClusterService.CLUSTER_TYPE_ECM){
                 withEcmService = true;
@@ -690,7 +727,7 @@ public class CloudAdminController {
             if (withIgService && withEcmService) break;
         }
 
-        for (EnvironmentCreationDataContainer.ConfigurationData confData : data.getConfigurations()){
+        for (EnvironmentDataContainer.ConfigurationData confData : data.getConfigurations()){
             int type = confData.getElement().getType();
             boolean dbCreationNotPossible = false;
             checkPlatformExistance(instanceClusterTypes, type);
