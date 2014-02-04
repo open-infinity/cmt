@@ -211,7 +211,7 @@
 
             // reset cloud selection, fire also change event to update zone selection
             $("#cloudSelect option").eq(0).attr("selected", "selected").trigger("change");
-            frequestD($("#cloudTypesSelectionAccordion"));
+            dimAccordionElements($("#cloudTypesSelectionAccordion"));
 			$(".addInstanceDialogError").hide();
 			$("#addInstanceDialog").dialog("open");
 		},

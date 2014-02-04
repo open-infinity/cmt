@@ -41,7 +41,7 @@ function createPlatformSelectAccordion(dialog, data){
 	// Events 
 	
 	dialog.accordion.find(".togglePlatformSelectionRow :radio").change(function(e){
-		handlePlatformSelectionChange($(this), data, dialog.identificationPrefix);
+		handlePlatformSelectionChange($(this), data, dialog.idPrefix);
 	});	
 	
 	dialog.accordion.find(".toggleEbsRow :radio").change(function(e) {
@@ -251,19 +251,19 @@ function handleParametersSelectionChange(item){
     }
 }
 
-function handlePlatformSelectionChange(item, data, prefix) {
+function handlePlatformSelectionChange(item, model, prefix) {
 
 	// Grab data from accordion segment's model (elementData)
 	var elementData = item.parents(".ui-accordion-content").data('clusterConfiguration');
 
     // Handle selecting platform
     if (item.attr("id").indexOf("togglePlatformRadioOn") != -1) {
-        doSelectPlatform(item, elementData);
+        doSelectPlatform(item, elementData, prefix);
     }
 
     // Handle deselecting platform
     else if (item.attr("id").indexOf("togglePlatformRadioOff") !=  -1) {
-        doDeselectPlatform(item, elementData, data);
+        doDeselectPlatform(item, elementData, model, prefix);
     }
 
     // Handle invalid state
@@ -272,10 +272,10 @@ function handlePlatformSelectionChange(item, data, prefix) {
     }
 }
 
-function doSelectPlatform(item, elementData){
+function doSelectPlatform(item, elementData, prefix){
     togglePlatformSelection(item, "select", 0);
     for (var i = 0; i < elementData.dependees.length; i ++){
-        var accordionSegment = fetchDependeeAccordionSegment(elementData.dependees[i], elementData.idPrefix);
+        var accordionSegment = fetchDependeeAccordionSegment(elementData.dependees[i], prefix);
 
         // Make the dependee accordion segment selected
         var radioPlatformOn = accordionSegment.find('input[id*="togglePlatformRadioOn_"]');
@@ -287,17 +287,17 @@ function doSelectPlatform(item, elementData){
     }
 }
 
-function doDeselectPlatform(item, elementData, data){
+function doDeselectPlatform(item, elementData, model, prefix){
     togglePlatformSelection(item, "unselect", 0);
     for (var i = 0; i < elementData.dependees.length; i ++){
-        var accordionSegment = fetchDependeeAccordionSegment(elementData.dependees[i], elementData.idPrefix);
+        var accordionSegment = fetchDependeeAccordionSegment(elementData.dependees[i], prefix);
 
         // Check if some other platform also depends on the "dependent platform"
         var found = false;
-        for(var j = 0; j < data.elements.length; j++){
-            for(var k = 0; k < data.elements[j].dependees.length; k++){
-                if (data.elements[j].element.id !== elementData.element.id && data.elements[j].dependees[k] === elementData.dependees[i]){
-                     if  ($('#' + 'togglePlatformRadioOn_' + data.elements[i].element.id).attr('checked')) {
+        for(var j = 0; j < model.elements.length; j++){
+            for(var k = 0; k < model.elements[j].dependees.length; k++){
+                if (model.elements[j].element.id !== elementData.element.id && model.elements[j].dependees[k] === elementData.dependees[i]){
+                     if  ($('#' + 'togglePlatformRadioOn_' + model.elements[i].element.id).attr('checked')) {
                         found  = true;
                         break;
                     } else continue;

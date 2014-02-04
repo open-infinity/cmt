@@ -125,7 +125,7 @@
 
                 var request = $.ajax({
                     type: 'POST',
-                    url: portletURL.url.service.newService2URL,
+                    url: portletURL.url.service.newServiceURL,
                     data: data,
                     dataType: 'json'
                 });

@@ -527,8 +527,8 @@ dialogInstructionsLine1{font-size:.9em;}
 #addInstanceDialog .replicationClusterSizeRow{position:relative;margin-top: 1.1em;}
 #addServicesDialog .replicationClusterSizeRow{position:relative;margin-top: 1.1em;}
 
-#addInstanceDialog .replicationClusterSizeLabel{margin-top:0.3em;float:left;celar:left;}
-#addServicesDialog .replicationClusterSizeLabel{margin-top:0.3em;float:left;celar:left;}
+#addInstanceDialog .replicationClusterSizeLabel{margin-top:0.3em;float:left;clear:left;}
+#addServicesDialog .replicationClusterSizeLabel{margin-top:0.3em;float:left;clear:left;}
 
 #addInstanceDialog .replicationMachineSizeLabel{margin-top:.1em;float:left;}
 #addServicesDialog .replicationMachineSizeLabel{margin-top:.1em;float:left;}
