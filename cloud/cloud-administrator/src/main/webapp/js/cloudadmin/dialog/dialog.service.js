@@ -112,7 +112,7 @@
                     configurations:[]
                 };
 
-                prepareRequestData(cloudadmin.resource.elements, outData, cloudadmin.dialog.service.idPrefix);
+                getValues(cloudadmin.resource.elements, outData, cloudadmin.dialog.service.idPrefix);
                 if (outData.configurations.length === 0){
                     outData.configurations.push(0);
                 }

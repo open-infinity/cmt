@@ -240,12 +240,10 @@ function handleParametersSelectionChange(item){
     var parametersRow = item.parents(".toggleParametersRow").next();
 
 	if (item.attr("id").indexOf("toggleParametersOff") !==  -1) {
-        //item.parent().next().fadeTo(500, ".5");
         parametersRow.find(":radio").attr("disabled", true).button("refresh");
         parametersRow.fadeTo(500, ".5");
     }
     else{
-        //item.parent().next().fadeTo(500, "1");
         parametersRow.fadeTo(500, "1");
         parametersRow.find(":radio").attr("disabled", false).button("refresh");
     }
@@ -378,7 +376,7 @@ function dimAccordionElements(item){
 	item.find(".ebsSizeRow").css("opacity", ".5");
 }
 
-function prepareRequestData(elements, outData, prefix, accordion){
+function getValues(elements, outData, prefix, accordion){
     for(i = 0; i < elements.length; i++){
         if($('#' + "togglePlatformRadioOn_" + prefix + elements[i].element.id).attr('checked')){
 
@@ -436,9 +434,11 @@ function prepareRequestData(elements, outData, prefix, accordion){
                 }
 
                 // Push placeholder into empty array to make Spring Jackson parser happy
+                /*
                 if (configuration.parameters.keys.length === 0){
                     configuration.parameters.keys.push("-1");
                 }
+                */
             }
             else{
 
