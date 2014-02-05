@@ -61,8 +61,8 @@ public class MainController extends AbstractController{
     @ResourceMapping(GET_ELEMENTS)
     public void getElements(ResourceRequest request, ResourceResponse response, @RequestParam("page") int page, @RequestParam("rows") int rows) throws Exception {
         try {
-            List<ConfigurationElement> templates = (List<ConfigurationElement>)elementService.loadAll();
-            createOnePageResponse(response, templates, page, rows);
+            List<ConfigurationElement> elements = (List<ConfigurationElement>)elementService.loadAll();
+            createOnePageResponse(response, elements, page, rows);
         }
         catch (Exception e) {
             ExceptionUtil.throwSystemException(e);
@@ -109,7 +109,7 @@ public class MainController extends AbstractController{
     }
 
     /*
-     * Slices a subset from list, the result fits into one jqGgrid page.
+     * Slices a subset from list, the result fits into one jqGrid page.
      */
     private <T> void createOnePageResponse(ResourceResponse response, List<T> items, int page, int rows) throws IOException {
         int records = items.size();

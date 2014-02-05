@@ -31,9 +31,7 @@ jQuery(function($) {
 	var cloudadmin = window.cloudadmin || {};
 	
 	// After this, no need to add random at URL end
-	$.ajaxSetup({
-		  cache: false
-		});
+	$.ajaxSetup({cache: false});
 	
 	cloudadmin = {	
 			
@@ -287,40 +285,39 @@ var instanceManager = {
 
 				var instanceId = data.instanceId;
 				
-				instanceManager.createInstanceView(instanceId, tabName);
-				instanceManager.updateInstanceClusters(instanceId);
+				instanceManager.createInstanceView(data, tabName);
+				instanceManager.updateInstanceClusters(data.instanceId);
 			});
 		},
 		
 		// Create the instance view from the template (in instanceview.jsp)
-		createInstanceView: function (instanceId, tabName) {
+		createInstanceView: function (data, tabName) {
 			
-			var $template = $("#instanceviewtemplate").clone(true).attr("id","cloudadmincontent_"+instanceId);
+			var $template = $("#instanceviewtemplate").clone(true).attr("id","cloudadmincontent_"+ data.instanceId);
 			
 			$template.find("*").each(function () {
 				var uusi = this.getAttribute("id");
 				
 				if(uusi) {
-					uusi = uusi + "_" + instanceId;
+					uusi = uusi + "_" + data.instanceId;
 					this.setAttribute("id", uusi);
 				}
 			});
 			
 			// Add services button
 			$template.find(".add-services").button().click(function() {
-				cloudadmin.dialog.addServiceDialog.instanceId = instanceId;
- 				cloudadmin.dialog.addNewService(cloudadmin.dialog.addServiceDialog);
+ 				cloudadmin.dialog.addNewService(data.instanceId, data.cloudType, data.zone);
 			});
 			
 			//  View instance machines button
 			$template.find(".view-machines").button().click(function() {			
-				cloudadmin.dialog.initMachineDialog(instanceId);
+				cloudadmin.dialog.initMachineDialog(data.instanceId);
 				$("#machineListDialog").dialog("open");
 			});
 
 			//  Get instance ssh-key button
 			$template.find(".get-key").button().click(function() {			
-				var url = portletURL.url.instance.getInstanceKeyURL+"&id=" + instanceId;
+				var url = portletURL.url.instance.getInstanceKeyURL+"&id=" + data.instanceId;
 				window.location.href = url;
 			});
 			
@@ -495,7 +492,7 @@ var instanceManager = {
 			for(var i = 1; i < records; i++) {
 				id = $('#instances').jqGrid('getCell',i,'instanceId');
 				if (id != false) {
-					console.log("refreshInstanceStatus id="+id);
+					//console.log("refreshInstanceStatus id="+id);
 					url = portletURL.url.instance.instanceStatusURL + "&instanceId="+id;
 	
 					//console.log("fetching data for instance id : " + id);
@@ -516,7 +513,7 @@ var instanceManager = {
 		
 		// Refresh the instanceview
 		refreshInstanceView: function (instanceId) {
-			 console.log("refreshInstanceView("+instanceId+") called");
+			 //console.log("refreshInstanceView("+instanceId+") called");
 			 instanceManager.updateInstanceClusters(instanceId);
 		},
 		
@@ -562,7 +559,7 @@ var instanceManager = {
 		},
 
 		cloudTypeFmatter: function (cellvalue, options, rowObject) {
-			   console.log("CloudType: " + cellvalue);
+			   //console.log("CloudType: " + cellvalue);
 
 			   if(cellvalue == 0)
 				   return "Amazon";

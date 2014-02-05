@@ -25,6 +25,7 @@
 	</div>
 </div>
 
-<jsp:include page="resource.jsp" />
+<jsp:include page="properties.jsp" />
+<jsp:include page="templates.jsp" />
 <jsp:include page="instanceview.jsp" />
 <jsp:include page="dialogs.jsp" />

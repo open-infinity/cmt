@@ -7,7 +7,7 @@
 		<version>${project.global.version}</version>
 	   	<relativePath>..</relativePath>    		
     </parent>
-    <artifactId>cloud-administrator</artifactId>
+    <artifactId>cloud-administrator-dev</artifactId>
     <packaging>war</packaging>
     <properties>
         <sql.script.path>${project.parent.basedir}/cloud-repository/src/test/resources/sql</sql.script.path>

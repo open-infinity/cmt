@@ -3,6 +3,6 @@
 
 <display>
 	<category name="Open Infinity">
-		<portlet id="cloudadmin" />
+		<portlet id="cloudadmindev" />
 	</category>
 </display>

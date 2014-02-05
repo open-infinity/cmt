@@ -29,6 +29,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Collection;
 
 
@@ -76,6 +77,16 @@ public class ConfigurationElementServiceImpl implements ConfigurationElementServ
     @Log
     public Collection<ConfigurationElement> loadDependees(int elementId) {
         return elementRepository.loadDependees(elementId);
+    }
+
+    @Log
+    public Collection<Integer> loadDependeeIds(int elementId) {
+        Collection<ConfigurationElement> dependees = elementRepository.loadDependees(elementId);
+        Collection<Integer> dependeeIds= new ArrayList<Integer>();
+        for (ConfigurationElement d : dependees ){
+            dependeeIds.add(d.getId());
+        }
+        return dependeeIds;
     }
 
     @Override
