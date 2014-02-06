@@ -15,42 +15,21 @@
  */
 package org.openinfinity.cloud.service.healthmonitoring;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.HttpClient;
 import org.apache.log4j.Logger;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.openinfinity.cloud.domain.AbstractResponse;
-import org.openinfinity.cloud.domain.Cluster;
-import org.openinfinity.cloud.domain.GroupListResponse;
-import org.openinfinity.cloud.domain.HealthStatusResponse;
-import org.openinfinity.cloud.domain.Machine;
-import org.openinfinity.cloud.domain.MetricBoundariesResponse;
-import org.openinfinity.cloud.domain.MetricNamesResponse;
-import org.openinfinity.cloud.domain.MetricTypesResponse;
-import org.openinfinity.cloud.domain.Node;
-import org.openinfinity.cloud.domain.Notification;
-import org.openinfinity.cloud.domain.NodeListResponse;
-import org.openinfinity.cloud.domain.NotificationResponse;
+import org.openinfinity.cloud.domain.*;
 import org.openinfinity.cloud.service.administrator.ClusterService;
 import org.openinfinity.cloud.service.administrator.MachineService;
-import org.openinfinity.cloud.service.healthmonitoring.HealthMonitoringServiceImpl;
-import org.openinfinity.cloud.service.healthmonitoring.Request;
-import org.openinfinity.cloud.service.healthmonitoring.RequestBuilder;
 import org.openinfinity.cloud.util.http.HttpHelper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 
@@ -276,14 +255,27 @@ public class HealthMonitoringServiceImpl implements HealthMonitoringService {
             // FIXME: handling in case that response is of type error
             response = toObject(responseStr, HealthStatusResponse.class);
             
-            LOG.debug("Request for machine "+url);
+            LOG.debug("Request for machine " + url);
         } else {
             response = new HealthStatusResponse();
             response.setResponseStatus(AbstractResponse.STATUS_PARAM_FAIL);
         }
         return response;
     }
-    
+
+    @Override
+    public float getClusterLoad(Machine machine, String[] metricName, String metricType, String period){
+        HealthStatusResponse status = getClusterHealthStatusLast(machine, metricType, metricName, new Date());
+        List<HealthStatusResponse.SingleHealthStatus> metrics = status.getMetrics();
+        if (metrics.size() > 0){
+            Map<String, List<RrdValue>> values = metrics.get(0).getValues();
+            List<RrdValue> loadRrd = values.get(period);
+            if (loadRrd != null){
+                return loadRrd.get(0).getValue().floatValue();
+            }
+        }
+        return -1;
+    }
 
     @Override
     public String getHealthStatus() {

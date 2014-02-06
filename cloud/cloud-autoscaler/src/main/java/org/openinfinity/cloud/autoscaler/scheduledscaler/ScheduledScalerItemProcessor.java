@@ -16,8 +16,6 @@
 
 package org.openinfinity.cloud.autoscaler.scheduledscaler;
 
-import java.sql.Timestamp;
-
 import org.apache.log4j.Logger;
 import org.openinfinity.cloud.domain.Cluster;
 import org.openinfinity.cloud.domain.Instance;
@@ -31,6 +29,8 @@ import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import java.sql.Timestamp;
 
 /**
  * Scheduled scaler batch processor
@@ -52,28 +52,28 @@ public class ScheduledScalerItemProcessor implements ItemProcessor<ScalingRule, 
 	@Autowired
 	InstanceService instanceService;
 	
-	@Value("${deltaPlus}")
-    int deltaPlus;
+	@Value("${sampling.offset.end}")
+    int offsetEnd;
     
-    @Value("${deltaMinus}")
-    int deltaMinus;
+    @Value("${sampling.offset.start}")
+    int offsetStart;
     
 	@Override
 	public Job process(ScalingRule scalingRule) throws Exception {
 	    Timestamp periodFrom = scalingRule.getPeriodFrom();
 		Timestamp periodTo = scalingRule.getPeriodTo();
 		long now = System.currentTimeMillis();	
-		Timestamp windowStart = new Timestamp(now - deltaMinus );
-		Timestamp windowEnd = new Timestamp(now + deltaPlus); 
+		Timestamp samplingPeriodStart = new Timestamp(now - offsetStart );
+		Timestamp samplingPeriodEnd = new Timestamp(now + offsetEnd); 
 	
 	    LOG.debug(Integer.toString(scalingRule.getClusterId()));
    	    LOG.debug("state="+scalingRule.getScheduledScalingState());
    	    LOG.debug("now=" + (new Timestamp(now)).toString());
-	    LOG.debug("deltaMinus=" + Integer.toString(deltaMinus));
-	    LOG.debug("deltaPlus=" + Integer.toString(deltaPlus));
+	    LOG.debug("offsetStart=" + Integer.toString(offsetStart));
+	    LOG.debug("offsetEnd=" + Integer.toString(offsetEnd));
 
-	    LOG.debug("windowStart=" + windowStart.toString());
-  	    LOG.debug("windowEnd=" + windowEnd.toString());
+	    LOG.debug("samplingPeriodStart=" + samplingPeriodStart.toString());
+  	    LOG.debug("samplingPeriodEnd=" + samplingPeriodEnd.toString());
    	    LOG.debug("periodFrom=" + periodFrom.toString());
   	    LOG.debug("periodTo=" + periodTo.toString());
 
@@ -84,12 +84,12 @@ public class ScheduledScalerItemProcessor implements ItemProcessor<ScalingRule, 
 			job = null;
 
 			
-		} else if (windowStart.before(periodFrom) && windowEnd.after(periodFrom) && scalingRule.getScheduledScalingState() == 1){
+		} else if (samplingPeriodStart.before(periodFrom) && samplingPeriodEnd.after(periodFrom) && scalingRule.getScheduledScalingState() == 1){
 			job = createJob(scalingRule, cluster, scalingRule.getClusterSizeNew());
 			scalingRuleService.storeScalingOutParameters(cluster.getNumberOfMachines(), scalingRule.getClusterId());
-		} else if ((windowStart.before(periodTo) && windowEnd.after(periodTo)
-				&& windowStart.after(periodFrom) && scalingRule.getScheduledScalingState() == 0)
-				|| (windowStart.before(periodFrom) && windowEnd.after(periodTo))) {
+		} else if ((samplingPeriodStart.before(periodTo) && samplingPeriodEnd.after(periodTo)
+				&& samplingPeriodStart.after(periodFrom) && scalingRule.getScheduledScalingState() == 0)
+				|| (samplingPeriodStart.before(periodFrom) && samplingPeriodEnd.after(periodTo))) {
 			job = createJob(scalingRule, cluster, scalingRule.getClusterSizeOriginal());
 			scalingRuleService.storeScalingInParameters(scalingRule.getClusterId());			
 		} else {

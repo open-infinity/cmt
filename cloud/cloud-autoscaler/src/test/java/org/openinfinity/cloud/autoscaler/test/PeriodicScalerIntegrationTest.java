@@ -16,28 +16,11 @@
 
 package org.openinfinity.cloud.autoscaler.test;
 
-import static org.mockito.Mockito.when;
-
-import java.sql.Timestamp;
-
-import javax.sql.DataSource;
-
 import junit.framework.Assert;
-
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.test.JobLauncherTestUtils;
-import org.mockito.InjectMocks;
-import org.mockito.Matchers;
-import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.openinfinity.cloud.autoscaler.scheduledscaler.ScheduledScalerItemProcessor;
 import org.openinfinity.cloud.autoscaler.test.util.DatabaseUtils;
@@ -45,8 +28,17 @@ import org.openinfinity.cloud.autoscaler.test.util.HttpGateway;
 import org.openinfinity.cloud.domain.ScalingRule;
 import org.openinfinity.cloud.service.administrator.ClusterService;
 import org.openinfinity.cloud.service.administrator.JobService;
-import org.openinfinity.cloud.service.healthmonitoring.HealthMonitoringService;
 import org.openinfinity.cloud.service.scaling.ScalingRuleService;
+import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.test.JobLauncherTestUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import javax.sql.DataSource;
+import java.sql.Timestamp;
 
 /**
  * Integration tests for Periodic scaler.

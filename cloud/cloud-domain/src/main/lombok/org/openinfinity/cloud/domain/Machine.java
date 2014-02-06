@@ -22,6 +22,7 @@ import lombok.Data;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.NoArgsConstructor;
+import lombok.EqualsAndHashCode;
 
 import org.openinfinity.core.annotation.NotScript;
 
@@ -39,6 +40,7 @@ import org.openinfinity.core.annotation.NotScript;
 @Data
 @RequiredArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode(of={"id"})
 public class Machine implements Serializable {
 	
 	@NotScript	

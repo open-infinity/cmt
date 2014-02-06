@@ -17,34 +17,24 @@
 package org.openinfinity.cloud.autoscaler.periodicscaler;
 
 import org.apache.log4j.Logger;
-import org.codehaus.jackson.JsonParseException;
-import org.codehaus.jackson.map.JsonMappingException;
+import org.openinfinity.cloud.autoscaler.notifier.Notifier;
 import org.openinfinity.cloud.domain.*;
-import org.openinfinity.cloud.domain.HealthStatusResponse.SingleHealthStatus;
 import org.openinfinity.cloud.service.administrator.ClusterService;
 import org.openinfinity.cloud.service.administrator.InstanceService;
 import org.openinfinity.cloud.service.administrator.JobService;
-import org.openinfinity.cloud.service.administrator.MachineService;
 import org.openinfinity.cloud.service.healthmonitoring.HealthMonitoringService;
 import org.openinfinity.cloud.service.scaling.Enumerations.ClusterScalingState;
 import org.openinfinity.cloud.service.scaling.ScalingRuleService;
-import org.openinfinity.core.exception.SystemException;
-import org.openinfinity.core.util.ExceptionUtil;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.io.IOException;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Batch processor for verifying the scaling rules.
  * 
  * @author Ilkka Leinonen
  * @author Vedran Bartonicek
- * @version 1.3.0
+ * @version 1.2.2
  * @since 1.2.0
  */
 @Component("periodicScalerItemProcessor")
@@ -60,9 +50,6 @@ public class PeriodicScalerItemProcessor implements ItemProcessor<Machine, Job> 
 	private static final String METRIC_PERIOD = "shortterm";
 			
 	@Autowired
-	MachineService machineService;
-	
-	@Autowired
 	InstanceService instanceService;
 	
 	@Autowired 
@@ -73,18 +60,67 @@ public class PeriodicScalerItemProcessor implements ItemProcessor<Machine, Job> 
 		
 	@Autowired
 	HealthMonitoringService healthMonitoringService;
+
+    @Autowired
+    Notifier notifier;
 	
 	@Override
-	public Job process(Machine machine) throws Exception {
-		try {
-			return applyScalingRule(machine);
-		}
-		catch(SystemException e){
-		    ExceptionUtil.throwBusinessViolationException(e.getMessage(), e);
-			return null;
-		}			
-	}
-	
+	public Job process(Machine machine){
+        Job job = null;
+        int clusterId = machine.getClusterId();
+        ScalingRule rule = scalingRuleService.getRule(clusterId);
+        if (rule.isPeriodicScalingOn() == false){
+            return null;
+        }
+        Cluster cluster = clusterService.getCluster(clusterId);
+        String[] metricName = {METRIC_RRD_FILE_LOAD};
+        float load = healthMonitoringService.getClusterLoad(machine, metricName, METRIC_TYPE_LOAD, METRIC_PERIOD);
+        LOG.debug("load = " + load);
+        if (load == -1){
+            return null;
+        }
+
+        ClusterScalingState state = scalingRuleService.calculateScalingState(rule, load, clusterId);
+        switch (state) {
+            case REQUIRES_SCALING_OUT:
+                return createJob(machine, cluster, 1);
+            case REQUIRES_SCALING_IN:
+                return createJob(machine, cluster, -1);
+            case REQUIRED_SCALING_IS_NOT_POSSIBLE:
+                LOG.info("Cluster scaling failed. System load [" + load + "%] for cluster [" + clusterId + "] is too high, but cluster maximum size limit has been reached.");
+                if (notifier == null){
+                    LOG.info("Null notifier");
+                }
+                if (cluster == null){
+                    LOG.info("Null cluster");
+                }
+                LOG.info("notifier" + notifier.toString());
+                LOG.info("args:" + clusterId);
+                LOG.info("args:" + cluster.getInstanceId());
+                LOG.info("args:" + load);
+                notifier.notifyClusterScalingFailed(clusterId, cluster.getInstanceId(), load);
+            case SCALING_DISABLED:
+            case SCALING_SKIPPED:
+            case REQUIRES_NO_SCALING:
+            default:
+                break;
+        }
+        //return null;
+
+        /*
+        catch(EmptyResultDataAccessException e){
+            ExceptionUtil.throwSystemException(e.getMessage(), e);
+        }
+
+        catch (RuntimeException e) {
+            ExceptionUtil.throwBusinessViolationException(e.getMessage(), e);
+        }
+        */
+
+        return job;
+    }
+
+    /*
 	private Job applyScalingRule(Machine machine) throws IOException{
         int clusterId = machine.getClusterId();
 	    ScalingRule rule = null; 
@@ -127,14 +163,13 @@ public class PeriodicScalerItemProcessor implements ItemProcessor<Machine, Job> 
         }
         return null;
     }
-	
-	private float getClusterLoad(Machine machine) throws IOException, IndexOutOfBoundsException,  
-	    JsonParseException, JsonMappingException, SystemException {  
+	*/
+
+    /*
+	private float getClusterLoad(Machine machine){
 		String[] metricName = {METRIC_RRD_FILE_LOAD};
-		
-		HealthStatusResponse status = healthMonitoringService.getClusterHealthStatusLast(machine, METRIC_TYPE_LOAD, metricName, new Date());		
+		HealthStatusResponse status = healthMonitoringService.getClusterHealthStatusLast(machine, METRIC_TYPE_LOAD, metricName, new Date());
 		List<SingleHealthStatus> metrics = status.getMetrics();
-		LOG.debug("metrics len " + metrics.size());
         if (metrics.size() > 0){
 	        Map<String, List<RrdValue>> values = metrics.get(0).getValues();
 	        List<RrdValue> loadRrd = values.get(METRIC_PERIOD);
@@ -142,9 +177,9 @@ public class PeriodicScalerItemProcessor implements ItemProcessor<Machine, Job> 
     	        return loadRrd.get(0).getValue().floatValue();
 	        }
         }
-        LOG.info(MSG_HM_METRIC_NOT_AVAILABLE);
         return -1;
 	}
+	*/
 	
 	private Job createJob(Machine machine, Cluster cluster, int machinesGrowth) {
         Instance instance = instanceService.getInstance(cluster.getInstanceId());

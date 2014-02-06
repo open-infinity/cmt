@@ -16,20 +16,10 @@
 
 package org.openinfinity.cloud.autoscaler.test;
 
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.*;
-
-import java.sql.Timestamp;
-
 import junit.framework.Assert;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -41,6 +31,15 @@ import org.openinfinity.cloud.domain.ScalingRule;
 import org.openinfinity.cloud.service.administrator.ClusterService;
 import org.openinfinity.cloud.service.administrator.InstanceService;
 import org.openinfinity.cloud.service.scaling.ScalingRuleService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import java.sql.Timestamp;
+
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for Scheduled scaler.
@@ -71,10 +70,10 @@ public class ScheduledScalerUnitTest {
 	@Mock
 	ScalingRule mockScalingRule;
 
-	@Value("${deltaPlus}")
+	@Value("${sampling.offset.end}")
     int deltaPlus;
     
-    @Value("${deltaMinus}")
+    @Value("${sampling.offset.start}")
     int deltaMinus;
     
 	@Before

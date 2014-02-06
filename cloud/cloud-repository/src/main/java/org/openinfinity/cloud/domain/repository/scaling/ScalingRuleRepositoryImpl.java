@@ -20,7 +20,6 @@ import org.openinfinity.cloud.domain.ScalingRule;
 import org.openinfinity.core.annotation.AuditTrail;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.core.RowMapper;
@@ -171,11 +170,7 @@ public class ScalingRuleRepositoryImpl implements ScalingRuleRepository {
 
 	@AuditTrail
 	public ScalingRule getRule(int clusterId) {
-	    try {
-	    	return jdbcTemplate.queryForObject(LOAD_BY_CLUSTER_ID, new Object[]{clusterId}, scalingRuleRowMapper);
-	    } catch (EmptyResultDataAccessException dae) {
-	    	return null;
-	    }
+	    return jdbcTemplate.queryForObject(LOAD_BY_CLUSTER_ID, new Object[]{clusterId}, scalingRuleRowMapper);
 	}
 
 	@AuditTrail

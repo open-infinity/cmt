@@ -7,13 +7,13 @@
 	xmlns:p="http://www.springframework.org/schema/p"
 	xsi:schemaLocation="
 		http://www.springframework.org/schema/beans
-		http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
 		http://www.springframework.org/schema/context
-		http://www.springframework.org/schema/context/spring-context-3.0.xsd
+		http://www.springframework.org/schema/context/spring-context-3.1.xsd
 		http://www.springframework.org/schema/batch
 		http://www.springframework.org/schema/batch/spring-batch-2.2.xsd
         http://www.springframework.org/schema/task
-        http://www.springframework.org/schema/task/spring-task-3.0.xsd">
+        http://www.springframework.org/schema/task/spring-task-3.1.xsd">
        
     <context:property-placeholder location="
         classpath*:/META-INF/properties/system.properties,
@@ -92,6 +92,29 @@
 			</batch:tasklet>
 		</batch:step>
 	</batch:job>
+
+    <bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+        <property name="host">
+            <value>${email.host}</value>
+        </property>
+    </bean>
+
+    <bean id="templateMessage" class="org.springframework.mail.SimpleMailMessage">
+        <property name="from">
+            <value>${email.from}</value>
+        </property>
+        <property name="to">
+            <value>${email.to}</value>
+        </property>
+        <property name="subject">
+            <value>"Autoscaler notification"</value>
+        </property>
+    </bean>
+
+    <bean id="notifier" class="org.openinfinity.cloud.autoscaler.notifier.EmailNotifier">
+        <property name="mailSender" ref="mailSender"/>
+        <property name="templateMessage" ref="templateMessage"/>
+    </bean>
 	
 	<task:scheduled-tasks>  
 	    <task:scheduled ref="scheduledScalerLauncher" method="launch" cron="0 0/2 * * * ?"/>    

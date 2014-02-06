@@ -15,17 +15,10 @@
  */
 package org.openinfinity.cloud.service.healthmonitoring;
 
+import org.openinfinity.cloud.domain.*;
+
 import java.util.Date;
 import java.util.Map;
-
-import org.openinfinity.cloud.domain.GroupListResponse;
-import org.openinfinity.cloud.domain.HealthStatusResponse;
-import org.openinfinity.cloud.domain.Machine;
-import org.openinfinity.cloud.domain.MetricBoundariesResponse;
-import org.openinfinity.cloud.domain.MetricNamesResponse;
-import org.openinfinity.cloud.domain.MetricTypesResponse;
-import org.openinfinity.cloud.domain.NodeListResponse;
-import org.openinfinity.cloud.domain.NotificationResponse;
 
 /**
  * 
@@ -52,15 +45,14 @@ public interface HealthMonitoringService {
      * @param endTime     Period end date-time.
      * @return {@link HealthStatusResponse}.
      */
-    HealthStatusResponse getHealthStatus(String hostName, String sourceType, String metricType, String[] metricNames,
-                                         Date startTime, Date endTime);
+    HealthStatusResponse getHealthStatus(String hostName, String sourceType, String metricType, String[] metricNames, Date startTime, Date endTime);
 
-    HealthStatusResponse getClusterHealthStatus(Machine machine, String metricType,
-            String[] metricNames, Date date);
+    HealthStatusResponse getClusterHealthStatus(Machine machine, String metricType, String[] metricNames, Date date);
     
-    HealthStatusResponse getClusterHealthStatusLast(Machine machine, String metricType,
-            String[] metricNames, Date date);
-    
+    HealthStatusResponse getClusterHealthStatusLast(Machine machine, String metricType, String[] metricNames, Date date);
+
+    float getClusterLoad(Machine machine, String[] metricName, String metricType, String period);
+
     String getHealthStatus();
 
     /**
