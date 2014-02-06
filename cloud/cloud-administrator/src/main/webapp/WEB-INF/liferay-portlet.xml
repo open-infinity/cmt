@@ -3,7 +3,7 @@
 
 <liferay-portlet-app>
 	<portlet>
-		<portlet-name>cloudadmindev</portlet-name>
+		<portlet-name>cloudadmin</portlet-name>
 		<icon>/icon.png</icon>
 		<instanceable>true</instanceable>
 		<header-portlet-css>/css/cloudadmin.css</header-portlet-css>

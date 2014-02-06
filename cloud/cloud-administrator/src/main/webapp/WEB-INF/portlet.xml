@@ -7,8 +7,8 @@
 	xsi:schemaLocation="http://java.sun.com/xml/ns/portlet/portlet-app_2_0.xsd http://java.sun.com/xml/ns/portlet/portlet-app_2_0.xsd"
 >
 	<portlet>
-		<portlet-name>cloudadmindev</portlet-name>
-		<display-name>cloudadmindev</display-name>
+		<portlet-name>cloudadmin</portlet-name>
+		<display-name>cloudadmin</display-name>
 		<portlet-class>org.springframework.web.portlet.DispatcherPortlet</portlet-class>
 		
 		<supports>
@@ -18,12 +18,12 @@
 		</supports>
 		
 		<supported-locale>en</supported-locale>
-		<resource-bundle>cloudadmindev</resource-bundle>
+		<resource-bundle>cloudadmin</resource-bundle>
 		
 		<portlet-info>
-			<title>CloudAdminDev</title>
-			<short-title>CloudAdminDev</short-title>
-			<keywords>cloudadmindev</keywords>
+			<title>CloudAdmin</title>
+			<short-title>CloudAdmin</short-title>
+			<keywords>cloudadmin</keywords>
 		</portlet-info>
 		
 		<portlet-preferences>
