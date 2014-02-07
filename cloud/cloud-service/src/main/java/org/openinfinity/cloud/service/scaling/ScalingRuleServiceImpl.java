@@ -16,20 +16,21 @@
 
 package org.openinfinity.cloud.service.scaling;
 
-import java.util.Collection;
-
 import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.openinfinity.cloud.domain.Job;
 import org.openinfinity.cloud.domain.ScalingRule;
-import org.openinfinity.cloud.service.scaling.Enumerations.ClusterScalingState;
 import org.openinfinity.cloud.domain.repository.scaling.ScalingRuleRepository;
 import org.openinfinity.cloud.service.administrator.ClusterService;
 import org.openinfinity.cloud.service.administrator.JobService;
 import org.openinfinity.cloud.service.administrator.MachineService;
+import org.openinfinity.cloud.service.scaling.Enumerations.ClusterScalingState;
 import org.openinfinity.core.exception.BusinessViolationException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Collection;
 
 /**
  * Service interface implementation of the automated provisioning business
@@ -132,12 +133,14 @@ public class ScalingRuleServiceImpl implements ScalingRuleService {
 	 */
 	@Transactional
 	public void store(ScalingRule newScalingRule) {
-		ScalingRule scalingRule = scalingRuleRepository.getRule(newScalingRule.getClusterId());
-		if (scalingRule != null) {
-			scalingRuleRepository.updateExisting(newScalingRule);
-		} else {
-			scalingRuleRepository.addNew(newScalingRule);
-		}
+        try{
+            // If rule exists update it, otherwise this throws EmptyResultDataAccessException
+            scalingRuleRepository.getRule(newScalingRule.getClusterId());
+            scalingRuleRepository.updateExisting(newScalingRule);
+        }
+        catch (EmptyResultDataAccessException e){
+            scalingRuleRepository.addNew(newScalingRule);
+        }
 	}
 
     public void delete(int clusterId){
