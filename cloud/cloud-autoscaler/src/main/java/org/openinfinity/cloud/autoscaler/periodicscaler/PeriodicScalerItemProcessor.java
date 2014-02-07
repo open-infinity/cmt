@@ -17,7 +17,9 @@
 package org.openinfinity.cloud.autoscaler.periodicscaler;
 
 import org.apache.log4j.Logger;
+import org.openinfinity.cloud.autoscaler.common.ScalingData;
 import org.openinfinity.cloud.autoscaler.notifier.Notifier;
+import org.openinfinity.cloud.autoscaler.notifier.Notifier.NotificationType;
 import org.openinfinity.cloud.domain.*;
 import org.openinfinity.cloud.service.administrator.ClusterService;
 import org.openinfinity.cloud.service.administrator.InstanceService;
@@ -27,10 +29,14 @@ import org.openinfinity.cloud.service.scaling.Enumerations.ClusterScalingState;
 import org.openinfinity.cloud.service.scaling.ScalingRuleService;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
- * Batch processor for verifying the scaling rules.
+ * Batch processor for periodic autoscaler
  * 
  * @author Ilkka Leinonen
  * @author Vedran Bartonicek
@@ -39,16 +45,26 @@ import org.springframework.stereotype.Component;
  */
 @Component("periodicScalerItemProcessor")
 public class PeriodicScalerItemProcessor implements ItemProcessor<Machine, Job> {
+
 	private static final Logger LOG = Logger.getLogger(PeriodicScalerItemProcessor.class.getName());
 
-	private static final String MSG_HM_METRIC_NOT_AVAILABLE = "Requested metric is not available";
-	
 	private static final String METRIC_RRD_FILE_LOAD = "load-relative.rrd";
 	
 	private static final String METRIC_TYPE_LOAD = "load";
 	
 	private static final String METRIC_PERIOD = "shortterm";
-			
+
+    /**
+     * Maps cluster id (group id) to number of successive failures to get group load from rrd-http server
+     */
+    private Map<Integer, Integer> failureMap;
+
+    /**
+     * Specifies number of tolerated successive failures to get group load.
+     */
+    @Value("${http.attempts.threshold}")
+    int httpAttemptsThreshold;
+
 	@Autowired
 	InstanceService instanceService;
 	
@@ -63,31 +79,64 @@ public class PeriodicScalerItemProcessor implements ItemProcessor<Machine, Job> 
 
     @Autowired
     Notifier notifier;
-	
+
+    PeriodicScalerItemProcessor(){
+        LOG.info("Constructing PeriodicScalerItemProcessor");
+        failureMap = new HashMap<Integer, Integer>();
+    }
+
 	@Override
 	public Job process(Machine machine){
         Job job = null;
+
+        // Get cluster for machine
         int clusterId = machine.getClusterId();
         ScalingRule rule = scalingRuleService.getRule(clusterId);
         if (rule.isPeriodicScalingOn() == false){
             return null;
         }
         Cluster cluster = clusterService.getCluster(clusterId);
+
+        // Get number of successive failures to get a group load
+        boolean keyExists = failureMap.containsKey(clusterId);
+        int failures = 0;
+        if (keyExists == true){
+            failures = failureMap.get(clusterId);
+        }
+
+
+        // Handle group load result
+
+        // Get group load from http-rrd server
         String[] metricName = {METRIC_RRD_FILE_LOAD};
         float load = healthMonitoringService.getClusterLoad(machine, metricName, METRIC_TYPE_LOAD, METRIC_PERIOD);
-        LOG.debug("load = " + load);
+
+        // Load not received. Return null job and send notification if necessary
         if (load == -1){
+            failureMap.put(clusterId, ++failures);
+            if (failures == httpAttemptsThreshold){
+                notifier.notify(new ScalingData(failures, cluster), NotificationType.LOAD_FETCHING_FAILED);
+            }
             return null;
         }
 
-        ClusterScalingState state = scalingRuleService.calculateScalingState(rule, load, clusterId);
+        // Load received. Clear entry in failureMap for clusterId
+        else if (failures > 0){
+            failureMap.put(clusterId, 0);
+        }
+
+        LOG.debug("load = " + load);
+        LOG.debug("failures for clusterId = " + failureMap.get(clusterId));
+
+        // Apply scaling rule on cluster with given load.
+        // Autoscaler takes actions depending on returned ClusterScalingState.
+        ClusterScalingState state = scalingRuleService.applyScalingRule(load, clusterId, rule);
         switch (state) {
             case REQUIRES_SCALING_OUT:
                 return createJob(machine, cluster, 1);
             case REQUIRES_SCALING_IN:
                 return createJob(machine, cluster, -1);
             case REQUIRED_SCALING_IS_NOT_POSSIBLE:
-                LOG.info("Cluster scaling failed. System load [" + load + "%] for cluster [" + clusterId + "] is too high, but cluster maximum size limit has been reached.");
                 if (notifier == null){
                     LOG.info("Null notifier");
                 }
@@ -98,89 +147,15 @@ public class PeriodicScalerItemProcessor implements ItemProcessor<Machine, Job> 
                 LOG.info("args:" + clusterId);
                 LOG.info("args:" + cluster.getInstanceId());
                 LOG.info("args:" + load);
-                notifier.notifyClusterScalingFailed(clusterId, cluster.getInstanceId(), load);
-            case SCALING_DISABLED:
+                notifier.notify(new ScalingData(load, cluster, rule), NotificationType.SCALING_FAILED);
             case SCALING_SKIPPED:
             case REQUIRES_NO_SCALING:
             default:
                 break;
         }
-        //return null;
-
-        /*
-        catch(EmptyResultDataAccessException e){
-            ExceptionUtil.throwSystemException(e.getMessage(), e);
-        }
-
-        catch (RuntimeException e) {
-            ExceptionUtil.throwBusinessViolationException(e.getMessage(), e);
-        }
-        */
-
         return job;
     }
 
-    /*
-	private Job applyScalingRule(Machine machine) throws IOException{
-        int clusterId = machine.getClusterId();
-	    ScalingRule rule = null; 
-        Cluster cluster = null;
-	    try{
-            rule = scalingRuleService.getRule(clusterId);
-            if (rule == null) return null;
-            else if (rule.isPeriodicScalingOn() == false) return null;
-            else cluster = clusterService.getCluster(clusterId);
-        }
-        catch(Exception e){
-            if (rule == null){ 
-            	LOG.info("Rule not defined for cluster " + clusterId);
-            }
-            else if (cluster == null) {
-            	LOG.error("Cluster " + clusterId + " fetching failed.");
-            }
-            return null;
-        }
-        float load = getClusterLoad(machine);
-        LOG.debug("load = " + load);
-        if (load == -1) return null;
-
-        ClusterScalingState state = scalingRuleService.calculateScalingState(rule, load, clusterId);
-        switch (state) {
-            case REQUIRES_SCALING_OUT: 
-                return createJob(machine, cluster, 1);
-            case REQUIRES_SCALING_IN:  
-                return createJob(machine, cluster, -1);
-            case REQUIRED_SCALING_IS_NOT_POSSIBLE: 
-                ExceptionUtil.throwSystemException(
-                     "Cluster scaling failed. System load [" + load + "%] " +
-                     "for cluster [" + clusterId + "] is + too high, but " +
-                     "cluster maximum limit has been reached.");
-            case SCALING_DISABLED: 
-            case SCALING_SKIPPED:
-            case REQUIRES_NO_SCALING:
-        default:
-            break;
-        }
-        return null;
-    }
-	*/
-
-    /*
-	private float getClusterLoad(Machine machine){
-		String[] metricName = {METRIC_RRD_FILE_LOAD};
-		HealthStatusResponse status = healthMonitoringService.getClusterHealthStatusLast(machine, METRIC_TYPE_LOAD, metricName, new Date());
-		List<SingleHealthStatus> metrics = status.getMetrics();
-        if (metrics.size() > 0){
-	        Map<String, List<RrdValue>> values = metrics.get(0).getValues();
-	        List<RrdValue> loadRrd = values.get(METRIC_PERIOD);
-	        if (loadRrd != null){        
-    	        return loadRrd.get(0).getValue().floatValue();
-	        }
-        }
-        return -1;
-	}
-	*/
-	
 	private Job createJob(Machine machine, Cluster cluster, int machinesGrowth) {
         Instance instance = instanceService.getInstance(cluster.getInstanceId());
 		return new Job("scale_cluster",

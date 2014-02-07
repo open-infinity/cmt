@@ -242,20 +242,31 @@ public class HealthMonitoringServiceImpl implements HealthMonitoringService {
         return response;
     }
     
- // FIXME: this function needs refactoring  - there is lot of repeating code around.
     @Override
-    public HealthStatusResponse getClusterHealthStatusLast(Machine machine, String metricType, String[] metricNames, Date date) {
+    public HealthStatusResponse getLatestAvalibaleClusterHealthStatus(Machine machine, String metricType, String[] metricNames, Date date) {
         HealthStatusResponse response = null;
-        if (StringUtils.isNotBlank(metricType) && ArrayUtils.isNotEmpty(metricNames) && machine != null) { 
+
+        // Validate input parameters
+        if (StringUtils.isNotBlank(metricType) && ArrayUtils.isNotEmpty(metricNames) && machine != null && machine.getClusterId() > 0) {
+
+            // Form request
             String groupName = HM_GROUPNAME_PREFIX + machine.getClusterId();
-            String url = getRequestBuilder(machine.getDnsName()).buildLastHealthStatusRequest(
-                new Request(groupName, Request.SOURCE_GROUP, metricType, metricNames, date, date, RRA_STEP));
-            String responseStr = HttpHelper.executeHttpRequest(client, url);
-            
-            // FIXME: handling in case that response is of type error
-            response = toObject(responseStr, HealthStatusResponse.class);
-            
+            String url = getRequestBuilder(machine.getDnsName()).buildLastHealthStatusRequest( new Request(groupName, Request.SOURCE_GROUP, metricType, metricNames, date, date, RRA_STEP));
             LOG.debug("Request for machine " + url);
+
+            // Execute request
+            String responseStr = HttpHelper.executeHttpRequest(client, url);
+
+            // Handle response
+            if (responseStr == null) {
+                response = new HealthStatusResponse();
+                response.setResponseStatus(AbstractResponse.STATUS_NODE_FAIL);
+            }
+            else {
+                response = toObject(responseStr, HealthStatusResponse.class);
+                response.setResponseStatus(AbstractResponse.STATUS_OK);
+            }
+
         } else {
             response = new HealthStatusResponse();
             response.setResponseStatus(AbstractResponse.STATUS_PARAM_FAIL);
@@ -265,15 +276,23 @@ public class HealthMonitoringServiceImpl implements HealthMonitoringService {
 
     @Override
     public float getClusterLoad(Machine machine, String[] metricName, String metricType, String period){
-        HealthStatusResponse status = getClusterHealthStatusLast(machine, metricType, metricName, new Date());
-        List<HealthStatusResponse.SingleHealthStatus> metrics = status.getMetrics();
-        if (metrics.size() > 0){
-            Map<String, List<RrdValue>> values = metrics.get(0).getValues();
-            List<RrdValue> loadRrd = values.get(period);
-            if (loadRrd != null){
-                return loadRrd.get(0).getValue().floatValue();
+
+        // Ask for Group health status from http-rrd server
+        HealthStatusResponse response = getLatestAvalibaleClusterHealthStatus(machine, metricType, metricName, new Date());
+
+        // If response status is OK, extract load
+        if (response.getResponseStatus() == AbstractResponse.STATUS_OK){
+            List<HealthStatusResponse.SingleHealthStatus> metrics = response.getMetrics();
+            if (metrics.size() > 0){
+                Map<String, List<RrdValue>> values = metrics.get(0).getValues();
+                List<RrdValue> loadRrd = values.get(period);
+                if (loadRrd != null){
+                    return loadRrd.get(0).getValue().floatValue();
+                }
             }
         }
+
+        // Load not available
         return -1;
     }
 

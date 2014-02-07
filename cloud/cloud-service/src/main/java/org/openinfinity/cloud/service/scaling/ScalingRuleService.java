@@ -16,10 +16,10 @@
 
 package org.openinfinity.cloud.service.scaling;
 
-import java.util.Collection;
-
 import org.openinfinity.cloud.domain.ScalingRule;
 import org.openinfinity.cloud.service.scaling.Enumerations.ClusterScalingState;
+
+import java.util.Collection;
 
 /**
  * Service interface for automated provisioning business rules.
@@ -34,7 +34,7 @@ public interface ScalingRuleService {
 	/**
 	 * Calculates scaling balance state 
 	 */
-	ClusterScalingState calculateScalingState(ScalingRule rule, float load, int clusterId);
+    ClusterScalingState applyScalingRule(float load, int clusterId,	ScalingRule rule);
 	
 	/**
 	 * Stores the scaling rule into a repository.

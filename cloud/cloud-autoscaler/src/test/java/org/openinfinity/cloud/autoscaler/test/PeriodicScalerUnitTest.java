@@ -67,53 +67,103 @@ public class PeriodicScalerUnitTest {
 		MockitoAnnotations.initMocks(this);
 	}
 
+    /**
+     * Test situation when scaling out is needed, but not possible
+     *
+     * When load for cluster is available, and automatic (periodic) scaling is turned on,
+     * and maxim cluster size is reached,
+     * then send notification email,
+     * and don't scale the cluster.
+     *
+     * @throws Exception
+     */
 	@Test
 	public void sendEmailTest() throws Exception {
+
         Machine machine = new Machine();
         machine.setClusterId(1);
         machine.setId(1);
-
         ScalingRule rule = new ScalingRule();
         rule.setPeriodicScalingOn(true);
+        rule.setMaxLoad((float)0.9);
         Cluster cluster = new Cluster();
         cluster.setInstanceId(1);
-
         String[] metricName = {"load-relative.rrd"};
         String period = "shortterm";
 
+        // When load for cluster is available
         when(mockClusterService.getCluster(1)).thenReturn(cluster);
         when(mockHealthMonitoringService.getClusterLoad(machine, metricName, "load", period)).thenReturn((float) 1);
+
+        // and automatic (periodic) scaling is turned on...
 		when(mockScalingRuleService.getRule(1)).thenReturn(rule);
-        when(mockScalingRuleService.calculateScalingState(rule, 1, 1)).thenReturn(Enumerations.ClusterScalingState.REQUIRED_SCALING_IS_NOT_POSSIBLE);
-		Assert.assertNull(itemProcessor.process(machine));
+
+        // and maxim cluster size is reached...
+        when(mockScalingRuleService.applyScalingRule(1, 1, rule)).thenReturn(Enumerations.ClusterScalingState.REQUIRED_SCALING_IS_NOT_POSSIBLE);
+
+        // then send notification email...
+        // TODO: how to test?
+        // (How to check if email was sent? At least "org.springframework.mail.MailException" would be thrown if something goes wrong.)
+
+        // and don't scale the cluster.
+        Assert.assertNull(itemProcessor.process(machine));
 	}
 
+
+    /**
+     * Test situations when load is not available from the cluster
+     *
+     * When load for cluster is not available, and automatic (periodic) scaling is turned on,
+     * and number of past attempts equals threshold,
+     * then send notification email,
+     * and don't scale the cluster.
+     *
+     * @throws Exception
+     */
     @Test
     public void loadNotAvailableTest() throws Exception {
         Machine machine = new Machine();
         machine.setClusterId(1);
         machine.setId(1);
-
         ScalingRule rule = new ScalingRule();
         rule.setPeriodicScalingOn(true);
         Cluster cluster = new Cluster();
         cluster.setInstanceId(1);
-
         String[] metricName = {"load-relative.rrd"};
         String period = "shortterm";
 
+        // When load for cluster is not available,
         when(mockClusterService.getCluster(1)).thenReturn(cluster);
         when(mockHealthMonitoringService.getClusterLoad(machine, metricName, "load", period)).thenReturn((float) -1);
+
+        // and automatic (periodic) scaling is turned on,
+        when(mockScalingRuleService.getRule(1)).thenReturn(rule);
+
+        // then send notification email,
+        // TODO: how to test?
+
+        // and don't scale the cluster.
         Assert.assertNull(itemProcessor.process(machine));
     }
 
+    /**
+     * Test situations when periodic autoscaling is turned off
+     *
+     * When Periodic autoscaling is turned off,
+     * then don't scale the cluster.
+     *
+     * @throws Exception
+     */
     @Test
     public void periodicScalingNotOnTest() throws Exception {
         Machine machine = new Machine();
         machine.setClusterId(2);
         ScalingRule rule = new ScalingRule();
         rule.setPeriodicScalingOn(false);
+
+        // When Periodic autoscaling is turned off,
         when(mockScalingRuleService.getRule(2)).thenReturn(rule);
+        // then don't scale the cluster
         Assert.assertNull(itemProcessor.process(machine));
     }
 

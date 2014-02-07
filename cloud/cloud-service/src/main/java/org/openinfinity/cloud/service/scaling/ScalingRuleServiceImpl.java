@@ -24,7 +24,6 @@ import org.openinfinity.cloud.service.administrator.ClusterService;
 import org.openinfinity.cloud.service.administrator.JobService;
 import org.openinfinity.cloud.service.administrator.MachineService;
 import org.openinfinity.cloud.service.scaling.Enumerations.ClusterScalingState;
-import org.openinfinity.core.exception.BusinessViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
@@ -44,8 +43,7 @@ import java.util.Collection;
 @Service("scalingRuleService")
 public class ScalingRuleServiceImpl implements ScalingRuleService {
 
-	private static final Logger LOG = Logger
-			.getLogger(ScalingRuleServiceImpl.class.getName());
+	private static final Logger LOG = Logger.getLogger(ScalingRuleServiceImpl.class.getName());
 
 	@Autowired
 	ScalingRuleRepository scalingRuleRepository;
@@ -59,23 +57,7 @@ public class ScalingRuleServiceImpl implements ScalingRuleService {
 	@Autowired
 	JobService jobService;
 
-	@Override
-	public ClusterScalingState calculateScalingState(ScalingRule rule, float load,
-			int clusterId) {
-		validateInput(rule, load, clusterId);
-		return applyScalingRule(load, clusterId, rule);
-	}
-
-	public void validateInput(ScalingRule rule, float load, int clusterId) {
-		if (rule == null)
-			throw new BusinessViolationException("Invalid rule");
-		if (load < 0.0)
-			throw new BusinessViolationException("Invalid load: [" + load + "]");
-		if (clusterId < 0)
-			throw new BusinessViolationException("Invalid cluster: ["
-					+ clusterId + "]");
-	}
-
+    @Override
 	public ClusterScalingState applyScalingRule(float load, int clusterId,	ScalingRule rule) {
 		int clusterSize = clusterService.getCluster(clusterId).getNumberOfMachines();
 		int maxMachines = rule.getMaxNumberOfMachinesPerCluster();
@@ -86,8 +68,6 @@ public class ScalingRuleServiceImpl implements ScalingRuleService {
 				+ " load = " + load + " maxMachines = " + maxMachines
 				+ " minMachines = " + minMachines + " maxLoad = " + maxLoad
 				+ " minLoad = " + minLoad + " clusterSize = " + clusterSize);
-
-		ClusterScalingState state = ClusterScalingState.SCALING_DISABLED;
 
 		boolean scalingJobActive = true;
 		int jobId = rule.getJobId();
@@ -110,7 +90,8 @@ public class ScalingRuleServiceImpl implements ScalingRuleService {
 
 		LOG.debug("scalingJobReady=" + scalingJobActive	+ " allMachinesConfigured=" + allMachinesConfigured);
 
-		if (!rule.isPeriodicScalingOn() || scalingJobActive || !allMachinesConfigured){
+        ClusterScalingState state;
+        if (!rule.isPeriodicScalingOn() || scalingJobActive || !allMachinesConfigured){
 			state = ClusterScalingState.SCALING_SKIPPED;			
 		} else if ((load >= maxLoad && clusterSize < maxMachines) || (clusterSize < minMachines)){
 			state = ClusterScalingState.REQUIRES_SCALING_OUT;

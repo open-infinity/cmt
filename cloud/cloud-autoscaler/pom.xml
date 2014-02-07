@@ -227,7 +227,7 @@
                     <include>**/*Test.java</include>
                     <include>**/*TestCase.java</include>
                     -->
-                <skipTests>true</skipTests>
+                <skipTests>false</skipTests>
 				</configuration>
 				<dependencies>
                 <dependency>
