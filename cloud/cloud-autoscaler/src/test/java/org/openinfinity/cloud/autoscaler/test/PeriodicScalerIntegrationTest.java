@@ -95,7 +95,7 @@ public class PeriodicScalerIntegrationTest {
 	}
 	
 	/*
-     * Periodic scaler scaling out and in system test.
+     * Periodic autoscaler scaling out and in system test.
      * 
      * A mock rrd server and a database are configured so that periodic scaler would perform scale out
      * on a cluster.
@@ -105,9 +105,6 @@ public class PeriodicScalerIntegrationTest {
 	@Test
 	@Ignore
 	public void periodicScalerScaleOutScaleIn() throws Exception {	
-    	//when(mockHealthMonitoringService.getClusterHealthStatusLast(Matchers.any(),Matchers.any(),Matchers.any(),Matchers.any())).
-    	//thenReturn(1);
-    	
 		long now = System.currentTimeMillis();
 	    Timestamp from = new Timestamp(now - 3600000);
 	    Timestamp to = new Timestamp(now);

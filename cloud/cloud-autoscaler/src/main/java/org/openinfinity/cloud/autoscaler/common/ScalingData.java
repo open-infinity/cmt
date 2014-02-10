@@ -1,14 +1,17 @@
 package org.openinfinity.cloud.autoscaler.common;
 
+import org.apache.log4j.Logger;
 import org.openinfinity.cloud.domain.Cluster;
 import org.openinfinity.cloud.domain.ScalingRule;
 
 public class ScalingData {
-    int failures;
-    float load;
-    float threshold;
-    Cluster cluster;
-    ScalingRule scalingRule;
+    private static final Logger LOG = Logger.getLogger(ScalingData.class.getName());
+
+    private int failures;
+    private float load;
+    private float threshold;
+    private Cluster cluster;
+    private ScalingRule scalingRule;
 
     public ScalingData(int failures, float load, float threshold, Cluster cluster, ScalingRule scalingRule) {
         this.failures = failures;
@@ -27,6 +30,18 @@ public class ScalingData {
     public ScalingData(int failures, Cluster cluster) {
         this.failures = failures;
         this.cluster = cluster;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ScalingData)) return false;
+
+        ScalingData that = (ScalingData) o;
+        LOG.debug("Comparing values : " +cluster.getId() + " and " + that.getCluster().getId());
+        if (!(cluster.getId() == that.getCluster().getId())) return false;
+
+        return true;
     }
 
     public int getFailures() {

@@ -48,19 +48,26 @@ public class PeriodicScalerItemProcessor implements ItemProcessor<Machine, Job> 
 
 	private static final Logger LOG = Logger.getLogger(PeriodicScalerItemProcessor.class.getName());
 
-	private static final String METRIC_RRD_FILE_LOAD = "load-relative.rrd";
-	
-	private static final String METRIC_TYPE_LOAD = "load";
-	
-	private static final String METRIC_PERIOD = "shortterm";
+	public static final String METRIC_RRD_FILE_LOAD = "load-relative.rrd";
+
+    public static final String METRIC_TYPE_LOAD = "load";
+
+    public static final String METRIC_PERIOD = "shortterm";
 
     /**
      * Maps cluster id (group id) to number of successive failures to get group load from rrd-http server
      */
-    private Map<Integer, Integer> failureMap;
+    Map<Integer, Integer> failureMap;
+
+    /**
+     * Used to make unit testing easier
+     */
+    private int clusterId;
 
     /**
      * Specifies number of tolerated successive failures to get group load.
+     *
+     * If  number of failures is bigger than threshold, a notification is sent.
      */
     @Value("${http.attempts.threshold}")
     int httpAttemptsThreshold;
@@ -85,19 +92,31 @@ public class PeriodicScalerItemProcessor implements ItemProcessor<Machine, Job> 
         failureMap = new HashMap<Integer, Integer>();
     }
 
-	@Override
+    public int getClusterId() {
+        return clusterId;
+    }
+
+    public Map<Integer, Integer> getFailureMap() {
+        return failureMap;
+    }
+
+    public void setFailureMap(Map<Integer, Integer> failureMap) {
+        this.failureMap = failureMap;
+    }
+
+    @Override
 	public Job process(Machine machine){
         Job job = null;
 
         // Get cluster for machine
-        int clusterId = machine.getClusterId();
+        clusterId = machine.getClusterId();
         ScalingRule rule = scalingRuleService.getRule(clusterId);
         if (rule.isPeriodicScalingOn() == false){
             return null;
         }
         Cluster cluster = clusterService.getCluster(clusterId);
 
-        // Get number of successive failures to get a group load
+        // Get number of successive failed attempts to get a group load
         boolean keyExists = failureMap.containsKey(clusterId);
         int failures = 0;
         if (keyExists == true){
@@ -105,11 +124,11 @@ public class PeriodicScalerItemProcessor implements ItemProcessor<Machine, Job> 
         }
 
 
-        // Handle group load result
+        // Get group load and handle result
 
         // Get group load from http-rrd server
-        String[] metricName = {METRIC_RRD_FILE_LOAD};
-        float load = healthMonitoringService.getClusterLoad(machine, metricName, METRIC_TYPE_LOAD, METRIC_PERIOD);
+        String[] metricNames = {METRIC_RRD_FILE_LOAD};
+        float load = healthMonitoringService.getClusterLoad(machine, metricNames, METRIC_TYPE_LOAD, METRIC_PERIOD);
 
         // Load not received. Return null job and send notification if necessary
         if (load == -1){
@@ -125,9 +144,6 @@ public class PeriodicScalerItemProcessor implements ItemProcessor<Machine, Job> 
             failureMap.put(clusterId, 0);
         }
 
-        LOG.debug("load = " + load);
-        LOG.debug("failures for clusterId = " + failureMap.get(clusterId));
-
         // Apply scaling rule on cluster with given load.
         // Autoscaler takes actions depending on returned ClusterScalingState.
         ClusterScalingState state = scalingRuleService.applyScalingRule(load, clusterId, rule);
@@ -137,6 +153,7 @@ public class PeriodicScalerItemProcessor implements ItemProcessor<Machine, Job> 
             case REQUIRES_SCALING_IN:
                 return createJob(machine, cluster, -1);
             case REQUIRED_SCALING_IS_NOT_POSSIBLE:
+               /*
                 if (notifier == null){
                     LOG.info("Null notifier");
                 }
@@ -147,6 +164,7 @@ public class PeriodicScalerItemProcessor implements ItemProcessor<Machine, Job> 
                 LOG.info("args:" + clusterId);
                 LOG.info("args:" + cluster.getInstanceId());
                 LOG.info("args:" + load);
+                */
                 notifier.notify(new ScalingData(load, cluster, rule), NotificationType.SCALING_FAILED);
             case SCALING_SKIPPED:
             case REQUIRES_NO_SCALING:
