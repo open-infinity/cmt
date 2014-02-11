@@ -192,7 +192,15 @@
            <resource>
                <directory>src/main/resources/META-INF</directory>
                <filtering>true</filtering>
-           </resource> 
+           </resource>
+           <resource>
+               <directory>src/test/resources</directory>
+               <filtering>true</filtering>
+           </resource>
+           <resource>
+               <directory>src/test/resources/META-INF</directory>
+               <filtering>true</filtering>
+           </resource>
         </resources>
 		<pluginManagement>
 			<plugins>

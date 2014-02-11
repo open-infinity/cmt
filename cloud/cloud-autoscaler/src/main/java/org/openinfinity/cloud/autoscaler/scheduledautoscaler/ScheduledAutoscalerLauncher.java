@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.openinfinity.cloud.autoscaler.scheduledscaler;
+package org.openinfinity.cloud.autoscaler.scheduledautoscaler;
 
 import org.openinfinity.core.annotation.Log;
 import org.springframework.batch.core.Job;
@@ -25,14 +25,14 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 /**
- * Scheduled batch job launcher.
+ * Scheduled Autoscaler batch job launcher.
  * 
  * @author Vedran Bartonicek
  * @version 1.3.0
  * @since 1.2.0
  */
-@Component("scheduledScalerLauncher")
-public class ScheduledScalerLauncher {
+@Component("scheduledAutoscalerLauncher")
+public class ScheduledAutoscalerLauncher {
 	@Autowired
 	@Qualifier("scheduledJob")
 	private Job job;

@@ -37,7 +37,7 @@
 	<bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher"
 		p:jobRepository-ref="jobRepository" />
 		
-	<bean id="scheduledScalerItemReader" class="org.springframework.batch.item.database.JdbcCursorItemReader">
+	<bean id="scheduledAutoscalerItemReader" class="org.springframework.batch.item.database.JdbcCursorItemReader">
 		<property name="dataSource" ref="cloudDataSource"/>
 		<property name="sql" value="select * from scaling_rule_tbl where scheduled = 1"/>
 		<property name="rowMapper">
@@ -45,7 +45,7 @@
 		</property>
 	</bean>
 	
-	<bean id="periodicScalerItemReader" class="org.springframework.batch.item.database.JdbcCursorItemReader">
+	<bean id="periodicAutoscalerItemReader" class="org.springframework.batch.item.database.JdbcCursorItemReader">
 		<property name="dataSource" ref="cloudDataSource"/>
 		<property name="sql" value="select * from machine_tbl where machine_type = 'loadbalancer'"/>
 		<property name="rowMapper">
@@ -67,8 +67,8 @@
 		<batch:step id="stepP1">
 			<batch:tasklet transaction-manager="txManager"
 				start-limit="3">
-				<batch:chunk reader="periodicScalerItemReader" processor="periodicScalerItemProcessor"
-					writer="periodicScalerItemWriter" commit-interval="100" retry-limit="3">
+				<batch:chunk reader="periodicAutoscalerItemReader" processor="periodicAutoscalerItemProcessor"
+					writer="periodicAutoscalerItemWriter" commit-interval="100" retry-limit="3">
 					<batch:retryable-exception-classes>
                     	<batch:include class="org.springframework.dao.OptimisticLockingFailureException" />
                         <batch:include class="org.springframework.dao.DeadlockLoserDataAccessException" />
@@ -82,7 +82,7 @@
 		<batch:step id="stepS1">
 			<batch:tasklet transaction-manager="txManager"
 				start-limit="3">
-				<batch:chunk reader="scheduledScalerItemReader" processor="scheduledScalerItemProcessor"
+				<batch:chunk reader="scheduledAutoscalerItemReader" processor="scheduledAutoscalerItemProcessor"
 					writer="autoscalerItemWriter" commit-interval="100" retry-limit="3">
 					<batch:retryable-exception-classes>
                     	<batch:include class="org.springframework.dao.OptimisticLockingFailureException" />
@@ -117,8 +117,8 @@
     </bean>
 	
 	<task:scheduled-tasks>  
-	    <task:scheduled ref="scheduledScalerLauncher" method="launch" cron="0 0/2 * * * ?"/>    
-	    <task:scheduled ref="periodicScalerLauncher" method="launch" cron="*/10 * * * * ?"/>
+	    <task:scheduled ref="scheduledAutoscalerLauncher" method="launch" cron="0 0/2 * * * ?"/>
+	    <task:scheduled ref="periodicAutoscalerLauncher" method="launch" cron="*/10 * * * * ?"/>
 	</task:scheduled-tasks>
 		
 </beans>

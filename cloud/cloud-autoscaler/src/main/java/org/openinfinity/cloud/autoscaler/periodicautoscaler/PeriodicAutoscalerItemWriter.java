@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-package org.openinfinity.cloud.autoscaler.periodicscaler;
+package org.openinfinity.cloud.autoscaler.periodicautoscaler;
 
 
-import java.util.List;
 import org.openinfinity.cloud.domain.Job;
 import org.openinfinity.cloud.service.administrator.JobService;
 import org.openinfinity.cloud.service.scaling.ScalingRuleService;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 /**
  * Batch writer.
@@ -32,8 +33,8 @@ import org.springframework.stereotype.Component;
  * @version 1.3.0
  * @since 1.2.0
  */
-@Component("periodicScalerItemWriter")
-public class PeriodicScalerItemWriter implements ItemWriter<Job> {
+@Component("periodicAutoscalerItemWriter")
+public class PeriodicAutoscalerItemWriter implements ItemWriter<Job> {
 
 	@Autowired
     JobService jobService;		

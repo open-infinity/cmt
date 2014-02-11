@@ -24,7 +24,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
-import org.openinfinity.cloud.autoscaler.scheduledscaler.ScheduledScalerItemProcessor;
+import org.openinfinity.cloud.autoscaler.scheduledautoscaler.ScheduledAutoscalerItemProcessor;
 import org.openinfinity.cloud.domain.Cluster;
 import org.openinfinity.cloud.domain.Instance;
 import org.openinfinity.cloud.domain.ScalingRule;
@@ -42,20 +42,20 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Unit tests for Scheduled scaler.
+ * Unit tests for Scheduled Autoscaler.
  * 
  * @author Vedran Bartonicek
- * @version 1.3.0
+ * @version 1.2.2
  * @since 1.2.0
  */
 
 @ContextConfiguration(locations={"classpath*:META-INF/spring/cloud-autoscaler-test-unit-context.xml"})
 @RunWith(SpringJUnit4ClassRunner.class)
-public class ScheduledScalerUnitTest {
+public class ScheduledAutoscalerUnitTest {
 
 	@InjectMocks
 	@Autowired
-	ScheduledScalerItemProcessor itemProcessor;
+    ScheduledAutoscalerItemProcessor itemProcessor;
 
 	@Autowired
 	@Spy

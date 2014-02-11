@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.openinfinity.cloud.autoscaler.periodicscaler;
+package org.openinfinity.cloud.autoscaler.periodicautoscaler;
 
 import org.apache.log4j.Logger;
 import org.openinfinity.cloud.autoscaler.common.ScalingData;
@@ -43,12 +43,12 @@ import java.util.Map;
  * @version 1.2.2
  * @since 1.2.0
  */
-@Component("periodicScalerItemProcessor")
-public class PeriodicScalerItemProcessor implements ItemProcessor<Machine, Job> {
+@Component("periodicAutoscalerItemProcessor")
+public class PeriodicAutoscalerItemProcessor implements ItemProcessor<Machine, Job> {
 
-	private static final Logger LOG = Logger.getLogger(PeriodicScalerItemProcessor.class.getName());
+	private static final Logger LOG = Logger.getLogger(PeriodicAutoscalerItemProcessor.class.getName());
 
-	public static final String METRIC_RRD_FILE_LOAD = "load-relative.rrd";
+    public static final String[] METRIC_NAMES = {"load-relative.rrd"};
 
     public static final String METRIC_TYPE_LOAD = "load";
 
@@ -87,8 +87,8 @@ public class PeriodicScalerItemProcessor implements ItemProcessor<Machine, Job> 
     @Autowired
     Notifier notifier;
 
-    PeriodicScalerItemProcessor(){
-        LOG.info("Constructing PeriodicScalerItemProcessor");
+    PeriodicAutoscalerItemProcessor(){
+        LOG.info("Constructing PeriodicAutoscalerItemProcessor");
         failureMap = new HashMap<Integer, Integer>();
     }
 
@@ -125,12 +125,7 @@ public class PeriodicScalerItemProcessor implements ItemProcessor<Machine, Job> 
 
 
         // Get group load and handle result
-
-        // Get group load from http-rrd server
-        String[] metricNames = {METRIC_RRD_FILE_LOAD};
-        float load = healthMonitoringService.getClusterLoad(machine, metricNames, METRIC_TYPE_LOAD, METRIC_PERIOD);
-
-        // Load not received. Return null job and send notification if necessary
+        float load = healthMonitoringService.getClusterLoad(machine, METRIC_NAMES, METRIC_TYPE_LOAD, METRIC_PERIOD);
         if (load == -1){
             failureMap.put(clusterId, ++failures);
             if (failures == httpAttemptsThreshold){
@@ -153,18 +148,6 @@ public class PeriodicScalerItemProcessor implements ItemProcessor<Machine, Job> 
             case REQUIRES_SCALING_IN:
                 return createJob(machine, cluster, -1);
             case REQUIRED_SCALING_IS_NOT_POSSIBLE:
-               /*
-                if (notifier == null){
-                    LOG.info("Null notifier");
-                }
-                if (cluster == null){
-                    LOG.info("Null cluster");
-                }
-                LOG.info("notifier" + notifier.toString());
-                LOG.info("args:" + clusterId);
-                LOG.info("args:" + cluster.getInstanceId());
-                LOG.info("args:" + load);
-                */
                 notifier.notify(new ScalingData(load, cluster, rule), NotificationType.SCALING_FAILED);
             case SCALING_SKIPPED:
             case REQUIRES_NO_SCALING:

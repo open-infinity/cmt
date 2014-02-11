@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.openinfinity.cloud.autoscaler.scheduledscaler;
+package org.openinfinity.cloud.autoscaler.scheduledautoscaler;
 
 import org.apache.log4j.Logger;
 import org.openinfinity.cloud.domain.Cluster;
@@ -33,15 +33,15 @@ import org.springframework.stereotype.Component;
 import java.sql.Timestamp;
 
 /**
- * Scheduled scaler batch processor
+ * Scheduled Autoscaler batch processor
  * 
  * @author Vedran Bartonicek
  * @version 1.3.0
  * @since 1.2.0
  */
-@Component("scheduledScalerItemProcessor")
-public class ScheduledScalerItemProcessor implements ItemProcessor<ScalingRule, Job> {
-	private static final Logger LOG = Logger.getLogger(ScheduledScalerItemProcessor.class.getName());
+@Component("scheduledAutoscalerItemProcessor")
+public class ScheduledAutoscalerItemProcessor implements ItemProcessor<ScalingRule, Job> {
+	private static final Logger LOG = Logger.getLogger(ScheduledAutoscalerItemProcessor.class.getName());
 	
 	@Autowired
 	ScalingRuleService scalingRuleService;

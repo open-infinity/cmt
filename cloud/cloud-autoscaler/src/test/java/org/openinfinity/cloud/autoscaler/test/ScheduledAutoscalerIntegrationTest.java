@@ -38,24 +38,22 @@ import java.sql.Timestamp;
 import java.util.Collection;
 
 /**
- * Functional tests for Periodic scaler.
+ * Functional tests for Periodic Autoscaler.
  * 
  * @author Vedran Bartonicek
- * @version 1.3.0
+ * @version 1.2.2
  * @since 1.2.0
  */
-
-/*
- * E2E Spring batch testing for Autoscaler.
- * 
- */
-@ContextConfiguration(locations={"classpath*:META-INF/spring/t1-context.xml"})
+@ContextConfiguration(locations={"classpath*:META-INF/spring/cloud-autoscaler-test-integration-context.xml"})
 @RunWith(SpringJUnit4ClassRunner.class)
-public class ScheduledScalerIntegrationTest {
+public class ScheduledAutoscalerIntegrationTest {
 
 	private final int CLUSTER_ID = 1;
 
+    private static final int TIME_ONE_HOUR = 3600000;
+
     @Autowired
+    @Qualifier("scheduledJobLauncherTestUtils")
     private JobLauncherTestUtils jobLauncherTestUtils;
     
 	@Autowired
@@ -79,9 +77,8 @@ public class ScheduledScalerIntegrationTest {
 	public void scaleOut() throws Exception {
         long now = System.currentTimeMillis();
 	    Timestamp from = new Timestamp(now);
-	    Timestamp to = new Timestamp(now + 3600000);
-		DatabaseUtils.updateTestDatabase(DatabaseUtils.initDataSet(this,
-				DatabaseUtils.SQL_SCALE_OUT, from, to), dataSource);
+	    Timestamp to = new Timestamp(now + TIME_ONE_HOUR);
+		DatabaseUtils.updateTestDatabase(DatabaseUtils.initDataSet(this, DatabaseUtils.SQL_SCALE_OUT, from, to), dataSource);
 
 		JobExecution jobExecution = jobLauncherTestUtils.launchJob();
         Assert.assertEquals(jobExecution.getStatus(), BatchStatus.COMPLETED);
@@ -94,10 +91,9 @@ public class ScheduledScalerIntegrationTest {
 	@Test
 	public void scaleIn() throws Exception {
         long now = System.currentTimeMillis();
-	    Timestamp from = new Timestamp(now - 3600000);
+	    Timestamp from = new Timestamp(now - TIME_ONE_HOUR);
 	    Timestamp to = new Timestamp(now);
-	    DatabaseUtils.updateTestDatabase(DatabaseUtils.initDataSet(this,
-				DatabaseUtils.SQL_SCALE_IN, from, to), dataSource);
+	    DatabaseUtils.updateTestDatabase(DatabaseUtils.initDataSet(this, DatabaseUtils.SQL_SCALE_IN, from, to), dataSource);
 	    
 	    JobExecution jobExecution = jobLauncherTestUtils.launchJob();
         Assert.assertEquals(jobExecution.getStatus(), BatchStatus.COMPLETED);

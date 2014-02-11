@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.openinfinity.cloud.autoscaler.periodicscaler;
+package org.openinfinity.cloud.autoscaler.periodicautoscaler;
 
 import org.openinfinity.core.annotation.Log;
 import org.springframework.batch.core.Job;
@@ -32,8 +32,8 @@ import org.springframework.stereotype.Component;
  * @since 1.2.0
  */
  
-@Component("periodicScalerLauncher")
-public class PeriodicScalerLauncher {
+@Component("periodicAutoscalerLauncher")
+public class PeriodicAutoscalerLauncher {
 	@Autowired
 	@Qualifier("periodicJob")
 	private Job job;

@@ -38,7 +38,6 @@ public class ScalingData {
         if (!(o instanceof ScalingData)) return false;
 
         ScalingData that = (ScalingData) o;
-        LOG.debug("Comparing values : " +cluster.getId() + " and " + that.getCluster().getId());
         if (!(cluster.getId() == that.getCluster().getId())) return false;
 
         return true;
