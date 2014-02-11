@@ -16,9 +16,9 @@
 
 package org.openinfinity.cloud.domain.repository.administrator;
 
-import java.util.List;
-
 import org.openinfinity.cloud.domain.Job;
+
+import java.util.List;
 
 /**
  * Interface for Job repository
@@ -38,6 +38,7 @@ public interface JobRepository {
 	void setEndTime(int id);
 	Job getJob(int jobId);
 	int addJob(Job job);
+    Job getNewest();
 	List<Job> getJobsForInstance(int instanceId);
     void deleteAll();
 

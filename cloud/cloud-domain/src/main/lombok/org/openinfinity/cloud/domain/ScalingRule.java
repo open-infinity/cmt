@@ -39,7 +39,21 @@ import org.openinfinity.core.annotation.NotScript;
 @NoArgsConstructor
 @RequiredArgsConstructor
 public class ScalingRule implements Serializable {
-	
+
+    public static enum ScheduledScalingState{
+        READY_FOR_SCALE_IN(0),
+        READY_FOR_SCALE_OUT(1);
+
+        private final int value;
+        private ScheduledScalingState(int value) {
+            this.value = value;
+        }
+
+        public int getValue() {
+            return value;
+        }
+    }
+
 	@NonNull 
 	@NotScript
 	private int clusterId;

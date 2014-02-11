@@ -36,7 +36,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Batch processor for periodic autoscaler
+ * Batch processor for Periodic Autoscaler
  * 
  * @author Ilkka Leinonen
  * @author Vedran Bartonicek
@@ -88,7 +88,6 @@ public class PeriodicAutoscalerItemProcessor implements ItemProcessor<Machine, J
     Notifier notifier;
 
     PeriodicAutoscalerItemProcessor(){
-        LOG.info("Constructing PeriodicAutoscalerItemProcessor");
         failureMap = new HashMap<Integer, Integer>();
     }
 
@@ -123,7 +122,6 @@ public class PeriodicAutoscalerItemProcessor implements ItemProcessor<Machine, J
             failures = failureMap.get(clusterId);
         }
 
-
         // Get group load and handle result
         float load = healthMonitoringService.getClusterLoad(machine, METRIC_NAMES, METRIC_TYPE_LOAD, METRIC_PERIOD);
         if (load == -1){
@@ -144,9 +142,9 @@ public class PeriodicAutoscalerItemProcessor implements ItemProcessor<Machine, J
         ClusterScalingState state = scalingRuleService.applyScalingRule(load, clusterId, rule);
         switch (state) {
             case REQUIRES_SCALING_OUT:
-                return createJob(machine, cluster, 1);
+                return createJob(cluster, 1);
             case REQUIRES_SCALING_IN:
-                return createJob(machine, cluster, -1);
+                return createJob(cluster, -1);
             case REQUIRED_SCALING_IS_NOT_POSSIBLE:
                 notifier.notify(new ScalingData(load, cluster, rule), NotificationType.SCALING_FAILED);
             case SCALING_SKIPPED:
@@ -157,7 +155,7 @@ public class PeriodicAutoscalerItemProcessor implements ItemProcessor<Machine, J
         return job;
     }
 
-	private Job createJob(Machine machine, Cluster cluster, int machinesGrowth) {
+	private Job createJob(Cluster cluster, int machinesGrowth) {
         Instance instance = instanceService.getInstance(cluster.getInstanceId());
 		return new Job("scale_cluster",
 			cluster.getInstanceId(),

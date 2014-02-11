@@ -42,7 +42,7 @@ import java.sql.Timestamp;
 @Component("scheduledAutoscalerItemProcessor")
 public class ScheduledAutoscalerItemProcessor implements ItemProcessor<ScalingRule, Job> {
 	private static final Logger LOG = Logger.getLogger(ScheduledAutoscalerItemProcessor.class.getName());
-	
+
 	@Autowired
 	ScalingRuleService scalingRuleService;
 	
@@ -60,38 +60,37 @@ public class ScheduledAutoscalerItemProcessor implements ItemProcessor<ScalingRu
     
 	@Override
 	public Job process(ScalingRule scalingRule) throws Exception {
+
+        // Get scheduled scaling period
 	    Timestamp periodFrom = scalingRule.getPeriodFrom();
 		Timestamp periodTo = scalingRule.getPeriodTo();
+
+        // Get sampling period
 		long now = System.currentTimeMillis();	
 		Timestamp samplingPeriodStart = new Timestamp(now - offsetStart );
 		Timestamp samplingPeriodEnd = new Timestamp(now + offsetEnd); 
 	
-	    LOG.debug(Integer.toString(scalingRule.getClusterId()));
-   	    LOG.debug("state="+scalingRule.getScheduledScalingState());
-   	    LOG.debug("now=" + (new Timestamp(now)).toString());
-	    LOG.debug("offsetStart=" + Integer.toString(offsetStart));
-	    LOG.debug("offsetEnd=" + Integer.toString(offsetEnd));
-
-	    LOG.debug("samplingPeriodStart=" + samplingPeriodStart.toString());
-  	    LOG.debug("samplingPeriodEnd=" + samplingPeriodEnd.toString());
-   	    LOG.debug("periodFrom=" + periodFrom.toString());
-  	    LOG.debug("periodTo=" + periodTo.toString());
-
 		Cluster cluster = clusterService.getCluster(scalingRule.getClusterId());
 		Job job;
-		
+
+        // TODO : move this into Scaling service
+        // Invalid period defined in scaling_rule_tbl;
 		if (periodTo.before(periodFrom) || periodTo.equals(periodFrom)){
 			job = null;
 
-			
-		} else if (samplingPeriodStart.before(periodFrom) && samplingPeriodEnd.after(periodFrom) && scalingRule.getScheduledScalingState() == 1){
+        // Sampling period has "caught" the beginning of scheduled scaling period, and scheduled state is valid (state 1 = "OK for scaling out")
+		} else if (samplingPeriodStart.before(periodFrom) && samplingPeriodEnd.after(periodFrom) && scalingRule.getScheduledScalingState() == ScalingRule.ScheduledScalingState.READY_FOR_SCALE_OUT.getValue()){
 			job = createJob(scalingRule, cluster, scalingRule.getClusterSizeNew());
 			scalingRuleService.storeScalingOutParameters(cluster.getNumberOfMachines(), scalingRule.getClusterId());
+
+        // Sampling period has "caught" the end of scheduled scaling period, and scheduled state is valid (state 0 = "OK for scaling in")
 		} else if ((samplingPeriodStart.before(periodTo) && samplingPeriodEnd.after(periodTo)
-				&& samplingPeriodStart.after(periodFrom) && scalingRule.getScheduledScalingState() == 0)
+				&& samplingPeriodStart.after(periodFrom) && scalingRule.getScheduledScalingState() == ScalingRule.ScheduledScalingState.READY_FOR_SCALE_IN.getValue())
 				|| (samplingPeriodStart.before(periodFrom) && samplingPeriodEnd.after(periodTo))) {
 			job = createJob(scalingRule, cluster, scalingRule.getClusterSizeOriginal());
-			scalingRuleService.storeScalingInParameters(scalingRule.getClusterId());			
+			scalingRuleService.storeScalingInParameters(scalingRule.getClusterId());
+
+        // Sampling period is before or after scheduled scaling period
 		} else {
 			job = null;
 		}
