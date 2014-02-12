@@ -16,7 +16,6 @@
 
 package org.openinfinity.cloud.autoscaler.scheduledautoscaler;
 
-import org.apache.log4j.Logger;
 import org.openinfinity.cloud.domain.Cluster;
 import org.openinfinity.cloud.domain.Instance;
 import org.openinfinity.cloud.domain.Job;
@@ -41,9 +40,8 @@ import java.sql.Timestamp;
  */
 @Component("scheduledAutoscalerItemProcessor")
 public class ScheduledAutoscalerItemProcessor implements ItemProcessor<ScalingRule, Job> {
-	private static final Logger LOG = Logger.getLogger(ScheduledAutoscalerItemProcessor.class.getName());
 
-	@Autowired
+    @Autowired
 	ScalingRuleService scalingRuleService;
 	
 	@Autowired
@@ -57,7 +55,7 @@ public class ScheduledAutoscalerItemProcessor implements ItemProcessor<ScalingRu
     
     @Value("${sampling.offset.start}")
     int offsetStart;
-    
+
 	@Override
 	public Job process(ScalingRule scalingRule) throws Exception {
 
@@ -71,15 +69,16 @@ public class ScheduledAutoscalerItemProcessor implements ItemProcessor<ScalingRu
 		Timestamp samplingPeriodEnd = new Timestamp(now + offsetEnd); 
 	
 		Cluster cluster = clusterService.getCluster(scalingRule.getClusterId());
-		Job job;
 
+        Job job;
         // TODO : move this into Scaling service
         // Invalid period defined in scaling_rule_tbl;
 		if (periodTo.before(periodFrom) || periodTo.equals(periodFrom)){
 			job = null;
 
         // Sampling period has "caught" the beginning of scheduled scaling period, and scheduled state is valid (state 1 = "OK for scaling out")
-		} else if (samplingPeriodStart.before(periodFrom) && samplingPeriodEnd.after(periodFrom) && scalingRule.getScheduledScalingState() == ScalingRule.ScheduledScalingState.READY_FOR_SCALE_OUT.getValue()){
+		}
+		else if (samplingPeriodStart.before(periodFrom) && samplingPeriodEnd.after(periodFrom) && scalingRule.getScheduledScalingState() == ScalingRule.ScheduledScalingState.READY_FOR_SCALE_OUT.getValue()){
 			job = createJob(scalingRule, cluster, scalingRule.getClusterSizeNew());
 			scalingRuleService.storeScalingOutParameters(cluster.getNumberOfMachines(), scalingRule.getClusterId());
 
@@ -96,7 +95,18 @@ public class ScheduledAutoscalerItemProcessor implements ItemProcessor<ScalingRu
 		}
 		return job;
 	}
-	
+	 /*
+	 private Job createJob(Cluster cluster, int machinesGrowth) {
+        Instance instance = instanceService.getInstance(cluster.getInstanceId());
+		return new Job("scale_cluster",
+			cluster.getInstanceId(),
+			instance.getCloudType(),
+			JobService.CLOUD_JOB_CREATED,
+			instance.getZone(),
+			Integer.toString(cluster.getId()),
+			cluster.getNumberOfMachines() + machinesGrowth);
+	}
+	  */
 	private Job createJob(ScalingRule scalingRule, Cluster cluster, int scaledClusterSize){
 		int instanceId = cluster.getInstanceId();
 		Instance instance = instanceService.getInstance(instanceId);

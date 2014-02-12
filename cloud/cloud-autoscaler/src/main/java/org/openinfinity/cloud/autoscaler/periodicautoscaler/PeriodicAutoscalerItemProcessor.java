@@ -16,8 +16,7 @@
 
 package org.openinfinity.cloud.autoscaler.periodicautoscaler;
 
-import org.apache.log4j.Logger;
-import org.openinfinity.cloud.autoscaler.common.ScalingData;
+import org.openinfinity.cloud.autoscaler.util.ScalingData;
 import org.openinfinity.cloud.autoscaler.notifier.Notifier;
 import org.openinfinity.cloud.autoscaler.notifier.Notifier.NotificationType;
 import org.openinfinity.cloud.domain.*;
@@ -25,7 +24,7 @@ import org.openinfinity.cloud.service.administrator.ClusterService;
 import org.openinfinity.cloud.service.administrator.InstanceService;
 import org.openinfinity.cloud.service.administrator.JobService;
 import org.openinfinity.cloud.service.healthmonitoring.HealthMonitoringService;
-import org.openinfinity.cloud.service.scaling.Enumerations.ClusterScalingState;
+import org.openinfinity.cloud.service.scaling.Enumerations.ScalingState;
 import org.openinfinity.cloud.service.scaling.ScalingRuleService;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,8 +45,6 @@ import java.util.Map;
 @Component("periodicAutoscalerItemProcessor")
 public class PeriodicAutoscalerItemProcessor implements ItemProcessor<Machine, Job> {
 
-	private static final Logger LOG = Logger.getLogger(PeriodicAutoscalerItemProcessor.class.getName());
-
     public static final String[] METRIC_NAMES = {"load-relative.rrd"};
 
     public static final String METRIC_TYPE_LOAD = "load";
@@ -57,7 +54,7 @@ public class PeriodicAutoscalerItemProcessor implements ItemProcessor<Machine, J
     /**
      * Maps cluster id (group id) to number of successive failures to get group load from rrd-http server
      */
-    Map<Integer, Integer> failureMap;
+    private Map<Integer, Integer> failureMap;
 
     /**
      * Used to make unit testing easier
@@ -70,7 +67,7 @@ public class PeriodicAutoscalerItemProcessor implements ItemProcessor<Machine, J
      * If  number of failures is bigger than threshold, a notification is sent.
      */
     @Value("${http.attempts.threshold}")
-    int httpAttemptsThreshold;
+    private int httpAttemptsThreshold;
 
 	@Autowired
 	InstanceService instanceService;
@@ -91,34 +88,26 @@ public class PeriodicAutoscalerItemProcessor implements ItemProcessor<Machine, J
         failureMap = new HashMap<Integer, Integer>();
     }
 
-    public int getClusterId() {
-        return clusterId;
-    }
-
     public Map<Integer, Integer> getFailureMap() {
         return failureMap;
-    }
-
-    public void setFailureMap(Map<Integer, Integer> failureMap) {
-        this.failureMap = failureMap;
     }
 
     @Override
 	public Job process(Machine machine){
         Job job = null;
 
-        // Get cluster for machine
+        // Get rule and cluster
         clusterId = machine.getClusterId();
         ScalingRule rule = scalingRuleService.getRule(clusterId);
-        if (rule.isPeriodicScalingOn() == false){
+        if (!rule.isPeriodicScalingOn()){
             return null;
         }
         Cluster cluster = clusterService.getCluster(clusterId);
 
-        // Get number of successive failed attempts to get a group load
+        // Get number of previous successive failed attempts to get a group load
         boolean keyExists = failureMap.containsKey(clusterId);
         int failures = 0;
-        if (keyExists == true){
+        if (keyExists){
             failures = failureMap.get(clusterId);
         }
 
@@ -139,7 +128,7 @@ public class PeriodicAutoscalerItemProcessor implements ItemProcessor<Machine, J
 
         // Apply scaling rule on cluster with given load.
         // Autoscaler takes actions depending on returned ClusterScalingState.
-        ClusterScalingState state = scalingRuleService.applyScalingRule(load, clusterId, rule);
+        ScalingState state = scalingRuleService.applyScalingRule(load, clusterId, rule);
         switch (state) {
             case REQUIRES_SCALING_OUT:
                 return createJob(cluster, 1);

@@ -1,4 +1,4 @@
-package org.openinfinity.cloud.autoscaler.common;
+package org.openinfinity.cloud.autoscaler.util;
 
 import org.apache.log4j.Logger;
 import org.openinfinity.cloud.domain.Cluster;

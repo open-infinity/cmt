@@ -24,14 +24,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
-import org.openinfinity.cloud.autoscaler.common.ScalingData;
+import org.openinfinity.cloud.autoscaler.util.ScalingData;
 import org.openinfinity.cloud.autoscaler.notifier.Notifier;
 import org.openinfinity.cloud.autoscaler.periodicautoscaler.PeriodicAutoscalerItemProcessor;
 import org.openinfinity.cloud.domain.*;
 import org.openinfinity.cloud.service.administrator.ClusterService;
 import org.openinfinity.cloud.service.administrator.InstanceService;
 import org.openinfinity.cloud.service.healthmonitoring.HealthMonitoringService;
-import org.openinfinity.cloud.service.scaling.Enumerations;
+import org.openinfinity.cloud.service.scaling.Enumerations.ScalingState;
 import org.openinfinity.cloud.service.scaling.ScalingRuleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -108,7 +108,7 @@ public class PeriodicAutoscalerUnitTest {
         when(mockClusterService.getCluster(1)).thenReturn(cluster);
 
         when(mockHealthMonitoringService.getClusterLoad(machine, PeriodicAutoscalerItemProcessor.METRIC_NAMES, PeriodicAutoscalerItemProcessor.METRIC_TYPE_LOAD, PeriodicAutoscalerItemProcessor.METRIC_PERIOD)).thenReturn((float) 1);
-        when(mockScalingRuleService.applyScalingRule(1, 1, rule)).thenReturn(Enumerations.ClusterScalingState.REQUIRED_SCALING_IS_NOT_POSSIBLE);
+        when(mockScalingRuleService.applyScalingRule(1, 1, rule)).thenReturn(ScalingState.REQUIRED_SCALING_IS_NOT_POSSIBLE);
 
         // Then
         int failedAttempts = 0;
@@ -254,7 +254,7 @@ public class PeriodicAutoscalerUnitTest {
 
         // When
         when(mockHealthMonitoringService.getClusterLoad(machine, PeriodicAutoscalerItemProcessor.METRIC_NAMES, PeriodicAutoscalerItemProcessor.METRIC_TYPE_LOAD, PeriodicAutoscalerItemProcessor.METRIC_PERIOD)).thenReturn((float) 1);
-        when(mockScalingRuleService.applyScalingRule(1, 1, rule)).thenReturn(Enumerations.ClusterScalingState.REQUIRES_SCALING_OUT);
+        when(mockScalingRuleService.applyScalingRule(1, 1, rule)).thenReturn(ScalingState.REQUIRES_SCALING_OUT);
 
         // Then
         Job job = itemProcessor.process(machine);
@@ -299,7 +299,7 @@ public class PeriodicAutoscalerUnitTest {
 
         // When
         when(mockHealthMonitoringService.getClusterLoad(machine, PeriodicAutoscalerItemProcessor.METRIC_NAMES, PeriodicAutoscalerItemProcessor.METRIC_TYPE_LOAD, PeriodicAutoscalerItemProcessor.METRIC_PERIOD)).thenReturn((float) 1);
-        when(mockScalingRuleService.applyScalingRule(1, 1, rule)).thenReturn(Enumerations.ClusterScalingState.REQUIRES_SCALING_IN);
+        when(mockScalingRuleService.applyScalingRule(1, 1, rule)).thenReturn(ScalingState.REQUIRES_SCALING_IN);
 
         // Then
         Job job = itemProcessor.process(machine);

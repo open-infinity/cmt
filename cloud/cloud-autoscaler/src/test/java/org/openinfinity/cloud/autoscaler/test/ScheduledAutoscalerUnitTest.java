@@ -16,7 +16,7 @@
 
 package org.openinfinity.cloud.autoscaler.test;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,6 +27,7 @@ import org.mockito.Spy;
 import org.openinfinity.cloud.autoscaler.scheduledautoscaler.ScheduledAutoscalerItemProcessor;
 import org.openinfinity.cloud.domain.Cluster;
 import org.openinfinity.cloud.domain.Instance;
+import org.openinfinity.cloud.domain.Job;
 import org.openinfinity.cloud.domain.ScalingRule;
 import org.openinfinity.cloud.service.administrator.ClusterService;
 import org.openinfinity.cloud.service.administrator.InstanceService;
@@ -37,6 +38,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.sql.Timestamp;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -75,7 +77,7 @@ public class ScheduledAutoscalerUnitTest {
 	}
 
     /**
-     * Test case when sampling period is before scheduled period
+     * Test case when sampling period is before scheduled scaling period
      *
      * Given automatic (scheduled) scaling is turned on,
      * and sampling period is before scheduled period,
@@ -86,7 +88,7 @@ public class ScheduledAutoscalerUnitTest {
      * @throws Exception
      */
 	@Test
-	public void WindowBeforePeriodTest() throws Exception {
+	public void SamplingPeriodBeforeScheduledScalingPeriodTest() throws Exception {
 
         // Given
 		long now = System.currentTimeMillis();						
@@ -101,7 +103,7 @@ public class ScheduledAutoscalerUnitTest {
 	}
 
     /**
-     * Test case when sampling period is after scheduled period
+     * Test case when sampling period is after scheduled scaling period
      *
      * Given automatic (scheduled) scaling is turned on,
      * and sampling period is after scheduled period,
@@ -112,7 +114,7 @@ public class ScheduledAutoscalerUnitTest {
      * @throws Exception
      */
 	@Test
-	public void WindowAfterPeriodTest() throws Exception {
+	public void SamplingPeriodAfterScheduledPeriodTest() throws Exception {
 
         // Given
         long now = System.currentTimeMillis();
@@ -127,10 +129,10 @@ public class ScheduledAutoscalerUnitTest {
 	}
 
     /**
-     * Test case when sampling period is after scheduled period
+     * Test case when sampling period is invalid
      *
      * Given automatic (scheduled) scaling is turned on,
-     * and sampling period is after scheduled period,
+     * and sampling period is invalid so that period start is after period end,
      * and scaling is needed according to scaling rule,
      * When scaling rule is applied
      * Then don't scale the cluster.
@@ -138,14 +140,14 @@ public class ScheduledAutoscalerUnitTest {
      * @throws Exception
      */
 	@Test
-	public void WindowInvalidFromAfterToPeriodTest() throws Exception {
+	public void SamplingPeriodInvalidFromAfterToPeriodTest() throws Exception {
 
         // Given
         long now = System.currentTimeMillis();
 		when(mockScalingRule.getPeriodFrom()).thenReturn(new Timestamp(now+1));
 		when(mockScalingRule.getPeriodTo()).thenReturn(new Timestamp(now-1));
 		when(mockScalingRule.getClusterId()).thenReturn(1);	
-		when(mockScalingRule.getScheduledScalingState()).thenReturn(1);	
+		when(mockScalingRule.getScheduledScalingState()).thenReturn(ScalingRule.ScheduledScalingState.READY_FOR_SCALE_OUT.getValue());
 		when(mockScalingRule.getClusterSizeNew()).thenReturn(100);
 
         // When, Then
@@ -153,10 +155,10 @@ public class ScheduledAutoscalerUnitTest {
 	}
 
     /**
-     * Test case when sampling period is after scheduled period
+     * Test case when sampling period is invalid
      *
      * Given automatic (scheduled) scaling is turned on,
-     * and sampling period is after scheduled period,
+     * and sampling period is invalid so that period start equals period end,
      * and scaling is needed according to scaling rule,
      * When scaling rule is applied
      * Then don't scale the cluster.
@@ -164,7 +166,7 @@ public class ScheduledAutoscalerUnitTest {
      * @throws Exception
      */
 	@Test
-	public void WindowInvalidFromEqualsToPeriodTest() throws Exception {
+	public void SamplingPeriodInvalidFromEqualsToPeriodTest() throws Exception {
 
         // Given
         long now = System.currentTimeMillis();
@@ -179,11 +181,12 @@ public class ScheduledAutoscalerUnitTest {
 	}
 
     /**
-     * Test case when sampling period is after scheduled period
+     * Test case when sampling period "caught" scheduled scaling period start,
+     * but scaling has already been done.
      *
      * Given automatic (scheduled) scaling is turned on,
-     * and sampling period is after scheduled period,
-     * and scaling is needed according to scaling rule,
+     * and sampling period "caught" scheduled scaling period start,
+     * and scaling state is READY_FOR_SCALE_IN(0),
      * When scaling rule is applied
      * Then don't scale the cluster.
      *
@@ -197,7 +200,7 @@ public class ScheduledAutoscalerUnitTest {
 		when(mockScalingRule.getPeriodFrom()).thenReturn(new Timestamp(now));
 		when(mockScalingRule.getPeriodTo()).thenReturn(new Timestamp(now + 300000));
 		when(mockScalingRule.getClusterId()).thenReturn(1);	
-		when(mockScalingRule.getScheduledScalingState()).thenReturn(0);	
+		when(mockScalingRule.getScheduledScalingState()).thenReturn(ScalingRule.ScheduledScalingState.READY_FOR_SCALE_IN.getValue());
 		when(mockScalingRule.getClusterSizeNew()).thenReturn(100);
 
         // When, Then
@@ -205,25 +208,26 @@ public class ScheduledAutoscalerUnitTest {
 	}
 
     /**
-     * Test case when sampling period is after scheduled period
+     * Test scale out.
      *
      * Given automatic (scheduled) scaling is turned on,
-     * and sampling period is after scheduled period,
+     * and sampling period "caught" scheduled scaling period start,
      * and scaling is needed according to scaling rule,
      * When scaling rule is applied
-     * Then don't scale the cluster.
+     * Then scale the cluster to size defined by scaling rule,
+     * and make sure tat old size was stored in the scaling rule.
      *
      * @throws Exception
      */
 	@Test
-	public void PeriodFromInWindowAndRequiredScalingOutTest() throws Exception {
+	public void ScaleOutTest() throws Exception {
 
         // Given
         long now = System.currentTimeMillis();
 		when(mockScalingRule.getPeriodFrom()).thenReturn(new Timestamp(now));
 		when(mockScalingRule.getPeriodTo()).thenReturn(new Timestamp(now + 300000));
 		when(mockScalingRule.getClusterId()).thenReturn(1);	
-		when(mockScalingRule.getScheduledScalingState()).thenReturn(1);	
+		when(mockScalingRule.getScheduledScalingState()).thenReturn(ScalingRule.ScheduledScalingState.READY_FOR_SCALE_OUT.getValue());
 		when(mockScalingRule.getClusterSizeNew()).thenReturn(100);	
 
 		Cluster cluster = new Cluster();
@@ -234,18 +238,65 @@ public class ScheduledAutoscalerUnitTest {
 		Instance instance = new Instance();
 		instance.setCloudType(1);
 		instance.setZone("whatever");
-		when(mockInstanceService.getInstance(1)).thenReturn(instance);	
+		when(mockInstanceService.getInstance(1)).thenReturn(instance);
 
-		Assert.assertNotNull(itemProcessor.process(mockScalingRule));	
+        // When
+        Job job = itemProcessor.process(mockScalingRule);
+
+        // Then
 		verify(scalingRuleService).storeScalingOutParameters(10,1);
-	}
+        Assert.assertThat("1,100", is(job.getServices()));
+
+    }
 
     /**
-     * Test case when sampling period is after scheduled period
+     * Test scale in
      *
      * Given automatic (scheduled) scaling is turned on,
-     * and sampling period is after scheduled period,
-     * and scaling is needed according to scaling rule,
+     * and sampling period "caught" scheduled scaling period end,
+     * and scaling out has not yet been done,
+     * When scaling rule is applied
+     * Then scale the cluster to size defined by scaling rule,
+     * and make sure that scaling rule is updated (scaling state set back to READY_FOR_SCALE_OUT),
+     *
+     * @throws Exception
+     */
+    @Test
+    public void ScaleInTest() throws Exception {
+
+        // Given
+        long now = System.currentTimeMillis();
+        when(mockScalingRule.getPeriodFrom()).thenReturn(new Timestamp(now - 300000));
+        when(mockScalingRule.getPeriodTo()).thenReturn(new Timestamp(now));
+        when(mockScalingRule.getClusterId()).thenReturn(1);
+        when(mockScalingRule.getScheduledScalingState()).thenReturn(ScalingRule.ScheduledScalingState.READY_FOR_SCALE_IN.getValue());
+        when(mockScalingRule.getClusterSizeNew()).thenReturn(100);
+
+        Cluster cluster = new Cluster();
+        cluster.setInstanceId(1);
+        cluster.setNumberOfMachines(10);
+        when(mockClusterService.getCluster(1)).thenReturn(cluster);
+
+        Instance instance = new Instance();
+        instance.setCloudType(1);
+        instance.setZone("whatever");
+        when(mockInstanceService.getInstance(1)).thenReturn(instance);
+
+        // When
+        Job job = itemProcessor.process(mockScalingRule);
+
+        // Then
+        verify(scalingRuleService).storeScalingInParameters(1);
+        Assert.assertThat("1,0", is(job.getServices()));
+    }
+
+    /**
+     * Test case when sampling period "caught" scheduled scaling period end,
+     * but scaling out has not yet been done.
+     *
+     * Given automatic (scheduled) scaling is turned on,
+     * and sampling period "caught" scheduled scaling period start,
+     * and scaling state is READY_FOR_SCALE_IN(0),
      * When scaling rule is applied
      * Then don't scale the cluster.
      *
@@ -259,7 +310,7 @@ public class ScheduledAutoscalerUnitTest {
 		when(mockScalingRule.getPeriodFrom()).thenReturn(new Timestamp(now - 300000));
 		when(mockScalingRule.getPeriodTo()).thenReturn(new Timestamp(now));
 		when(mockScalingRule.getClusterId()).thenReturn(1);	
-		when(mockScalingRule.getScheduledScalingState()).thenReturn(3);	
+		when(mockScalingRule.getScheduledScalingState()).thenReturn(ScalingRule.ScheduledScalingState.READY_FOR_SCALE_OUT.getValue());
 		when(mockScalingRule.getClusterSizeNew()).thenReturn(100);
 
         // When, Then
@@ -267,40 +318,30 @@ public class ScheduledAutoscalerUnitTest {
 	}
 
     /**
-     * Test case when sampling period is after scheduled period
+     * Test case when scaling state is invalid
      *
      * Given automatic (scheduled) scaling is turned on,
-     * and sampling period is after scheduled period,
-     * and scaling is needed according to scaling rule,
+     * and sampling period "caught" scheduled scaling period start,
+     * and scaling state is READY_FOR_SCALE_IN(0),
      * When scaling rule is applied
      * Then don't scale the cluster.
      *
      * @throws Exception
      */
-	@Test
-	public void PeriodToInWindowAndRequiredScalingInTest() throws Exception {
+    @Test
+    public void InvalidStateTest() throws Exception {
 
         // Given
         long now = System.currentTimeMillis();
-		when(mockScalingRule.getPeriodFrom()).thenReturn(new Timestamp(now - 300000));
-		when(mockScalingRule.getPeriodTo()).thenReturn(new Timestamp(now));
-		when(mockScalingRule.getClusterId()).thenReturn(1);	
-		when(mockScalingRule.getScheduledScalingState()).thenReturn(0);	
-		when(mockScalingRule.getClusterSizeNew()).thenReturn(100);	
+        when(mockScalingRule.getPeriodFrom()).thenReturn(new Timestamp(now - 300000));
+        when(mockScalingRule.getPeriodTo()).thenReturn(new Timestamp(now));
+        when(mockScalingRule.getClusterId()).thenReturn(1);
+        when(mockScalingRule.getScheduledScalingState()).thenReturn(9999);
+        when(mockScalingRule.getClusterSizeNew()).thenReturn(100);
 
-		Cluster cluster = new Cluster();
-		cluster.setInstanceId(1);
-		cluster.setNumberOfMachines(10);
-		when(mockClusterService.getCluster(1)).thenReturn(cluster);	
-
-		Instance instance = new Instance();
-		instance.setCloudType(1);
-		instance.setZone("whatever");
-		when(mockInstanceService.getInstance(1)).thenReturn(instance);	
-
-		Assert.assertNotNull(itemProcessor.process(mockScalingRule));	
-		verify(scalingRuleService).storeScalingInParameters(1);
-	}
+        // When, Then
+        Assert.assertNull(itemProcessor.process(mockScalingRule));
+    }
 
 }
 

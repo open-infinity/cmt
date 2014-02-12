@@ -1,7 +1,7 @@
 package org.openinfinity.cloud.autoscaler.notifier;
 
 import org.apache.log4j.Logger;
-import org.openinfinity.cloud.autoscaler.common.ScalingData;
+import org.openinfinity.cloud.autoscaler.util.ScalingData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailSender;
@@ -30,41 +30,6 @@ public class EmailNotifier implements Notifier{
         this.templateMessage = templateMessage;
     }
 
-    /*
-    @Override
-    public void notifyClusterScalingFailed(int clusterId, int instanceId, float load, float threshold) {
-        SimpleMailMessage msg = new SimpleMailMessage(this.templateMessage);
-        String text = "Scaling out attempt failed.\n" +
-                "Load average for the cluster is too high, and cluster maximum size limit has been reached." + "\n" +
-                "Severity: " + "CRITICAL\n" +
-                "cloud zone: " + cloudZone + "\n" +
-                "instance id: " + instanceId + "\n" +
-                "cluster id: " + clusterId + "\n" +
-                "load:" + load + "\n" +
-                "max load threshold:" + threshold
-
-        msg.setText(text);
-        LOG.info(text);
-
-        this.mailSender.send(msg);
-    }
-
-    @Override
-    public void notifyGroupLoadFetchingFailed(int clusterId, int instanceId, int failures) {
-        SimpleMailMessage msg = new SimpleMailMessage(this.templateMessage);
-        String text ="Unable to scale cluster\n." +
-                "Load average for the cluster is not available." + "\n" +
-                "Severity: " + "HIGH\n" +
-                "cloud zone: " + cloudZone + "\n" +
-                "instance id: " + instanceId + "\n" +
-                "cluster id: " + clusterId + "\n" +
-                "attempts:" + failures ;
-
-        msg.setText(text);
-        LOG.info(text);
-        this.mailSender.send(msg);
-    }
-     */
     @Override
     public void notify(ScalingData d, NotificationType t){
         SimpleMailMessage msg = new SimpleMailMessage(this.templateMessage);

@@ -23,12 +23,13 @@ import org.openinfinity.cloud.domain.repository.scaling.ScalingRuleRepository;
 import org.openinfinity.cloud.service.administrator.ClusterService;
 import org.openinfinity.cloud.service.administrator.JobService;
 import org.openinfinity.cloud.service.administrator.MachineService;
-import org.openinfinity.cloud.service.scaling.Enumerations.ClusterScalingState;
+import org.openinfinity.cloud.service.scaling.Enumerations.ScalingState;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Timestamp;
 import java.util.Collection;
 
 /**
@@ -58,12 +59,13 @@ public class ScalingRuleServiceImpl implements ScalingRuleService {
 	JobService jobService;
 
     @Override
-	public ClusterScalingState applyScalingRule(float load, int clusterId,	ScalingRule rule) {
+	public ScalingState applyScalingRule(float load, int clusterId,	ScalingRule rule) {
 		int clusterSize = clusterService.getCluster(clusterId).getNumberOfMachines();
 		int maxMachines = rule.getMaxNumberOfMachinesPerCluster();
 		int minMachines = rule.getMinNumberOfMachinesPerCluster();
 		float maxLoad = rule.getMaxLoad();
 		float minLoad = rule.getMinLoad();
+
 		LOG.debug("executeBusinessLogic() Parameters: clusterId = " + clusterId
 				+ " load = " + load + " maxMachines = " + maxMachines
 				+ " minMachines = " + minMachines + " maxLoad = " + maxLoad
@@ -90,23 +92,73 @@ public class ScalingRuleServiceImpl implements ScalingRuleService {
 
 		LOG.debug("scalingJobReady=" + scalingJobActive	+ " allMachinesConfigured=" + allMachinesConfigured);
 
-        ClusterScalingState state;
+        ScalingState state;
         if (!rule.isPeriodicScalingOn() || scalingJobActive || !allMachinesConfigured){
-			state = ClusterScalingState.SCALING_SKIPPED;			
+			state = ScalingState.SCALING_SKIPPED;			
 		} else if ((load >= maxLoad && clusterSize < maxMachines) || (clusterSize < minMachines)){
-			state = ClusterScalingState.REQUIRES_SCALING_OUT;
+			state = ScalingState.REQUIRES_SCALING_OUT;
 		} else if ((load <= minLoad && clusterSize > minMachines) || (clusterSize > maxMachines)){
-			state = ClusterScalingState.REQUIRES_SCALING_IN;
+			state = ScalingState.REQUIRES_SCALING_IN;
 		} else if (clusterSize >= maxMachines && load > maxLoad){
-			state = ClusterScalingState.REQUIRED_SCALING_IS_NOT_POSSIBLE;
+			state = ScalingState.REQUIRED_SCALING_IS_NOT_POSSIBLE;
 		} else {
-			state = ClusterScalingState.REQUIRES_NO_SCALING;
+			state = ScalingState.REQUIRES_NO_SCALING;
 		}
 
 		LOG.debug("applyScalingRule() return = " + state.name());
 		return state;
 	}
+    //TODO check if there is "ANY" scaling job for the cluster
+    @Override
+    public ScalingState applyScalingRule(Timestamp samplingPeriodFrom, Timestamp samplingPeriodTo, int clusterId, ScalingRule scalingRule) {
+        Timestamp periodFrom = scalingRule.getPeriodFrom();
+        Timestamp periodTo = scalingRule.getPeriodTo();
+        return null;
+        /*
+        if (periodTo.before(periodFrom) || periodTo.equals(periodFrom)){
+            job = null;
 
+            // Sampling period has "caught" the beginning of scheduled scaling period, and scheduled state is valid (state 1 = "OK for scaling out")
+        }
+        else if (samplingPeriodStart.before(periodFrom) && samplingPeriodEnd.after(periodFrom) && scalingRule.getScheduledScalingState() == ScalingRule.ScheduledScalingState.READY_FOR_SCALE_OUT.getValue()){
+            job = createJob(scalingRule, cluster, scalingRule.getClusterSizeNew());
+            scalingRuleService.storeScalingOutParameters(cluster.getNumberOfMachines(), scalingRule.getClusterId());
+
+            // Sampling period has "caught" the end of scheduled scaling period, and scheduled state is valid (state 0 = "OK for scaling in")
+        } else if ((samplingPeriodStart.before(periodTo) && samplingPeriodEnd.after(periodTo)
+                && samplingPeriodStart.after(periodFrom) && scalingRule.getScheduledScalingState() == ScalingRule.ScheduledScalingState.READY_FOR_SCALE_IN.getValue())
+                || (samplingPeriodStart.before(periodFrom) && samplingPeriodEnd.after(periodTo))) {
+            job = createJob(scalingRule, cluster, scalingRule.getClusterSizeOriginal());
+            scalingRuleService.storeScalingInParameters(scalingRule.getClusterId());
+
+            // Sampling period is before or after scheduled scaling period
+        } else {
+            job = null;
+        } */
+    }
+    /*
+    if (periodTo.before(periodFrom) || periodTo.equals(periodFrom)){
+			job = null;
+
+        // Sampling period has "caught" the beginning of scheduled scaling period, and scheduled state is valid (state 1 = "OK for scaling out")
+		}
+		else if (samplingPeriodStart.before(periodFrom) && samplingPeriodEnd.after(periodFrom) && scalingRule.getScheduledScalingState() == ScalingRule.ScheduledScalingState.READY_FOR_SCALE_OUT.getValue()){
+			job = createJob(scalingRule, cluster, scalingRule.getClusterSizeNew());
+			scalingRuleService.storeScalingOutParameters(cluster.getNumberOfMachines(), scalingRule.getClusterId());
+
+        // Sampling period has "caught" the end of scheduled scaling period, and scheduled state is valid (state 0 = "OK for scaling in")
+		} else if ((samplingPeriodStart.before(periodTo) && samplingPeriodEnd.after(periodTo)
+				&& samplingPeriodStart.after(periodFrom) && scalingRule.getScheduledScalingState() == ScalingRule.ScheduledScalingState.READY_FOR_SCALE_IN.getValue())
+				|| (samplingPeriodStart.before(periodFrom) && samplingPeriodEnd.after(periodTo))) {
+			job = createJob(scalingRule, cluster, scalingRule.getClusterSizeOriginal());
+			scalingRuleService.storeScalingInParameters(scalingRule.getClusterId());
+
+        // Sampling period is before or after scheduled scaling period
+		} else {
+			job = null;
+		}
+
+     */
 	/*
 	 * Using two sql requests instead of using single with command
 	 * "on duplicate key update". That is beacuse H2 db, which is used for

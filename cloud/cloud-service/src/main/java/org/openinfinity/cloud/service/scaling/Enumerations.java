@@ -24,7 +24,7 @@ package org.openinfinity.cloud.service.scaling;
  * @since 1.0.0
  */
 public final class Enumerations{
-	public enum ClusterScalingState {
+	public enum ScalingState {
 		REQUIRES_SCALING_IN,
 		REQUIRES_SCALING_OUT,
 		REQUIRES_NO_SCALING,
