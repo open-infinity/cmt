@@ -16,16 +16,16 @@
 
 package org.openinfinity.cloud.autoscaler.periodicautoscaler;
 
-import org.openinfinity.cloud.autoscaler.util.ScalingData;
+import org.openinfinity.cloud.autoscaler.common.AutoscalerItemProcessor;
 import org.openinfinity.cloud.autoscaler.notifier.Notifier;
 import org.openinfinity.cloud.autoscaler.notifier.Notifier.NotificationType;
-import org.openinfinity.cloud.domain.*;
-import org.openinfinity.cloud.service.administrator.ClusterService;
-import org.openinfinity.cloud.service.administrator.InstanceService;
-import org.openinfinity.cloud.service.administrator.JobService;
+import org.openinfinity.cloud.autoscaler.util.ScalingData;
+import org.openinfinity.cloud.domain.Cluster;
+import org.openinfinity.cloud.domain.Job;
+import org.openinfinity.cloud.domain.Machine;
+import org.openinfinity.cloud.domain.ScalingRule;
 import org.openinfinity.cloud.service.healthmonitoring.HealthMonitoringService;
 import org.openinfinity.cloud.service.scaling.Enumerations.ScalingState;
-import org.openinfinity.cloud.service.scaling.ScalingRuleService;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -43,7 +43,7 @@ import java.util.Map;
  * @since 1.2.0
  */
 @Component("periodicAutoscalerItemProcessor")
-public class PeriodicAutoscalerItemProcessor implements ItemProcessor<Machine, Job> {
+public class PeriodicAutoscalerItemProcessor extends AutoscalerItemProcessor implements ItemProcessor<Machine, Job> {
 
     public static final String[] METRIC_NAMES = {"load-relative.rrd"};
 
@@ -70,15 +70,6 @@ public class PeriodicAutoscalerItemProcessor implements ItemProcessor<Machine, J
     private int httpAttemptsThreshold;
 
 	@Autowired
-	InstanceService instanceService;
-	
-	@Autowired 
-	ClusterService clusterService;
-	
-	@Autowired
-	ScalingRuleService scalingRuleService;
-		
-	@Autowired
 	HealthMonitoringService healthMonitoringService;
 
     @Autowired
@@ -95,24 +86,21 @@ public class PeriodicAutoscalerItemProcessor implements ItemProcessor<Machine, J
     @Override
 	public Job process(Machine machine){
         Job job = null;
-
-        // Get rule and cluster
         clusterId = machine.getClusterId();
         ScalingRule rule = scalingRuleService.getRule(clusterId);
+
         if (!rule.isPeriodicScalingOn()){
             return null;
         }
-        Cluster cluster = clusterService.getCluster(clusterId);
 
-        // Get number of previous successive failed attempts to get a group load
+        Cluster cluster = clusterService.getCluster(clusterId);
         boolean keyExists = failureMap.containsKey(clusterId);
         int failures = 0;
         if (keyExists){
             failures = failureMap.get(clusterId);
         }
-
-        // Get group load and handle result
         float load = healthMonitoringService.getClusterLoad(machine, METRIC_NAMES, METRIC_TYPE_LOAD, METRIC_PERIOD);
+
         if (load == -1){
             failureMap.put(clusterId, ++failures);
             if (failures == httpAttemptsThreshold){
@@ -120,39 +108,24 @@ public class PeriodicAutoscalerItemProcessor implements ItemProcessor<Machine, J
             }
             return null;
         }
-
-        // Load received. Clear entry in failureMap for clusterId
         else if (failures > 0){
             failureMap.put(clusterId, 0);
         }
 
-        // Apply scaling rule on cluster with given load.
-        // Autoscaler takes actions depending on returned ClusterScalingState.
         ScalingState state = scalingRuleService.applyScalingRule(load, clusterId, rule);
         switch (state) {
-            case REQUIRES_SCALING_OUT:
-                return createJob(cluster, 1);
-            case REQUIRES_SCALING_IN:
-                return createJob(cluster, -1);
-            case REQUIRED_SCALING_IS_NOT_POSSIBLE:
+            case SCALE_OUT:
+                return createJob(cluster, cluster.getNumberOfMachines() + 1);
+            case SCALE_IN:
+                return createJob(cluster, cluster.getNumberOfMachines() - 1);
+            case SCALING_OUT_IMPOSSIBLE:
                 notifier.notify(new ScalingData(load, cluster, rule), NotificationType.SCALING_FAILED);
-            case SCALING_SKIPPED:
-            case REQUIRES_NO_SCALING:
+            case SCALING_ONGOING:
+            case SCALING_NOT_REQUIRED:
             default:
                 break;
         }
         return job;
     }
 
-	private Job createJob(Cluster cluster, int machinesGrowth) {
-        Instance instance = instanceService.getInstance(cluster.getInstanceId());
-		return new Job("scale_cluster",
-			cluster.getInstanceId(),
-			instance.getCloudType(),
-			JobService.CLOUD_JOB_CREATED,
-			instance.getZone(),
-			Integer.toString(cluster.getId()),
-			cluster.getNumberOfMachines() + machinesGrowth);	
-	}
-	
 }

@@ -16,6 +16,7 @@
 
 package org.openinfinity.cloud.service.scaling;
 
+import org.openinfinity.cloud.domain.Cluster;
 import org.openinfinity.cloud.domain.ScalingRule;
 import org.openinfinity.cloud.service.scaling.Enumerations.ScalingState;
 
@@ -40,7 +41,7 @@ public interface ScalingRuleService {
     /**
      * Calculates scaling state for Scheduled Autoscaler
      */
-    ScalingState applyScalingRule(Timestamp samplingPeriodFrom, Timestamp samplingPeriodTo, int clusterId, ScalingRule rule);
+    ScalingState applyScalingRule(Timestamp samplingPeriodFrom, Timestamp samplingPeriodTo, Cluster cluster, ScalingRule rule);
 	
 	/**
 	 * Stores the scaling rule into a repository.

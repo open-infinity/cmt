@@ -39,7 +39,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.sql.DataSource;
 import java.sql.Timestamp;
-import java.util.Collection;
 
 /**
  * Integration tests for Scheduled Autoscaler.
@@ -52,7 +51,7 @@ import java.util.Collection;
 @RunWith(SpringJUnit4ClassRunner.class)
 public class ScheduledAutoscalerIntegrationTest {
 
-	private final int CLUSTER_ID = 1;
+    private final int CLUSTER_ID = 1;
 
     private static final int TIME_ONE_HOUR = 3600000;
 
@@ -113,8 +112,9 @@ public class ScheduledAutoscalerIntegrationTest {
 		ScalingRule scalingRule = scalingRuleService.getRule(CLUSTER_ID);
 		Assert.assertEquals(2, scalingRule.getClusterSizeOriginal());
 		Assert.assertEquals(2, scalingRule.getScheduledScalingState());
-		Assert.assertEquals("1,5", jobService.getJob(getJobId()).getServices());
-	}
+        Assert.assertEquals("1,5", jobService.getJob(jobService.getNewest().getJobId()).getServices());
+
+    }
     /**
      * Test case for scaling in
      *
@@ -143,7 +143,7 @@ public class ScheduledAutoscalerIntegrationTest {
         // Then
         Assert.assertEquals(jobExecution.getStatus(), BatchStatus.COMPLETED);
 		Assert.assertEquals(2, scalingRuleService.getRule(CLUSTER_ID).getScheduledScalingState());
-        Assert.assertEquals("1,1", jobService.getJob(getJobId()).getServices());
+        Assert.assertEquals("1,1", jobService.getJob(jobService.getNewest().getJobId()).getServices());
     }
 
     /**
@@ -277,14 +277,5 @@ public class ScheduledAutoscalerIntegrationTest {
         return jobService.getNewest().getJobId();
     }
 
-    private int getJobId(){
-        int jobId = -1;
-        Collection<Job> jobs = jobService.getJobs(1,1);
-        for (Job j : jobs){
-            jobId =  j.getJobId();
-        }
-        return jobId;
-    }
-	
 }
 

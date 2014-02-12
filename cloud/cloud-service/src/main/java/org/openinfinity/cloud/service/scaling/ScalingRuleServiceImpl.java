@@ -16,7 +16,7 @@
 
 package org.openinfinity.cloud.service.scaling;
 
-import org.apache.log4j.Logger;
+import org.openinfinity.cloud.domain.Cluster;
 import org.openinfinity.cloud.domain.Job;
 import org.openinfinity.cloud.domain.ScalingRule;
 import org.openinfinity.cloud.domain.repository.scaling.ScalingRuleRepository;
@@ -44,8 +44,6 @@ import java.util.Collection;
 @Service("scalingRuleService")
 public class ScalingRuleServiceImpl implements ScalingRuleService {
 
-	private static final Logger LOG = Logger.getLogger(ScalingRuleServiceImpl.class.getName());
-
 	@Autowired
 	ScalingRuleRepository scalingRuleRepository;
 
@@ -65,100 +63,73 @@ public class ScalingRuleServiceImpl implements ScalingRuleService {
 		int minMachines = rule.getMinNumberOfMachinesPerCluster();
 		float maxLoad = rule.getMaxLoad();
 		float minLoad = rule.getMinLoad();
+        ScalingState state = ScalingState.SCALING_NOT_REQUIRED;
 
-		LOG.debug("executeBusinessLogic() Parameters: clusterId = " + clusterId
-				+ " load = " + load + " maxMachines = " + maxMachines
-				+ " minMachines = " + minMachines + " maxLoad = " + maxLoad
-				+ " minLoad = " + minLoad + " clusterSize = " + clusterSize);
-
-		boolean scalingJobActive = true;
-		int jobId = rule.getJobId();
-		Job job = null;
-
-		// If there was a scaling job, check if it is ready
-		if (jobId != -1) {
-			job = jobService.getJob(jobId);
-			if (job != null) {
-				int jobStatus = job.getJobStatus();
-				if (jobStatus == JobService.CLOUD_JOB_READY)
-					scalingJobActive = false;
-			}
-		} else
-			scalingJobActive = false;
-
-		boolean allMachinesConfigured = false;
-
-		if (!scalingJobActive) allMachinesConfigured = machineService.allMachinesConfigured(clusterId);
-
-		LOG.debug("scalingJobReady=" + scalingJobActive	+ " allMachinesConfigured=" + allMachinesConfigured);
-
-        ScalingState state;
-        if (!rule.isPeriodicScalingOn() || scalingJobActive || !allMachinesConfigured){
-			state = ScalingState.SCALING_SKIPPED;			
+        if (isScalingOngoing(rule)){
+			state = ScalingState.SCALING_ONGOING;
 		} else if ((load >= maxLoad && clusterSize < maxMachines) || (clusterSize < minMachines)){
-			state = ScalingState.REQUIRES_SCALING_OUT;
+			state = ScalingState.SCALE_OUT;
 		} else if ((load <= minLoad && clusterSize > minMachines) || (clusterSize > maxMachines)){
-			state = ScalingState.REQUIRES_SCALING_IN;
+			state = ScalingState.SCALE_IN;
 		} else if (clusterSize >= maxMachines && load > maxLoad){
-			state = ScalingState.REQUIRED_SCALING_IS_NOT_POSSIBLE;
-		} else {
-			state = ScalingState.REQUIRES_NO_SCALING;
+			state = ScalingState.SCALING_OUT_IMPOSSIBLE;
 		}
-
-		LOG.debug("applyScalingRule() return = " + state.name());
 		return state;
 	}
-    //TODO check if there is "ANY" scaling job for the cluster
+
     @Override
-    public ScalingState applyScalingRule(Timestamp samplingPeriodFrom, Timestamp samplingPeriodTo, int clusterId, ScalingRule scalingRule) {
+    public ScalingState applyScalingRule(Timestamp samplingPeriodFrom, Timestamp samplingPeriodTo, Cluster cluster, ScalingRule scalingRule) {
         Timestamp periodFrom = scalingRule.getPeriodFrom();
         Timestamp periodTo = scalingRule.getPeriodTo();
-        return null;
-        /*
-        if (periodTo.before(periodFrom) || periodTo.equals(periodFrom)){
-            job = null;
 
-            // Sampling period has "caught" the beginning of scheduled scaling period, and scheduled state is valid (state 1 = "OK for scaling out")
+        ScalingState state = ScalingState.SCALING_NOT_REQUIRED;
+
+        if (isScalingOngoing(scalingRule)){
+            state = ScalingState.SCALING_ONGOING;
+        } else if (scalingRule.getMaxNumberOfMachinesPerCluster() <= scalingRule.getClusterSizeNew()){
+            state = ScalingState.SCALING_OUT_IMPOSSIBLE;
         }
-        else if (samplingPeriodStart.before(periodFrom) && samplingPeriodEnd.after(periodFrom) && scalingRule.getScheduledScalingState() == ScalingRule.ScheduledScalingState.READY_FOR_SCALE_OUT.getValue()){
-            job = createJob(scalingRule, cluster, scalingRule.getClusterSizeNew());
-            scalingRuleService.storeScalingOutParameters(cluster.getNumberOfMachines(), scalingRule.getClusterId());
+        else if (periodTo.before(periodFrom) || periodTo.equals(periodFrom)){
+            state = ScalingState.SCALING_RULE_INVALID;
+        }
+        else if (samplingPeriodFrom.before(periodFrom) && samplingPeriodTo.after(periodFrom)
+                && scalingRule.getScheduledScalingState() == ScalingRule.ScheduledScalingState.READY_FOR_SCALE_OUT.getValue()){
 
-            // Sampling period has "caught" the end of scheduled scaling period, and scheduled state is valid (state 0 = "OK for scaling in")
-        } else if ((samplingPeriodStart.before(periodTo) && samplingPeriodEnd.after(periodTo)
-                && samplingPeriodStart.after(periodFrom) && scalingRule.getScheduledScalingState() == ScalingRule.ScheduledScalingState.READY_FOR_SCALE_IN.getValue())
-                || (samplingPeriodStart.before(periodFrom) && samplingPeriodEnd.after(periodTo))) {
-            job = createJob(scalingRule, cluster, scalingRule.getClusterSizeOriginal());
-            scalingRuleService.storeScalingInParameters(scalingRule.getClusterId());
+            storeScalingOutParameters(cluster.getNumberOfMachines(), scalingRule.getClusterId());
+            state = ScalingState.SCALE_OUT;
 
-            // Sampling period is before or after scheduled scaling period
-        } else {
-            job = null;
-        } */
+        } else if ((samplingPeriodFrom.before(periodTo) && samplingPeriodTo.after(periodTo)
+                && samplingPeriodFrom.after(periodFrom) && scalingRule.getScheduledScalingState() == ScalingRule.ScheduledScalingState.READY_FOR_SCALE_IN.getValue())
+                || (samplingPeriodFrom.before(periodFrom) && samplingPeriodTo.after(periodTo))) {
+
+            storeScalingInParameters(scalingRule.getClusterId());
+            state = ScalingState.SCALE_IN;
+        }
+        return state;
     }
-    /*
-    if (periodTo.before(periodFrom) || periodTo.equals(periodFrom)){
-			job = null;
 
-        // Sampling period has "caught" the beginning of scheduled scaling period, and scheduled state is valid (state 1 = "OK for scaling out")
-		}
-		else if (samplingPeriodStart.before(periodFrom) && samplingPeriodEnd.after(periodFrom) && scalingRule.getScheduledScalingState() == ScalingRule.ScheduledScalingState.READY_FOR_SCALE_OUT.getValue()){
-			job = createJob(scalingRule, cluster, scalingRule.getClusterSizeNew());
-			scalingRuleService.storeScalingOutParameters(cluster.getNumberOfMachines(), scalingRule.getClusterId());
+    boolean isScalingOngoing(ScalingRule rule){
+        boolean scalingJobActive = true;
+        int jobId = rule.getJobId();
 
-        // Sampling period has "caught" the end of scheduled scaling period, and scheduled state is valid (state 0 = "OK for scaling in")
-		} else if ((samplingPeriodStart.before(periodTo) && samplingPeriodEnd.after(periodTo)
-				&& samplingPeriodStart.after(periodFrom) && scalingRule.getScheduledScalingState() == ScalingRule.ScheduledScalingState.READY_FOR_SCALE_IN.getValue())
-				|| (samplingPeriodStart.before(periodFrom) && samplingPeriodEnd.after(periodTo))) {
-			job = createJob(scalingRule, cluster, scalingRule.getClusterSizeOriginal());
-			scalingRuleService.storeScalingInParameters(scalingRule.getClusterId());
+        // If there was a scaling job, check if it is ready
+        if (jobId != -1) {
+            Job job = jobService.getJob(jobId);
+            if (job != null) {
+                int jobStatus = job.getJobStatus();
+                if (jobStatus == JobService.CLOUD_JOB_READY)
+                    scalingJobActive = false;
+            }
+        } else
+            scalingJobActive = false;
 
-        // Sampling period is before or after scheduled scaling period
-		} else {
-			job = null;
-		}
+        boolean allMachinesConfigured = false;
+        if (!scalingJobActive) {
+            allMachinesConfigured = machineService.allMachinesConfigured(rule.getClusterId());
+        }
+        return scalingJobActive || !allMachinesConfigured;
+    }
 
-     */
 	/*
 	 * Using two sql requests instead of using single with command
 	 * "on duplicate key update". That is beacuse H2 db, which is used for
@@ -193,8 +164,7 @@ public class ScalingRuleServiceImpl implements ScalingRuleService {
 	}
 
 	public void storeScalingOutParameters(int numberOfMachines, int clusterId) {
-		scalingRuleRepository.storeStateScheduledScaling(numberOfMachines,
-				clusterId);
+		scalingRuleRepository.storeStateScheduledScaling(numberOfMachines, clusterId);
 	}
 
 	public void storeScalingInParameters(int clusterId) {
