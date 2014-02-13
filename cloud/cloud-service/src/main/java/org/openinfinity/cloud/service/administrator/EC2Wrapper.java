@@ -16,61 +16,25 @@
 
 package org.openinfinity.cloud.service.administrator;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-
-import org.apache.log4j.Logger;
-import org.openinfinity.core.util.ExceptionUtil;
-
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.services.ec2.AmazonEC2;
 import com.amazonaws.services.ec2.AmazonEC2Client;
-import com.amazonaws.services.ec2.model.AssociateAddressRequest;
-import com.amazonaws.services.ec2.model.AttachVolumeRequest;
-import com.amazonaws.services.ec2.model.AuthorizeSecurityGroupIngressRequest;
-import com.amazonaws.services.ec2.model.CreateKeyPairRequest;
-import com.amazonaws.services.ec2.model.CreateKeyPairResult;
-import com.amazonaws.services.ec2.model.CreateSecurityGroupRequest;
-import com.amazonaws.services.ec2.model.CreateSecurityGroupResult;
-import com.amazonaws.services.ec2.model.CreateTagsRequest;
-import com.amazonaws.services.ec2.model.CreateVolumeRequest;
-import com.amazonaws.services.ec2.model.CreateVolumeResult;
-import com.amazonaws.services.ec2.model.DeleteKeyPairRequest;
-import com.amazonaws.services.ec2.model.DeleteSecurityGroupRequest;
-import com.amazonaws.services.ec2.model.DeleteVolumeRequest;
-import com.amazonaws.services.ec2.model.DescribeInstancesRequest;
-import com.amazonaws.services.ec2.model.DescribeInstancesResult;
-import com.amazonaws.services.ec2.model.DescribeVolumesRequest;
-import com.amazonaws.services.ec2.model.DescribeVolumesResult;
-import com.amazonaws.services.ec2.model.DetachVolumeRequest;
-import com.amazonaws.services.ec2.model.DisassociateAddressRequest;
+import com.amazonaws.services.ec2.model.*;
 import com.amazonaws.services.ec2.model.Instance;
-import com.amazonaws.services.ec2.model.IpPermission;
-import com.amazonaws.services.ec2.model.KeyPair;
-import com.amazonaws.services.ec2.model.Placement;
-import com.amazonaws.services.ec2.model.Reservation;
-import com.amazonaws.services.ec2.model.RevokeSecurityGroupIngressRequest;
-import com.amazonaws.services.ec2.model.RunInstancesRequest;
-import com.amazonaws.services.ec2.model.RunInstancesResult;
-import com.amazonaws.services.ec2.model.Tag;
-import com.amazonaws.services.ec2.model.TerminateInstancesRequest;
-import com.amazonaws.services.ec2.model.UserIdGroupPair;
 import com.amazonaws.services.elasticloadbalancing.AmazonElasticLoadBalancing;
-import com.amazonaws.services.elasticloadbalancing.AmazonElasticLoadBalancingClient;
-import com.amazonaws.services.elasticloadbalancing.model.CreateAppCookieStickinessPolicyRequest;
-import com.amazonaws.services.elasticloadbalancing.model.CreateLoadBalancerRequest;
-import com.amazonaws.services.elasticloadbalancing.model.CreateLoadBalancerResult;
-import com.amazonaws.services.elasticloadbalancing.model.DeleteLoadBalancerRequest;
-import com.amazonaws.services.elasticloadbalancing.model.DeregisterInstancesFromLoadBalancerRequest;
-import com.amazonaws.services.elasticloadbalancing.model.Listener;
-import com.amazonaws.services.elasticloadbalancing.model.RegisterInstancesWithLoadBalancerRequest;
-import com.amazonaws.services.elasticloadbalancing.model.SetLoadBalancerPoliciesOfListenerRequest;
+import com.amazonaws.services.elasticloadbalancing.model.*;
+import org.apache.log4j.Logger;
+import org.openinfinity.core.util.ExceptionUtil;
 
-import static org.openinfinity.cloud.service.administrator.InstanceService.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+
+import static org.openinfinity.cloud.service.administrator.InstanceService.CLOUD_TYPE_AMAZON;
+import static org.openinfinity.cloud.service.administrator.InstanceService.CLOUD_TYPE_EUCALYPTUS;
 
 /**
  * EC2 wrapper.
@@ -166,7 +130,7 @@ public class EC2Wrapper {
 		} catch (AmazonServiceException ase) {
 			String message = ase.getMessage();
 			LOG.error("Caught Exception: " + message);
-			LOG.error("Reponse Status Code: " + ase.getStatusCode());
+			LOG.error("Response Status Code: " + ase.getStatusCode());
 			LOG.error("Error Code: " + ase.getErrorCode());
 			LOG.error("Request ID: " + ase.getRequestId());
 			ExceptionUtil.throwSystemException(message, ase);

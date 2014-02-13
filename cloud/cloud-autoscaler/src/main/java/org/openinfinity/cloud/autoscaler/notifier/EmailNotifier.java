@@ -50,8 +50,8 @@ public class EmailNotifier implements Notifier{
     }
 
     private String msgGroupLoadFetchingFailed(ScalingData d) {
-        return "Unable to scale cluster.\n" +
-                "Load average for the cluster is not available." + "\n\n" +
+        return "Autoscaling of the cluster is not possible.\n" +
+                "Cluster load average is not available." + "\n\n" +
                 "Severity: " + "HIGH\n" +
                 "cloud zone: " + cloudZone + "\n" +
                 "instance id: " + d.getCluster().getInstanceId() + "\n" +

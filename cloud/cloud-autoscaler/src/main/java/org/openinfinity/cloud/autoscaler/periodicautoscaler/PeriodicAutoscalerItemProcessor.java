@@ -16,6 +16,7 @@
 
 package org.openinfinity.cloud.autoscaler.periodicautoscaler;
 
+import org.apache.log4j.Logger;
 import org.openinfinity.cloud.autoscaler.common.AutoscalerItemProcessor;
 import org.openinfinity.cloud.autoscaler.notifier.Notifier;
 import org.openinfinity.cloud.autoscaler.notifier.Notifier.NotificationType;
@@ -29,6 +30,7 @@ import org.openinfinity.cloud.service.scaling.Enumerations.ScalingState;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -44,6 +46,9 @@ import java.util.Map;
  */
 @Component("periodicAutoscalerItemProcessor")
 public class PeriodicAutoscalerItemProcessor extends AutoscalerItemProcessor implements ItemProcessor<Machine, Job> {
+
+    private static final Logger LOG = Logger.getLogger(PeriodicAutoscalerItemProcessor.class.getName());
+
 
     public static final String[] METRIC_NAMES = {"load-relative.rrd"};
 
@@ -87,9 +92,15 @@ public class PeriodicAutoscalerItemProcessor extends AutoscalerItemProcessor imp
 	public Job process(Machine machine){
         Job job = null;
         clusterId = machine.getClusterId();
-        ScalingRule rule = scalingRuleService.getRule(clusterId);
-
-        if (!rule.isPeriodicScalingOn()){
+        ScalingRule rule;
+        try{
+            rule = scalingRuleService.getRule(clusterId);
+            if (!rule.isPeriodicScalingOn()){
+                return null;
+            }
+        }
+        catch (EmptyResultDataAccessException e){
+            LOG.debug("Scaling rule does not exist for clusterId [" + clusterId + "]");
             return null;
         }
 

@@ -28,10 +28,14 @@
     
 	<bean id="txManager" 
 	    class="org.springframework.jdbc.datasource.DataSourceTransactionManager"
-		p:dataSource-ref="cloudDataSource" /> 	
-	
-	<bean id="jobRepository" class="org.springframework.batch.core.repository.support.JobRepositoryFactoryBean"
-		p:dataSource-ref="cloudDataSource"
+		p:dataSource-ref="cloudDataSource" />
+
+    <bean id="springBatchTxManager"
+          class="org.springframework.jdbc.datasource.DataSourceTransactionManager"
+          p:dataSource-ref="springBatchDataSource" />
+
+    <bean id="jobRepository" class="org.springframework.batch.core.repository.support.JobRepositoryFactoryBean"
+		p:dataSource-ref="springBatchDataSource"
 		p:transactionManager-ref="txManager" />
 	
 	<bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher"
@@ -55,7 +59,7 @@
 
 	<batch:job id="periodicJob">
 		<batch:step id="stepP1">
-			<batch:tasklet transaction-manager="txManager"
+			<batch:tasklet transaction-manager="springBatchTxManager"
 				start-limit="3">
 				<batch:chunk reader="periodicAutoscalerItemReader" processor="periodicAutoscalerItemProcessor"
 					writer="periodicAutoscalerItemWriter" commit-interval="100" retry-limit="3">
@@ -70,7 +74,7 @@
 	
 	<batch:job id="scheduledJob">
 		<batch:step id="stepS1">
-			<batch:tasklet transaction-manager="txManager"
+			<batch:tasklet transaction-manager="springBatchTxManager"
 				start-limit="3">
 				<batch:chunk reader="scheduledAutoscalerItemReader" processor="scheduledAutoscalerItemProcessor"
 					writer="scheduledAutoscalerItemWriter" commit-interval="100" retry-limit="3">

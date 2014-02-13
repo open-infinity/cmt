@@ -35,8 +35,8 @@ public final class Enumerations{
 	
 	public enum ScalingPolicy {
 		MANUAL,
-		AUTOMATIC;
-	}
+		AUTOMATIC
+    }
 }
 
 

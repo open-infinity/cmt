@@ -52,6 +52,7 @@
           class="org.springframework.batch.core.repository.support.JobRepositoryFactoryBean"
           p:dataSource-ref="cloudDataSource" p:transactionManager-ref="txManager" />
 
+
     <bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
         <property name="jobRepository" ref="jobRepository" />
     </bean>
