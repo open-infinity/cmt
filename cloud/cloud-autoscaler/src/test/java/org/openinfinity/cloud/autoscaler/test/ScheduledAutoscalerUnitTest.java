@@ -59,12 +59,6 @@ public class ScheduledAutoscalerUnitTest {
 	@Autowired
     ScheduledAutoscalerItemProcessor itemProcessor;
 
-    /*
-	@Autowired
-	@Spy
-	ScalingRuleService scalingRuleService;
-    */
-
 	@Mock
 	ClusterService mockClusterService;
 
@@ -231,14 +225,13 @@ public class ScheduledAutoscalerUnitTest {
         LOG.debug("ENTER ScaleOutTest");
         // Given
         long now = System.currentTimeMillis();
-        //Timestamp period
 		when(mockScalingRule.getPeriodFrom()).thenReturn(new Timestamp(now));
 		when(mockScalingRule.getPeriodTo()).thenReturn(new Timestamp(now + 300000));
 		when(mockScalingRule.getClusterId()).thenReturn(1);
         when(mockScalingRule.getJobId()).thenReturn(1);
         when(mockScalingRule.getScheduledScalingState()).thenReturn(ScalingRule.ScheduledScalingState.READY_FOR_SCALE_OUT.getValue());
 		when(mockScalingRule.getClusterSizeNew()).thenReturn(100);
-		//when(mockScalingRuleService.applyScalingRule()).thenReturn(ScalingState.SCALE_OUT);
+
         Cluster cluster = new Cluster();
 		cluster.setInstanceId(1);
 		cluster.setNumberOfMachines(10);
@@ -293,7 +286,6 @@ public class ScheduledAutoscalerUnitTest {
         Job job = itemProcessor.process(mockScalingRule);
 
         // Then
-        //verify(scalingRuleService).storeScalingInParameters(1);
         Assert.assertThat("1,0", is(job.getServices()));
     }
 

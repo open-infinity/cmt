@@ -86,13 +86,14 @@ public class ScalingRuleServiceImpl implements ScalingRuleService {
 
         if (isScalingOngoing(scalingRule)){
             state = ScalingState.SCALING_ONGOING;
+
         } else if (scalingRule.getMaxNumberOfMachinesPerCluster() <= scalingRule.getClusterSizeNew()){
             state = ScalingState.SCALING_OUT_IMPOSSIBLE;
-        }
-        else if (periodTo.before(periodFrom) || periodTo.equals(periodFrom)){
+
+        } else if (periodTo.before(periodFrom) || periodTo.equals(periodFrom)){
             state = ScalingState.SCALING_RULE_INVALID;
-        }
-        else if (samplingPeriodFrom.before(periodFrom) && samplingPeriodTo.after(periodFrom)
+
+        } else if (samplingPeriodFrom.before(periodFrom) && samplingPeriodTo.after(periodFrom)
                 && scalingRule.getScheduledScalingState() == ScalingRule.ScheduledScalingState.READY_FOR_SCALE_OUT.getValue()){
 
             storeScalingOutParameters(cluster.getNumberOfMachines(), scalingRule.getClusterId());
@@ -132,13 +133,12 @@ public class ScalingRuleServiceImpl implements ScalingRuleService {
 
 	/*
 	 * Using two sql requests instead of using single with command
-	 * "on duplicate key update". That is beacuse H2 db, which is used for
-	 * testing, would not support it. -Vedran Bartonicek
+	 * "on duplicate key update". That is because H2 db, which is used for
+	 * testing, would not support it.
 	 */
 	@Transactional
 	public void store(ScalingRule newScalingRule) {
         try{
-            // If rule exists update it, otherwise this throws EmptyResultDataAccessException
             scalingRuleRepository.getRule(newScalingRule.getClusterId());
             scalingRuleRepository.updateExisting(newScalingRule);
         }

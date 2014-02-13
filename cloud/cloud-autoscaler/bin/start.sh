@@ -1,7 +1,7 @@
 #!/bin/bash
 
 USER=toas
-CP=/opt/toas/cloudmanagementtools/autoscaler/lib/java/cloud-autoscaler-1.2.0.RELEASE.jar
+CP=/opt/toas/cloudmanagementtools/autoscaler/lib/java/cloud-autoscaler-1.2.2.jar
 PID_FILE=/opt/toas/cloudmanagementtools/autoscaler/var/run/autoscaler.pid
 JAVA_HOME=/etc/alternatives/java_sdk_openjdk/
 

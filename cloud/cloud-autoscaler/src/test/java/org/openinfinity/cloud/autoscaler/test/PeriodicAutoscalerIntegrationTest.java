@@ -245,6 +245,9 @@ public class PeriodicAutoscalerIntegrationTest {
         Assert.assertEquals(job.getJobId(), scalingRuleService.getRule(CLUSTER_ID).getJobId());
     }
 
+
+    // Utility functions
+
     private boolean configureRrdServer(String loadType) throws InterruptedException{
         boolean success = false;
         for (int counter = 1; counter <= REQUEST_ATTEMPTS; counter++){
