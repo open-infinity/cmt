@@ -64,7 +64,7 @@ class oibackup::config {
 	# Backup cron file
 	file { "/opt/openinfinity/2.0.0/backup/scripts/oi-daily-backup.sh":
 		ensure => present,
-	        content => template("oibackup/oi-daily-backup.sh.template"),
+        content => template("oibackup/oi-daily-backup.sh.template"),
 		owner => "root",
 		group => "root",
 		mode => 0755,
@@ -74,7 +74,7 @@ class oibackup::config {
 	# Daily backup cron row
 	file { "/etc/cron.d/oi-daily-backup":
 		ensure => present,
-	        content => template("oibackup/cron_d_oi-daily-backup.template"),
+        content => template("oibackup/cron_d_oi-daily-backup.template"),
 		owner => "root",
 		group => "root",
 		mode => 0644,
