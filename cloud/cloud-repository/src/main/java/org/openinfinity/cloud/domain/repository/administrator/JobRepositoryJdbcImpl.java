@@ -142,7 +142,7 @@ public class JobRepositoryJdbcImpl implements JobRepository {
 		parameters.put("job_start_time", job.getStartTime());
 		parameters.put("job_end_time", job.getEndTime());
 		Number newId = insert.executeAndReturnKey(parameters);
-		LOG.info("Job id: "+newId);
+		LOG.info("Job id: " + newId);
 		int jobId = newId.intValue();
 		job.setJobId(jobId);
 		return jobId;

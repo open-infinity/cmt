@@ -41,6 +41,8 @@ public class EmailNotifier implements Notifier{
             case LOAD_FETCHING_FAILED:
                 notification = msgGroupLoadFetchingFailed(d);
                 break;
+            case PREVIOUS_SCALING_FAILED:
+                notification = msgPerviousScalingFailed(d);
             default:
                 break;
         }
@@ -51,23 +53,38 @@ public class EmailNotifier implements Notifier{
 
     private String msgGroupLoadFetchingFailed(ScalingData d) {
         return "Autoscaling of the cluster is not possible.\n" +
-                "Cluster load average is not available." + "\n\n" +
-                "Severity: " + "HIGH\n" +
-                "cloud zone: " + cloudZone + "\n" +
-                "instance id: " + d.getCluster().getInstanceId() + "\n" +
-                "cluster id: " + d.getCluster().getId() + "\n" +
-                "attempts:" + d.getFailures();
+               "Cluster load average is not available." + "\n\n" +
+               "Severity: " + "HIGH\n" +
+               "cloud zone: " + cloudZone + "\n" +
+               "instance id: " + d.getCluster().getInstanceId() + "\n" +
+               "cluster id: " + d.getCluster().getId() + "\n" +
+               "attempts:" + d.getFailures();
     }
 
     private String msgClusterScalingFailed(ScalingData d) {
         return "Scaling out attempt failed.\n" +
-                "Load average for the cluster is too high, and cluster maximum size limit has been reached." + "\n\n" +
-                "Severity: " + "CRITICAL\n" +
-                "cloud zone: " + cloudZone + "\n" +
-                "instance id: " + d.getCluster().getInstanceId() + "\n" +
-                "cluster id: " + d.getCluster().getId() + "\n" +
-                "load:" + d.getLoad() + "\n" +
-                "max load threshold:" + d.getThreshold() + "\n" +
-                "max cluster size:" + d.getScalingRule().getMaxNumberOfMachinesPerCluster();
+               "Load average for the cluster is too high, and cluster maximum size limit has been reached." + "\n\n" +
+               "Severity: " + "CRITICAL\n" +
+               "cloud zone: " + cloudZone + "\n" +
+               "instance id: " + d.getCluster().getInstanceId() + "\n" +
+               "cluster id: " + d.getCluster().getId() + "\n" +
+               "load:" + d.getLoad() + "\n" +
+               "max load threshold:" + d.getThreshold() + "\n" +
+               "max cluster size:" + d.getScalingRule().getMaxNumberOfMachinesPerCluster();
+    }
+
+    private String msgPerviousScalingFailed(ScalingData d) {
+        return "There is a scaling job failure for this cluster.\n" +
+               "This indicates a problem with cloud infrastructure\n" +
+               "Autoscaler can not scale this cluster before the problem is solved and\n" +
+               "scaling rule's job id is reset\n\n" +
+               "Severity: " + "CRITICAL\n" +
+               "cloud zone: " + cloudZone + "\n" +
+               "instance id: " + d.getCluster().getInstanceId() + "\n" +
+               "cluster id: " + d.getCluster().getId() + "\n" +
+               "load:" + d.getLoad() + "\n" +
+               "max load threshold:" + d.getThreshold() + "\n" +
+               "max cluster size:" + d.getScalingRule().getMaxNumberOfMachinesPerCluster() + "\n" +
+               "failed job id:" + d.getScalingRule().getJobId();
     }
 }

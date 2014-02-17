@@ -243,7 +243,7 @@ public class HealthMonitoringServiceImpl implements HealthMonitoringService {
     }
     
     @Override
-    public HealthStatusResponse getLatestAvalibaleClusterHealthStatus(Machine machine, String metricType, String[] metricNames, Date date) {
+    public HealthStatusResponse getLatestAvailabaleClusterHealthStatus(Machine machine, String metricType, String[] metricNames, Date date) {
         HealthStatusResponse response = null;
 
         // Validate input parameters
@@ -278,7 +278,7 @@ public class HealthMonitoringServiceImpl implements HealthMonitoringService {
     public float getClusterLoad(Machine machine, String[] metricName, String metricType, String period){
 
         // Ask for Group health status from http-rrd server
-        HealthStatusResponse response = getLatestAvalibaleClusterHealthStatus(machine, metricType, metricName, new Date());
+        HealthStatusResponse response = getLatestAvailabaleClusterHealthStatus(machine, metricType, metricName, new Date());
 
         // If response status is OK, extract load
         if (response.getResponseStatus() == AbstractResponse.STATUS_OK){
@@ -322,7 +322,7 @@ public class HealthMonitoringServiceImpl implements HealthMonitoringService {
             //LOG.debug("================================================");
             obj = mapper.readValue(source, expectedType);
         } catch (Exception e) {
-            LOG.error("Exception occured while converting from String to Object. ", e);
+            LOG.error("Exception occurred while converting from String to Object. ", e);
         }
 
         return obj;

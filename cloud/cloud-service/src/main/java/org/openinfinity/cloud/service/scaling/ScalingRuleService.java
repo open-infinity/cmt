@@ -32,11 +32,17 @@ import java.util.Collection;
  * @since 1.0.0
  */
 public interface ScalingRuleService {
-	
+
+    public static enum ClusterScalingStatus{
+        IDLE,
+        ERROR,
+        UNDER_CONSTRUCTION,
+    }
+
 	/**
 	 * Calculates scaling state for Periodic Autoscaler
 	 */
-    ScalingState applyScalingRule(float load, int clusterId,	ScalingRule rule);
+    ScalingState applyScalingRule(float load, int clusterId, ScalingRule rule);
 
     /**
      * Calculates scaling state for Scheduled Autoscaler

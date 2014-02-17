@@ -49,7 +49,7 @@ public interface HealthMonitoringService {
 
     HealthStatusResponse getClusterHealthStatus(Machine machine, String metricType, String[] metricNames, Date date);
     
-    HealthStatusResponse getLatestAvalibaleClusterHealthStatus(Machine machine, String metricType, String[] metricNames, Date date);
+    HealthStatusResponse getLatestAvailabaleClusterHealthStatus(Machine machine, String metricType, String[] metricNames, Date date);
 
     float getClusterLoad(Machine machine, String[] metricName, String metricType, String period);
 

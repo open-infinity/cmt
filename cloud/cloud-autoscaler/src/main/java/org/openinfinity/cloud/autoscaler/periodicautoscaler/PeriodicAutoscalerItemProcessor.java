@@ -18,7 +18,6 @@ package org.openinfinity.cloud.autoscaler.periodicautoscaler;
 
 import org.apache.log4j.Logger;
 import org.openinfinity.cloud.autoscaler.common.AutoscalerItemProcessor;
-import org.openinfinity.cloud.autoscaler.notifier.Notifier;
 import org.openinfinity.cloud.autoscaler.notifier.Notifier.NotificationType;
 import org.openinfinity.cloud.autoscaler.util.ScalingData;
 import org.openinfinity.cloud.domain.Cluster;
@@ -33,9 +32,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * Batch processor for Periodic Autoscaler
  * 
@@ -47,24 +43,11 @@ import java.util.Map;
 @Component("periodicAutoscalerItemProcessor")
 public class PeriodicAutoscalerItemProcessor extends AutoscalerItemProcessor implements ItemProcessor<Machine, Job> {
 
-    private static final Logger LOG = Logger.getLogger(PeriodicAutoscalerItemProcessor.class.getName());
-
-
     public static final String[] METRIC_NAMES = {"load-relative.rrd"};
 
     public static final String METRIC_TYPE_LOAD = "load";
 
     public static final String METRIC_PERIOD = "shortterm";
-
-    /**
-     * Maps cluster id (group id) to number of successive failures to get group load from rrd-http server
-     */
-    private Map<Integer, Integer> failureMap;
-
-    /**
-     * Used to make unit testing easier
-     */
-    private int clusterId;
 
     /**
      * Specifies number of tolerated successive failures to get group load.
@@ -77,19 +60,14 @@ public class PeriodicAutoscalerItemProcessor extends AutoscalerItemProcessor imp
 	@Autowired
 	HealthMonitoringService healthMonitoringService;
 
-    @Autowired
-    Notifier notifier;
-
     PeriodicAutoscalerItemProcessor(){
-        failureMap = new HashMap<Integer, Integer>();
     }
 
-    public Map<Integer, Integer> getFailureMap() {
-        return failureMap;
-    }
+    private static final Logger LOG = Logger.getLogger(PeriodicAutoscalerItemProcessor.class.getName());
 
     @Override
 	public Job process(Machine machine){
+
         Job job = null;
         clusterId = machine.getClusterId();
         ScalingRule rule;
@@ -100,42 +78,49 @@ public class PeriodicAutoscalerItemProcessor extends AutoscalerItemProcessor imp
             }
         }
         catch (EmptyResultDataAccessException e){
-            LOG.debug("Scaling rule does not exist for clusterId [" + clusterId + "]");
             return null;
         }
 
         Cluster cluster = clusterService.getCluster(clusterId);
-        boolean keyExists = failureMap.containsKey(clusterId);
-        int failures = 0;
-        if (keyExists){
-            failures = failureMap.get(clusterId);
-        }
-        float load = healthMonitoringService.getClusterLoad(machine, METRIC_NAMES, METRIC_TYPE_LOAD, METRIC_PERIOD);
+        Failures failures = initializeFailures();
+        int httpFailures = failures.getHttpFailures();
 
+        float load = healthMonitoringService.getClusterLoad(machine, METRIC_NAMES, METRIC_TYPE_LOAD, METRIC_PERIOD);
         if (load == -1){
-            failureMap.put(clusterId, ++failures);
-            if (failures == httpAttemptsThreshold){
-                notifier.notify(new ScalingData(failures, cluster), NotificationType.LOAD_FETCHING_FAILED);
+            failures.setHttpFailures(++httpFailures);
+            if (httpFailures == httpAttemptsThreshold){
+                notifier.notify(new ScalingData(httpFailures, cluster), NotificationType.LOAD_FETCHING_FAILED);
             }
             return null;
         }
-        else if (failures > 0){
-            failureMap.put(clusterId, 0);
+        else if (httpFailures > 0){
+            failures.setHttpFailures(0);
         }
 
         ScalingState state = scalingRuleService.applyScalingRule(load, clusterId, rule);
         switch (state) {
             case SCALE_OUT:
-                return createJob(cluster, cluster.getNumberOfMachines() + 1);
+                job = createJob(cluster, cluster.getNumberOfMachines() + 1);
+                break;
             case SCALE_IN:
-                return createJob(cluster, cluster.getNumberOfMachines() - 1);
+                job = createJob(cluster, cluster.getNumberOfMachines() - 1);
+                break;
             case SCALING_OUT_IMPOSSIBLE:
                 notifier.notify(new ScalingData(load, cluster, rule), NotificationType.SCALING_FAILED);
+                break;
+            case SCALING_ERROR:
+                if (!failures.isJobFailureDetected()) {
+                    failures.setJobFailureDetected(true);
+                    notifier.notify(new ScalingData(load, cluster, rule), NotificationType.PREVIOUS_SCALING_FAILED);
+                }
+                break;
             case SCALING_ONGOING:
             case SCALING_NOT_REQUIRED:
+            case SCALING_RULE_INVALID:
             default:
                 break;
         }
+        failuresMap.put(clusterId, failures);
         return job;
     }
 

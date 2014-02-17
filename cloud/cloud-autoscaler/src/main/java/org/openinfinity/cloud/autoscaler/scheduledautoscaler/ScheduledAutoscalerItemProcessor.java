@@ -17,6 +17,9 @@
 package org.openinfinity.cloud.autoscaler.scheduledautoscaler;
 
 import org.openinfinity.cloud.autoscaler.common.AutoscalerItemProcessor;
+import org.openinfinity.cloud.autoscaler.notifier.Notifier;
+import org.openinfinity.cloud.autoscaler.periodicautoscaler.Failures;
+import org.openinfinity.cloud.autoscaler.util.ScalingData;
 import org.openinfinity.cloud.domain.Cluster;
 import org.openinfinity.cloud.domain.Job;
 import org.openinfinity.cloud.domain.ScalingRule;
@@ -37,32 +40,55 @@ import java.sql.Timestamp;
 @Component("scheduledAutoscalerItemProcessor")
 public class ScheduledAutoscalerItemProcessor extends AutoscalerItemProcessor implements ItemProcessor<ScalingRule, Job> {
 
-	@Value("${sampling.offset.end}")
+    @Value("${sampling.offset.end}")
     int offsetEnd;
     
     @Value("${sampling.offset.start}")
     int offsetStart;
 
+    public int getOffsetEnd() {
+        return offsetEnd;
+    }
+
+    public int getOffsetStart() {
+        return offsetStart;
+    }
+
 	@Override
-	public Job process(ScalingRule scalingRule) throws Exception {
+	public Job process(ScalingRule rule) throws Exception {
 
 		long now = System.currentTimeMillis();
 		Timestamp samplingPeriodStart = new Timestamp(now - offsetStart );
-		Timestamp samplingPeriodEnd = new Timestamp(now + offsetEnd); 
-		Cluster cluster = clusterService.getCluster(scalingRule.getClusterId());
-        Job job = null;
-        Enumerations.ScalingState state = scalingRuleService.applyScalingRule(samplingPeriodStart, samplingPeriodEnd, cluster, scalingRule);
+		Timestamp samplingPeriodEnd = new Timestamp(now + offsetEnd);
 
+        clusterId = rule.getClusterId();
+        Cluster cluster = clusterService.getCluster(clusterId);
+        Job job = null;
+        Failures failures = initializeFailures();
+
+        Enumerations.ScalingState state = scalingRuleService.applyScalingRule(samplingPeriodStart, samplingPeriodEnd, cluster, rule);
         switch (state) {
             case SCALE_OUT:
-                return createJob(cluster, scalingRule.getClusterSizeNew());
+                return createJob(cluster, rule.getClusterSizeNew());
             case SCALE_IN:
-                return createJob(cluster, scalingRule.getClusterSizeOriginal());
+                return createJob(cluster, rule.getClusterSizeOriginal());
             case SCALING_OUT_IMPOSSIBLE:
+                break;
             case SCALING_ONGOING:
+                break;
             case SCALING_NOT_REQUIRED:
+                break;
+            case SCALING_RULE_INVALID:
+                break;
+            case SCALING_ERROR:
+                if (!failures.isJobFailureDetected()) {
+                    failures.setJobFailureDetected(true);
+                    notifier.notify(new ScalingData(0, cluster, rule), Notifier.NotificationType.PREVIOUS_SCALING_FAILED);
+                }
+                break;
             default:
                 break;
+
         }
 		return job;
 	}

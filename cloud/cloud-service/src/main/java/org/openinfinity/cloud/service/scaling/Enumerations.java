@@ -30,7 +30,8 @@ public final class Enumerations{
         SCALE_OUT,
         SCALE_IN,
         SCALING_OUT_IMPOSSIBLE,
-        SCALING_RULE_INVALID
+        SCALING_RULE_INVALID,
+        SCALING_ERROR
 	}
 	
 	public enum ScalingPolicy {

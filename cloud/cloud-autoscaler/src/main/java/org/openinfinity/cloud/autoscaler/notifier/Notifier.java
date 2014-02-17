@@ -7,6 +7,7 @@ public interface Notifier {
 
     public enum NotificationType {
         SCALING_FAILED,
-        LOAD_FETCHING_FAILED
+        LOAD_FETCHING_FAILED,
+        PREVIOUS_SCALING_FAILED
     }
 }

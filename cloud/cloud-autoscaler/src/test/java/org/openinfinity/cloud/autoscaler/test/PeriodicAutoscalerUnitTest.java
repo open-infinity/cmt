@@ -16,15 +16,16 @@
 
 package org.openinfinity.cloud.autoscaler.test;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.apache.log4j.Logger;
+import org.junit.*;
+import org.junit.rules.TestName;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 import org.openinfinity.cloud.autoscaler.notifier.Notifier;
+import org.openinfinity.cloud.autoscaler.periodicautoscaler.Failures;
 import org.openinfinity.cloud.autoscaler.periodicautoscaler.PeriodicAutoscalerItemProcessor;
 import org.openinfinity.cloud.autoscaler.util.ScalingData;
 import org.openinfinity.cloud.domain.*;
@@ -52,7 +53,12 @@ import static org.mockito.Mockito.*;
 @RunWith(SpringJUnit4ClassRunner.class)
 public class PeriodicAutoscalerUnitTest {
 
-	@InjectMocks
+    private static final Logger LOG = Logger.getLogger(PeriodicAutoscalerUnitTest.class.getName());
+
+    @Rule
+    public TestName name = new TestName();
+
+    @InjectMocks
 	@Autowired
     PeriodicAutoscalerItemProcessor itemProcessor;
 
@@ -75,15 +81,22 @@ public class PeriodicAutoscalerUnitTest {
 	@Before
 	public void initMocks() {
 		MockitoAnnotations.initMocks(this);
+        LOG.debug("ENTER " + name.getMethodName());
 	}
+
+    @After
+    public void after(){
+        LOG.debug("EXIT " + name.getMethodName());
+    }
 
     /**
      * Test case when scaling is required but not possible
      *
      * Given automatic (periodic) scaling is turned on,
-     * When load for cluster is available,
+     * and load for cluster is available,
      * and scaling is needed according to scaling rule,
      * and maxim cluster size is reached,
+     * When batch item is processed
      * Then send notification email,
      * and don't scale the cluster.
      *
@@ -102,18 +115,19 @@ public class PeriodicAutoscalerUnitTest {
         Cluster cluster = new Cluster();
         cluster.setInstanceId(1);
         cluster.setId(1);
+        int failedAttempts = 0;
+        Failures failures = new Failures(1, false);
+        itemProcessor.getFailuresMap().put(1, failures);
         when(mockScalingRuleService.getRule(1)).thenReturn(rule);
-
-        // When
         when(mockClusterService.getCluster(1)).thenReturn(cluster);
-
         when(mockHealthMonitoringService.getClusterLoad(machine, PeriodicAutoscalerItemProcessor.METRIC_NAMES, PeriodicAutoscalerItemProcessor.METRIC_TYPE_LOAD, PeriodicAutoscalerItemProcessor.METRIC_PERIOD)).thenReturn((float) 1);
         when(mockScalingRuleService.applyScalingRule(1, 1, rule)).thenReturn(ScalingState.SCALING_OUT_IMPOSSIBLE);
 
+        // When
+        Job job = itemProcessor.process(machine);
+
         // Then
-        int failedAttempts = 0;
-        itemProcessor.getFailureMap().put(1, failedAttempts);
-        Assert.assertNull(itemProcessor.process(machine));
+        Assert.assertNull(job);
         verify(notifier).notify(new ScalingData(failedAttempts, cluster), Notifier.NotificationType.SCALING_FAILED);
 	}
 
@@ -122,8 +136,9 @@ public class PeriodicAutoscalerUnitTest {
      * attempts to get load is reached
      *
      * Given automatic (periodic) scaling is turned on,
-     * When load for cluster is not available,
+     * and load for cluster is not available,
      * and number of past attempts equals threshold,
+     * When batch item is processed
      * Then send notification email,
      * and don't scale the cluster.
      *
@@ -131,6 +146,8 @@ public class PeriodicAutoscalerUnitTest {
      */
     @Test
     public void loadNotAvailableThresholdReachedTest() throws Exception {
+
+        // Given
         Machine machine = new Machine();
         machine.setClusterId(1);
         machine.setId(1);
@@ -139,19 +156,19 @@ public class PeriodicAutoscalerUnitTest {
         Cluster cluster = new Cluster();
         cluster.setInstanceId(1);
         cluster.setId(1);
-
-        // Given
         when(mockScalingRuleService.getRule(1)).thenReturn(rule);
-
-        // When
         when(mockClusterService.getCluster(1)).thenReturn(cluster);
         when(mockHealthMonitoringService.getClusterLoad(machine, PeriodicAutoscalerItemProcessor.METRIC_NAMES, PeriodicAutoscalerItemProcessor.METRIC_TYPE_LOAD, PeriodicAutoscalerItemProcessor.METRIC_PERIOD)).thenReturn((float) -1);
         int failedAttempts = 1;
-        itemProcessor.getFailureMap().put(1, failedAttempts);
+        Failures failures = new Failures(1, false);
+        itemProcessor.getFailuresMap().put(1, failures);
         ScalingData sd = new ScalingData(failedAttempts, cluster);
 
+        // When
+        Job job = itemProcessor.process(machine);
+
         // Then
-        Assert.assertNull(itemProcessor.process(machine));
+        Assert.assertNull(job);
         verify(notifier).notify(sd, Notifier.NotificationType.LOAD_FETCHING_FAILED);
     }
 
@@ -160,8 +177,9 @@ public class PeriodicAutoscalerUnitTest {
      * attempts to get load is NOT reached
      *
      * Given that automatic (periodic) scaling is turned on,
-     * When load for cluster is not available,
+     * and load for cluster is not available,
      * and number of past attempts equals threshold,
+     * When batch item is processed
      * Then send notification email,
      * and don't scale the cluster.
      *
@@ -169,6 +187,8 @@ public class PeriodicAutoscalerUnitTest {
      */
     @Test
     public void loadNotAvailableBelowThresholdTest() throws Exception {
+
+        // Given
         Machine machine = new Machine();
         machine.setClusterId(1);
         machine.setId(1);
@@ -177,24 +197,112 @@ public class PeriodicAutoscalerUnitTest {
         Cluster cluster = new Cluster();
         cluster.setInstanceId(1);
         cluster.setId(1);
-
-        // Given
         when(mockScalingRuleService.getRule(1)).thenReturn(rule);
-
-        // When
         when(mockClusterService.getCluster(1)).thenReturn(cluster);
         when(mockHealthMonitoringService.getClusterLoad(machine, PeriodicAutoscalerItemProcessor.METRIC_NAMES, PeriodicAutoscalerItemProcessor.METRIC_TYPE_LOAD, PeriodicAutoscalerItemProcessor.METRIC_PERIOD)).thenReturn((float) -1);
 
         // NOTE: threshold is 2 in autoscalertest.properties, and failedAttempts gets increased by 1
         int failedAttempts = 0;
-        itemProcessor.getFailureMap().put(1, failedAttempts);
+        Failures failures = new Failures(0, false);
+        itemProcessor.getFailuresMap().put(1, failures);
         ScalingData sd = new ScalingData(failedAttempts, cluster);
 
+        // When
+        Job job = itemProcessor.process(machine);
+
         // Then
-        Assert.assertNull(itemProcessor.process(machine));
+        Assert.assertNull(job);
         verify(notifier, never()).notify(sd, Notifier.NotificationType.LOAD_FETCHING_FAILED);
     }
 
+
+    /**
+     * Test situations when scaling out is required according to the scaling rules,
+     * but there were known failed jobs for this rule.
+     *
+     * Given that automatic (periodic) scaling is turned on,
+     * and load for cluster is not available,
+     * and number of past attempts equals threshold,
+     * When batch item is processed
+     * Then don't send notification email,
+     * and don't scale the cluster.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void scalingOutKnownJobErrorTest() throws Exception {
+
+        // Given
+        Machine machine = new Machine();
+        machine.setClusterId(1);
+        machine.setId(1);
+        ScalingRule rule = new ScalingRule();
+        rule.setPeriodicScalingOn(true);
+        Cluster cluster = new Cluster();
+        cluster.setInstanceId(1);
+        cluster.setId(1);
+        when(mockScalingRuleService.getRule(1)).thenReturn(rule);
+        when(mockClusterService.getCluster(1)).thenReturn(cluster);
+        when(mockHealthMonitoringService.getClusterLoad(machine, PeriodicAutoscalerItemProcessor.METRIC_NAMES, PeriodicAutoscalerItemProcessor.METRIC_TYPE_LOAD, PeriodicAutoscalerItemProcessor.METRIC_PERIOD)).thenReturn((float) 1);
+        when(mockScalingRuleService.applyScalingRule(1, 1, rule)).thenReturn(ScalingState.SCALING_ERROR);
+
+        // NOTE: threshold is 2 in autoscalertest.properties, and failedAttempts gets increased by 1
+        boolean jobFailureDetected = true;
+        Failures failures = new Failures(0, jobFailureDetected);
+        itemProcessor.getFailuresMap().put(1, failures);
+        ScalingData sd = new ScalingData(1, cluster, rule);
+
+        // When
+        Job job = itemProcessor.process(machine);
+
+        // Then
+        Assert.assertNull(job);
+        verify(notifier, never()).notify(sd, Notifier.NotificationType.PREVIOUS_SCALING_FAILED);
+    }
+
+    /**
+     * Test situations when scaling out is required according to the scaling rules,
+     * but there were known failed jobs for this rule.
+     *
+     * Given that automatic (periodic) scaling is turned on,
+     * and load for cluster is not available,
+     * and number of past attempts equals threshold,
+     * When batch item is processed
+     * Then send notification email,
+     * and don't scale the cluster.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void scalingOutNewJobErrorTest() throws Exception {
+
+        // Given
+        Machine machine = new Machine();
+        machine.setClusterId(1);
+        machine.setId(1);
+        ScalingRule rule = new ScalingRule();
+        rule.setPeriodicScalingOn(true);
+        Cluster cluster = new Cluster();
+        cluster.setInstanceId(1);
+        cluster.setId(1);
+        when(mockScalingRuleService.getRule(1)).thenReturn(rule);
+        when(mockClusterService.getCluster(1)).thenReturn(cluster);
+        when(mockHealthMonitoringService.getClusterLoad(machine, PeriodicAutoscalerItemProcessor.METRIC_NAMES, PeriodicAutoscalerItemProcessor.METRIC_TYPE_LOAD, PeriodicAutoscalerItemProcessor.METRIC_PERIOD)).thenReturn((float) 1);
+        when(mockScalingRuleService.applyScalingRule(1, 1, rule)).thenReturn(ScalingState.SCALING_ERROR);
+
+        // NOTE: threshold is 2 in autoscalertest.properties, and failedAttempts gets increased by 1
+        boolean jobFailureDetected = false;
+        Failures failures = new Failures(0, jobFailureDetected);
+        itemProcessor.getFailuresMap().put(1, failures);
+        ScalingData sd = new ScalingData(1, cluster, rule);
+
+        // When
+        Job job = itemProcessor.process(machine);
+
+        // Then
+        Assert.assertNull(job);
+        verify(notifier, times(1)).notify(sd, Notifier.NotificationType.PREVIOUS_SCALING_FAILED);
+    }
 
     /**
      * Test situations when periodic autoscaling is turned off
@@ -221,10 +329,8 @@ public class PeriodicAutoscalerUnitTest {
     /**
      * Test situations when scaling out is required
      *
-     * Given that cloud exists,
-     * and automatic (periodic) scaling is turned on,
-     * When load for cluster is available,
-     * and scaling is needed according to scaling rule,
+     * Given scaling is needed according to scaling rule,
+     * When batch item is processed
      * Then create a new Job that will increase cluster size by 1 machine
      *
      * @throws Exception
@@ -251,13 +357,13 @@ public class PeriodicAutoscalerUnitTest {
         when(mockClusterService.getCluster(1)).thenReturn(cluster);
         rule.setPeriodicScalingOn(true);
         when(mockScalingRuleService.getRule(1)).thenReturn(rule);
-
-        // When
         when(mockHealthMonitoringService.getClusterLoad(machine, PeriodicAutoscalerItemProcessor.METRIC_NAMES, PeriodicAutoscalerItemProcessor.METRIC_TYPE_LOAD, PeriodicAutoscalerItemProcessor.METRIC_PERIOD)).thenReturn((float) 1);
         when(mockScalingRuleService.applyScalingRule(1, 1, rule)).thenReturn(ScalingState.SCALE_OUT);
 
-        // Then
+        // When
         Job job = itemProcessor.process(machine);
+
+        // Then
         Assert.assertNotNull(job);
         Assert.assertThat(job.getJobType(), is("scale_cluster"));
         Assert.assertThat(job.getServices(), is("1,101"));
@@ -268,8 +374,9 @@ public class PeriodicAutoscalerUnitTest {
      *
      * Given that cloud exists,
      * and automatic (periodic) scaling is turned on,
-     * When load for cluster is available,
+     * and load for cluster is available,
      * and scaling is needed according to scaling rule,
+     * When batch item is processed
      * Then create a new Job that will decrease cluster size by 1 machine
      *
      * @throws Exception
@@ -296,13 +403,13 @@ public class PeriodicAutoscalerUnitTest {
         when(mockClusterService.getCluster(1)).thenReturn(cluster);
         rule.setPeriodicScalingOn(true);
         when(mockScalingRuleService.getRule(1)).thenReturn(rule);
-
-        // When
         when(mockHealthMonitoringService.getClusterLoad(machine, PeriodicAutoscalerItemProcessor.METRIC_NAMES, PeriodicAutoscalerItemProcessor.METRIC_TYPE_LOAD, PeriodicAutoscalerItemProcessor.METRIC_PERIOD)).thenReturn((float) 1);
         when(mockScalingRuleService.applyScalingRule(1, 1, rule)).thenReturn(ScalingState.SCALE_IN);
 
-        // Then
+        // When
         Job job = itemProcessor.process(machine);
+
+        // Then
         Assert.assertNotNull(job);
         Assert.assertThat(job.getJobType(), is("scale_cluster"));
         Assert.assertThat(job.getServices(), is("1,99"));

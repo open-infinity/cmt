@@ -16,6 +16,7 @@
 
 package org.openinfinity.cloud.service.scaling;
 
+import org.apache.log4j.Logger;
 import org.openinfinity.cloud.domain.Cluster;
 import org.openinfinity.cloud.domain.Job;
 import org.openinfinity.cloud.domain.ScalingRule;
@@ -35,7 +36,7 @@ import java.util.Collection;
 /**
  * Service interface implementation of the automated provisioning business
  * rules.
- * 
+ *
  * @author Ilkka Leinonen
  * @author Vedran Bartonicek
  * @version 1.0.0
@@ -44,7 +45,9 @@ import java.util.Collection;
 @Service("scalingRuleService")
 public class ScalingRuleServiceImpl implements ScalingRuleService {
 
-	@Autowired
+    private static final Logger LOG = Logger.getLogger(ScalingRuleServiceImpl.class.getName());
+
+    @Autowired
 	ScalingRuleRepository scalingRuleRepository;
 
 	@Autowired
@@ -63,72 +66,105 @@ public class ScalingRuleServiceImpl implements ScalingRuleService {
 		int minMachines = rule.getMinNumberOfMachinesPerCluster();
 		float maxLoad = rule.getMaxLoad();
 		float minLoad = rule.getMinLoad();
-        ScalingState state = ScalingState.SCALING_NOT_REQUIRED;
 
-        if (isScalingOngoing(rule)){
-			state = ScalingState.SCALING_ONGOING;
-		} else if ((load >= maxLoad && clusterSize < maxMachines) || (clusterSize < minMachines)){
-			state = ScalingState.SCALE_OUT;
-		} else if ((load <= minLoad && clusterSize > minMachines) || (clusterSize > maxMachines)){
-			state = ScalingState.SCALE_IN;
-		} else if (clusterSize >= maxMachines && load > maxLoad){
-			state = ScalingState.SCALING_OUT_IMPOSSIBLE;
-		}
+        LOG.debug("ENTER applyScalingRule");
+        LOG.debug("load:" + load + ", clusterId:" + clusterId);
+
+        ClusterScalingStatus clusterScalingStatus = getClusterScalingStatus(rule);
+        ScalingState state;
+
+        if(clusterScalingStatus == ClusterScalingStatus.ERROR){
+            state = ScalingState.SCALING_ERROR;
+
+        } else if(clusterScalingStatus == ClusterScalingStatus.UNDER_CONSTRUCTION){
+            state = ScalingState.SCALING_ONGOING;
+
+        } else if ((load >= maxLoad && clusterSize < maxMachines) || (clusterSize < minMachines)){
+            state = ScalingState.SCALE_OUT;
+
+        } else if ((load <= minLoad && clusterSize > minMachines) || (clusterSize > maxMachines)){
+            state = ScalingState.SCALE_IN;
+
+        } else if (clusterSize >= maxMachines && load > maxLoad){
+            state = ScalingState.SCALING_OUT_IMPOSSIBLE;
+
+        } else {
+            state = ScalingState.SCALING_NOT_REQUIRED;
+        }
+        LOG.debug("applyScalingRule result:" + state);
 		return state;
 	}
 
     @Override
-    public ScalingState applyScalingRule(Timestamp samplingPeriodFrom, Timestamp samplingPeriodTo, Cluster cluster, ScalingRule scalingRule) {
-        Timestamp periodFrom = scalingRule.getPeriodFrom();
-        Timestamp periodTo = scalingRule.getPeriodTo();
+    public ScalingState applyScalingRule(Timestamp samplingPeriodFrom, Timestamp samplingPeriodTo, Cluster cluster, ScalingRule rule) {
+        Timestamp periodFrom = rule.getPeriodFrom();
+        Timestamp periodTo = rule.getPeriodTo();
+        ScalingState state;
+        ClusterScalingStatus clusterScalingStatus = getClusterScalingStatus(rule);
 
-        ScalingState state = ScalingState.SCALING_NOT_REQUIRED;
+        if(clusterScalingStatus == ClusterScalingStatus.ERROR){
+            state = ScalingState.SCALING_ERROR;
 
-        if (isScalingOngoing(scalingRule)){
+        } else if(clusterScalingStatus == ClusterScalingStatus.UNDER_CONSTRUCTION){
             state = ScalingState.SCALING_ONGOING;
 
-        } else if (scalingRule.getMaxNumberOfMachinesPerCluster() <= scalingRule.getClusterSizeNew()){
-            state = ScalingState.SCALING_OUT_IMPOSSIBLE;
+        } else if (rule.getMaxNumberOfMachinesPerCluster() <= rule.getClusterSizeNew()){
+                state = ScalingState.SCALING_OUT_IMPOSSIBLE;
 
         } else if (periodTo.before(periodFrom) || periodTo.equals(periodFrom)){
             state = ScalingState.SCALING_RULE_INVALID;
 
         } else if (samplingPeriodFrom.before(periodFrom) && samplingPeriodTo.after(periodFrom)
-                && scalingRule.getScheduledScalingState() == ScalingRule.ScheduledScalingState.READY_FOR_SCALE_OUT.getValue()){
+                && rule.getScheduledScalingState() == ScalingRule.ScheduledScalingState.READY_FOR_SCALE_OUT.getValue()){
 
-            storeScalingOutParameters(cluster.getNumberOfMachines(), scalingRule.getClusterId());
+            storeScalingOutParameters(cluster.getNumberOfMachines(), rule.getClusterId());
             state = ScalingState.SCALE_OUT;
 
         } else if ((samplingPeriodFrom.before(periodTo) && samplingPeriodTo.after(periodTo)
-                && samplingPeriodFrom.after(periodFrom) && scalingRule.getScheduledScalingState() == ScalingRule.ScheduledScalingState.READY_FOR_SCALE_IN.getValue())
+                && samplingPeriodFrom.after(periodFrom) && rule.getScheduledScalingState() == ScalingRule.ScheduledScalingState.READY_FOR_SCALE_IN.getValue())
                 || (samplingPeriodFrom.before(periodFrom) && samplingPeriodTo.after(periodTo))) {
 
-            storeScalingInParameters(scalingRule.getClusterId());
+            storeScalingInParameters(rule.getClusterId());
             state = ScalingState.SCALE_IN;
+
+        } else {
+            state = ScalingState.SCALING_NOT_REQUIRED;
         }
+        LOG.debug("applyScalingRule result:" + state);
         return state;
     }
 
-    boolean isScalingOngoing(ScalingRule rule){
-        boolean scalingJobActive = true;
+    ClusterScalingStatus getClusterScalingStatus(ScalingRule rule){
+        ClusterScalingStatus scalingJobStatus = ClusterScalingStatus.IDLE;
         int jobId = rule.getJobId();
-
-        // If there was a scaling job, check if it is ready
-        if (jobId != -1) {
-            Job job = jobService.getJob(jobId);
-            if (job != null) {
+        try{
+            if (jobId == -1) {
+                scalingJobStatus = ClusterScalingStatus.IDLE;
+            } else {
+                Job job = jobService.getJob(jobId);
                 int jobStatus = job.getJobStatus();
-                if (jobStatus == JobService.CLOUD_JOB_READY)
-                    scalingJobActive = false;
+                boolean allMachinesConfigured = machineService.allMachinesConfigured(rule.getClusterId());
+                if (jobStatus == JobService.CLOUD_JOB_READY) {
+                    if (allMachinesConfigured){
+                        scalingJobStatus = ClusterScalingStatus.IDLE;
+                    } else {
+                        scalingJobStatus = ClusterScalingStatus.UNDER_CONSTRUCTION;
+                    }
+                } else if (jobStatus == JobService.CLOUD_JOB_ERROR) {
+                    scalingJobStatus = ClusterScalingStatus.ERROR;
+                } else if (jobStatus == JobService.CLOUD_JOB_CREATED) {
+                    scalingJobStatus = ClusterScalingStatus.UNDER_CONSTRUCTION;
+                } else if (jobStatus == JobService.CLOUD_JOB_STARTED) {
+                    scalingJobStatus = ClusterScalingStatus.UNDER_CONSTRUCTION;
+                }
             }
-        } else
-            scalingJobActive = false;
-
-        boolean allMachinesConfigured = false;
-        if (!scalingJobActive) {
-            allMachinesConfigured = machineService.allMachinesConfigured(rule.getClusterId());
         }
-        return scalingJobActive || !allMachinesConfigured;
+        catch (Exception e){
+            scalingJobStatus = ClusterScalingStatus.ERROR;
+            LOG.error("Fetching job for scaling rule for cluster " + rule.getClusterId() +  "failed.", e);
+        }
+        LOG.debug("getClusterScalingStatus for clusterId:" +  rule.getClusterId() + " and job id:" +jobId + " is:" + scalingJobStatus);
+        return scalingJobStatus;
     }
 
 	/*

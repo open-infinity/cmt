@@ -16,6 +16,7 @@
 
 package org.openinfinity.cloud.autoscaler.test;
 
+import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -50,6 +51,8 @@ import java.sql.Timestamp;
 @ContextConfiguration(locations={"classpath*:META-INF/spring/cloud-autoscaler-test-integration-context.xml"})
 @RunWith(SpringJUnit4ClassRunner.class)
 public class ScheduledAutoscalerIntegrationTest {
+
+    private static final Logger LOG = Logger.getLogger(ScheduledAutoscalerIntegrationTest.class.getName());
 
     private final int CLUSTER_ID = 1;
 

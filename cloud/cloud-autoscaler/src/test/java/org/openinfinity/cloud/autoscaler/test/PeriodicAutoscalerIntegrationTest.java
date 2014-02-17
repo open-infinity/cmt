@@ -16,6 +16,7 @@
 
 package org.openinfinity.cloud.autoscaler.test;
 
+import org.apache.log4j.Logger;
 import org.dbunit.dataset.DataSetException;
 import org.junit.After;
 import org.junit.Assert;
@@ -59,7 +60,9 @@ import static org.hamcrest.CoreMatchers.is;
 @RunWith(SpringJUnit4ClassRunner.class)
 public class PeriodicAutoscalerIntegrationTest {
 
-	private static final String MOCK_SERVER_PATH = "src/test/python/mock-rrd-server.py";
+    private static final Logger LOG = Logger.getLogger(PeriodicAutoscalerIntegrationTest.class.getName());
+
+    private static final String MOCK_SERVER_PATH = "src/test/python/mock-rrd-server.py";
 
     private static final String URL_LOAD_LOW = "http://127.0.0.1:8181/test/load/low";
 
@@ -142,7 +145,7 @@ public class PeriodicAutoscalerIntegrationTest {
     public void scaleNotNeededTest() throws Exception {
 
         // Given
-        org.junit.Assert.assertThat(configureRrdServer(URL_LOAD_MEDIUM), is(true));
+        Assert.assertThat(configureRrdServer(URL_LOAD_MEDIUM), is(true));
 
         // When
         JobExecution jobExecution = jobLauncherTestUtils.launchJob();
@@ -169,7 +172,7 @@ public class PeriodicAutoscalerIntegrationTest {
     public void scaleOutTest() throws Exception {
 
         // Given
-        org.junit.Assert.assertThat(configureRrdServer(URL_LOAD_HIGH), is(true));
+        Assert.assertThat(configureRrdServer(URL_LOAD_HIGH), is(true));
 
         // When
         JobExecution jobExecution = jobLauncherTestUtils.launchJob();
@@ -198,7 +201,7 @@ public class PeriodicAutoscalerIntegrationTest {
     public void scaleInTest() throws Exception {
 
         // Given
-        org.junit.Assert.assertThat(configureRrdServer(URL_LOAD_LOW), is(true));
+        Assert.assertThat(configureRrdServer(URL_LOAD_LOW), is(true));
 
         // When
         JobExecution jobExecution = jobLauncherTestUtils.launchJob();
@@ -228,21 +231,20 @@ public class PeriodicAutoscalerIntegrationTest {
     public void scaleOngoingTest() throws Exception {
 
         // Given
-        org.junit.Assert.assertThat(configureRrdServer(URL_LOAD_HIGH), is(true));
-
+        Assert.assertThat(configureRrdServer(URL_LOAD_HIGH), is(true));
         Cluster cluster = clusterService.getCluster(CLUSTER_ID);
         Instance instance = instanceService.getInstance(cluster.getInstanceId());
-        Job job = new Job("scale_cluster", cluster.getInstanceId(), instance.getCloudType(), JobService.CLOUD_JOB_CREATED, instance.getZone(),
-                Integer.toString(cluster.getId()), cluster.getNumberOfMachines() + 1);
-
-        scalingRuleService.storeJobId(CLUSTER_ID, jobService.addJob(job));
+        Job job = new Job("scale_cluster", cluster.getInstanceId(), instance.getCloudType(), JobService.CLOUD_JOB_CREATED, instance.getZone(), Integer.toString(cluster.getId()), cluster.getNumberOfMachines() + 1);
+        int jobId = jobService.addJob(job);
+        scalingRuleService.storeJobId(CLUSTER_ID, jobId);
+        Assert.assertEquals(jobId, scalingRuleService.getRule(CLUSTER_ID).getJobId());
 
         // When
         JobExecution jobExecution = jobLauncherTestUtils.launchJob();
 
         // Then
         Assert.assertEquals(jobExecution.getStatus(), BatchStatus.COMPLETED);
-        Assert.assertEquals(job.getJobId(), scalingRuleService.getRule(CLUSTER_ID).getJobId());
+        Assert.assertEquals(jobId, scalingRuleService.getRule(CLUSTER_ID).getJobId());
     }
 
 
