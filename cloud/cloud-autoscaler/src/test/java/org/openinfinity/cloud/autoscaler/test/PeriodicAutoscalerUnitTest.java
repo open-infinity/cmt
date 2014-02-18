@@ -55,6 +55,12 @@ public class PeriodicAutoscalerUnitTest {
 
     private static final Logger LOG = Logger.getLogger(PeriodicAutoscalerUnitTest.class.getName());
 
+    private ScalingRule rule;
+
+    private Cluster cluster;
+
+    private Machine machine;
+
     @Rule
     public TestName name = new TestName();
 
@@ -106,16 +112,8 @@ public class PeriodicAutoscalerUnitTest {
 	public void requiredScalingNotPossibleTest() throws Exception {
 
         // Given
-        Machine machine = new Machine();
-        machine.setClusterId(1);
-        machine.setId(1);
-        ScalingRule rule = new ScalingRule();
-        rule.setPeriodicScalingOn(true);
+        initData();
         rule.setMaxLoad((float)0.9);
-        Cluster cluster = new Cluster();
-        cluster.setInstanceId(1);
-        cluster.setId(1);
-        int failedAttempts = 0;
         ClusterProcessingState clusterProcessingState = new ClusterProcessingState(1, false, false);
         itemProcessor.getProcessingStatusMap().put(1, clusterProcessingState);
         when(mockScalingRuleService.getRule(1)).thenReturn(rule);
@@ -128,7 +126,7 @@ public class PeriodicAutoscalerUnitTest {
 
         // Then
         Assert.assertNull(job);
-        verify(notifier).notify(new ScalingData(failedAttempts, cluster), Notifier.NotificationType.SCALING_FAILED_RULE_LIMIT);
+        verify(notifier).notify(new ScalingData(0, cluster), Notifier.NotificationType.SCALING_FAILED_RULE_LIMIT);
 	}
 
     /**
@@ -148,21 +146,13 @@ public class PeriodicAutoscalerUnitTest {
     public void loadNotAvailableThresholdReachedTest() throws Exception {
 
         // Given
-        Machine machine = new Machine();
-        machine.setClusterId(1);
-        machine.setId(1);
-        ScalingRule rule = new ScalingRule();
-        rule.setPeriodicScalingOn(true);
-        Cluster cluster = new Cluster();
-        cluster.setInstanceId(1);
-        cluster.setId(1);
+        initData();
         when(mockScalingRuleService.getRule(1)).thenReturn(rule);
         when(mockClusterService.getCluster(1)).thenReturn(cluster);
         when(mockHealthMonitoringService.getClusterLoad(machine, PeriodicAutoscalerItemProcessor.METRIC_NAMES, PeriodicAutoscalerItemProcessor.METRIC_TYPE_LOAD, PeriodicAutoscalerItemProcessor.METRIC_PERIOD)).thenReturn((float) -1);
-        int failedAttempts = 1;
         ClusterProcessingState clusterProcessingState = new ClusterProcessingState(1, false, false);
         itemProcessor.getProcessingStatusMap().put(1, clusterProcessingState);
-        ScalingData sd = new ScalingData(failedAttempts, cluster);
+        ScalingData sd = new ScalingData(1, cluster);
 
         // When
         Job job = itemProcessor.process(machine);
@@ -189,23 +179,15 @@ public class PeriodicAutoscalerUnitTest {
     public void loadNotAvailableBelowThresholdTest() throws Exception {
 
         // Given
-        Machine machine = new Machine();
-        machine.setClusterId(1);
-        machine.setId(1);
-        ScalingRule rule = new ScalingRule();
-        rule.setPeriodicScalingOn(true);
-        Cluster cluster = new Cluster();
-        cluster.setInstanceId(1);
-        cluster.setId(1);
+        initData();
         when(mockScalingRuleService.getRule(1)).thenReturn(rule);
         when(mockClusterService.getCluster(1)).thenReturn(cluster);
         when(mockHealthMonitoringService.getClusterLoad(machine, PeriodicAutoscalerItemProcessor.METRIC_NAMES, PeriodicAutoscalerItemProcessor.METRIC_TYPE_LOAD, PeriodicAutoscalerItemProcessor.METRIC_PERIOD)).thenReturn((float) -1);
 
         // NOTE: threshold is 2 in autoscalertest.properties, and failedAttempts gets increased by 1
-        int failedAttempts = 0;
         ClusterProcessingState clusterProcessingState = new ClusterProcessingState(0, false, false);
         itemProcessor.getProcessingStatusMap().put(1, clusterProcessingState);
-        ScalingData sd = new ScalingData(failedAttempts, cluster);
+        ScalingData sd = new ScalingData(0, cluster);
 
         // When
         Job job = itemProcessor.process(machine);
@@ -232,22 +214,12 @@ public class PeriodicAutoscalerUnitTest {
     public void scalingOutNewJobErrorTest() throws Exception {
 
         // Given
-        Machine machine = new Machine();
-        machine.setClusterId(1);
-        machine.setId(1);
-        ScalingRule rule = new ScalingRule();
-        rule.setPeriodicScalingOn(true);
-        Cluster cluster = new Cluster();
-        cluster.setInstanceId(1);
-        cluster.setId(1);
+        initData();
         when(mockScalingRuleService.getRule(1)).thenReturn(rule);
         when(mockClusterService.getCluster(1)).thenReturn(cluster);
         when(mockHealthMonitoringService.getClusterLoad(machine, PeriodicAutoscalerItemProcessor.METRIC_NAMES, PeriodicAutoscalerItemProcessor.METRIC_TYPE_LOAD, PeriodicAutoscalerItemProcessor.METRIC_PERIOD)).thenReturn((float) 1);
         when(mockScalingRuleService.applyScalingRule(1, 1, rule)).thenReturn(ScalingStatus.SCALING_IMPOSSIBLE_CLUSTER_ERROR);
-
-        // NOTE: threshold is 2 in autoscalertest.properties, and failedAttempts gets increased by 1
-        boolean jobFailureDetected = false;
-        ClusterProcessingState clusterProcessingState = new ClusterProcessingState(0, jobFailureDetected, false);
+        ClusterProcessingState clusterProcessingState = new ClusterProcessingState(0, false, false);
         itemProcessor.getProcessingStatusMap().put(1, clusterProcessingState);
         ScalingData sd = new ScalingData(1, cluster, rule);
 
@@ -276,21 +248,12 @@ public class PeriodicAutoscalerUnitTest {
     public void scalingOutKnownJobErrorTest() throws Exception {
 
         // Given
-        Machine machine = new Machine();
-        machine.setClusterId(1);
-        machine.setId(1);
-        ScalingRule rule = new ScalingRule();
-        rule.setPeriodicScalingOn(true);
-        Cluster cluster = new Cluster();
-        cluster.setInstanceId(1);
-        cluster.setId(1);
+        initData();
         when(mockScalingRuleService.getRule(1)).thenReturn(rule);
         when(mockClusterService.getCluster(1)).thenReturn(cluster);
         when(mockHealthMonitoringService.getClusterLoad(machine, PeriodicAutoscalerItemProcessor.METRIC_NAMES, PeriodicAutoscalerItemProcessor.METRIC_TYPE_LOAD, PeriodicAutoscalerItemProcessor.METRIC_PERIOD)).thenReturn((float) 1);
         when(mockScalingRuleService.applyScalingRule(1, 1, rule)).thenReturn(ScalingStatus.SCALING_IMPOSSIBLE_CLUSTER_ERROR);
-
-        boolean jobFailureDetected = true;
-        ClusterProcessingState clusterProcessingState = new ClusterProcessingState(0, jobFailureDetected, false);
+        ClusterProcessingState clusterProcessingState = new ClusterProcessingState(0, true, false);
         itemProcessor.getProcessingStatusMap().put(1, clusterProcessingState);
         ScalingData sd = new ScalingData(1, cluster, rule);
 
@@ -319,19 +282,11 @@ public class PeriodicAutoscalerUnitTest {
     public void clusterNewConfigurationErrorTest() throws Exception {
 
         // Given
-        Machine machine = new Machine();
-        machine.setClusterId(1);
-        machine.setId(1);
-        ScalingRule rule = new ScalingRule();
-        rule.setPeriodicScalingOn(true);
-        Cluster cluster = new Cluster();
-        cluster.setInstanceId(1);
-        cluster.setId(1);
+        initData();
         when(mockScalingRuleService.getRule(1)).thenReturn(rule);
         when(mockClusterService.getCluster(1)).thenReturn(cluster);
         when(mockHealthMonitoringService.getClusterLoad(machine, PeriodicAutoscalerItemProcessor.METRIC_NAMES, PeriodicAutoscalerItemProcessor.METRIC_TYPE_LOAD, PeriodicAutoscalerItemProcessor.METRIC_PERIOD)).thenReturn((float) 1);
         when(mockScalingRuleService.applyScalingRule(1, 1, rule)).thenReturn(ScalingStatus.SCALING_IMPOSSIBLE_MACHINE_CONFIGURATION_ERROR);
-
         ClusterProcessingState clusterProcessingState = new ClusterProcessingState(0, false, false);
         itemProcessor.getProcessingStatusMap().put(1, clusterProcessingState);
         ScalingData sd = new ScalingData(1, cluster, rule);
@@ -361,19 +316,11 @@ public class PeriodicAutoscalerUnitTest {
     public void clusterKnownConfigurationErrorTest() throws Exception {
 
         // Given
-        Machine machine = new Machine();
-        machine.setClusterId(1);
-        machine.setId(1);
-        ScalingRule rule = new ScalingRule();
-        rule.setPeriodicScalingOn(true);
-        Cluster cluster = new Cluster();
-        cluster.setInstanceId(1);
-        cluster.setId(1);
+        initData();
         when(mockScalingRuleService.getRule(1)).thenReturn(rule);
         when(mockClusterService.getCluster(1)).thenReturn(cluster);
         when(mockHealthMonitoringService.getClusterLoad(machine, PeriodicAutoscalerItemProcessor.METRIC_NAMES, PeriodicAutoscalerItemProcessor.METRIC_TYPE_LOAD, PeriodicAutoscalerItemProcessor.METRIC_PERIOD)).thenReturn((float) 1);
         when(mockScalingRuleService.applyScalingRule(1, 1, rule)).thenReturn(ScalingStatus.SCALING_IMPOSSIBLE_MACHINE_CONFIGURATION_ERROR);
-
         ClusterProcessingState clusterProcessingState = new ClusterProcessingState(0, false, true);
         itemProcessor.getProcessingStatusMap().put(1, clusterProcessingState);
         ScalingData sd = new ScalingData(1, cluster, rule);
@@ -527,6 +474,17 @@ public class PeriodicAutoscalerUnitTest {
 
         // Then
         Assert.assertNotNull(job);
+    }
+
+    private void initData(){
+        machine = new Machine();
+        machine.setClusterId(1);
+        machine.setId(1);
+        rule = new ScalingRule();
+        rule.setPeriodicScalingOn(true);
+        cluster = new Cluster();
+        cluster.setInstanceId(1);
+        cluster.setId(1);
     }
 
 }
