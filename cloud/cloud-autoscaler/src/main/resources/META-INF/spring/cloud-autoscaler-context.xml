@@ -28,16 +28,20 @@
     
 	<bean id="txManager" 
 	    class="org.springframework.jdbc.datasource.DataSourceTransactionManager"
-		p:dataSource-ref="cloudDataSource" /> 	
-	
-	<bean id="jobRepository" class="org.springframework.batch.core.repository.support.JobRepositoryFactoryBean"
-		p:dataSource-ref="cloudDataSource"
+		p:dataSource-ref="cloudDataSource" />
+
+    <bean id="springBatchTxManager"
+          class="org.springframework.jdbc.datasource.DataSourceTransactionManager"
+          p:dataSource-ref="springBatchDataSource" />
+
+    <bean id="jobRepository" class="org.springframework.batch.core.repository.support.JobRepositoryFactoryBean"
+		p:dataSource-ref="springBatchDataSource"
 		p:transactionManager-ref="txManager" />
 	
 	<bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher"
 		p:jobRepository-ref="jobRepository" />
 		
-	<bean id="scheduledScalerItemReader" class="org.springframework.batch.item.database.JdbcCursorItemReader">
+	<bean id="scheduledAutoscalerItemReader" class="org.springframework.batch.item.database.JdbcCursorItemReader">
 		<property name="dataSource" ref="cloudDataSource"/>
 		<property name="sql" value="select * from scaling_rule_tbl where scheduled = 1"/>
 		<property name="rowMapper">
@@ -45,7 +49,7 @@
 		</property>
 	</bean>
 	
-	<bean id="periodicScalerItemReader" class="org.springframework.batch.item.database.JdbcCursorItemReader">
+	<bean id="periodicAutoscalerItemReader" class="org.springframework.batch.item.database.JdbcCursorItemReader">
 		<property name="dataSource" ref="cloudDataSource"/>
 		<property name="sql" value="select * from machine_tbl where machine_type = 'loadbalancer'"/>
 		<property name="rowMapper">
@@ -53,22 +57,12 @@
 		</property>
 	</bean>
 
-	<bean id="autoscalerItemWriter" class="org.springframework.batch.item.database.JdbcBatchItemWriter">
-		<property name="assertUpdates" value="true" />
-		<property name="itemSqlParameterSourceProvider">
-			<bean class="org.springframework.batch.item.database.BeanPropertyItemSqlParameterSourceProvider" />
-		</property>
-		<property name="dataSource" ref="cloudDataSource" />
-		<property name="sql" value="insert into job_tbl (job_type, job_status, job_instance_id, job_services, job_cloud, job_zone)  
-		    values (:jobType, :jobStatus, :instanceId, :services, :cloud, :zone)" />
-	</bean>
-	
 	<batch:job id="periodicJob">
 		<batch:step id="stepP1">
-			<batch:tasklet transaction-manager="txManager"
+			<batch:tasklet transaction-manager="springBatchTxManager"
 				start-limit="3">
-				<batch:chunk reader="periodicScalerItemReader" processor="periodicScalerItemProcessor"
-					writer="periodicScalerItemWriter" commit-interval="100" retry-limit="3">
+				<batch:chunk reader="periodicAutoscalerItemReader" processor="periodicAutoscalerItemProcessor"
+					writer="periodicAutoscalerItemWriter" commit-interval="100" retry-limit="3">
 					<batch:retryable-exception-classes>
                     	<batch:include class="org.springframework.dao.OptimisticLockingFailureException" />
                         <batch:include class="org.springframework.dao.DeadlockLoserDataAccessException" />
@@ -80,10 +74,10 @@
 	
 	<batch:job id="scheduledJob">
 		<batch:step id="stepS1">
-			<batch:tasklet transaction-manager="txManager"
+			<batch:tasklet transaction-manager="springBatchTxManager"
 				start-limit="3">
-				<batch:chunk reader="scheduledScalerItemReader" processor="scheduledScalerItemProcessor"
-					writer="autoscalerItemWriter" commit-interval="100" retry-limit="3">
+				<batch:chunk reader="scheduledAutoscalerItemReader" processor="scheduledAutoscalerItemProcessor"
+					writer="scheduledAutoscalerItemWriter" commit-interval="100" retry-limit="3">
 					<batch:retryable-exception-classes>
                     	<batch:include class="org.springframework.dao.OptimisticLockingFailureException" />
                         <batch:include class="org.springframework.dao.DeadlockLoserDataAccessException" />
@@ -92,6 +86,11 @@
 			</batch:tasklet>
 		</batch:step>
 	</batch:job>
+
+    <task:scheduled-tasks>
+        <task:scheduled ref="scheduledAutoscalerLauncher" method="launch" cron="0 0/2 * * * ?"/>
+        <task:scheduled ref="periodicAutoscalerLauncher" method="launch" cron="*/10 * * * * ?"/>
+    </task:scheduled-tasks>
 
     <bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
         <property name="host">
@@ -116,9 +115,4 @@
         <property name="templateMessage" ref="templateMessage"/>
     </bean>
 	
-	<task:scheduled-tasks>  
-	    <task:scheduled ref="scheduledScalerLauncher" method="launch" cron="0 0/2 * * * ?"/>    
-	    <task:scheduled ref="periodicScalerLauncher" method="launch" cron="*/10 * * * * ?"/>
-	</task:scheduled-tasks>
-		
 </beans>

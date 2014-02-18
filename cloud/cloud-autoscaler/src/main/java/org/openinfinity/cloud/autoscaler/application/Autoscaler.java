@@ -2,11 +2,10 @@ package org.openinfinity.cloud.autoscaler.application;
 
 import org.apache.commons.daemon.Daemon;
 import org.apache.commons.daemon.DaemonContext;
-import org.apache.commons.daemon.DaemonInitException;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class Autoscaler implements Daemon {
-    ClassPathXmlApplicationContext spring = null;
+    private ClassPathXmlApplicationContext spring = null;
     
     @Override
     public void destroy() {
@@ -16,7 +15,7 @@ public class Autoscaler implements Daemon {
     }
 
     @Override
-    public void init(DaemonContext arg0) throws DaemonInitException, Exception {
+    public void init(DaemonContext arg0){
         this.spring = new ClassPathXmlApplicationContext("/META-INF/spring/cloud-autoscaler-context.xml");   
     }
 

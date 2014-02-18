@@ -1,8 +1,8 @@
 package org.openinfinity.cloud.service.administrator;
 
-import java.util.Collection;
-
 import org.openinfinity.cloud.domain.Job;
+
+import java.util.Collection;
 
 /**
  * Job Service interface implementation for handling cloud configuration management.
@@ -38,5 +38,7 @@ import org.openinfinity.cloud.domain.Job;
 	void updateStatus(int id, int status);
 
     void deleteAll();
-	
+
+    Job getNewest();
+
 }

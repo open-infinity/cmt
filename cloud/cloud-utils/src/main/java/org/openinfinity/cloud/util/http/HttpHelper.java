@@ -15,6 +15,7 @@
  */
 package org.openinfinity.cloud.util.http;
 
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
@@ -22,6 +23,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
+
 import java.io.IOException;
 
 /**
@@ -30,6 +32,7 @@ import java.io.IOException;
  * @author Ilkka Leinonen
  * @author Timo Saarinen
  * @author Nishant Gupta
+ * @author Vedran Bartonicek
  */
 public class HttpHelper {
 
@@ -38,10 +41,14 @@ public class HttpHelper {
 
     public static String executeHttpRequest(HttpClient client, String url) {
         HttpUriRequest request = new HttpGet(url);
-        
+
         try {
             HttpResponse response = client.execute(request);
-            return EntityUtils.toString(response.getEntity());
+            int status = response.getStatusLine().getStatusCode();
+            if (status >= 200 && status < 300) {
+                HttpEntity entity = response.getEntity();
+                return entity != null ? EntityUtils.toString(entity) : null;
+            }
         } catch (ClientProtocolException e) {
             LOG.warn(EXCEPTION_WHILE_EXECUTING_HTTP_REQUEST +"----" +e.getMessage());
         } catch (IOException e) {

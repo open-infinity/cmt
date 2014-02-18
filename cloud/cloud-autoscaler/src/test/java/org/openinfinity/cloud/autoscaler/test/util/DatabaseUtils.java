@@ -1,18 +1,20 @@
 package org.openinfinity.cloud.autoscaler.test.util;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.net.URL;
-import java.sql.Timestamp;
-
-import javax.sql.DataSource;
-
 import org.dbunit.database.DatabaseDataSourceConnection;
 import org.dbunit.database.IDatabaseConnection;
+import org.dbunit.dataset.DataSetException;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.ReplacementDataSet;
 import org.dbunit.dataset.xml.FlatXmlDataSetBuilder;
 import org.dbunit.operation.DatabaseOperation;
+
+import javax.sql.DataSource;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.sql.Timestamp;
 
 /**
  * Cloud-autoscaler periodic scaler, functional tests
@@ -36,20 +38,13 @@ public class DatabaseUtils {
 		}
 	}
 	
-	public static IDataSet initDataSet(Object obj, String sqlScript, Timestamp from, Timestamp to) throws Exception
+	public static IDataSet initDataSet(Object obj, String sqlScript, Timestamp from, Timestamp to) throws URISyntaxException, FileNotFoundException, DataSetException
     {
-		ReplacementDataSet dataSet = null;
-		
-		try{		
-			URL resourceLocation = obj.getClass().getClassLoader().getResource(sqlScript);
-	        dataSet = new ReplacementDataSet(new FlatXmlDataSetBuilder().
-	            build(new FileInputStream(new File(resourceLocation.toURI())))); 
-	        dataSet.addReplacementObject("[from]", from);
-	        dataSet.addReplacementObject("[to]", to);
-		}
-		catch (Exception e){
-		    e.printStackTrace();
-		}
+		ReplacementDataSet dataSet;
+        URL resourceLocation = obj.getClass().getClassLoader().getResource(sqlScript);
+        dataSet = new ReplacementDataSet(new FlatXmlDataSetBuilder().build(new FileInputStream(new File(resourceLocation.toURI()))));
+        dataSet.addReplacementObject("[from]", from);
+        dataSet.addReplacementObject("[to]", to);
         return dataSet;
     }
 }

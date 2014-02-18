@@ -215,7 +215,8 @@ public class ScalingRuleRepositoryImpl implements ScalingRuleRepository {
             }
         });
     }
-	
+
+    @AuditTrail
 	public void addNew(final ScalingRule newScalingRule){
 		SimpleJdbcInsert insert = new SimpleJdbcInsert(dataSource).withTableName("scaling_rule_tbl");	
 		Map<String,Object> parameters = new HashMap<String,Object>();	

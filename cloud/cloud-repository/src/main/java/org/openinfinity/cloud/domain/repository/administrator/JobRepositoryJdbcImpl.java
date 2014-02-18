@@ -16,18 +16,6 @@
 
 package org.openinfinity.cloud.domain.repository.administrator;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-
-import javax.sql.DataSource;
-
 import org.apache.log4j.Logger;
 import org.openinfinity.cloud.domain.Job;
 import org.openinfinity.core.annotation.AuditTrail;
@@ -40,6 +28,15 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.Assert;
+
+import javax.sql.DataSource;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Jdbc implementation of Job repository interface
@@ -145,11 +142,17 @@ public class JobRepositoryJdbcImpl implements JobRepository {
 		parameters.put("job_start_time", job.getStartTime());
 		parameters.put("job_end_time", job.getEndTime());
 		Number newId = insert.executeAndReturnKey(parameters);
-		LOG.info("Job id: "+newId);
+		LOG.info("Job id: " + newId);
 		int jobId = newId.intValue();
 		job.setJobId(jobId);
 		return jobId;
 	}
+
+    @AuditTrail
+    public Job getNewest(){
+        List<Job> jobs = jdbcTemplate.query("select * from job_tbl order by job_id desc limit 1", new JobMapper());
+        return DataAccessUtils.singleResult(jobs);
+    }
 
 	private static final class JobMapper implements RowMapper<Job> {
 

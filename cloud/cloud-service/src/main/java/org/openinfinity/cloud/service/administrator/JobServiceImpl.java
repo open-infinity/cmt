@@ -1,13 +1,13 @@
 package org.openinfinity.cloud.service.administrator;
 
-import java.util.Collection;
-import java.util.List;
-
 import org.openinfinity.cloud.domain.Job;
 import org.openinfinity.cloud.domain.repository.administrator.JobRepository;
 import org.openinfinity.core.annotation.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Job Service interface for handling cloud configuration management.
@@ -61,4 +61,10 @@ public class JobServiceImpl implements JobService {
     public void deleteAll() {
         jobRepository.deleteAll();
     }
+
+    @Log
+    public Job getNewest() {
+        return jobRepository.getNewest();
+    }
+
 }
