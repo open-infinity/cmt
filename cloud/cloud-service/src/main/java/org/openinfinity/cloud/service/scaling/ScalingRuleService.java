@@ -18,7 +18,7 @@ package org.openinfinity.cloud.service.scaling;
 
 import org.openinfinity.cloud.domain.Cluster;
 import org.openinfinity.cloud.domain.ScalingRule;
-import org.openinfinity.cloud.service.scaling.Enumerations.ScalingState;
+import org.openinfinity.cloud.service.scaling.Enumerations.ScalingStatus;
 
 import java.sql.Timestamp;
 import java.util.Collection;
@@ -35,19 +35,20 @@ public interface ScalingRuleService {
 
     public static enum ClusterStatus {
         IDLE,
-        ERROR,
-        UNDER_CONSTRUCTION,
+        SCALING_JOB_ERROR,
+        MACHINE_CONFIGURATION_FAILURE,
+        MACHINE_UNDER_CONSTRUCTION,
     }
 
 	/**
 	 * Calculates scaling state for Periodic Autoscaler
 	 */
-    ScalingState applyScalingRule(float load, int clusterId, ScalingRule rule);
+    ScalingStatus applyScalingRule(float load, int clusterId, ScalingRule rule);
 
     /**
      * Calculates scaling state for Scheduled Autoscaler
      */
-    ScalingState applyScalingRule(Timestamp samplingPeriodFrom, Timestamp samplingPeriodTo, Cluster cluster, ScalingRule rule);
+    ScalingStatus applyScalingRule(Timestamp samplingPeriodFrom, Timestamp samplingPeriodTo, Cluster cluster, ScalingRule rule);
 	
 	/**
 	 * Stores the scaling rule into a repository.

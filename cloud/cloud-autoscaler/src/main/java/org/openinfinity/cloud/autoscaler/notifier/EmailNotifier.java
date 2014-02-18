@@ -35,14 +35,17 @@ public class EmailNotifier implements Notifier{
         SimpleMailMessage msg = new SimpleMailMessage(this.templateMessage);
         String notification = null;
         switch (t){
-            case SCALING_FAILED:
-                notification = msgClusterScalingFailed(d);
+            case SCALING_FAILED_RULE_LIMIT:
+                notification = msgScalingFailedRuleLimit(d);
                 break;
             case LOAD_FETCHING_FAILED:
                 notification = msgGroupLoadFetchingFailed(d);
                 break;
             case PREVIOUS_SCALING_FAILED:
                 notification = msgPerviousScalingFailed(d);
+                break;
+            case MACHINE_CONFIGURATION_ERROR:
+                notification = msgMachineConfigurationError(d);
             default:
                 break;
         }
@@ -61,7 +64,7 @@ public class EmailNotifier implements Notifier{
                "attempts:" + d.getFailures();
     }
 
-    private String msgClusterScalingFailed(ScalingData d) {
+    private String msgScalingFailedRuleLimit(ScalingData d) {
         return "Scaling out attempt failed.\n" +
                "Load average for the cluster is too high, and cluster maximum size limit has been reached." + "\n\n" +
                "Severity: " + "CRITICAL\n" +
@@ -75,7 +78,7 @@ public class EmailNotifier implements Notifier{
 
     private String msgPerviousScalingFailed(ScalingData d) {
         return "There is a scaling job failure for this cluster.\n" +
-               "This indicates a problem with cloud infrastructure\n" +
+               "This indicates a problem with cloud infrastructure.\n" +
                "Autoscaler can not scale this cluster before the problem is solved and\n" +
                "scaling rule's job id is reset\n\n" +
                "Severity: " + "CRITICAL\n" +
@@ -87,4 +90,16 @@ public class EmailNotifier implements Notifier{
                "max cluster size:" + d.getScalingRule().getMaxNumberOfMachinesPerCluster() + "\n" +
                "failed job id:" + d.getScalingRule().getJobId();
     }
+
+    private String msgMachineConfigurationError(ScalingData d) {
+        return "There are machines in the cluster which are not configured.\n" +
+               "This indicates a problem with cloud infrastructure.\n" +
+               "Autoscaler can not scale this cluster before the problem is solved and\n" +
+               "all machines in the cluster are configured.\n\n" +
+               "Severity: " + "CRITICAL\n" +
+               "cloud zone: " + cloudZone + "\n" +
+               "instance id: " + d.getCluster().getInstanceId() + "\n" +
+               "cluster id: " + d.getCluster().getId() + "\n";
+    }
+
 }

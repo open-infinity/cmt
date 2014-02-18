@@ -24,20 +24,23 @@ package org.openinfinity.cloud.service.scaling;
  * @since 1.0.0
  */
 public final class Enumerations{
-	public enum ScalingState {
-        SCALING_ONGOING,
+
+    public enum ScalingStatus {
         SCALING_NOT_REQUIRED,
-        SCALE_OUT,
-        SCALE_IN,
-        SCALING_OUT_IMPOSSIBLE,
-        SCALING_RULE_INVALID,
-        SCALING_ERROR
+        SCALING_OUT_REQUIRED,
+        SCALING_IN_REQUIRED,
+        SCALING_IMPOSSIBLE_SCALING_ALREADY_ONGOING,
+        SCALING_IMPOSSIBLE_SCALING_RULE_LIMIT,
+        SCALING_IMPOSSIBLE_MACHINE_CONFIGURATION_ERROR,
+        SCALING_IMPOSSIBLE_INVALID_RULE,
+        SCALING_IMPOSSIBLE_CLUSTER_ERROR,
 	}
 	
 	public enum ScalingPolicy {
 		MANUAL,
 		AUTOMATIC
     }
+
 }
 
 

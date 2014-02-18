@@ -24,7 +24,7 @@ import org.openinfinity.cloud.domain.Job;
 import org.openinfinity.cloud.domain.Machine;
 import org.openinfinity.cloud.domain.ScalingRule;
 import org.openinfinity.cloud.service.healthmonitoring.HealthMonitoringService;
-import org.openinfinity.cloud.service.scaling.Enumerations.ScalingState;
+import org.openinfinity.cloud.service.scaling.Enumerations.ScalingStatus;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -94,26 +94,28 @@ public class PeriodicAutoscalerItemProcessor extends AutoscalerItemProcessor imp
             clusterProcessingState.setHttpFailures(0);
         }
 
-        ScalingState state = scalingRuleService.applyScalingRule(load, clusterId, rule);
-        switch (state) {
-            case SCALE_OUT:
+        ScalingStatus status = scalingRuleService.applyScalingRule(load, clusterId, rule);
+        switch (status) {
+            case SCALING_OUT_REQUIRED:
                 job = createJob(cluster, cluster.getNumberOfMachines() + 1);
                 break;
-            case SCALE_IN:
+            case SCALING_IN_REQUIRED:
                 job = createJob(cluster, cluster.getNumberOfMachines() - 1);
                 break;
-            case SCALING_OUT_IMPOSSIBLE:
-                notifier.notify(new ScalingData(load, cluster, rule), NotificationType.SCALING_FAILED);
+            case SCALING_IMPOSSIBLE_SCALING_RULE_LIMIT:
+                notifier.notify(new ScalingData(load, cluster, rule), NotificationType.SCALING_FAILED_RULE_LIMIT);
                 break;
-            case SCALING_ERROR:
-                if (!clusterProcessingState.isJobFailureDetected()) {
-                    clusterProcessingState.setJobFailureDetected(true);
-                    notifier.notify(new ScalingData(load, cluster, rule), NotificationType.PREVIOUS_SCALING_FAILED);
-                }
+            case SCALING_IMPOSSIBLE_CLUSTER_ERROR:
+                notifyPreviousScalingFailed(clusterProcessingState, cluster, rule);
                 break;
-            case SCALING_ONGOING:
+            case SCALING_IMPOSSIBLE_SCALING_ALREADY_ONGOING:
+                break;
             case SCALING_NOT_REQUIRED:
-            case SCALING_RULE_INVALID:
+                break;
+            case SCALING_IMPOSSIBLE_INVALID_RULE:
+                break;
+            case SCALING_IMPOSSIBLE_MACHINE_CONFIGURATION_ERROR:
+                notifyMachineConfigurationError(clusterProcessingState, cluster, rule);
             default:
                 break;
         }

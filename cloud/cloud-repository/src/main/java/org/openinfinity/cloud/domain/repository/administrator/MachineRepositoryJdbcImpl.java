@@ -16,15 +16,6 @@
 
 package org.openinfinity.cloud.domain.repository.administrator;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.sql.DataSource;
-
-import org.apache.log4j.Logger;
 import org.openinfinity.cloud.domain.Machine;
 import org.openinfinity.core.annotation.AuditTrail;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +27,13 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.Assert;
+
+import javax.sql.DataSource;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Jdbc implementation of Machine repository interface
@@ -120,6 +118,14 @@ public class MachineRepositoryJdbcImpl implements MachineRepository {
             ("select * from machine_tbl where machine_cluster_id = ? and machine_configured != 3",
               new Object[] {clusterId}, machineRowMapper);
         return machines.size() == 0 ? true : false;
+    }
+
+    @AuditTrail
+    public boolean machinesWithConfigureErrorExist(int clusterId) {
+        List<Machine> machines = this.jdbcTemplate.query
+            ("select * from machine_tbl where machine_cluster_id = ? and machine_configured == 5",
+              new Object[] {clusterId}, machineRowMapper);
+        return machines.size() == 0 ? false : true;
     }
 	
 	

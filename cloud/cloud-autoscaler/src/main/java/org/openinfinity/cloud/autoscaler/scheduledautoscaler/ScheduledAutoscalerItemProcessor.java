@@ -17,13 +17,11 @@
 package org.openinfinity.cloud.autoscaler.scheduledautoscaler;
 
 import org.openinfinity.cloud.autoscaler.common.AutoscalerItemProcessor;
-import org.openinfinity.cloud.autoscaler.notifier.Notifier;
 import org.openinfinity.cloud.autoscaler.periodicautoscaler.ClusterProcessingState;
-import org.openinfinity.cloud.autoscaler.util.ScalingData;
 import org.openinfinity.cloud.domain.Cluster;
 import org.openinfinity.cloud.domain.Job;
 import org.openinfinity.cloud.domain.ScalingRule;
-import org.openinfinity.cloud.service.scaling.Enumerations;
+import org.openinfinity.cloud.service.scaling.Enumerations.ScalingStatus;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -66,25 +64,25 @@ public class ScheduledAutoscalerItemProcessor extends AutoscalerItemProcessor im
         Job job = null;
         ClusterProcessingState clusterProcessingState = initializeFailures();
 
-        Enumerations.ScalingState state = scalingRuleService.applyScalingRule(samplingPeriodStart, samplingPeriodEnd, cluster, rule);
-        switch (state) {
-            case SCALE_OUT:
+        ScalingStatus status = scalingRuleService.applyScalingRule(samplingPeriodStart, samplingPeriodEnd, cluster, rule);
+        switch (status) {
+            case SCALING_OUT_REQUIRED:
                 return createJob(cluster, rule.getClusterSizeNew());
-            case SCALE_IN:
+            case SCALING_IN_REQUIRED:
                 return createJob(cluster, rule.getClusterSizeOriginal());
-            case SCALING_OUT_IMPOSSIBLE:
+            case SCALING_IMPOSSIBLE_SCALING_RULE_LIMIT:
                 break;
-            case SCALING_ONGOING:
+            case SCALING_IMPOSSIBLE_SCALING_ALREADY_ONGOING:
                 break;
             case SCALING_NOT_REQUIRED:
                 break;
-            case SCALING_RULE_INVALID:
+            case SCALING_IMPOSSIBLE_INVALID_RULE:
                 break;
-            case SCALING_ERROR:
-                if (!clusterProcessingState.isJobFailureDetected()) {
-                    clusterProcessingState.setJobFailureDetected(true);
-                    notifier.notify(new ScalingData(0, cluster, rule), Notifier.NotificationType.PREVIOUS_SCALING_FAILED);
-                }
+            case SCALING_IMPOSSIBLE_CLUSTER_ERROR:
+                notifyPreviousScalingFailed(clusterProcessingState, cluster, rule);
+                break;
+            case SCALING_IMPOSSIBLE_MACHINE_CONFIGURATION_ERROR:
+                notifyMachineConfigurationError(clusterProcessingState, cluster, rule);
                 break;
             default:
                 break;

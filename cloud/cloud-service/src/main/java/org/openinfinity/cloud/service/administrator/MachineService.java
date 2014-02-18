@@ -16,11 +16,9 @@
 
 package org.openinfinity.cloud.service.administrator;
 
-import java.util.Collection;
-import java.util.List;
-
-import org.openinfinity.cloud.domain.Key;
 import org.openinfinity.cloud.domain.Machine;
+
+import java.util.Collection;
 
 /**
  * Machine service interface for handling virtual images inside a cloud environment
@@ -53,8 +51,10 @@ public interface MachineService {
 	Collection<Machine> getMachinesInClusterExceptType(int clusterId, String machineType);
 	
     boolean allMachinesConfigured(int clusterId);
-	
-	Collection<Machine> getMachinesNeedingConfigure();
+
+    boolean machinesWithConfigureErrorExist(int clusterId);
+
+    Collection<Machine> getMachinesNeedingConfigure();
 	
 	Collection<Machine> getBigDataMachinesNeedingConfigure();
 	

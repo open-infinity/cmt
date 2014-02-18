@@ -16,16 +16,16 @@
 
 package org.openinfinity.cloud.service.administrator;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 import org.openinfinity.cloud.domain.Machine;
 import org.openinfinity.cloud.domain.repository.administrator.MachineRepository;
 import org.openinfinity.core.annotation.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Machine service implementation for handling virtual images inside a cloud environment.
@@ -163,6 +163,11 @@ public class MachineServiceImpl implements MachineService {
    @Log
     public boolean allMachinesConfigured(int clusterId) {
        return machineRepository.allMachinesConfigured(clusterId);
-    } 
+    }
+
+    @Log
+    public boolean machinesWithConfigureErrorExist(int clusterId) {
+       return machineRepository.machinesWithConfigureErrorExist(clusterId);
+    }
 
 }

@@ -16,10 +16,9 @@
 
 package org.openinfinity.cloud.domain.repository.administrator;
 
-import java.util.List;
-
-import org.openinfinity.cloud.domain.Cluster;
 import org.openinfinity.cloud.domain.Machine;
+
+import java.util.List;
 
 /**
  * Interface for Machine repository
@@ -38,7 +37,8 @@ public interface MachineRepository {
 	List<Machine> getMachinesInClusterRunningAndReady(int clusterId);
 	List<Machine> getMachinesInClusterExceptType(int clusterId, String machineType);
 	boolean allMachinesConfigured(int clusterId);
-	List<Machine> getMachinesNeedingConfigure();
+    boolean machinesWithConfigureErrorExist(int clusterId);
+    List<Machine> getMachinesNeedingConfigure();
 	List<Machine> getBigDataMachinesNeedingConfigure();
 	List<Machine> getMachinesNeedingUpdate(int cloudType);
 	void updateMachineConfigure(int id, int configured); 
