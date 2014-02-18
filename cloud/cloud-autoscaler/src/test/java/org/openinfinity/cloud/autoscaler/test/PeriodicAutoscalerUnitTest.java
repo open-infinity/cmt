@@ -25,7 +25,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 import org.openinfinity.cloud.autoscaler.notifier.Notifier;
-import org.openinfinity.cloud.autoscaler.periodicautoscaler.Failures;
+import org.openinfinity.cloud.autoscaler.periodicautoscaler.ClusterProcessingState;
 import org.openinfinity.cloud.autoscaler.periodicautoscaler.PeriodicAutoscalerItemProcessor;
 import org.openinfinity.cloud.autoscaler.util.ScalingData;
 import org.openinfinity.cloud.domain.*;
@@ -116,8 +116,8 @@ public class PeriodicAutoscalerUnitTest {
         cluster.setInstanceId(1);
         cluster.setId(1);
         int failedAttempts = 0;
-        Failures failures = new Failures(1, false);
-        itemProcessor.getFailuresMap().put(1, failures);
+        ClusterProcessingState clusterProcessingState = new ClusterProcessingState(1, false);
+        itemProcessor.getProcessingStatusMap().put(1, clusterProcessingState);
         when(mockScalingRuleService.getRule(1)).thenReturn(rule);
         when(mockClusterService.getCluster(1)).thenReturn(cluster);
         when(mockHealthMonitoringService.getClusterLoad(machine, PeriodicAutoscalerItemProcessor.METRIC_NAMES, PeriodicAutoscalerItemProcessor.METRIC_TYPE_LOAD, PeriodicAutoscalerItemProcessor.METRIC_PERIOD)).thenReturn((float) 1);
@@ -160,8 +160,8 @@ public class PeriodicAutoscalerUnitTest {
         when(mockClusterService.getCluster(1)).thenReturn(cluster);
         when(mockHealthMonitoringService.getClusterLoad(machine, PeriodicAutoscalerItemProcessor.METRIC_NAMES, PeriodicAutoscalerItemProcessor.METRIC_TYPE_LOAD, PeriodicAutoscalerItemProcessor.METRIC_PERIOD)).thenReturn((float) -1);
         int failedAttempts = 1;
-        Failures failures = new Failures(1, false);
-        itemProcessor.getFailuresMap().put(1, failures);
+        ClusterProcessingState clusterProcessingState = new ClusterProcessingState(1, false);
+        itemProcessor.getProcessingStatusMap().put(1, clusterProcessingState);
         ScalingData sd = new ScalingData(failedAttempts, cluster);
 
         // When
@@ -203,8 +203,8 @@ public class PeriodicAutoscalerUnitTest {
 
         // NOTE: threshold is 2 in autoscalertest.properties, and failedAttempts gets increased by 1
         int failedAttempts = 0;
-        Failures failures = new Failures(0, false);
-        itemProcessor.getFailuresMap().put(1, failures);
+        ClusterProcessingState clusterProcessingState = new ClusterProcessingState(0, false);
+        itemProcessor.getProcessingStatusMap().put(1, clusterProcessingState);
         ScalingData sd = new ScalingData(failedAttempts, cluster);
 
         // When
@@ -248,8 +248,8 @@ public class PeriodicAutoscalerUnitTest {
 
         // NOTE: threshold is 2 in autoscalertest.properties, and failedAttempts gets increased by 1
         boolean jobFailureDetected = true;
-        Failures failures = new Failures(0, jobFailureDetected);
-        itemProcessor.getFailuresMap().put(1, failures);
+        ClusterProcessingState clusterProcessingState = new ClusterProcessingState(0, jobFailureDetected);
+        itemProcessor.getProcessingStatusMap().put(1, clusterProcessingState);
         ScalingData sd = new ScalingData(1, cluster, rule);
 
         // When
@@ -292,8 +292,8 @@ public class PeriodicAutoscalerUnitTest {
 
         // NOTE: threshold is 2 in autoscalertest.properties, and failedAttempts gets increased by 1
         boolean jobFailureDetected = false;
-        Failures failures = new Failures(0, jobFailureDetected);
-        itemProcessor.getFailuresMap().put(1, failures);
+        ClusterProcessingState clusterProcessingState = new ClusterProcessingState(0, jobFailureDetected);
+        itemProcessor.getProcessingStatusMap().put(1, clusterProcessingState);
         ScalingData sd = new ScalingData(1, cluster, rule);
 
         // When
@@ -413,6 +413,38 @@ public class PeriodicAutoscalerUnitTest {
         Assert.assertNotNull(job);
         Assert.assertThat(job.getJobType(), is("scale_cluster"));
         Assert.assertThat(job.getServices(), is("1,99"));
+    }
+
+    /**
+     * Test job creation
+     *
+     * Given itemProcessor is created,
+     * and cluster is created,
+     * When function createJob() is called
+     * Then it returns new job.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void createJob() throws Exception {
+
+        // Given
+        Job job = null;
+        Cluster cluster = new Cluster();
+        cluster.setInstanceId(1);
+        cluster.setNumberOfMachines(10);
+        when(mockClusterService.getCluster(1)).thenReturn(cluster);
+
+        Instance instance = new Instance();
+        instance.setCloudType(1);
+        instance.setZone("whatever");
+        when(mockInstanceService.getInstance(1)).thenReturn(instance);
+
+        // When
+        job = itemProcessor.createJob(cluster, 1);
+
+        // Then
+        Assert.assertNotNull(job);
     }
 
 }

@@ -16,36 +16,18 @@
 
 package org.openinfinity.cloud.application.worker.component;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.net.SocketAddress;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Properties;
-
+import com.amazonaws.auth.AWSCredentials;
+import com.amazonaws.services.ec2.model.KeyPair;
+import com.amazonaws.services.ec2.model.Reservation;
+import com.amazonaws.services.ec2.model.Tag;
+import com.jcraft.jsch.Channel;
+import com.jcraft.jsch.ChannelExec;
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.Session;
 import org.apache.log4j.Logger;
 import org.openinfinity.cloud.application.worker.Worker;
-import org.openinfinity.cloud.domain.AuthorizationRoute;
-import org.openinfinity.cloud.domain.Cluster;
-import org.openinfinity.cloud.domain.ElasticIP;
-import org.openinfinity.cloud.domain.Instance;
-import org.openinfinity.cloud.domain.Job;
-import org.openinfinity.cloud.domain.Key;
-import org.openinfinity.cloud.domain.Machine;
-import org.openinfinity.cloud.domain.MulticastAddress;
-import org.openinfinity.cloud.service.administrator.AuthorizationRoutingService;
-import org.openinfinity.cloud.service.administrator.ClusterService;
-import org.openinfinity.cloud.service.administrator.EC2Wrapper;
-import org.openinfinity.cloud.service.administrator.InstanceService;
-import org.openinfinity.cloud.service.administrator.JobService;
-import org.openinfinity.cloud.service.administrator.KeyService;
-import org.openinfinity.cloud.service.administrator.MachineService;
-import org.openinfinity.cloud.service.administrator.MulticastAddressService;
+import org.openinfinity.cloud.domain.*;
+import org.openinfinity.cloud.service.administrator.*;
 import org.openinfinity.cloud.service.deployer.DeployerService;
 import org.openinfinity.cloud.service.properties.CentralizedPropertiesService;
 import org.openinfinity.cloud.service.usage.UsageService;
@@ -57,14 +39,12 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
-import com.amazonaws.auth.AWSCredentials;
-import com.amazonaws.services.ec2.model.KeyPair;
-import com.amazonaws.services.ec2.model.Reservation;
-import com.amazonaws.services.ec2.model.Tag;
-import com.jcraft.jsch.Channel;
-import com.jcraft.jsch.ChannelExec;
-import com.jcraft.jsch.JSch;
-import com.jcraft.jsch.Session;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+import java.net.SocketAddress;
+import java.util.*;
 
 /**
  * EC2Worker Component
@@ -1216,7 +1196,7 @@ public class EC2Worker implements Worker {
 			}
 		}
 		
-		// Finnaly, call puppet agent once more on manager machine to create nodelist.conf file for health monitoring
+		// Finally, call puppet agent once more on manager machine to create nodelist.conf file for health monitoring
 		if(sshRunCommand(machine, cmd, key) == null) {
             machineService.updateMachineConfigure(machine.getId(), MachineService.MACHINE_CONFIGURE_ERROR);
             return -1;

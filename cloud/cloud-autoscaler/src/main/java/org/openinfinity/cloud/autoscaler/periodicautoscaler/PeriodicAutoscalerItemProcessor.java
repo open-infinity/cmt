@@ -16,7 +16,6 @@
 
 package org.openinfinity.cloud.autoscaler.periodicautoscaler;
 
-import org.apache.log4j.Logger;
 import org.openinfinity.cloud.autoscaler.common.AutoscalerItemProcessor;
 import org.openinfinity.cloud.autoscaler.notifier.Notifier.NotificationType;
 import org.openinfinity.cloud.autoscaler.util.ScalingData;
@@ -63,8 +62,6 @@ public class PeriodicAutoscalerItemProcessor extends AutoscalerItemProcessor imp
     PeriodicAutoscalerItemProcessor(){
     }
 
-    private static final Logger LOG = Logger.getLogger(PeriodicAutoscalerItemProcessor.class.getName());
-
     @Override
 	public Job process(Machine machine){
 
@@ -82,19 +79,19 @@ public class PeriodicAutoscalerItemProcessor extends AutoscalerItemProcessor imp
         }
 
         Cluster cluster = clusterService.getCluster(clusterId);
-        Failures failures = initializeFailures();
-        int httpFailures = failures.getHttpFailures();
+        ClusterProcessingState clusterProcessingState = initializeFailures();
+        int httpFailures = clusterProcessingState.getHttpFailures();
 
         float load = healthMonitoringService.getClusterLoad(machine, METRIC_NAMES, METRIC_TYPE_LOAD, METRIC_PERIOD);
         if (load == -1){
-            failures.setHttpFailures(++httpFailures);
+            clusterProcessingState.setHttpFailures(++httpFailures);
             if (httpFailures == httpAttemptsThreshold){
                 notifier.notify(new ScalingData(httpFailures, cluster), NotificationType.LOAD_FETCHING_FAILED);
             }
             return null;
         }
         else if (httpFailures > 0){
-            failures.setHttpFailures(0);
+            clusterProcessingState.setHttpFailures(0);
         }
 
         ScalingState state = scalingRuleService.applyScalingRule(load, clusterId, rule);
@@ -109,8 +106,8 @@ public class PeriodicAutoscalerItemProcessor extends AutoscalerItemProcessor imp
                 notifier.notify(new ScalingData(load, cluster, rule), NotificationType.SCALING_FAILED);
                 break;
             case SCALING_ERROR:
-                if (!failures.isJobFailureDetected()) {
-                    failures.setJobFailureDetected(true);
+                if (!clusterProcessingState.isJobFailureDetected()) {
+                    clusterProcessingState.setJobFailureDetected(true);
                     notifier.notify(new ScalingData(load, cluster, rule), NotificationType.PREVIOUS_SCALING_FAILED);
                 }
                 break;
@@ -120,7 +117,7 @@ public class PeriodicAutoscalerItemProcessor extends AutoscalerItemProcessor imp
             default:
                 break;
         }
-        failuresMap.put(clusterId, failures);
+        processingStatusMap.put(clusterId, clusterProcessingState);
         return job;
     }
 

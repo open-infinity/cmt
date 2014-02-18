@@ -70,13 +70,13 @@ public class ScalingRuleServiceImpl implements ScalingRuleService {
         LOG.debug("ENTER applyScalingRule");
         LOG.debug("load:" + load + ", clusterId:" + clusterId);
 
-        ClusterScalingStatus clusterScalingStatus = getClusterScalingStatus(rule);
+        ClusterStatus clusterStatus = getClusterScalingStatus(rule);
         ScalingState state;
 
-        if(clusterScalingStatus == ClusterScalingStatus.ERROR){
+        if(clusterStatus == ClusterStatus.ERROR){
             state = ScalingState.SCALING_ERROR;
 
-        } else if(clusterScalingStatus == ClusterScalingStatus.UNDER_CONSTRUCTION){
+        } else if(clusterStatus == ClusterStatus.UNDER_CONSTRUCTION){
             state = ScalingState.SCALING_ONGOING;
 
         } else if ((load >= maxLoad && clusterSize < maxMachines) || (clusterSize < minMachines)){
@@ -100,12 +100,12 @@ public class ScalingRuleServiceImpl implements ScalingRuleService {
         Timestamp periodFrom = rule.getPeriodFrom();
         Timestamp periodTo = rule.getPeriodTo();
         ScalingState state;
-        ClusterScalingStatus clusterScalingStatus = getClusterScalingStatus(rule);
+        ClusterStatus clusterStatus = getClusterScalingStatus(rule);
 
-        if(clusterScalingStatus == ClusterScalingStatus.ERROR){
+        if(clusterStatus == ClusterStatus.ERROR){
             state = ScalingState.SCALING_ERROR;
 
-        } else if(clusterScalingStatus == ClusterScalingStatus.UNDER_CONSTRUCTION){
+        } else if(clusterStatus == ClusterStatus.UNDER_CONSTRUCTION){
             state = ScalingState.SCALING_ONGOING;
 
         } else if (rule.getMaxNumberOfMachinesPerCluster() <= rule.getClusterSizeNew()){
@@ -134,33 +134,33 @@ public class ScalingRuleServiceImpl implements ScalingRuleService {
         return state;
     }
 
-    ClusterScalingStatus getClusterScalingStatus(ScalingRule rule){
-        ClusterScalingStatus scalingJobStatus = ClusterScalingStatus.IDLE;
+    ClusterStatus getClusterScalingStatus(ScalingRule rule){
+        ClusterStatus scalingJobStatus = ClusterStatus.IDLE;
         int jobId = rule.getJobId();
         try{
             if (jobId == -1) {
-                scalingJobStatus = ClusterScalingStatus.IDLE;
+                scalingJobStatus = ClusterStatus.IDLE;
             } else {
                 Job job = jobService.getJob(jobId);
                 int jobStatus = job.getJobStatus();
                 boolean allMachinesConfigured = machineService.allMachinesConfigured(rule.getClusterId());
                 if (jobStatus == JobService.CLOUD_JOB_READY) {
                     if (allMachinesConfigured){
-                        scalingJobStatus = ClusterScalingStatus.IDLE;
+                        scalingJobStatus = ClusterStatus.IDLE;
                     } else {
-                        scalingJobStatus = ClusterScalingStatus.UNDER_CONSTRUCTION;
+                        scalingJobStatus = ClusterStatus.UNDER_CONSTRUCTION;
                     }
                 } else if (jobStatus == JobService.CLOUD_JOB_ERROR) {
-                    scalingJobStatus = ClusterScalingStatus.ERROR;
+                    scalingJobStatus = ClusterStatus.ERROR;
                 } else if (jobStatus == JobService.CLOUD_JOB_CREATED) {
-                    scalingJobStatus = ClusterScalingStatus.UNDER_CONSTRUCTION;
+                    scalingJobStatus = ClusterStatus.UNDER_CONSTRUCTION;
                 } else if (jobStatus == JobService.CLOUD_JOB_STARTED) {
-                    scalingJobStatus = ClusterScalingStatus.UNDER_CONSTRUCTION;
+                    scalingJobStatus = ClusterStatus.UNDER_CONSTRUCTION;
                 }
             }
         }
         catch (Exception e){
-            scalingJobStatus = ClusterScalingStatus.ERROR;
+            scalingJobStatus = ClusterStatus.ERROR;
             LOG.error("Fetching job for scaling rule for cluster " + rule.getClusterId() +  "failed.", e);
         }
         LOG.debug("getClusterScalingStatus for clusterId:" +  rule.getClusterId() + " and job id:" +jobId + " is:" + scalingJobStatus);

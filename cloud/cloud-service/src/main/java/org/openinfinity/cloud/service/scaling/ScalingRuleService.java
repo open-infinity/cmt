@@ -33,7 +33,7 @@ import java.util.Collection;
  */
 public interface ScalingRuleService {
 
-    public static enum ClusterScalingStatus{
+    public static enum ClusterStatus {
         IDLE,
         ERROR,
         UNDER_CONSTRUCTION,

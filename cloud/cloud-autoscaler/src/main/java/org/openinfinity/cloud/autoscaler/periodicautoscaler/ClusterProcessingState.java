@@ -1,10 +1,10 @@
 package org.openinfinity.cloud.autoscaler.periodicautoscaler;
 
-public class Failures {
+public class ClusterProcessingState {
     int httpFailures;
     boolean jobFailureDetected;
 
-    public Failures(int httpFailures, boolean jobFailureDetected) {
+    public ClusterProcessingState(int httpFailures, boolean jobFailureDetected) {
         this.httpFailures = httpFailures;
         this.jobFailureDetected = jobFailureDetected;
     }

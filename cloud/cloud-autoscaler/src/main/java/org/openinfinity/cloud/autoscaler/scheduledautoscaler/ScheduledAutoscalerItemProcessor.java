@@ -18,7 +18,7 @@ package org.openinfinity.cloud.autoscaler.scheduledautoscaler;
 
 import org.openinfinity.cloud.autoscaler.common.AutoscalerItemProcessor;
 import org.openinfinity.cloud.autoscaler.notifier.Notifier;
-import org.openinfinity.cloud.autoscaler.periodicautoscaler.Failures;
+import org.openinfinity.cloud.autoscaler.periodicautoscaler.ClusterProcessingState;
 import org.openinfinity.cloud.autoscaler.util.ScalingData;
 import org.openinfinity.cloud.domain.Cluster;
 import org.openinfinity.cloud.domain.Job;
@@ -64,7 +64,7 @@ public class ScheduledAutoscalerItemProcessor extends AutoscalerItemProcessor im
         clusterId = rule.getClusterId();
         Cluster cluster = clusterService.getCluster(clusterId);
         Job job = null;
-        Failures failures = initializeFailures();
+        ClusterProcessingState clusterProcessingState = initializeFailures();
 
         Enumerations.ScalingState state = scalingRuleService.applyScalingRule(samplingPeriodStart, samplingPeriodEnd, cluster, rule);
         switch (state) {
@@ -81,14 +81,13 @@ public class ScheduledAutoscalerItemProcessor extends AutoscalerItemProcessor im
             case SCALING_RULE_INVALID:
                 break;
             case SCALING_ERROR:
-                if (!failures.isJobFailureDetected()) {
-                    failures.setJobFailureDetected(true);
+                if (!clusterProcessingState.isJobFailureDetected()) {
+                    clusterProcessingState.setJobFailureDetected(true);
                     notifier.notify(new ScalingData(0, cluster, rule), Notifier.NotificationType.PREVIOUS_SCALING_FAILED);
                 }
                 break;
             default:
                 break;
-
         }
 		return job;
 	}

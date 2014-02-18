@@ -1,7 +1,7 @@
 package org.openinfinity.cloud.autoscaler.common;
 
 import org.openinfinity.cloud.autoscaler.notifier.Notifier;
-import org.openinfinity.cloud.autoscaler.periodicautoscaler.Failures;
+import org.openinfinity.cloud.autoscaler.periodicautoscaler.ClusterProcessingState;
 import org.openinfinity.cloud.domain.Cluster;
 import org.openinfinity.cloud.domain.Instance;
 import org.openinfinity.cloud.domain.Job;
@@ -17,10 +17,10 @@ import java.util.Map;
 public class AutoscalerItemProcessor {
 
     /**
-     * Maps cluster id (group id) to Failures data
+     * Maps cluster id (group id) to ClusterProcessingState data
      */
 
-    protected Map<Integer, Failures> failuresMap;
+    protected Map<Integer, ClusterProcessingState> processingStatusMap;
 
     protected int clusterId;
 
@@ -37,11 +37,11 @@ public class AutoscalerItemProcessor {
     protected Notifier notifier;
 
     protected AutoscalerItemProcessor(){
-        failuresMap = new HashMap<Integer, Failures>();
+        processingStatusMap = new HashMap<Integer, ClusterProcessingState>();
     }
 
-    public Map<Integer, Failures> getFailuresMap() {
-        return failuresMap;
+    public Map<Integer, ClusterProcessingState> getProcessingStatusMap() {
+        return processingStatusMap;
     }
 
     public Job createJob(Cluster cluster, int newClusterSize) {
@@ -55,10 +55,10 @@ public class AutoscalerItemProcessor {
                 newClusterSize);
     }
 
-    protected Failures initializeFailures(){
-        if (!failuresMap.containsKey(clusterId)){
-            failuresMap.put(clusterId, new Failures(0, false));
+    protected ClusterProcessingState initializeFailures(){
+        if (!processingStatusMap.containsKey(clusterId)){
+            processingStatusMap.put(clusterId, new ClusterProcessingState(0, false));
         }
-        return failuresMap.get(clusterId);
+        return processingStatusMap.get(clusterId);
     }
 }
