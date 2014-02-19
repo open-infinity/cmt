@@ -73,34 +73,4 @@
         </property>
     </bean>
 
-    <!--
-    <bean id="springBatchDataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
-          destroy-method="close">
-        <property name="driverClass">
-            <value>${cmt-spring.batch.jdbc.driverClassName}</value>
-        </property>
-        <property name="jdbcUrl">
-            <value>${cmt-spring.batch.jdbc.url}</value>
-        </property>
-        <property name="user">
-            <value>${cmt-spring.batch.jdbc.username}</value>
-        </property>
-        <property name="password">
-            <value>${cmt-spring.batch.jdbc.password}</value>
-        </property>
-        <property name="maxPoolSize">
-            <value>30</value>
-        </property>
-        <property name="minPoolSize">
-            <value>2</value>
-        </property>
-        <property name="numHelperThreads">
-            <value>2</value>
-        </property>
-        <property name="testConnectionOnCheckout">
-            <value>true</value>
-        </property>
-    </bean>
-    -->
-	
 </beans>

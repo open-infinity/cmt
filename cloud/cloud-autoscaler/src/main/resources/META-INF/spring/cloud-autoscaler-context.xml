@@ -36,7 +36,7 @@
 
     <bean id="jobRepository" class="org.springframework.batch.core.repository.support.JobRepositoryFactoryBean"
 		p:dataSource-ref="springBatchDataSource"
-		p:transactionManager-ref="txManager" />
+		p:transactionManager-ref="springBatchTxManager" />
 	
 	<bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher"
 		p:jobRepository-ref="jobRepository" />

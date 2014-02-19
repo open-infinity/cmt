@@ -11,7 +11,7 @@
 		http://www.springframework.org/schema/context
 		http://www.springframework.org/schema/context/spring-context-3.0.xsd
 		http://www.springframework.org/schema/batch
-		http://www.springframework.org/schema/batch/spring-batch-2.1.xsd
+		http://www.springframework.org/schema/batch/spring-batch-2.2.xsd
         http://www.springframework.org/schema/task
         http://www.springframework.org/schema/task/spring-task-3.0.xsd">
        
@@ -30,18 +30,22 @@
 		
 	<bean id="txManager" 
 	    class="org.springframework.jdbc.datasource.DataSourceTransactionManager"
-		p:dataSource-ref="cloudDataSource" /> 	
+		p:dataSource-ref="cloudDataSource" />
+
+    <bean id="springBatchTxManager"
+          class="org.springframework.jdbc.datasource.DataSourceTransactionManager"
+          p:dataSource-ref="springBatchDataSource" />
 	
 	<bean id="jobRepository" class="org.springframework.batch.core.repository.support.JobRepositoryFactoryBean"
-		p:dataSource-ref="cloudDataSource"
-		p:transactionManager-ref="txManager" />
+		p:dataSource-ref="springBatchDataSource"
+		p:transactionManager-ref="springBatchTxManager" />
 	
 	<bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher"
 		p:jobRepository-ref="jobRepository" />
 		
 	<batch:job id="cloudPropertiesBatchJob">
 		<batch:step id="stepP1">
-			<batch:tasklet transaction-manager="txManager"
+			<batch:tasklet transaction-manager="springBatchTxManager"
 				start-limit="1">
 				<batch:chunk 
 					reader="periodicCloudPropertiesReader" 

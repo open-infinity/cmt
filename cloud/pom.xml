@@ -17,7 +17,6 @@
 		<mysql.version>5.1.18</mysql.version>
 		
  		<open-infinity-core.version>1.3.0.RELEASE</open-infinity-core.version>
-<!--  		<open-infinity-core.version>SNAPSHOT</open-infinity-core.version> -->
 		<maven.build.timestamp.format>yyyyMMdd-HHmm</maven.build.timestamp.format>
 	</properties>
 	<modules>
@@ -166,9 +165,6 @@
 			</plugin>
 		</plugins>
 	</build>
-    <!-- ================================================ -->
-    <!-- Repository Configuration -->
-    <!-- ================================================ -->
 	<pluginRepositories>
 		<pluginRepository>
 			<id>maven-repo</id>

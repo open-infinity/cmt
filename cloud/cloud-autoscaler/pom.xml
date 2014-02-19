@@ -239,6 +239,7 @@
                 </dependency>
             </dependencies>
 			</plugin>
+            <!--
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>exec-maven-plugin</artifactId>
@@ -251,6 +252,7 @@
 					</arguments>
 				</configuration>
 			</plugin>
+			-->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
