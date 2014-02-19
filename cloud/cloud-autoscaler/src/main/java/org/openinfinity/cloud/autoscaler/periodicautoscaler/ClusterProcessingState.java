@@ -6,14 +6,45 @@ public class ClusterProcessingState {
     boolean detectedMachineConfigurationError;
     boolean detectedInvalidScalingRule;
     boolean detectedScalingRuleLimit;
+    boolean detectedInvalidInternalState;
+    float load;
 
-   public ClusterProcessingState(int httpFailures, boolean detectedJobError, boolean detectedMachineConfigurationError, boolean detectedInvalidScalingRule, boolean scalingImpossibleRuleLimit) {
+    public ClusterProcessingState(int httpFailures, boolean detectedJobError, boolean detectedMachineConfigurationError,
+                                  boolean detectedInvalidScalingRule, boolean detectedScalingRuleLimit, boolean detectedInvalidInternalState) {
+        this.detectedInvalidInternalState = detectedInvalidInternalState;
         this.httpFailures = httpFailures;
         this.detectedJobError = detectedJobError;
         this.detectedMachineConfigurationError = detectedMachineConfigurationError;
         this.detectedInvalidScalingRule = detectedInvalidScalingRule;
-        this.detectedScalingRuleLimit = scalingImpossibleRuleLimit;
-   }
+        this.detectedScalingRuleLimit = detectedScalingRuleLimit;
+    }
+
+    public ClusterProcessingState(int httpFailures, boolean detectedJobError, boolean detectedMachineConfigurationError,
+                                  boolean detectedInvalidScalingRule, boolean detectedScalingRuleLimit, boolean detectedInvalidInternalState, float load) {
+        this.httpFailures = httpFailures;
+        this.detectedJobError = detectedJobError;
+        this.detectedMachineConfigurationError = detectedMachineConfigurationError;
+        this.detectedInvalidScalingRule = detectedInvalidScalingRule;
+        this.detectedScalingRuleLimit = detectedScalingRuleLimit;
+        this.detectedInvalidInternalState = detectedInvalidInternalState;
+        this.load = load;
+    }
+
+    public float getLoad() {
+        return load;
+    }
+
+    public void setLoad(float load) {
+        this.load = load;
+    }
+
+    public boolean isDetectedInvalidInternalState() {
+        return detectedInvalidInternalState;
+    }
+
+    public void setDetectedInvalidInternalState(boolean detectedInvalidInternalState) {
+        this.detectedInvalidInternalState = detectedInvalidInternalState;
+    }
 
     public int getHttpFailures() {
         return httpFailures;

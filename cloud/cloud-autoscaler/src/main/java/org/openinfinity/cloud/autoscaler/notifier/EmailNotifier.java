@@ -50,6 +50,9 @@ public class EmailNotifier implements Notifier{
             case SCALING_RULE_LIMIT:
                 notification = msgScalingFailedRuleLimit(d);
                 break;
+            case INVALID_INTERNAL_STATE:
+                notification = msgInvalidInternalState(d);
+                break;
             default:
                 break;
         }
@@ -70,7 +73,7 @@ public class EmailNotifier implements Notifier{
 
     private String msgScalingFailedRuleLimit(ScalingData d) {
         return "Scaling out attempt failed.\n" +
-               "Load average for the cluster is too high, and cluster maximum size limit has been reached." + "\n\n" +
+               "Load average for the cluster is high enough to trigger scaling out, but cluster maximum size limit has been reached." + "\n\n" +
                "Severity: " + "CRITICAL\n" +
                "cloud zone: " + cloudZone + "\n" +
                "instance id: " + d.getCluster().getInstanceId() + "\n" +
@@ -110,7 +113,18 @@ public class EmailNotifier implements Notifier{
         return "Scaling rule for cluster is invalid.\n" +
                "Autoscaler can not scale this cluster before scaling rules are not properly set.\n\n" +
                "Severity: " + "CRITICAL\n" +
-               "cloud zone: " + cloudZone + "\n";
+               "cloud zone: " + cloudZone + "\n" +
+               "instance id: " + d.getCluster().getInstanceId() + "\n" +
+               "cluster id: " + d.getCluster().getId() + "\n";
+    }
+    private String msgInvalidInternalState(ScalingData d) {
+        return "Autoscaler state for the cluster is invalid.\n" +
+               "This indicates that there is some inconsistency in data, or the root cause is bug in autoscaler.\n\n" +
+               "Autoscaler can not scale this cluster before this issue is fixed.\n\n" +
+               "Severity: " + "CRITICAL\n" +
+               "cloud zone: " + cloudZone + "\n" +
+               "instance id: " + d.getCluster().getInstanceId() + "\n" +
+               "cluster id: " + d.getCluster().getId() + "\n";
     }
 
 }

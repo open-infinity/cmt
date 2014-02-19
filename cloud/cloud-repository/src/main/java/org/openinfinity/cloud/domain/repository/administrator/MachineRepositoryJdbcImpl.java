@@ -123,7 +123,7 @@ public class MachineRepositoryJdbcImpl implements MachineRepository {
     @AuditTrail
     public boolean machinesWithConfigureErrorExist(int clusterId) {
         List<Machine> machines = this.jdbcTemplate.query
-            ("select * from machine_tbl where machine_cluster_id = ? and machine_configured == 5",
+            ("select * from machine_tbl where machine_cluster_id = ? and machine_configured = 5",
               new Object[] {clusterId}, machineRowMapper);
         return machines.size() == 0 ? false : true;
     }

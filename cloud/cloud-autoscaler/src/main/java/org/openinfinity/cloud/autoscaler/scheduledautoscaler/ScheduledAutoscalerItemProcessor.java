@@ -57,7 +57,7 @@ public class ScheduledAutoscalerItemProcessor extends AutoscalerItemProcessor im
         cluster = clusterService.getCluster(rule.getClusterId());
 
         long now = System.currentTimeMillis();
-		Timestamp samplingPeriodStart = new Timestamp(now - offsetStart );
+		Timestamp samplingPeriodStart = new Timestamp(now - offsetStart);
 		Timestamp samplingPeriodEnd = new Timestamp(now + offsetEnd);
 
         ClusterProcessingState clusterState = getClusterState();

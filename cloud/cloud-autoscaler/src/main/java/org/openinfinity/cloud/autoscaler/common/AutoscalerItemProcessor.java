@@ -53,6 +53,10 @@ public abstract class AutoscalerItemProcessor {
     protected Job handleScalingStatus(ClusterProcessingState clusterState, ScalingRule rule, Enumerations.ScalingStatus scalingStatus){
         Job job = null;
         switch (scalingStatus) {
+            case SCALING_NOT_REQUIRED:
+                break;
+            case SCALING_ALREADY_ONGOING:
+                break;
             case SCALING_OUT_REQUIRED:
                 job = createJob(cluster, getScaleOutSize());
                 clusterState.clearErrors();
@@ -61,24 +65,24 @@ public abstract class AutoscalerItemProcessor {
                 job = createJob(cluster, getScaleInSize());
                 clusterState.clearErrors();
                 break;
-            case SCALING_IMPOSSIBLE_SCALING_JOB_ERROR:
+            case ERROR_SCALING_JOB_ERROR:
                 notifyScalingJobError(clusterState, cluster, rule);
                 break;
-            case SCALING_IMPOSSIBLE_MACHINE_CONFIGURATION_ERROR:
+            case ERROR_MACHINE_CONFIGURATION_FAILURE:
                 notifyMachineConfigurationError(clusterState, cluster, rule);
                 break;
-            case SCALING_IMPOSSIBLE_INVALID_RULE:
+            case ERROR_INVALID_RULE:
                 notifyInvalidRule(clusterState, cluster, rule);
                 break;
-            case SCALING_IMPOSSIBLE_SCALING_RULE_LIMIT:
+            case ERROR_SCALING_RULE_LIMIT:
                 notifyScalingRuleLimit(clusterState, cluster, rule);
                 break;
-            case SCALING_IMPOSSIBLE_SCALING_ALREADY_ONGOING:
-                break;
-            case SCALING_NOT_REQUIRED:
+            case ERROR_INVALID_INTERNAL_STATE:
+                notifyInvalidInternalState(clusterState, cluster, rule);
                 break;
             default:
                 break;
+
         }
         return job;
     }
@@ -96,7 +100,7 @@ public abstract class AutoscalerItemProcessor {
 
     protected ClusterProcessingState getClusterState(){
         if (!processingStatusMap.containsKey(cluster.getId())){
-            processingStatusMap.put(cluster.getId(), new ClusterProcessingState(0, false, false, false, false));
+            processingStatusMap.put(cluster.getId(), new ClusterProcessingState(0, false, false, false, false, false));
         }
         return processingStatusMap.get(cluster.getId());
     }
@@ -125,7 +129,13 @@ public abstract class AutoscalerItemProcessor {
     protected void notifyScalingRuleLimit(ClusterProcessingState state, Cluster cluster, ScalingRule rule){
         if (!state.isDetectedScalingRuleLimit()) {
             state.setDetectedScalingRuleLimit(true);
-            notifier.notify(new ScalingData(0, cluster, rule), NotificationType.SCALING_RULE_LIMIT);
+            notifier.notify(new ScalingData(state.getLoad(), cluster, rule), NotificationType.SCALING_RULE_LIMIT);
+        }
+    }
+    protected void notifyInvalidInternalState(ClusterProcessingState state, Cluster cluster, ScalingRule rule){
+        if (!state.isDetectedInvalidInternalState()) {
+            state.setDetectedInvalidInternalState(true);
+            notifier.notify(new ScalingData(0, cluster, rule), NotificationType.INVALID_INTERNAL_STATE);
         }
     }
 

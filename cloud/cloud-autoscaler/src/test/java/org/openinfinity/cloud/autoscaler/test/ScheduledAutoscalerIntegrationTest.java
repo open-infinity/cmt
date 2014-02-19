@@ -16,10 +16,10 @@
 
 package org.openinfinity.cloud.autoscaler.test;
 
+import org.apache.log4j.Logger;
 import org.dbunit.dataset.DataSetException;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openinfinity.cloud.autoscaler.test.util.DatabaseUtils;
@@ -54,6 +54,9 @@ import java.sql.Timestamp;
 @ContextConfiguration(locations={"classpath*:META-INF/spring/cloud-autoscaler-test-integration-context.xml"})
 @RunWith(SpringJUnit4ClassRunner.class)
 public class ScheduledAutoscalerIntegrationTest {
+
+    private static final Logger LOG = Logger.getLogger(ScheduledAutoscalerIntegrationTest.class.getName());
+
 
     private final int CLUSTER_ID = 1;
 
@@ -103,7 +106,6 @@ public class ScheduledAutoscalerIntegrationTest {
      * @throws Exception
      */
 	@Test
-    //@Ignore
 	public void scaleOut() throws Exception {
 
         // Given
@@ -176,7 +178,7 @@ public class ScheduledAutoscalerIntegrationTest {
         JobExecution jobExecution = jobLauncherTestUtils.launchJob();
 
         // Then
-        assertThatNothingHappened(jobExecution, lastCreatedJobId);
+        assertThatNothingHappened(jobExecution, lastCreatedJobId, 1);
 
     }
 
@@ -204,7 +206,7 @@ public class ScheduledAutoscalerIntegrationTest {
         JobExecution jobExecution = jobLauncherTestUtils.launchJob();
 
         // Then
-        assertThatNothingHappened(jobExecution, lastCreatedJobId);
+        assertThatNothingHappened(jobExecution, lastCreatedJobId, 1);
     }
 
     /**
@@ -231,7 +233,7 @@ public class ScheduledAutoscalerIntegrationTest {
         JobExecution jobExecution = jobLauncherTestUtils.launchJob();
 
         // Then
-        assertThatNothingHappened(jobExecution, lastCreatedJobId);
+        assertThatNothingHappened(jobExecution, lastCreatedJobId, 1);
     }
 
     /**
@@ -255,7 +257,7 @@ public class ScheduledAutoscalerIntegrationTest {
         JobExecution jobExecution = jobLauncherTestUtils.launchJob();
 
         // Then
-        assertThatNothingHappened(jobExecution, lastCreatedJobId);
+        assertThatNothingHappened(jobExecution, lastCreatedJobId, 1);
     }
 
     /**
@@ -279,13 +281,13 @@ public class ScheduledAutoscalerIntegrationTest {
         JobExecution jobExecution = jobLauncherTestUtils.launchJob();
 
         // Then
-        assertThatNothingHappened(jobExecution, lastCreatedJobId);
+        assertThatNothingHappened(jobExecution, lastCreatedJobId, 1);
     }
 
     /**
      * Test case when sampling period "caught" scheduled scaling period start,
      * but scaling has already been done.
-     *
+     *                                                        LOG
      * Given automatic (scheduled) scaling is turned on,
      * and sampling period "caught" scheduled scaling period start,
      * and scaling state is READY_FOR_SCALE_IN(0),
@@ -295,17 +297,17 @@ public class ScheduledAutoscalerIntegrationTest {
      * @throws Exception
      */
     @Test
-    @Ignore
     public void PeriodFromInWindowAndNotRequiredScalingOutTest() throws Exception {
-
         // Given
-        int lastCreatedJobId = initializeTestData(new Timestamp(now), new Timestamp(now + TIME_ONE_HOUR), true, 0, DatabaseUtils.SQL_SCALE_OUT);
+        int scheduledScalingState = ScalingRule.ScheduledScalingState.READY_FOR_SCALE_IN.getValue();
+        int lastCreatedJobId = initializeTestData(new Timestamp(now), new Timestamp(now + TIME_ONE_HOUR), true, scheduledScalingState, DatabaseUtils.SQL_SCALE_OUT);
 
         // When
         JobExecution jobExecution = jobLauncherTestUtils.launchJob();
 
         // Then
-        assertThatNothingHappened(jobExecution, lastCreatedJobId);
+        assertThatNothingHappened(jobExecution, lastCreatedJobId, scheduledScalingState);
+
     }
 
     /**
@@ -321,17 +323,23 @@ public class ScheduledAutoscalerIntegrationTest {
      * @throws Exception
      */
     @Test
-    @Ignore
     public void PeriodToInWindowAndNotRequiredScalingInTest() throws Exception {
 
         // Given
-        int lastCreatedJobId = initializeTestData(new Timestamp(now - TIME_ONE_HOUR), new Timestamp(now), true, 1, DatabaseUtils.SQL_SCALE_IN);
+        int scheduledScalingState = ScalingRule.ScheduledScalingState.READY_FOR_SCALE_OUT.getValue();
+        int lastCreatedJobId = initializeTestData(new Timestamp(now - TIME_ONE_HOUR), new Timestamp(now), true, scheduledScalingState, DatabaseUtils.SQL_SCALE_IN);
 
         // When
         JobExecution jobExecution = jobLauncherTestUtils.launchJob();
 
         // Then
-        assertThatNothingHappened(jobExecution, lastCreatedJobId);
+        Assert.assertEquals(jobExecution.getStatus(), BatchStatus.COMPLETED);
+        ScalingRule scalingRule = scalingRuleService.getRule(CLUSTER_ID);
+        Assert.assertEquals(1, scalingRule.getClusterSizeOriginal());
+        Assert.assertEquals(5, scalingRule.getClusterSizeNew());
+        Assert.assertEquals(scheduledScalingState, scalingRule.getScheduledScalingState());
+        Assert.assertEquals(-1, scalingRule.getJobId());
+        Assert.assertEquals(lastCreatedJobId, jobService.getNewest().getJobId());
     }
 
     /**
@@ -371,12 +379,12 @@ public class ScheduledAutoscalerIntegrationTest {
         return jobService.getNewest().getJobId();
     }
 
-    private void assertThatNothingHappened(JobExecution jobExecution, int lastCreatedJobId){
+    private void assertThatNothingHappened(JobExecution jobExecution, int lastCreatedJobId, int scheduledScalingState){
         Assert.assertEquals(jobExecution.getStatus(), BatchStatus.COMPLETED);
         ScalingRule scalingRule = scalingRuleService.getRule(CLUSTER_ID);
         Assert.assertEquals(6, scalingRule.getClusterSizeOriginal());
         Assert.assertEquals(5, scalingRule.getClusterSizeNew());
-        Assert.assertEquals(1, scalingRule.getScheduledScalingState());
+        Assert.assertEquals(scheduledScalingState, scalingRule.getScheduledScalingState());
         Assert.assertEquals(-1, scalingRule.getJobId());
         Assert.assertEquals(lastCreatedJobId, jobService.getNewest().getJobId());
     }
@@ -401,6 +409,7 @@ public class ScheduledAutoscalerIntegrationTest {
         rule.setScheduledScalingState(scheduledScalingState);
         scalingRuleService.store(rule);
         Assert.assertEquals(scheduledScaling, scalingRuleService.getRule(CLUSTER_ID).isScheduledScalingOn());
+        Assert.assertEquals(scheduledScalingState, scalingRuleService.getRule(CLUSTER_ID).getScheduledScalingState());
         return createJob();
     }
 

@@ -75,6 +75,7 @@ public class PeriodicAutoscalerItemProcessor extends AutoscalerItemProcessor imp
         cluster = clusterService.getCluster(machine.getClusterId());
         ClusterProcessingState clusterState = getClusterState();
         int httpFailures = clusterState.getHttpFailures();
+
         float load = healthMonitoringService.getClusterLoad(machine, METRIC_NAMES, METRIC_TYPE_LOAD, METRIC_PERIOD);
         if (load == -1){
             clusterState.setHttpFailures(++httpFailures);
@@ -84,6 +85,7 @@ public class PeriodicAutoscalerItemProcessor extends AutoscalerItemProcessor imp
             return null;
         }
         else {
+            clusterState.setLoad(load);
             clusterState.setHttpFailures(0);
         }
 
