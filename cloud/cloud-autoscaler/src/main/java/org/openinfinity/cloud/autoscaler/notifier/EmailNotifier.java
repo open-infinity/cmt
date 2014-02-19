@@ -79,6 +79,7 @@ public class EmailNotifier implements Notifier{
                "instance id: " + d.getCluster().getInstanceId() + "\n" +
                "cluster id: " + d.getCluster().getId() + "\n" +
                "load:" + d.getLoad() + "\n" +
+               "cluster size:" + d.getCluster().getNumberOfMachines() + "\n" +
                "max load threshold:" + d.getThreshold() + "\n" +
                "max cluster size:" + d.getScalingRule().getMaxNumberOfMachinesPerCluster();
     }
