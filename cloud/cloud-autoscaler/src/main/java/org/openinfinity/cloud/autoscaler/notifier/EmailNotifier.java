@@ -34,18 +34,22 @@ public class EmailNotifier implements Notifier{
     public void notify(ScalingData d, NotificationType t){
         SimpleMailMessage msg = new SimpleMailMessage(this.templateMessage);
         String notification = null;
-        switch (t){
-            case SCALING_FAILED_RULE_LIMIT:
-                notification = msgScalingFailedRuleLimit(d);
-                break;
+        switch (t) {
             case LOAD_FETCHING_FAILED:
                 notification = msgGroupLoadFetchingFailed(d);
                 break;
-            case PREVIOUS_SCALING_FAILED:
-                notification = msgPerviousScalingFailed(d);
+            case SCALING_JOB_ERROR:
+                notification = msgPreviousScalingFailed(d);
                 break;
             case MACHINE_CONFIGURATION_ERROR:
                 notification = msgMachineConfigurationError(d);
+                break;
+            case SCALING_RULE_INVALID:
+                notification = msgScalingRuleInvalid(d);
+                break;
+            case SCALING_RULE_LIMIT:
+                notification = msgScalingFailedRuleLimit(d);
+                break;
             default:
                 break;
         }
@@ -76,7 +80,7 @@ public class EmailNotifier implements Notifier{
                "max cluster size:" + d.getScalingRule().getMaxNumberOfMachinesPerCluster();
     }
 
-    private String msgPerviousScalingFailed(ScalingData d) {
+    private String msgPreviousScalingFailed(ScalingData d) {
         return "There is a scaling job failure for this cluster.\n" +
                "This indicates a problem with cloud infrastructure.\n" +
                "Autoscaler can not scale this cluster before the problem is solved and\n" +
@@ -100,6 +104,13 @@ public class EmailNotifier implements Notifier{
                "cloud zone: " + cloudZone + "\n" +
                "instance id: " + d.getCluster().getInstanceId() + "\n" +
                "cluster id: " + d.getCluster().getId() + "\n";
+    }
+
+    private String msgScalingRuleInvalid(ScalingData d) {
+        return "Scaling rule for cluster is invalid.\n" +
+               "Autoscaler can not scale this cluster before scaling rules are not properly set.\n\n" +
+               "Severity: " + "CRITICAL\n" +
+               "cloud zone: " + cloudZone + "\n";
     }
 
 }

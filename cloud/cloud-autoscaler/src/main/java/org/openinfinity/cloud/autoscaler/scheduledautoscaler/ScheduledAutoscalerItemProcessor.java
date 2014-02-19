@@ -18,10 +18,8 @@ package org.openinfinity.cloud.autoscaler.scheduledautoscaler;
 
 import org.openinfinity.cloud.autoscaler.common.AutoscalerItemProcessor;
 import org.openinfinity.cloud.autoscaler.periodicautoscaler.ClusterProcessingState;
-import org.openinfinity.cloud.domain.Cluster;
 import org.openinfinity.cloud.domain.Job;
 import org.openinfinity.cloud.domain.ScalingRule;
-import org.openinfinity.cloud.service.scaling.Enumerations.ScalingStatus;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -53,41 +51,28 @@ public class ScheduledAutoscalerItemProcessor extends AutoscalerItemProcessor im
     }
 
 	@Override
-	public Job process(ScalingRule rule) throws Exception {
+	public Job process(ScalingRule scalingRule) throws Exception {
 
-		long now = System.currentTimeMillis();
+        rule = scalingRule;
+        cluster = clusterService.getCluster(rule.getClusterId());
+
+        long now = System.currentTimeMillis();
 		Timestamp samplingPeriodStart = new Timestamp(now - offsetStart );
 		Timestamp samplingPeriodEnd = new Timestamp(now + offsetEnd);
 
-        clusterId = rule.getClusterId();
-        Cluster cluster = clusterService.getCluster(clusterId);
-        Job job = null;
-        ClusterProcessingState clusterProcessingState = initializeFailures();
+        ClusterProcessingState clusterState = getClusterState();
+        Job job = handleScalingStatus(clusterState, rule, scalingRuleService.applyScalingRule(samplingPeriodStart, samplingPeriodEnd, clusterService.getCluster(rule.getClusterId()), rule));
+        processingStatusMap.put(cluster.getId(), clusterState);
 
-        ScalingStatus status = scalingRuleService.applyScalingRule(samplingPeriodStart, samplingPeriodEnd, cluster, rule);
-        switch (status) {
-            case SCALING_OUT_REQUIRED:
-                return createJob(cluster, rule.getClusterSizeNew());
-            case SCALING_IN_REQUIRED:
-                return createJob(cluster, rule.getClusterSizeOriginal());
-            case SCALING_IMPOSSIBLE_SCALING_RULE_LIMIT:
-                break;
-            case SCALING_IMPOSSIBLE_SCALING_ALREADY_ONGOING:
-                break;
-            case SCALING_NOT_REQUIRED:
-                break;
-            case SCALING_IMPOSSIBLE_INVALID_RULE:
-                break;
-            case SCALING_IMPOSSIBLE_CLUSTER_ERROR:
-                notifyPreviousScalingFailed(clusterProcessingState, cluster, rule);
-                break;
-            case SCALING_IMPOSSIBLE_MACHINE_CONFIGURATION_ERROR:
-                notifyMachineConfigurationError(clusterProcessingState, cluster, rule);
-                break;
-            default:
-                break;
-        }
-		return job;
+        return job;
 	}
+
+    protected int getScaleOutSize(){
+        return rule.getClusterSizeNew();
+    }
+
+    protected int getScaleInSize(){
+        return rule.getClusterSizeOriginal();
+    }
 
 }

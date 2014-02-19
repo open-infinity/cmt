@@ -103,6 +103,7 @@ public class ScheduledAutoscalerIntegrationTest {
      * @throws Exception
      */
 	@Test
+    //@Ignore
 	public void scaleOut() throws Exception {
 
         // Given
@@ -114,11 +115,10 @@ public class ScheduledAutoscalerIntegrationTest {
 		JobExecution jobExecution = jobLauncherTestUtils.launchJob();
 
         // Then
-        Assert.assertEquals(jobExecution.getStatus(), BatchStatus.COMPLETED);
+        Assert.assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 		ScalingRule scalingRule = scalingRuleService.getRule(CLUSTER_ID);
 		Assert.assertEquals(2, scalingRule.getClusterSizeOriginal());
 		Assert.assertEquals(2, scalingRule.getScheduledScalingState());
-
         Assert.assertEquals("1,5", jobService.getJob(jobService.getNewest().getJobId()).getServices());
 
     }

@@ -73,7 +73,7 @@ public class ScalingRuleServiceImpl implements ScalingRuleService {
         ScalingStatus status;
 
         if(clusterStatus == ClusterStatus.SCALING_JOB_ERROR){
-            status = ScalingStatus.SCALING_IMPOSSIBLE_CLUSTER_ERROR;
+            status = ScalingStatus.SCALING_IMPOSSIBLE_SCALING_JOB_ERROR;
 
         } else if(clusterStatus == ClusterStatus.MACHINE_UNDER_CONSTRUCTION){
             status = ScalingStatus.SCALING_IMPOSSIBLE_SCALING_ALREADY_ONGOING;
@@ -102,7 +102,7 @@ public class ScalingRuleServiceImpl implements ScalingRuleService {
         ClusterStatus clusterStatus = getClusterScalingStatus(rule);
 
         if(clusterStatus == ClusterStatus.SCALING_JOB_ERROR){
-            state = ScalingStatus.SCALING_IMPOSSIBLE_CLUSTER_ERROR;
+            state = ScalingStatus.SCALING_IMPOSSIBLE_SCALING_JOB_ERROR;
 
         } else if(clusterStatus == ClusterStatus.MACHINE_UNDER_CONSTRUCTION){
             state = ScalingStatus.SCALING_IMPOSSIBLE_SCALING_ALREADY_ONGOING;

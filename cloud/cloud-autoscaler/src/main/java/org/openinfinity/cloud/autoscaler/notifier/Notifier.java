@@ -6,9 +6,10 @@ public interface Notifier {
     void notify(ScalingData scalingData, NotificationType type);
 
     public enum NotificationType {
-        SCALING_FAILED_RULE_LIMIT,
+        SCALING_RULE_LIMIT,
+        SCALING_RULE_INVALID,
+        SCALING_JOB_ERROR,
         LOAD_FETCHING_FAILED,
-        PREVIOUS_SCALING_FAILED,
         MACHINE_CONFIGURATION_ERROR
     }
 }
