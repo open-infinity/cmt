@@ -24,18 +24,28 @@
                         <cloudadmin.worker.service.ee_platform.image.eucalyptus.0>emi-xxxxxxxxxx</cloudadmin.worker.service.ee_platform.image.eucalyptus.0>
                         <cloudadmin.worker.service.ee_platform.image.eucalyptus.1>emi-xxxxxxxxxx</cloudadmin.worker.service.ee_platform.image.eucalyptus.1>
                         <cloudadmin.worker.service.bigdata_platform.image.eucalyptus.0>emi-xxxxxxxxx</cloudadmin.worker.service.bigdata_platform.image.eucalyptus.0>
-			<cloudadmin.worker.service.bigdata_platform.image.eucalyptus.1>emi-xxxxxxxxx</cloudadmin.worker.service.bigdata_platform.image.eucalyptus.1>
+			            <cloudadmin.worker.service.bigdata_platform.image.eucalyptus.1>emi-xxxxxxxxx</cloudadmin.worker.service.bigdata_platform.image.eucalyptus.1>
                         <cloudadmin.worker.service.nosql_platform.image.eucalyptus.0>emi-xxxxxxxxxx</cloudadmin.worker.service.nosql_platform.image.eucalyptus.0>
-			<cloudadmin.worker.service.nosql_platform.image.eucalyptus.1>emi-xxxxxxxxxx</cloudadmin.worker.service.nosql_platform.image.eucalyptus.1>
+			            <cloudadmin.worker.service.nosql_platform.image.eucalyptus.1>emi-xxxxxxxxxx</cloudadmin.worker.service.nosql_platform.image.eucalyptus.1>
                         <euca.accessKey>abc1234567</euca.accessKey>
                         <euca.secretKey>abc1234567</euca.secretKey>
                         <euca.zonelist>zone1</euca.zonelist>
                         <infrastructure.awsaccesskeyid>abc1234567</infrastructure.awsaccesskeyid>
                         <infrastructure.awssecretkey>abc1234567</infrastructure.awssecretkey>
+
                         <cmt-admin.jdbc.driverClassName>com.mysql.jdbc.Driver</cmt-admin.jdbc.driverClassName>
                         <cmt-admin.jdbc.url>jdbc:mysql://localhost</cmt-admin.jdbc.url>
                         <cmt-admin.jdbc.username>user</cmt-admin.jdbc.username>
                         <cmt-admin.jdbc.password>passwd</cmt-admin.jdbc.password>
+
+                        <cmt-spring.batch.jdbc.url>jdbc:mysql://localhost</cmt-spring.batch.jdbc.url>
+                        <cmt-spring.batch.jdbc.driverClassName>com.mysql.jdbc.Driver</cmt-spring.batch.jdbc.driverClassName>
+                        <cmt-spring.batch.jdbc.username>user</cmt-spring.batch.jdbc.username>
+                        <cmt-spring.batch.jdbc.password>passwd</cmt-spring.batch.jdbc.password>
+
+                        <cmt-autoscaler.email.host>mailserver@acme</cmt-autoscaler.email.host>
+                        <cmt-autoscaler.email.from>from@acme.com</cmt-autoscaler.email.from>
+                        <cmt-autoscaler.email.to>to@acme.com</cmt-autoscaler.email.to>
 			
                         <aws.bucketendpoint>0.0.0.0</aws.bucketendpoint>		  
                         <aws.accessKey>abc1234567</aws.accessKey>
