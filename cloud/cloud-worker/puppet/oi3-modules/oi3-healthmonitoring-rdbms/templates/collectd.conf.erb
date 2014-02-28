@@ -124,7 +124,7 @@ LoadPlugin load
 LoadPlugin memory
 ##LoadPlugin modbus
 #LoadPlugin multimeter
-##LoadPlugin mysql
+LoadPlugin mysql
 ##LoadPlugin netapp
 ##LoadPlugin netlink
 #LoadPlugin network
@@ -468,20 +468,20 @@ LoadPlugin rrdtool
 #       <Plugin "GenericJMX">
 #              <MBean "memory">
 #                     ObjectName "java.lang:type=Memory"
-#                     <Value>
-#                            Type "jmx_memory"
+#                    <Value>
+#                          Type "jmx_memory"
 #                            Table true
 #                            Attribute "HeapMemoryUsage"
-#                    </Value>
+#                     </Value>
 #              </MBean>
 #              <Connection>
 #                     User monitorRole
-#                    Password <%=tomcat_monitor_role_pwd%>
-#                    Host "<%=hostname%>"
+#                     Password <%=tomcat_monitor_role_pwd%>
+#                     Host "<%=hostname%>"
 #                     ServiceURL "service:jmx:rmi:///jndi/rmi://localhost:<%=tomcat_jmx_port%>/jmxrmi"
 #                     Collect "memory"
 #              </Connection>
-#       </Plugin>
+#      </Plugin>
 #</Plugin>
 
 #<Plugin libvirt>
@@ -582,6 +582,14 @@ LoadPlugin rrdtool
 #		SlaveNotifications true
 #	</Database>
 #</Plugin>
+
+<Plugin mysql>
+        <Database openinfinity>
+                Host "localhost"
+                User "healthmonitoring"
+                Password <%=rdbms_healthmonitoring_pwd%>
+	</Database>
+</Plugin>
 
 #<Plugin netapp>
 #	<Host "netapp1.example.com">

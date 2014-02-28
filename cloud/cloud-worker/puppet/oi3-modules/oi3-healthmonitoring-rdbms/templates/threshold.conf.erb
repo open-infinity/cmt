@@ -9,7 +9,7 @@ LoadPlugin threshold
             WarningMax 3000
         </Type>
     </Plugin>
-    
+
     <Plugin df>
         <Type percent_bytes>
             Persist false
@@ -17,12 +17,21 @@ LoadPlugin threshold
             WarningMin 10
         </Type>
     </Plugin>
-    
+
     <Plugin load>
         <Type load>
             Persist false
             Instance relative
             WarningMax 1
+        </Type>
+    </Plugin>
+
+    <Plugin mysql>
+        Instance openinfinity
+        <Type threads>
+            Persist false
+            Instance connected
+            WarningMax 140 
         </Type>
     </Plugin>
 
