@@ -1,0 +1,2 @@
+JETTY_HOME="<%= @directory %>/jetty"
+JETTY_USER="<%= @user %>"
