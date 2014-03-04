@@ -1,8 +1,10 @@
 class oi3-portal::install {
-	package { ["java-1.7.0-openjdk", "oi3-connectorj", "oi3-liferay", "oi3-core", "oi3-tomcat"]:
+	package { ["java-1.7.0-openjdk", "oi3-connectorj", "oi3-liferay", "oi3-core", "oi3-tomcat", "oi3-secvault", "oi3-hazelcast"]:
 		ensure => present,
 		require => Class["oi3-basic"],
 	}
+#	package { ["oi3-bas"]:
+
 
 	file {"/opt/openinfinity/3.0.0/deploy":
                 ensure => directory,
@@ -94,6 +96,25 @@ class oi3-portal::config {
                 require => Class["oi3-portal::install"],
         }
 
+	# Security Vault configuration
+	file {"/opt/openinfinity/3.0.0/tomcat/conf/securityvault.properties":
+		ensure => present,
+		owner => 'oiuser',
+		group => 'oiuser',
+		mode => 0600,
+		source => "puppet:///modules/oi3-bas/securityvault.properties",
+		require => Class["oi3-portal::install"],
+	}
+
+	file {"/opt/openinfinity/3.0.0/tomcat/conf/hazelcast.xml":
+		ensure => present,
+		owner => 'oiuser',
+		group => 'oiuser',
+		mode => 0600,
+		content => template("oi3-bas/hazelcast.xml.erb"),
+		require => Class["oi3-portal::install"],
+	}
+	
         file {"/opt/openinfinity/3.0.0/tomcat/conf/context.xml":
                 ensure => present,
                 owner => 'oiuser',
