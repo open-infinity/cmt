@@ -34,7 +34,7 @@ class oi3-rdbms::install {
 		require => file["/opt/openinfinity/3.0.0/rdbms/data"],
 	}
 
-	package { "oi3-rdbms-3.0.0-1":
+	package { "oi3-rdbms":
 		ensure => present,
 		require => file["/opt/openinfinity/3.0.0/rdbms/data/my.cnf"],
 	}
@@ -45,7 +45,7 @@ class oi3-rdbms::install {
 		owner => "root",
 		group => "root",
 		mode => 0755,
-		require => package["oi3-rdbms-3.0.0-1"],
+		require => package["oi3-rdbms"],
 	}
 
 	user { "mysql":
