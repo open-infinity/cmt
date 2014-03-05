@@ -28,7 +28,8 @@ class oi3-bas::config {
 		owner => 'oiuser',
 		group => 'oiuser',
 		mode => 0600,
-		source => "puppet:///modules/oi3-bas/server.xml",
+		#source => "puppet:///modules/oi3-bas/server.xml",
+		content => template("oi3-bas/server.xml.erb"),
 		require => Class["oi3-bas::install"],
 	}
 
