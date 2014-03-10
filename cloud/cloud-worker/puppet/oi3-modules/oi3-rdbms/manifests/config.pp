@@ -4,7 +4,7 @@ class oi3-rdbms::config {
                source => "puppet:///modules/oi3-rdbms/openinfinity.cnf",
                owner => "root",
                group => "root",
-               mode => 0755,
+               mode => 0644,
                require => Class["oi3-rdbms::install"],
 	}
 
