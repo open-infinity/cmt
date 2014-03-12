@@ -1,7 +1,8 @@
 class oi3ldap {
-  package {"java-1.7.0-openjdk":
-    ensure => present
-  }
+  ensure_resource('package', 'java-1.7.0-openjdk', {
+	ensure => present,
+  })
+
   package {"apacheds":
     ensure => present,
     require => Package["java-1.7.0-openjdk"]
