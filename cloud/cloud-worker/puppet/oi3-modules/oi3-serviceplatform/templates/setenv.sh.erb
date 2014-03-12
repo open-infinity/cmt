@@ -9,6 +9,9 @@ JMX_OPTS="-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=653
 MULE_OPTS="-Dmule.workingDirectory=/opt/data/.mule"
 SECURITY_VAULT_OPTS="-Dsecurity.vault.properties.file=/opt/openinfinity/3.0.0/tomcat/conf/securityvault.properties"
 
-JAVA_OPTS="$JAVA_OPTS $LTT_OPTS $MULE_OPTS $CLASS_LOADER_OPTS -Duser.timezone=EET -Dfile.encoding=UTF8 $JVM_MEMORY_OPTS $SECURITY_VAULT_OPTS"
-CATALINA_OPTS="$CATALINA_OPTS $JMX_OPTS"
+EXTRA_JVM_OPS="<%= extra_jvm_opts %>"
+EXTRA_CATALINA_OPS="<%= extra_catalina_opts %>"
+
+JAVA_OPTS="$JAVA_OPTS $LTT_OPTS $MULE_OPTS $CLASS_LOADER_OPTS -Duser.timezone=EET -Dfile.encoding=UTF8 $JVM_MEMORY_OPTS $SECURITY_VAULT_OPTS $EXTRA_JVM_OPS"
+CATALINA_OPTS="$CATALINA_OPTS $JMX_OPTS $EXTRA_CATALINA_OPS"
 MULE_HOME="/opt/data"

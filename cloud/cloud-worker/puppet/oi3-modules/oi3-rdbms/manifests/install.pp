@@ -24,28 +24,9 @@ class oi3-rdbms::install {
                 require => file["/opt/openinfinity/3.0.0/rdbms"],
         }	
 
-
-	file {"/opt/openinfinity/3.0.0/rdbms/data/my.cnf":
-		ensure => present,
-		source => "puppet:///modules/oi3-rdbms/my.cnf",
-		owner => "mysql",
-		group => "mysql",
-		mode => 0644,
-		require => file["/opt/openinfinity/3.0.0/rdbms/data"],
-	}
-
 	package { "oi3-rdbms":
 		ensure => present,
-		require => file["/opt/openinfinity/3.0.0/rdbms/data/my.cnf"],
-	}
-
-	file { "/etc/init.d/mysql":
-		ensure => present,
-		source => "puppet:///modules/oi3-rdbms/mysql",
-		owner => "root",
-		group => "root",
-		mode => 0755,
-		require => package["oi3-rdbms"],
+		require => file["/opt/openinfinity/3.0.0/rdbms/data"],
 	}
 
 	user { "mysql":
