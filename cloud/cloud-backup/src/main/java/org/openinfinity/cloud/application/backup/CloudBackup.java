@@ -58,6 +58,15 @@ public class CloudBackup {
 	private static CloudBackup cloudBackupInstance = null;
 
 	/**
+	 * Returns the BackupProperties class from spring application context. 
+	 * This is a convenience method.
+	 * @return CloudProperties object or null
+	 */
+	public static BackupProperties getBackupProperties() {
+		return (BackupProperties) getInstance().getContext().getBean("backupProperties");
+	}
+	
+	/**
 	 * Reads initial instance data from the database and creates schedulable
 	 * jobs based on that.
 	 */

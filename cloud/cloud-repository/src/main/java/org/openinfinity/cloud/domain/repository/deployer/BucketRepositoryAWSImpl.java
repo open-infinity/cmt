@@ -16,6 +16,7 @@
 package org.openinfinity.cloud.domain.repository.deployer;
 
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -72,6 +73,7 @@ public class BucketRepositoryAWSImpl implements BucketRepository {
 	 */
 	public String createBucket(InputStream inputStream, String bucketName, String key, Map<String, String> metadataMap) {
 		ObjectMetadata objectMetadata = new ObjectMetadata();
+		objectMetadata.setUserMetadata(metadataMap);
 		PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, key, inputStream, objectMetadata);
 		simpleStorageService.createBucket(bucketName);
 		simpleStorageService.putObject(putObjectRequest);
@@ -83,6 +85,15 @@ public class BucketRepositoryAWSImpl implements BucketRepository {
 	 */
 	public InputStream load(String bucketName, String key) {
 		return simpleStorageService.getObject(bucketName, key).getObjectContent();
+	}
+
+	/**
+	 * Retrieves bucked meta data based on bucket name.
+	 * @author Timo Saarinen
+	 */
+	public Map<String, String> readMetadata(String bucketName, String key) {
+		ObjectMetadata omd = simpleStorageService.getObjectMetadata(bucketName, key);
+		return (omd != null) ? omd.getUserMetadata() : null;
 	}
 	
 	/**

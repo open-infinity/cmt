@@ -367,6 +367,7 @@ CONSTRAINT `cluster_id` FOREIGN KEY (`cluster_id`) REFERENCES `cluster_tbl` (`cl
 CREATE TABLE `backup_operation_tbl` (
 `backup_operation_id` int(11) NOT NULL AUTO_INCREMENT,
 `operation` ENUM('backup', 'full-restore', 'partial-restore', 'refresh-schedules') NOT NULL,
+`cipher` ENUM('yes', 'no', 'default') NOT NULL  DEFAULT 'default',
 `create_time` datetime NULL,
 `update_time` datetime NULL,
 `target_cluster_id` int(11) NOT NULL,

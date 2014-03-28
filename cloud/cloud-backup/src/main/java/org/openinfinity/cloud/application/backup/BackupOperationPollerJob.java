@@ -74,6 +74,10 @@ public class BackupOperationPollerJob {
 							JobResultSaver jrs = new JobResultSaver(op, machines.size());
 							for (Machine machine : machines) {
 								InstanceBackupJob job = new InstanceBackupJob(cluster_info, machine.getId(), jrs);
+								if ("yes".equalsIgnoreCase(op.getCipher()))
+									job.setCipher(true);
+								else if ("no".equalsIgnoreCase(op.getCipher()))
+									job.setCipher(true);
 		
 								logger.trace("Scheduling job " + job);
 		
@@ -108,7 +112,8 @@ public class BackupOperationPollerJob {
 							JobResultSaver jrs = new JobResultSaver(op, machines.size());
 							for (Machine machine : machines) {
 								InstanceRestoreJob job = new InstanceRestoreJob(target_cluster_info, source_cluster_info, machine.getId(), jrs);
-								job.setLocalPackageDirectory("/var/tmp"); // TODO
+								job.setLocalPackageDirectory(CloudBackup.getBackupProperties().getTemporaryDirectory());
+								//job.setLocalPackageDirectory("/var/tmp");
 								
 								// Trigger job instantly
 								dynamicQuartzSchedulerManager.runJob("job-" + op.getId() + "-" 
@@ -135,7 +140,8 @@ public class BackupOperationPollerJob {
 							JobResultSaver jrs = new JobResultSaver(op, machines.size());
 							for (Machine machine : machines) {
 								InstanceRestoreJob job = new InstanceRestoreJob(cluster_info, machine.getId(), jrs);
-								job.setLocalPackageDirectory("/var/tmp"); // TODO
+								job.setLocalPackageDirectory(CloudBackup.getBackupProperties().getTemporaryDirectory());
+								//job.setLocalPackageDirectory("/var/tmp"); // TODO
 			
 								// Trigger job instantly
 								dynamicQuartzSchedulerManager.runJob("job-" + op.getId() 

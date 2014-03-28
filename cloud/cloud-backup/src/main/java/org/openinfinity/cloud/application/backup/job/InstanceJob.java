@@ -15,6 +15,7 @@ import org.apache.log4j.Logger;
 import org.openinfinity.cloud.application.backup.CloudBackup;
 import org.openinfinity.cloud.domain.Machine;
 import org.openinfinity.cloud.service.administrator.MachineService;
+import org.openinfinity.core.annotation.Encrypt;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -96,6 +97,16 @@ abstract public class InstanceJob {
 	private ResultListener listener;
 	
 	/**
+	 * Whether to cipher the backup data or not.
+	 */
+	private boolean cipher = true;
+	
+	/**
+	 * Backup bundle compression method. Typical are "zip", "tar", "tar/gz", "tar/bz2" and "tar/xz".
+	 */
+	private String compressionMethod = "tar/xz"; // TODO: is it possible to get this from VM?
+	
+	/**
 	 * The default constructor.
 	 */
 	public InstanceJob(ClusterInfo target_cluster, ClusterInfo source_cluster, int machineId, ResultListener listener) {
@@ -111,6 +122,9 @@ abstract public class InstanceJob {
 		this.storageCluster = source_cluster;
 		this.logicalMachineName = decideLogicalHostname(machineId);
 		this.setJobName(logicalMachineName);
+
+		// Use cipher default from application context 
+		this.cipher = CloudBackup.getBackupProperties().isCipher();
 	}
 
 	/**
@@ -298,5 +312,25 @@ abstract public class InstanceJob {
 
 	public void setStorageCluster(ClusterInfo storageCluster) {
 		this.storageCluster = storageCluster;
+	}
+
+	public boolean useCipher() {
+		return isCipher();
+	}
+
+	public boolean isCipher() {
+		return cipher;
+	}
+
+	public void setCipher(boolean encrypt) {
+		this.cipher = encrypt;
+	}
+
+	public String getCompressionMethod() {
+		return compressionMethod;
+	}
+
+	public void setCompressionMethod(String compressionMethod) {
+		this.compressionMethod = compressionMethod;
 	}
 }

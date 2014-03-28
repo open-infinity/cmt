@@ -16,9 +16,12 @@
 package org.openinfinity.cloud.domain.repository.deployer;
 
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import javax.swing.JApplet;
 
 import org.apache.log4j.Logger;
 import org.jets3t.service.Constants;
@@ -28,7 +31,6 @@ import org.jets3t.service.StorageService;
 import org.jets3t.service.impl.rest.httpclient.RestS3Service;
 import org.jets3t.service.model.S3Bucket;
 import org.jets3t.service.model.S3Object;
-
 import org.openinfinity.cloud.util.credentials.ProviderCredentialsImpl;
 import org.openinfinity.core.annotation.AuditTrail;
 import org.openinfinity.core.annotation.Log;
@@ -37,6 +39,8 @@ import org.openinfinity.core.util.ExceptionUtil;
 import org.openinfinity.core.util.IOUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
+
+import com.amazonaws.services.s3.model.ObjectMetadata;
 
 /**
  * Standardized Jets3t interface for creating buckets with simple storage services.
@@ -107,8 +111,36 @@ public class BucketRepositoryJets3tImpl implements BucketRepository {
 		}
 		return inputStream;
 	}
+
 	
-	
+	/**
+	 * Retrieves bucked meta data based on bucket name.
+	 * @author Timo Saarinen
+	 */
+	public Map<String, String> readMetadata(String bucketName, String key) {
+		Map<String, Object> metadataMap = null;
+		try {
+			simpleStorageService = new RestS3Service(new ProviderCredentialsImpl(accesskeyid, secretkey));
+			S3Object s3o = simpleStorageService.getObject(bucketName, key);
+			if (s3o != null) metadataMap = s3o.getMetadataMap();
+		} catch (Throwable throwable) {
+			throwable.printStackTrace();
+			ExceptionUtil.throwSystemException(throwable.getMessage(), ExceptionLevel.ERROR, BucketRepository.EXCEPTION_MESSAGE_CONNECTION_FAILURE);
+		}
+		
+		// Convert Map<String, Object> to Map<String, String>.
+		if (metadataMap != null) {
+			Map<String, String> md = new HashMap<String, String>();
+			for (String metaKey : metadataMap.keySet()) {
+				Object metaObject = metadataMap.get(metaKey);
+				if (metaObject != null) {
+					md.put(metaKey, metaObject.toString());
+				}
+			}
+			return md;
+		}
+		return null;
+	}
 	
 
 	/**

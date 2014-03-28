@@ -68,7 +68,9 @@ public class RemoteMachineCommand implements Command {
 		logger.debug("Local filename for backup will be " + package_file);
 
 		// The command to be executed in the remote host
-		String package_command = "/opt/openinfinity/3.0.0/backup/stream-backup"; // FIXME: non-hardcoded path
+		String package_command = CloudBackup.getBackupProperties().getRemoteBackupCommand();
+		if (package_command == null) throw new NullPointerException("remoteBackupCommand is null");
+		//String package_command = "/opt/openinfinity/3.0.0/backup/stream-backup"; // FIXME: non-hardcoded path
 
 		// Test that the backup file exists
 		int remote_exit_status1 = runRemoteCommand("touch " + package_command, null, "/dev/null");
@@ -119,8 +121,9 @@ public class RemoteMachineCommand implements Command {
 		// The backup file
 		File package_file = job.getLocalBackupFile();
 		
-		// The comand to be execute in the remote host
-		String restore_command = "/opt/openinfinity/3.0.0/backup/stream-restore"; // FIXME: non-hardcoded
+		// The command to be execute in the remote host
+		String restore_command = CloudBackup.getBackupProperties().getRemoteRestoreCommand();
+		//String restore_command = "/opt/openinfinity/3.0.0/backup/stream-restore"; // FIXME: non-hardcoded
 
 		// Test that the backup file exists
 		int remote_exit_status1 = runRemoteCommand("touch " + restore_command, null, "/dev/null");
@@ -197,8 +200,12 @@ public class RemoteMachineCommand implements Command {
 			logger.trace("Command execution finished with return value "
 					+ retval + ".");
 		} catch (Exception e) {
-			throw new BackupException("Remote shell command execution failed:"
-					+ e.getMessage(), e);
+			if (e.getCause() != null && e.getCause().getMessage() != null) {
+				throw new BackupException(e.getCause().getMessage(), e);
+			} else {
+				throw new BackupException("Remote shell command execution failed:"
+						+ e.getMessage(), e);
+			}
 		}
 		return retval;
 	}

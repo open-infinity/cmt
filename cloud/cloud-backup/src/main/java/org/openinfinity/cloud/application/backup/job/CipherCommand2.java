@@ -40,9 +40,17 @@ public class CipherCommand2 implements Command {
 	
 	public void execute() throws Exception {
 		if (job instanceof InstanceBackupJob) {
-			cipher();
+			if (job.useCipher()) {
+				cipher();
+			} else {
+				logger.info("Ciphering disbled.");
+			}
 		} else if (job instanceof InstanceRestoreJob) {
-			decipher();
+			if (job.useCipher()) {
+				decipher();
+			} else {
+				logger.info("(De)ciphering disbled.");
+			}
 		} else {
 			throw new BackupException("Unexpected base class " + job.getClass());
 		}
@@ -50,9 +58,13 @@ public class CipherCommand2 implements Command {
 
 	public void undo() throws Exception {
 		if (job instanceof InstanceBackupJob) {
-			decipher();
+			if (job.useCipher()) {
+				decipher();
+			}
 		} else if (job instanceof InstanceRestoreJob) {
-			cipher();
+			if (job.useCipher()) {
+				cipher();
+			}
 		} else {
 			throw new BackupException("Unexpected base class " + job.getClass());
 		}

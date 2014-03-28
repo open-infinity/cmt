@@ -26,6 +26,7 @@ public class BackupWorkRepositoryJdbcImpl implements BackupWorkRepository {
 	public static final String TABLE_BACKUP_OPERATION = "backup_operation_tbl";
 	public static final String COLUMN_ID = "backup_operation_id";
 	public static final String COLUMN_OPERATION = "operation";
+	public static final String COLUMN_CIPHER = "cipher";
 	public static final String COLUMN_UPDATED = "update_time";
 	public static final String COLUMN_CREATED = "create_time";
 	public static final String COLUMN_TARGET_CLUSTER_ID = "target_cluster_id";
@@ -53,6 +54,7 @@ public class BackupWorkRepositoryJdbcImpl implements BackupWorkRepository {
 		if (op.getId() == -1) {
 			jdbcTemplate.update("INSERT INTO " + TABLE_BACKUP_OPERATION + " ("
 					+ COLUMN_OPERATION + ", " 
+					+ COLUMN_CIPHER + ", " 
 					+ COLUMN_UPDATED + ", "
 					+ COLUMN_CREATED + ", " 
 					+ COLUMN_TARGET_CLUSTER_ID + ", "
@@ -62,6 +64,7 @@ public class BackupWorkRepositoryJdbcImpl implements BackupWorkRepository {
 					+ ") VALUES (?, ?, ?, ?, ?, ?, ?)",
 					new Object[] { 
 						op.getOperation(), 
+						op.getCipher(), 
 						new java.util.Date(),
 						new java.util.Date(), 
 						op.getTargetClusterId() == -1 ? null : op.getTargetClusterId(), 
@@ -72,6 +75,7 @@ public class BackupWorkRepositoryJdbcImpl implements BackupWorkRepository {
 		} else {
 			jdbcTemplate.update("UPDATE " + TABLE_BACKUP_OPERATION + " SET "
 					+ COLUMN_OPERATION + " = ?, " 
+					+ COLUMN_CIPHER + " = ?, " 
 					+ COLUMN_UPDATED + " = ?, "
 					+ COLUMN_TARGET_CLUSTER_ID + " = ?, " 
 					+ COLUMN_SOURCE_CLUSTER_ID + " = ?, " 
@@ -79,6 +83,7 @@ public class BackupWorkRepositoryJdbcImpl implements BackupWorkRepository {
 					+ COLUMN_DESCRIPTION + " = ? "
 					+ "WHERE " + COLUMN_ID + " = ?", new Object[] {
 					op.getOperation(), 
+					op.getCipher(), 
 					op.getUpdated(),
 					op.getTargetClusterId() == -1 ? null : op.getTargetClusterId(), 
 					op.getSourceClusterId() == -1 ? null : op.getSourceClusterId(), 
@@ -115,6 +120,7 @@ public class BackupWorkRepositoryJdbcImpl implements BackupWorkRepository {
 			BackupOperation op = new BackupOperation();
 			op.setId(rs.getInt(COLUMN_ID));
 			op.setOperation(rs.getString(COLUMN_OPERATION));
+			op.setCipher(rs.getString(COLUMN_CIPHER));
 			op.setUpdated(rs.getDate(COLUMN_UPDATED));
 			if (rs.getString(COLUMN_TARGET_CLUSTER_ID) != null) {
 				op.setTargetClusterId(rs.getInt(COLUMN_TARGET_CLUSTER_ID));

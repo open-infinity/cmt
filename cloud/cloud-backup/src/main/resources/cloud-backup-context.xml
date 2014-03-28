@@ -30,7 +30,8 @@
     	classpath*:/META-INF/properties/infrastructure.properties,
     	classpath*:/META-INF/properties/jets3.properties,
     	classpath*:/META-INF/properties/crypto.properties,
-    	classpath*:/META-INF/properties/repository.properties" />
+    	classpath*:/META-INF/properties/repository.properties,
+    	classpath*:backup.properties" />
 
 	<!-- <bean id="cryptoSupport" class="org.openinfinity.core.crypto.CryptoSupport"> 
 		<constructor-arg name="symmetricKeyPath" value="${symmetric.key.path}" /> 
@@ -41,6 +42,13 @@
 	<bean id="machineService" class="org.openinfinity.cloud.service.administrator.MachineServiceImpl" />
 	<bean id="backupService" class="org.openinfinity.cloud.service.backup.BackupServiceImpl" />
 	<bean id="backupWorkRepository" class="org.openinfinity.cloud.domain.repository.backup.BackupWorkRepositoryJdbcImpl">
+	</bean>
+
+	<bean id="backupProperties" class="org.openinfinity.cloud.application.backup.BackupProperties">
+		<property name="remoteBackupCommand" value="${backup.remote-backup-command}" />
+		<property name="remoteRestoreCommand" value="${backup.remote-restore-command}" />
+		<property name="remoteSyncCommand" value="${backup.remote-sync-command}" />
+		<property name="temporaryDirectory" value="${backup.temporary-dir}" />
 	</bean>
 
 	<bean id="cloudDataSource" destroy-method="close"

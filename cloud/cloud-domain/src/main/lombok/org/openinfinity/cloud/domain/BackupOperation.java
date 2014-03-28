@@ -36,6 +36,14 @@ public class BackupOperation {
 	public static final String REFRESH_SCHEDULES = "refresh-schedules";
 
 	/**
+	 * Whether to cipher the backup or not. Allowed values are "yes", "no" and "default".
+	 * The "default" option makes the backup prefer the value set in application
+	 * context. Naturally this option has only effect in case of "backup" operation.
+	 */
+	@NotScript
+	private String cipher = "default";
+
+	/**
 	 * Time, when the operation was updated last time.
 	 */
 	@NotScript

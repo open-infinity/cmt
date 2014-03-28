@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.io.SequenceInputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 import javax.naming.Context;
 
@@ -80,21 +81,37 @@ public class StorageCommand implements Command {
 		bucketRepository.createBucket(
 				new ByteArrayInputStream(info.getBytes()), 
 				BUCKET_ROOT_NAME, "info", new HashMap<String, String>());
-		
-		// Upload the package to S3 repository as a bucket
-		FileInputStream fis = new FileInputStream(job.getLocalBackupFile());
+
+		// Create metadata
 		Map<String, String> metadataMap = new HashMap<String, String>();
 		metadataMap.put("hostname", job.getHostname());
+		metadataMap.put("hostrole", job.getLogicalMachineName());
 		metadataMap.put("username", job.getUsername());
 		metadataMap.put("filename", job.getLocalBackupFile().getName());
+		metadataMap.put("encryption", job.isCipher() ? "yes" : "no");
+		metadataMap.put("compression-method", job.getCompressionMethod());
+		
+		// Upload the backup package to S3 repository as a bucket
+		FileInputStream fis = new FileInputStream(job.getLocalBackupFile());
 		logger.info("Storing the backup to S3 repository: name=" + getBucketNameForJob() 
 				+ " key=" + getBucketKeyForJob());
 		String location = bucketRepository.createBucket(
 				fis, getBucketNameForJob(), getBucketKeyForJob(), metadataMap);
-		logger.debug("bucket created in location=" + location);
+		logger.debug("bucket created in location " + location);
 		fis.close();
+
+		// Check that metadata was saved successfully
+		logger.trace("Reading the saved metadata and comparing it to the written one");
+		Map<String, String> metadataMap2 = bucketRepository.readMetadata(getBucketNameForJob(), getBucketKeyForJob());
+		for (String k : metadataMap.keySet()) {
+			if (!metadataMap.get(k).equals(metadataMap2.get(k))) {
+				throw new BackupException("Metadata mismatch! '" + metadataMap.get(k) + "' != '" + (metadataMap2.get(k)) + "'");
+			}
+		}
+		logger.info("Metadata check succeeded");
 		
 		// Finally delete the local backup file
+		logger.trace("Deleteting local backup file");
 		File f = job.getLocalBackupFile();
 		if (f != null) {
 			f.delete();

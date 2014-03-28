@@ -45,15 +45,26 @@ public interface BucketRepository {
 	
 	/**
 	 * Retrieves bucket based on bucket name.
+	 * 
 	 * @param bucketName Defines the name of the bucket.
 	 * @param key Defines the name of the object stored inside the bucket.
 	 * @return Inputstream represents the stream of the bucket.
 	 */
 	InputStream load(String bucketName, String key);
-	
+
+	/**
+	 * Retrieves bucked meta data based on bucket name.
+	 * 
+	 * @param bucketName Defines the name of the bucket.
+	 * @param key Defines the name of the object stored inside the bucket.
+	 * @return Meta data as a string map.
+	 * @author Timo Saarinen
+	 */
+	Map<String, String> readMetadata(String bucketName, String key);
 	
 	/**
 	 * Deletes object in a bucket bucket.
+	 * 
 	 * @param bucketName Defines the name of the bucket.
 	 * @param key Defines the name of the object stored inside the bucket.
 	 */
@@ -62,6 +73,7 @@ public interface BucketRepository {
 
 	/**
 	 * Deletes all object in a bucket and the bucket itself.
+	 * 
 	 * @param bucketName
 	 */
 	public void deleteBucketAndObjects(String bucketName);
