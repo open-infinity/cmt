@@ -140,10 +140,10 @@
         <Valve className="org.apache.catalina.valves.AccessLogValve" directory="logs"
                prefix="localhost_access_log." suffix=".txt"
                pattern="%h %l %u %t &quot;%r&quot; %s %b" />
-	
-<!--	<Valve className="org.openinfinity.security.spring.catalina.v7.Valve"/> -->
+
         <!-- Open Infinity Security Vault -->
         <Valve className="org.openinfinity.sso.valve.AttributeBasedSecurityVaultValve" />
+
       </Host>
     </Engine>
   </Service>

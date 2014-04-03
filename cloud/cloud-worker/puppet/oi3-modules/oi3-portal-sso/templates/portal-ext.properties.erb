@@ -48,21 +48,10 @@ jdbc.default.url=jdbc:mysql://<%= dbaddress %>/lportal?emulateLocators=true&useU
 jdbc.default.username=liferay
 jdbc.default.password=<%= liferay_db_password %>
 
-# old sso parameters
+#org.openinfinity.sso.springsecurity.liferay.PreAuthenticationAwareAutologinFilter=true
+
 auto.login.hooks=org.openinfinity.sso.springsecurity.liferay.PreAuthenticatedAutoLogin
 logout.events.post=org.openinfinity.sso.springsecurity.liferay.SAMLPostLogoutAction
 auth.pipeline.enable.liferay.check=false
-user.principal.property.screenname=urn:oasis:names:tc:SAML:2.0:profiles:attribute:DCE:principal
-user.principal.property.emailaddress=emailAddress
-user.principal.property.facebookid=facebookId
-user.principal.property.openid=openid
-user.principal.property.locale=preferredlocale
-user.principal.property.firstname=firstName
-user.principal.property.middlename=middleName
-user.principal.property.lastname=lastName
-user.principal.property.prefix=prefix
-user.principal.property.suffix=suffix
-user.principal.property.sex=sex
-user.principal.property.birthdate=birthdate
-user.principal.property.jobtitle=jobtitle
-provisioning=false
+
+provisioning=true

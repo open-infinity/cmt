@@ -1,3 +1,0 @@
-jossoForMule {
-  org.openinfinity.sso.springsecurity.SAMLLoginModule required debug=true principal="userId";
-};
