@@ -1,6 +1,7 @@
 package org.openinfinity.cloud.service.backup;
 
 import java.util.List;
+import java.util.Set;
 
 import org.openinfinity.cloud.domain.BackupOperation;
 import org.openinfinity.cloud.domain.BackupRule;
@@ -51,7 +52,7 @@ public interface BackupService {
 	 * Returns list of clusters to be backed up.
 	 * @return List of cluster ids
 	 */
-	public List<Integer> getBackupClusters();
+	public Set<Integer> getBackupClusters();
 	
 	/**
 	 * Get all backup rules of the given cluster.

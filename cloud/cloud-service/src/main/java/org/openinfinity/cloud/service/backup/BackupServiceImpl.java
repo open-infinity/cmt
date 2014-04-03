@@ -1,6 +1,7 @@
 package org.openinfinity.cloud.service.backup;
 
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -36,7 +37,7 @@ public class BackupServiceImpl implements BackupService {
 
 	// ------------------------------------------------------------------------
 	
-	public List<Integer> getBackupClusters() {
+	public Set<Integer> getBackupClusters() {
 		return backupRuleRepository.getBackupClusters();
 	}
 

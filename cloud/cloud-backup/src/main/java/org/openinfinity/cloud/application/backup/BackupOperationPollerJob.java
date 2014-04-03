@@ -6,6 +6,7 @@ import org.openinfinity.cloud.application.backup.job.*;
 import org.openinfinity.cloud.domain.*;
 import org.openinfinity.cloud.domain.repository.backup.*;
 import org.openinfinity.cloud.service.administrator.MachineService;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.apache.log4j.Logger;
 import org.aspectj.apache.bcel.generic.ReturnaddressType;
 import org.aspectj.weaver.patterns.ThisOrTargetAnnotationPointcut;
@@ -74,9 +75,9 @@ public class BackupOperationPollerJob {
 							JobResultSaver jrs = new JobResultSaver(op, machines.size());
 							for (Machine machine : machines) {
 								InstanceBackupJob job = new InstanceBackupJob(cluster_info, machine.getId(), jrs);
-								if ("yes".equalsIgnoreCase(op.getCipher()))
-									job.setCipher(true);
-								else if ("no".equalsIgnoreCase(op.getCipher()))
+								if ("no".equalsIgnoreCase(op.getCipher()))
+									job.setCipher(false);
+								else if ("yes".equalsIgnoreCase(op.getCipher()))
 									job.setCipher(true);
 		
 								logger.trace("Scheduling job " + job);
@@ -174,7 +175,11 @@ public class BackupOperationPollerJob {
 								+ "', marking it failed and skipping");
 						op.setState(BackupOperation.FAILED);
 						op.setDescription("Unrecognized backup operation: " + op.getOperation());
-						backupWorkRepository.writeBackupOperation(op);
+						try {
+							backupWorkRepository.writeBackupOperation(op);
+						} catch (DataIntegrityViolationException e) {
+							logger.warn(e.getMessage());
+						}
 					}
 		
 				} catch (Exception e) {

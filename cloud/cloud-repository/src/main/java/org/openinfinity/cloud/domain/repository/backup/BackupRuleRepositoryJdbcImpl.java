@@ -19,17 +19,22 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.LinkedList;
+import java.util.Set;
+import java.util.TreeSet;
 
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.Assert;
 import org.openinfinity.cloud.domain.BackupRule;
+import org.openinfinity.cloud.domain.repository.deployer.BucketRepositoryJets3tImpl;
+import org.apache.log4j.Logger;
 
 /**
  * Cluster backup schedule repository implementation for relational database
@@ -39,6 +44,8 @@ import org.openinfinity.cloud.domain.BackupRule;
  */
 @Repository("backupRepository")
 public class BackupRuleRepositoryJdbcImpl implements BackupRuleRepository {
+	private static final Logger logger = Logger.getLogger(BackupRuleRepositoryJdbcImpl.class.getName());
+	
 	public static final String TABLE_BACKUP_RULE = "backup_rule_tbl";
 	public static final String COLUMN_ID = "backup_rule_id";
 	public static final String COLUMN_CLUSTER_ID = "cluster_id";
@@ -58,14 +65,12 @@ public class BackupRuleRepositoryJdbcImpl implements BackupRuleRepository {
 		jdbcTemplate = new JdbcTemplate(ds);
 	}
 	
-	public List<Integer> getBackupClusters() {
-		final List<Integer> ids = new LinkedList<Integer>();
-		jdbcTemplate.query("SELECT DISTINCT cluster_id FROM "
-				+ TABLE_BACKUP_RULE, new RowCallbackHandler() {
+	public Set<Integer> getBackupClusters() {
+		final TreeSet<Integer> ids = new TreeSet<Integer>();
+		jdbcTemplate.query("SELECT " + COLUMN_CLUSTER_ID + " FROM " + TABLE_BACKUP_RULE, 
+				new RowCallbackHandler() {
 			public void processRow(ResultSet rs) throws SQLException {
-				while (rs.next()) {
-					ids.add(new Integer(rs.getInt(0)));
-				}
+				ids.add(new Integer(rs.getInt(1)));
 			}
 		});
 		return ids;

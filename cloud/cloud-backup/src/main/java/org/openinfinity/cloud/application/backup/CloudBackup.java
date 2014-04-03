@@ -2,6 +2,7 @@ package org.openinfinity.cloud.application.backup;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.openinfinity.cloud.application.backup.job.*;
@@ -133,38 +134,38 @@ public class CloudBackup {
 		dynamicQuartzSchedulerManager.deleteAlljobs();
 		
 		// Read instance information from the database
-		List<Integer> cluster_ids = backupService.getBackupClusters();
+		Set<Integer> cluster_ids = backupService.getBackupClusters();
+		logger.debug("Backup cluster count is " + cluster_ids.size() + " (active and passive)");
 		for (int cluster_id : cluster_ids) {
-			Instance instance = instanceService.getInstance(cluster_id);
-			if (instance != null) {
-				Cluster cluster = clusterService.getCluster(cluster_id);
-				List<BackupRule> rules = backupService.getClusterBackupRules(cluster_id);
+			Cluster cluster = clusterService.getCluster(cluster_id);
+			List<BackupRule> rules = backupService
+					.getClusterBackupRules(cluster_id);
 
-				// Iterate all the cluster in instance
-				ClusterInfo clusterInfo = new ClusterInfo(cluster_id, cluster.getInstanceId());
+			// Iterate all the cluster in instance
+			ClusterInfo clusterInfo = new ClusterInfo(cluster_id,
+					cluster.getInstanceId());
 
-				// Iterate all the machines in cluster
-				for (Machine machine : machineService
-						.getMachinesInCluster(cluster.getId())) {
-					InstanceJob job = new InstanceBackupJob(clusterInfo, machine.getId(), null);
-					job.setLocalPackageDirectory("/var/tmp"); // TODO
+			// Iterate all the machines in cluster
+			for (Machine machine : machineService.getMachinesInCluster(cluster.getId())) {
+				InstanceJob job = new InstanceBackupJob(clusterInfo,
+						machine.getId(), null);
+				job.setLocalPackageDirectory(getBackupProperties().getTemporaryDirectory());
 
-					for (BackupRule rule : rules) {
+				for (BackupRule rule : rules) {
+					if (rule.isActive()) {
 						// Schedule backup job
-						String cron_String = "0" + rule.getCronMinutes() + " " 
+						String cron_String = "0 " 
+								+ rule.getCronMinutes() + " "
 								+ rule.getCronHours() + " "
 								+ rule.getCronDayOfMonth() + " "
 								+ rule.getCronMonth() + " "
-								+ rule.getCronYear() + " "
-								+ rule.getCronDayOfWeek();
-						dynamicQuartzSchedulerManager.addJob(
-								job.getJobName(), 
-								"cluster-" + cluster_id,
-								job, cron_String);
+								+ rule.getCronDayOfWeek() + " " 
+								+ rule.getCronYear();
+						dynamicQuartzSchedulerManager.addJob(job.getJobName(),
+								"cluster-" + cluster_id, job, cron_String);
+						logger.info("Scheduled job " + job.getJobName() + " with schedule " + cron_String);
 					}
 				}
-			} else {
-				throw new BackupException("No instance to backup!");
 			}
 		}
 		

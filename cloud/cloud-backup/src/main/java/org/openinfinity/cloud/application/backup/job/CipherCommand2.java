@@ -140,6 +140,8 @@ public class CipherCommand2 implements Command {
 		// Update backup file name and delete plain one
 		job.setLocalBackupFile(cipherFile);
 		plainFile.delete();
+		
+		logger.info("Package ciphered successfully.");
 	}
 	
 	/**
@@ -218,6 +220,8 @@ public class CipherCommand2 implements Command {
 		job.setLocalBackupFile(plainFile);
 		cipherFile.delete();
 */		
+		
+		logger.info("Package deciphered successfully.");
 	}
 
 }
