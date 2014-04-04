@@ -16,6 +16,7 @@
 package org.openinfinity.cloud.domain.repository.backup;
 
 import java.util.List;
+import java.util.Set;
 
 import org.openinfinity.cloud.domain.BackupRule;
 
@@ -29,7 +30,7 @@ public interface BackupRuleRepository {
 	 * Returns list of clusters to be backed up.
 	 * @return List of cluster ids
 	 */
-	public List<Integer> getBackupClusters();
+	public Set<Integer> getBackupClusters();
 	
 	/**
 	 * Get all backup rules of the given cluster.

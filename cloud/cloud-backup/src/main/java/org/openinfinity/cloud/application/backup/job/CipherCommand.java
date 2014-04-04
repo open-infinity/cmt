@@ -28,7 +28,7 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
  * @author Timo Saarinen
  */
 public class CipherCommand implements Command {
-	private final static String ALGORITHM = "Blowfish";
+	final static String ALGORITHM = "Blowfish";
 	
 	private Logger logger = Logger.getLogger(CipherCommand.class);
 
@@ -104,6 +104,8 @@ public class CipherCommand implements Command {
 		// Update backup file name and delete plain one
 		job.setLocalBackupFile(cipherFile);
 		plainFile.delete();
+		
+		logger.info("Package ciphered successfully.");
 	}
 	
 	/**
@@ -138,6 +140,8 @@ public class CipherCommand implements Command {
 		// Update backup file name and delete the ciphered
 		job.setLocalBackupFile(plainFile);
 		cipherFile.delete();
+		
+		logger.info("Package deciphered successfully.");
 	}
 
 	/**

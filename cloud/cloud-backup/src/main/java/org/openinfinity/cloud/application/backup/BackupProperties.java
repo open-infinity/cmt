@@ -11,7 +11,7 @@ public class BackupProperties {
 	private String remoteRestoreCommand;
 	private String remoteSyncCommand;
 	private String temporaryDirectory;
-	private boolean cipher;
+	private boolean cipher = true;
 	
 	public String getRemoteBackupCommand() {
 		return remoteBackupCommand;

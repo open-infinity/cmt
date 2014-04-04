@@ -9,6 +9,8 @@ import java.io.SequenceInputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import javax.naming.Context;
 
@@ -83,13 +85,18 @@ public class StorageCommand implements Command {
 				BUCKET_ROOT_NAME, "info", new HashMap<String, String>());
 
 		// Create metadata
+		logger.debug("Creating metadata");
 		Map<String, String> metadataMap = new HashMap<String, String>();
 		metadataMap.put("hostname", job.getHostname());
 		metadataMap.put("hostrole", job.getLogicalMachineName());
 		metadataMap.put("username", job.getUsername());
 		metadataMap.put("filename", job.getLocalBackupFile().getName());
-		metadataMap.put("encryption", job.isCipher() ? "yes" : "no");
+		metadataMap.put("ciphered", job.isCipher() ? "yes" : "no");
+		metadataMap.put("cipher-algorithm", job.getCipherAlgorithm());
 		metadataMap.put("compression-method", job.getCompressionMethod());
+		for (String key : new TreeSet<String>(metadataMap.keySet())) {
+			logger.debug("  " + key + " = " + metadataMap.get(key));
+		}
 		
 		// Upload the backup package to S3 repository as a bucket
 		FileInputStream fis = new FileInputStream(job.getLocalBackupFile());
@@ -128,11 +135,23 @@ public class StorageCommand implements Command {
 	public void restore() throws Exception {
 		logger.trace("restore");
 
+		// Read related metadata first
+		logger.info("Reading the bucket metadata");
+		Map<String, String> metadataMap = bucketRepository.readMetadata(getBucketNameForJob(), getBucketKeyForJob());
+		for (String key : new TreeSet<String>(metadataMap.keySet())) {
+			logger.info("  " + key + " = " + metadataMap.get(key));
+		}
+		if ("yes".equalsIgnoreCase(metadataMap.get("ciphered"))) {
+			logger.info("The bundle is ciphered");
+			job.setCipher(true);
+		} else {
+			logger.info("The bundle is not ciphered");
+			job.setCipher(false);
+		}
+
 		// Decide local package filename
-		String package_filename = "cluster" + job.getStorageCluster().getClusterId() + "-"
-				+ job.getLogicalMachineName() + "-backup.tar.xz";
-		job.setLocalBackupFile(new File(job.getLocalPackageDirectory(), package_filename));
-		
+		job.setLocalBackupFile(new File(job.getLocalPackageDirectory(), metadataMap.get("filename")));
+
 		// Download package file from S3 repository
 		logger.info("Downloading backup bucket from S3 storage" 
 				+ " (name=" + getBucketNameForJob() 

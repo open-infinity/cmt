@@ -49,6 +49,7 @@
 		<property name="remoteRestoreCommand" value="${backup.remote-restore-command}" />
 		<property name="remoteSyncCommand" value="${backup.remote-sync-command}" />
 		<property name="temporaryDirectory" value="${backup.temporary-dir}" />
+		<property name="cipher" value="${backup.cipher}" />
 	</bean>
 
 	<bean id="cloudDataSource" destroy-method="close"
@@ -72,7 +73,7 @@
 		<property name="quartzProperties">
 			<props>
 				<prop key="org.quartz.threadPool.class">org.quartz.simpl.SimpleThreadPool</prop>
-				<prop key="org.quartz.threadPool.threadCount">2</prop>
+				<prop key="org.quartz.threadPool.threadCount">${backup.thread-count}</prop>
 			</props>
 		</property>
 	</bean>

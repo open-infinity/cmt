@@ -121,7 +121,7 @@ abstract public class InstanceJob {
 		this.virtualCluster = target_cluster;
 		this.storageCluster = source_cluster;
 		this.logicalMachineName = decideLogicalHostname(machineId);
-		this.setJobName(logicalMachineName);
+		this.setJobName("cluster-" + source_cluster.getClusterId() + "_" + logicalMachineName);
 
 		// Use cipher default from application context 
 		this.cipher = CloudBackup.getBackupProperties().isCipher();
@@ -244,8 +244,13 @@ abstract public class InstanceJob {
 	public interface ResultListener {
 		public void report(boolean success, String description);
 	}
-	
+
 	// ---- Getters & Setters ----------------------------------------------------------------------
+	
+	public String getCipherAlgorithm() {
+		return CipherCommand.ALGORITHM;
+	}
+	
 	public String getPassword() {
 		return password;
 	}
