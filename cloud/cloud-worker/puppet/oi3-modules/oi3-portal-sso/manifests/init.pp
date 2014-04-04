@@ -1,10 +1,10 @@
-class oiportal-sso::install {
+class oi3-portal-sso::install {
 	package { ["java-1.7.0-openjdk", "oi3-connectorj", "oi3-liferay", "oi3-core", "oi3-tomcat", "oi3-secvault", "oi3-hazelcast", "oi3-preauthautologin"]:
 		ensure => present,
 		require => Class["oi3-basic"],
 	}
 
-#	package {"oi-autologin-3.0.0-1":
+#	package {"oi3-preauthautologin":
 #		ensure => present,
 #		require => Package["oi3-liferay"],
 #	}
@@ -31,7 +31,7 @@ class oiportal-sso::install {
 	}
 }
 
-class oiportal-sso::config {
+class oi3-portal-sso::config {
 	exec {"set-privileges":
 		command => "/bin/chown -R oiuser:oiuser /opt/openinfinity/3.0.0",
 		require => Class["oi3-portal-sso::install"],
@@ -175,7 +175,7 @@ class oiportal-sso::config {
         }
 }
 
-class oiportal-sso::service {
+class oi3-portal-sso::service {
 	service {"oi-tomcat":
 		ensure => running,
 		hasrestart => true,
