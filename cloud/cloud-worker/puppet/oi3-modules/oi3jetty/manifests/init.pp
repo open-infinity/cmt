@@ -21,7 +21,7 @@ class jetty($directory = '/opt', $user = 'jetty', $group = 'jetty') {
 		mode => 0644,
 	} ->
 	file { "start.ini":
-		path => "${directory}/jetty/start.ini",
+		path => "${directory}/jetty/start.ini_openinfinity_example",
 		source => "puppet:///modules/oi3jetty/start.ini",
 		owner => $user,
 		group => $group,
