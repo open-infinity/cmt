@@ -205,11 +205,11 @@ public class EC2Wrapper {
 		try {
 			AuthorizeSecurityGroupIngressRequest request = new AuthorizeSecurityGroupIngressRequest();
 		//	if(this.cloudType == InstanceService.CLOUD_TYPE_EUCALYPTUS) {
-				request.setFromPort(fromPort);
+		/*		request.setFromPort(fromPort);
 				request.setToPort(toPort);
 				request.setSourceSecurityGroupName(sourceGroupName);
 				request.setSourceSecurityGroupOwnerId(sourceGroupOwner);
-				request.setIpProtocol(protocol);
+				request.setIpProtocol(protocol); */
 	//		} else {
 
 				UserIdGroupPair pair = new UserIdGroupPair();
