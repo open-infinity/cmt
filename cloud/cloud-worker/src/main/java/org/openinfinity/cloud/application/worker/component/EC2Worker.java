@@ -1693,9 +1693,9 @@ public class EC2Worker implements Worker {
 					LOG.debug(threadName+": Comparing address "+tempAddress);
 					while (ite.hasNext()) {
 						MulticastAddress a = ite.next();
-						LOG.debug(threadName+": Address to compare "+a.getAddress());
+						//LOG.debug(threadName+": Address to compare "+a.getAddress());
 						if (a.getAddress() != null && a.getAddress().equals(tempAddress)) {
-							LOG.debug(threadName+": Found the same, marking unusable");
+							LOG.debug(threadName+": Address allready in use, can't use this one");
 							usable = false;
 						}
 					}

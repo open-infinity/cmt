@@ -204,13 +204,13 @@ public class EC2Wrapper {
 	public void authorizeGroup(String securityGroupName, String sourceGroupName, String sourceGroupOwner, Integer fromPort, Integer toPort, String protocol) {
 		try {
 			AuthorizeSecurityGroupIngressRequest request = new AuthorizeSecurityGroupIngressRequest();
-			if(this.cloudType == InstanceService.CLOUD_TYPE_EUCALYPTUS) {
+		//	if(this.cloudType == InstanceService.CLOUD_TYPE_EUCALYPTUS) {
 				request.setFromPort(fromPort);
 				request.setToPort(toPort);
 				request.setSourceSecurityGroupName(sourceGroupName);
 				request.setSourceSecurityGroupOwnerId(sourceGroupOwner);
 				request.setIpProtocol(protocol);
-			} else {
+	//		} else {
 
 				UserIdGroupPair pair = new UserIdGroupPair();
 				pair.setGroupName(sourceGroupName);
@@ -225,7 +225,7 @@ public class EC2Wrapper {
 				List<IpPermission> permList = new ArrayList<IpPermission>();
 				permList.add(perm);
 				request.setIpPermissions(permList);
-			}
+	//		}
 			request.setGroupName(securityGroupName);
 			
 			ec2.authorizeSecurityGroupIngress(request);
