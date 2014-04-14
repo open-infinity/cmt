@@ -100,7 +100,7 @@ public class MachineConfigurer implements Configurer {
 			ec2.setEndpoint(endPoint);
 			ec2.init(eucaCredentials, m.getCloud());
 		}
-		int maxWaitForRunning = 96;
+		int maxWaitForRunning = 500;
 		while(!m.getState().equals("running") && maxWaitForRunning > 0) {
 			LOG.info(threadName+": Waiting instance "+m.getInstanceId()+" to be at 'running' state. Waiting for "+maxWaitForRunning+" times");
 			try {
@@ -120,7 +120,7 @@ public class MachineConfigurer implements Configurer {
 			String volumeState = ec2.getVolumeState(m.getEbsVolumeId());
 			if(volumeState != null && volumeState.equals("creating")) {
 				LOG.info(threadName+": EBS volume still in creating phase, we need to wait a bit");
-				int maxWaitForEBS = 96;
+				int maxWaitForEBS = 500;
 				while(volumeState.equals("creating") && maxWaitForEBS > 0) {
 					LOG.info(threadName+": Waiting for EBS volume "+m.getEbsVolumeId()+" to be available");
 					try {
@@ -155,7 +155,7 @@ public class MachineConfigurer implements Configurer {
 			volumeState = ec2.getVolumeState(m.getEbsVolumeId());
 			LOG.info(threadName+": Current volume state is "+volumeState);
 			if(volumeState != null && volumeState.equals("attaching")) {
-				int maxWaitForEBS = 96;
+				int maxWaitForEBS = 500;
 				while(volumeState.equals("attaching") && maxWaitForEBS > 0) {
 					LOG.info(threadName+": Waiting for EBS volume "+m.getEbsVolumeId()+" to be attached");
 					try {
@@ -179,7 +179,7 @@ public class MachineConfigurer implements Configurer {
 		String connectionRetryTimes = PropertyManager.getProperty("cloudadmin.worker.configurer.connection.retrys");
 		int x = Integer.parseInt(connectionRetryTimes);
 		if(x == 0) {
-			x = 60;
+			x = 500;
 		}
 		while(!connectOK) {
 			x--;
