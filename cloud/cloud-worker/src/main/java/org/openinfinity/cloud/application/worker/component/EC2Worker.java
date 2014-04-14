@@ -1606,7 +1606,7 @@ public class EC2Worker implements Worker {
 					machine.setEbsVolumeSize(cluster.getEbsVolumesUsed());
 				}
 			}
-			int maxWait = 120;
+			int maxWait = 500;
 			while((tempInstance.getPrivateDnsName().equals("0.0.0.0") || tempInstance.getPrivateDnsName().startsWith("euca-0-0-0-0")) && maxWait > 0) {
 				LOG.info(threadName+": Could not get IP address yet, waiting for a moment");
 				try {

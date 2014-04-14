@@ -35,6 +35,7 @@ import org.openinfinity.cloud.service.administrator.ClusterService;
 import org.openinfinity.cloud.service.administrator.InstanceService;
 import org.openinfinity.cloud.service.administrator.KeyService;
 import org.openinfinity.cloud.service.administrator.MachineService;
+import org.openinfinity.cloud.util.PropertyManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Async;
@@ -81,7 +82,7 @@ public class BigDataConfigurer implements Configurer {
 		Key k = keyService.getKeyByInstanceId(instance.getInstanceId());
 		Machine managementMachine = machineService.getClusterManagementMachine(m.getClusterId());
 		
-		int maxWaitForRunning = 96;
+		int maxWaitForRunning = 500;
 		while(!m.getState().equals("running") && maxWaitForRunning > 0) {
 			LOG.info(threadName+": Waiting instance "+m.getInstanceId()+" to be at 'running' state. Waiting for "+maxWaitForRunning+" times");
 			try {
@@ -155,8 +156,12 @@ public class BigDataConfigurer implements Configurer {
 		String threadName = Thread.currentThread().getName();
 		
 		boolean connectOK = false;
-		int x = 60;
-		
+		String connectionRetryTimes = PropertyManager.getProperty("cloudadmin.worker.configurer.connection.retrys");
+		int x = Integer.parseInt(connectionRetryTimes);
+		if(x == 0) {
+			x = 500;
+		}
+				
 		while(!connectOK) {
 			x--;
 			Socket s = null;
