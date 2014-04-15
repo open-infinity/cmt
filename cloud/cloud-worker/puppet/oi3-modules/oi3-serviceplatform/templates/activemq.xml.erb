@@ -33,6 +33,7 @@
 	  <jdbcPersistenceAdapter dataSource="#mysql-ds"/>
     </persistenceAdapter>
     
+<!-- Systemusage configurations to be parametrized -->
 	<systemUsage>
 	    <systemUsage>
 		<memoryUsage>
@@ -51,12 +52,19 @@
     <transportConnectors>
       <transportConnector name="openwire" uri="vm://localhost"/>
     </transportConnectors>
+    
+<!--
+ <transportConnectors>
+      <transportConnector name="openwire" uri="tcp://localhost:61616" discoveryUri="multicast://<%= multicastaddress %>:54339"/>
+    </transportConnectors>
+-->    
+    
   </broker>
 
 
   <bean id="mysql-ds" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
 	<property name="driverClassName" value="com.mysql.jdbc.Driver"/>
-	<property name="url" value="jdbc:mysql://<%= dbaddress %>/toasactivemq?relaxAutoCommit=true&amp;autoReconnect=true"/>
+	<property name="url" value="jdbc:mysql://<%= dbaddress %>/toasamq<%= nodeid %>?relaxAutoCommit=true&amp;autoReconnect=true"/>
 	<property name="validationQuery" value="select 1"/>
 	<property name="username" value="activemq"/>
 	<property name="password" value="<%= amq_password  %>"/>
