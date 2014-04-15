@@ -935,7 +935,7 @@ public class EC2Worker implements Worker {
 		machine.setInstanceId(machineInstance.getInstanceId());
 		machine.setType("manager");
 		machine.setConfigured(MachineService.MACHINE_CONFIGURE_STARTED);
-		int maxWait = 100;
+		int maxWait = 500;
 		while((machineInstance.getPrivateDnsName().equals("0.0.0.0") || machineInstance.getPrivateDnsName().equals("euca-0-0-0-0")) && maxWait > 0) {
 			LOG.info(threadName+": Could not get IP address yet, waiting for a moment");
 			try {
@@ -946,7 +946,7 @@ public class EC2Worker implements Worker {
 			maxWait--;
 			machineInstance = ec2.describeInstance(machineInstance.getInstanceId());
 		}
-		int maxWaitForRunning = 96;
+		int maxWaitForRunning = 500;
 		while(!machineInstance.getState().getName().equals("running") && maxWaitForRunning > 0) {
 			LOG.info(threadName+": Waiting instance "+machineInstance.getInstanceId()+" to be at 'running' state. Waiting for "+maxWaitForRunning+" times");
 			try {
@@ -1120,7 +1120,7 @@ public class EC2Worker implements Worker {
 					}
 				}
 			}
-			maxWait = 60;
+			maxWait = 500;
 			
 			while ((tempInstance.getPrivateDnsName() == null || tempInstance.getPrivateDnsName().equals("null") || tempInstance.getPrivateDnsName().equals("0.0.0.0") || tempInstance.getPrivateDnsName().equals("euca-0-0-0-0")) && maxWait > 0) {
 				LOG.info(threadName + ": Cloud not get IP address yet, waiting for a moment");
@@ -1211,7 +1211,12 @@ public class EC2Worker implements Worker {
 		String threadName = Thread.currentThread().getName();
 		
 		boolean connectOK = false;
-		int x = 60;
+		String connectionRetryTimes = PropertyManager.getProperty("cloudadmin.worker.configurer.connection.retrys");
+		int x = Integer.parseInt(connectionRetryTimes);
+		if(x == 0) {
+			x = 500;
+		}
+		
 		
 		while(!connectOK) {
 			x--;
@@ -1601,7 +1606,7 @@ public class EC2Worker implements Worker {
 					machine.setEbsVolumeSize(cluster.getEbsVolumesUsed());
 				}
 			}
-			int maxWait = 120;
+			int maxWait = 500;
 			while((tempInstance.getPrivateDnsName().equals("0.0.0.0") || tempInstance.getPrivateDnsName().startsWith("euca-0-0-0-0")) && maxWait > 0) {
 				LOG.info(threadName+": Could not get IP address yet, waiting for a moment");
 				try {
