@@ -60,7 +60,7 @@ for i in range(0, n):
 time1 = time.time()
 
 rate = n / (time1 - time0)
-print("%.1f inserts per second" % (rate))
-print("%.1f inserts per minute" % (rate*60))
-print("%.1f million inserts per day" % (rate*24*60*60 / 1000000))
+print("%.0f inserts per second" % (rate))
+print("%.0f inserts per minute" % (rate*60))
+print("%.0f million inserts per day" % (rate*24*60*60 / 1000000))
 
