@@ -19,8 +19,6 @@ parser.add_option("-p", "--port", dest="port", default='27017',
 (options, args) = parser.parse_args()
 
 # Connection
-# w=0 disabled write concern replication
-# w=3 enables write concern replication for replica sets of size 3
 client = pymongo.MongoClient(options.host, int(options.port), w=options.write_concerns)
 
 # Database and collection
