@@ -49,11 +49,11 @@ for i in range(0, n):
         'Quebec': random.uniform(0, 10), 
         'Romeo': random.uniform(0, 10), 
         'Sierra': random.uniform(0, 10), 
-        'Tango': random.uniform(0, 10)
-        'Uniform': random.uniform(0, 10)
-        'Victor': random.uniform(0, 10)
-        'Whiskey': random.uniform(0, 10)
-        'X-ray': random.uniform(0, 10)
+        'Tango': random.uniform(0, 10),
+        'Uniform': random.uniform(0, 10),
+        'Victor': random.uniform(0, 10),
+        'Whiskey': random.uniform(0, 10),
+        'X-ray': random.uniform(0, 10),
         'Zulu': random.uniform(0, 10)
     }
     collection.insert(item)
