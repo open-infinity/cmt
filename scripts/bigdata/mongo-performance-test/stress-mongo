@@ -1,0 +1,68 @@
+#!/usr/bin/env python2
+
+import pymongo
+import time
+import random
+import optparse
+from optparse import OptionParser
+
+# Parse options
+parser = OptionParser()
+parser.add_option("-n", "--count", dest="writes", default='10000',
+                  help="Number of writes", metavar="WRITES")
+parser.add_option("-w", "--write-concern-size", dest="write_concerns", default='3',
+                  help="Write concerns replication size", metavar="WC")
+parser.add_option("-c", "--host", dest="host", default='localhost',
+                  help="Hostname for mongos process", metavar="HOST")
+parser.add_option("-p", "--port", dest="port", default='27017',
+                  help="Port", metavar="PORT")
+(options, args) = parser.parse_args()
+
+# Connection
+# w=0 disabled write concern replication
+# w=3 enables write concern replication for replica sets of size 3
+client = pymongo.MongoClient(options.host, int(options.port), w=options.write_concerns)
+
+# Database and collection
+db = client['stress-test']
+collection = db['test']
+
+# Aggressive writes
+time0 = time.time()
+n = int(options.writes)
+for i in range(0, n):
+    item = { 
+        'Alpha': random.uniform(0, 10), 
+        'Bravo': random.uniform(0, 10), 
+        'Charlie': random.uniform(0, 10), 
+        'Delta': random.uniform(0, 10), 
+        'Echo': random.uniform(0, 10), 
+        'Foxtrot': random.uniform(0, 10), 
+        'Golf': random.uniform(0, 10), 
+        'Hotel': random.uniform(0, 10), 
+        'India': random.uniform(0, 10), 
+        'Juliet': random.uniform(0, 10),
+        'Kilo': random.uniform(0, 10), 
+        'Lima': random.uniform(0, 10), 
+        'Mike': random.uniform(0, 10), 
+        'November': random.uniform(0, 10), 
+        'Oscar': random.uniform(0, 10), 
+        'Papa': random.uniform(0, 10), 
+        'Quebec': random.uniform(0, 10), 
+        'Romeo': random.uniform(0, 10), 
+        'Sierra': random.uniform(0, 10), 
+        'Tango': random.uniform(0, 10)
+        'Uniform': random.uniform(0, 10)
+        'Victor': random.uniform(0, 10)
+        'Whiskey': random.uniform(0, 10)
+        'X-ray': random.uniform(0, 10)
+        'Zulu': random.uniform(0, 10)
+    }
+    collection.insert(item)
+time1 = time.time()
+
+rate = n / (time1 - time0)
+print("%.1f inserts per second" % (rate))
+print("%.1f inserts per minute" % (rate*60))
+print("%.1f million inserts per day" % (rate*24*60*60 / 1000000))
+
