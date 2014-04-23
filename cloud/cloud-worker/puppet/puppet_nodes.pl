@@ -257,7 +257,6 @@ if($type eq "portal_lb" || $type eq "service_lb") {
 		}
 	}
 	push(@class, "oibackup");
-	push(@class, "oilttwatch");
 } elsif($type eq "ig") {
 	my $sql = "select cluster_id from cluster_tbl where instance_id = $instance and cluster_type=0";
         my $sth = $dbh->prepare($sql);
@@ -355,7 +354,6 @@ if($type eq "portal_lb" || $type eq "service_lb") {
 			jvmmem => $javaMem,
 			jvmperm => $javaPerm,
 	);
-	push(@class, "oilttwatch");
 } elsif ($type eq "ee") {
 	# Query multicast address and machine type
 	my $sql = "select cluster_multicast_address,cluster_machine_type from cluster_tbl where cluster_id = $cluster";
@@ -398,7 +396,6 @@ if($type eq "portal_lb" || $type eq "service_lb") {
 	# Add Puppet modules        
 	push(@class, "oibas");
 	push(@class, "oitomee");
-	push(@class, "oilttwatch");
 	push(@class, "oibackup");
 	
 	# Set parameters

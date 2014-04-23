@@ -147,7 +147,7 @@ if ($instance eq "93" && $hostname ne "omatrafitestdb1.trafi.fi" && $hostname ne
 # PORTAL
 
 if($hostname eq "omatrafitest1.trafi.fi") {
-        push(@class, "oi3-basic", "oi3-ebs", "oi3-portal", "oi3-lttwatch");
+        push(@class, "oi3-basic", "oi3-ebs", "oi3-portal");
 
         %parameters = (
 	    activiti_password => "xxxx",
@@ -380,7 +380,6 @@ if($type eq "portal_lb" || $type eq "service_lb") {
 		}
 	}
 	#push(@class, "oibackup");
-	push(@class, "oi3-lttwatch");
 } elsif($type eq "ig") {
 	my $sql = "select cluster_id from cluster_tbl where instance_id = $instance and cluster_type=0";
         my $sth = $dbh->prepare($sql);
@@ -479,7 +478,6 @@ if($type eq "portal_lb" || $type eq "service_lb") {
 			jvmperm => $javaPerm,
 			tomcat_monitor_role_pwd => "xxxx",
 	);
-	push(@class, "oi3-lttwatch");
 } elsif ($type eq "ee") {
 	# Query multicast address and machine type
 	my $sql = "select cluster_multicast_address,cluster_machine_type from cluster_tbl where cluster_id = $cluster";
@@ -522,7 +520,6 @@ if($type eq "portal_lb" || $type eq "service_lb") {
 	# Add Puppet modules        
 	push(@class, "oi3-bas");
 	push(@class, "oi3-tomee");
-	push(@class, "oi3-lttwatch");
 	#push(@class, "oibackup");
 	
 	# Set parameters
