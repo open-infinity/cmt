@@ -27,6 +27,25 @@ my %postparameters;
 my %hm_parameters;
 my %ebsparameters;
 
+# Query machine RAM
+# Used in HM and load balancer blocks
+
+# Query machine type
+my $sql = "select cluster_machine_type from cluster_tbl where cluster_id = $cluster";
+my $sth = $dbh->prepare($sql);
+$sth->execute() or die "Error in SQL execute: $DBI::errstr";
+my @row = $sth->fetchrow_array();
+my $machineType = $row[0];
+$sth->finish;
+
+# Query RAM for machine
+$sql = "select ram from machine_type_tbl where id = $machineType";
+$sth = $dbh->prepare($sql);
+$sth->execute() or die "Error in SQL execute: $DBI::errstr";
+@row = $sth->fetchrow_array();
+my $ram = $row[0];
+$sth->finish;
+
 if($hostname eq "galeratesti1") {
         push(@class, "oi3-basic");
         push(@class, "oi3-mariadbgalera");
@@ -95,22 +114,6 @@ if ($instance eq "93" && $hostname ne "omatrafitestdb1.trafi.fi" && $hostname ne
         if ($node_hostname eq "NA"){
                 die "Host name assigning failed";
         }
-
-        # Query machine type in cluster
-       	$sql = "select cluster_machine_type from cluster_tbl where cluster_id = $cluster";
-        $sth = $dbh->prepare($sql);
-        $sth->execute() or die "Error in SQL execute: $DBI::errstr";
-        my @row = $sth->fetchrow_array();
-        my $machineType = $row[0];
-        $sth->finish;
-
-        # Query RAM allocated to machine
-        $sql = "select ram from machine_type_tbl where id = $machineType";
-	$sth = $dbh->prepare($sql);
-	$sth->execute() or die "Error in SQL execute: $DBI::errstr";
-	@row = $sth->fetchrow_array();
-	my $ram = $row[0];
-	$sth->finish;
         
         # Query cloud zone
         $sql = "select cloud_zone from instance_tbl where instance_id = $instance";
@@ -237,10 +240,10 @@ if($hostname eq "wms.ee.amazon.instance") {
 
 push(@class, "oi3-basic");
 
-my $sql = "select machine_extra_ebs_volume_device from machine_tbl where machine_type = 'clustermember' and machine_id = $machine";
-my $sth = $dbh->prepare($sql);
+$sql = "select machine_extra_ebs_volume_device from machine_tbl where machine_type = 'clustermember' and machine_id = $machine";
+$sth = $dbh->prepare($sql);
 $sth->execute() or die "Error in SQL execute: $DBI::errstr";
-my @row = $sth->fetchrow_array;
+@row = $sth->fetchrow_array;
 if(!defined($row[0])) {
         %ebsparameters = (
                 ebsVolumeUsed => 'false',
@@ -288,7 +291,8 @@ if($type eq "portal_lb" || $type eq "service_lb") {
 	}
 	$sth->finish;
 	%parameters = (
-		portal_addresses => \@addrlist
+		portal_addresses => \@addrlist,
+                maxconn => roundup($ram / 1024 * 20000 , 10)
 	);
 	push(@class, "oi3-baslb");
 } elsif($type eq "portal" || $type eq "service") {
