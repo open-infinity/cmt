@@ -11,15 +11,21 @@ parser = OptionParser()
 parser.add_option("-n", "--count", dest="writes", default='10000',
                   help="Number of writes", metavar="WRITES")
 parser.add_option("-w", "--write-concern-size", dest="write_concerns", default='3',
-                  help="Write concerns replication size", metavar="WC")
+                  help="Write concerns replication size. If 0 no replication is expected.", metavar="WC")
 parser.add_option("-c", "--host", dest="host", default='localhost',
                   help="Hostname for mongos process", metavar="HOST")
 parser.add_option("-p", "--port", dest="port", default='27017',
                   help="Port", metavar="PORT")
+parser.add_option("-s", "--sync", dest="sync", default='fsync',
+                  help="Write concerns syncing method, either 'none', 'journal' or 'fsync', The default is 'fsync'.", metavar="SYNC")
 (options, args) = parser.parse_args()
 
 # Connection
-client = pymongo.MongoClient(options.host, int(options.port), w=options.write_concerns)
+wc_j = False
+wc_fsync = False
+if options.sync == 'sync': wc_j = True
+if options.sync == 'fsync': wc_fsync = True
+client = pymongo.MongoClient(options.host, int(options.port), w=options.write_concerns, j=wc_j, fsync=wc_fsync)
 
 # Database and collection
 db = client['stress-test']
@@ -62,5 +68,5 @@ time1 = time.time()
 rate = n / (time1 - time0)
 print("%.0f inserts per second" % (rate))
 print("%.0f inserts per minute" % (rate*60))
-print("%.0f million inserts per day" % (rate*24*60*60 / 1000000))
+print("%.1f million inserts per day" % (rate*24*60*60 / 1000000))
 
