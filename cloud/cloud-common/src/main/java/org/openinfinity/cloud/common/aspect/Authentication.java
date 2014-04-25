@@ -20,9 +20,9 @@ public class Authentication {
     private LiferayService liferayService;
 
     @Pointcut("@annotation(org.openinfinity.cloud.common.annotation.Authenticated) && args(request, response,..)")
-    void authenitcated(ResourceRequest request, ResourceResponse response){}
+    void authenticated(ResourceRequest request, ResourceResponse response){}
 
-    @Before("authenitcated(request, response)")
+    @Before("authenticated(request, response)")
     public void authenticateUser(ResourceRequest request, ResourceResponse response) {
         User user = liferayService.getUser(request, response);
         if (user == null) ExceptionUtil.throwSystemException("User authentication with Liferay failed");

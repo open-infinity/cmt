@@ -36,9 +36,11 @@
 <!-- Systemusage configurations to be parametrized -->
 	<systemUsage>
 	    <systemUsage>
+		<!--
 		<memoryUsage>
 		    <memoryUsage limit="20 mb"/>
 		</memoryUsage>
+		-->
 		<storeUsage>
 		    <storeUsage limit="1 gb"/>
 		</storeUsage>
@@ -48,16 +50,20 @@
 	    </systemUsage>
 	</systemUsage>
     
-
+<!--
     <transportConnectors>
       <transportConnector name="openwire" uri="vm://localhost"/>
     </transportConnectors>
-    
-<!--
- <transportConnectors>
+--> 
+
+    <networkConnectors>
+      <networkConnector uri="multicast://<%= multicastaddress %>:54339"/>
+    </networkConnectors>
+
+
+   <transportConnectors>
       <transportConnector name="openwire" uri="tcp://localhost:61616" discoveryUri="multicast://<%= multicastaddress %>:54339"/>
     </transportConnectors>
--->    
     
   </broker>
 

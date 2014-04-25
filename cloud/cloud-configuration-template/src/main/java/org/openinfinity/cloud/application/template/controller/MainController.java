@@ -13,6 +13,7 @@ import org.openinfinity.cloud.service.configurationtemplate.entity.api.Configura
 import org.openinfinity.cloud.service.configurationtemplate.entity.api.InstallationModuleService;
 import org.openinfinity.cloud.service.configurationtemplate.entity.api.InstallationPackageService;
 import org.openinfinity.cloud.util.collection.ListUtil;
+import org.openinfinity.cloud.util.http.HttpCodes;
 import org.openinfinity.cloud.util.serialization.JsonDataWrapper;
 import org.openinfinity.cloud.util.serialization.SerializerUtil;
 import org.openinfinity.core.util.ExceptionUtil;
@@ -20,8 +21,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.portlet.bind.annotation.RenderMapping;
 import org.springframework.web.portlet.bind.annotation.ResourceMapping;
 
+import javax.portlet.RenderRequest;
+import javax.portlet.RenderResponse;
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
 import java.io.IOException;
@@ -56,6 +60,16 @@ public class MainController extends AbstractController{
     }
 
     private static final Logger LOG = Logger.getLogger(MainController.class.getName());
+
+    @RenderMapping
+    public String showView(RenderRequest request, RenderResponse response) {
+        User user = liferayService.getUser(request);
+        if(user == null) {
+            response.setProperty(ResourceResponse.HTTP_STATUS_CODE, HttpCodes.HTTP_ERROR_CODE_USER_NOT_LOGGED_IN);
+            return "notlogged";
+        }
+        return "main";
+    }
 
     @Authenticated
     @ResourceMapping(GET_ELEMENTS)
