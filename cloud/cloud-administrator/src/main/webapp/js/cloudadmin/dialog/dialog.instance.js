@@ -74,7 +74,7 @@
 
                 // Events
 
-                // Update zones on cloudSelect change
+                // Handle zone update on cloudSelect change
                 cloudSelect.change(function() {
                     var cloudId = $('#cloudSelect option:selected').val();
                     if (!cloudId) {
@@ -90,7 +90,7 @@
                     });
                 });
 
-                // Update elements on template change
+                // Handle elements update on template change
                 $("#addInstanceTemplateSelect").change(function() {
                     var templateId = $("#addInstanceTemplateSelect").val();
 

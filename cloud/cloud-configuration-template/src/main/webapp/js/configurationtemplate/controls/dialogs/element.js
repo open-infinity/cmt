@@ -271,6 +271,10 @@
         return (obj !== "" && typeof obj !== 'undefined' && !isNaN(obj) && (Math.round(obj) == obj) && obj > 0) ? true : false;
     }
 
+    function isPosIntOrZero(obj){
+            return (obj !== "" && typeof obj !== 'undefined' && !isNaN(obj) && (Math.round(obj) == obj) && obj >= 0) ? true : false;
+        }
+
     function getElement(){
         var e = {};
         e.id = (dlg.mode == "edit") ? parseInt(dlg.html.id.text(), 10) : -1;
@@ -317,7 +321,7 @@
             res = false;
             console.log("err.internalError");
         }
-        else if (!isPosInt(element.type)){
+        else if (!isPosIntOrZero(element.type)){
             res = false;
             alertWrongInput(dlg.html.type, err.mustBePositiveInteger);
         }
@@ -337,7 +341,7 @@
             res = false;
             alertWrongInput(dlg.html.maxMachines, err.mustBePositiveInteger);
         }
-        else if (element.minMachines >= element.maxMachines){
+        else if (element.minMachines > element.maxMachines){
             res = false;
             alertWrongInput(dlg.html.maxMachines, err.invalidMachineRange);
         }
@@ -353,7 +357,7 @@
             res = false;
             alertWrongInput(dlg.html.maxReplicationMachines, err.mustBePositiveInteger);
         }
-        else if (element.minReplicationMachines >= element.maxReplicationMachines && element.replicated === 'true') {
+        else if (element.minReplicationMachines > element.maxReplicationMachines && element.replicated === 'true') {
             res = false;
             alertWrongInput(dlg.html.maxReplicationMachines, err.invalidMachineRange);
         }
