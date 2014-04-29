@@ -1,8 +1,4 @@
 class oi3-bas::config {
-	exec {"set-privileges":
-                command => "/bin/chown -R oiuser:oiuser /opt/openinfinity/3.0.0",
-                require => Class["oi3-bas::install"],
-        }
 
 	file {"/opt/openinfinity/3.0.0/tomcat/bin/setenv.sh":
                 ensure => present,
@@ -68,7 +64,7 @@ class oi3-bas::config {
                 mode => 0755,
                 source => "puppet:///modules/oi3-bas/oi-tomcat",
                 require => Class["oi3-bas::install"],
-    }
+    	}
     
         file {"/opt/openinfinity/3.0.0/tomcat/conf/jmxremote.password":
                 ensure => present,
