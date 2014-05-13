@@ -53,6 +53,12 @@ public interface BucketRepository {
 	InputStream load(String bucketName, String key);
 
 	/**
+	 * Tests whether the given bucket name and key exist in the repository.
+	 * @return True if the object exists in the repo, false if not.
+	 */
+	boolean has(String bucketName, String key);
+
+	/**
 	 * Retrieves bucked meta data based on bucket name.
 	 * 
 	 * @param bucketName Defines the name of the bucket.

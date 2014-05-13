@@ -39,20 +39,22 @@ public class CipherCommand implements Command {
 	}
 	
 	public void execute() throws Exception {
-		if (job instanceof InstanceBackupJob) {
-			if (job.useCipher()) {
-				cipher();
+		if (job.getLocalBackupFile() != null) {
+			if (job instanceof InstanceBackupJob) {
+				if (job.useCipher()) {
+					cipher();
+				} else {
+					logger.info("Ciphering disbled.");
+				}
+			} else if (job instanceof InstanceRestoreJob) {
+				if (job.useCipher()) {
+					decipher();
+				} else {
+					logger.info("(De)ciphering disbled.");
+				}
 			} else {
-				logger.info("Ciphering disbled.");
+				throw new BackupException("Unexpected base class " + job.getClass());
 			}
-		} else if (job instanceof InstanceRestoreJob) {
-			if (job.useCipher()) {
-				decipher();
-			} else {
-				logger.info("(De)ciphering disbled.");
-			}
-		} else {
-			throw new BackupException("Unexpected base class " + job.getClass());
 		}
 	}
 
@@ -74,7 +76,7 @@ public class CipherCommand implements Command {
 	 * Cipher backup package.
 	 */
 	private void cipher() throws Exception {
-		logger.trace("cipher");
+		logger.info("Ciphering using " + ALGORITHM + " algorithm");
 
 		// Get cipher
 		SecretKey secret_key = getSecretKey();
@@ -112,7 +114,7 @@ public class CipherCommand implements Command {
 	 * Decipher backup package.
 	 */
 	private void decipher() throws Exception {
-		logger.trace("decipher");
+		logger.info("Deciphering using " + ALGORITHM + " algorithm");
 
 		// Get cipher
 		SecretKey secret_key = getSecretKey();

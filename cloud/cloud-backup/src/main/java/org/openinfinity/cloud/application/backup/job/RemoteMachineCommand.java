@@ -1,9 +1,18 @@
 package org.openinfinity.cloud.application.backup.job;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Date;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Set;
+import java.util.TreeSet;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.openinfinity.cloud.application.backup.CloudBackup;
 import org.openinfinity.cloud.domain.Key;
@@ -29,9 +38,18 @@ public class RemoteMachineCommand implements Command {
 	 */
 	public void execute() throws Exception {
 		if (job instanceof InstanceBackupJob) {
-			backup();
+			job.setTimestamp(new Date());
+			if (job.getVirtualCluster().isMongo()) {
+				backupMongo();
+			} else {
+				backup();
+			}
 		} else if (job instanceof InstanceRestoreJob) {
-			restore();
+			if (job.getVirtualCluster().isMongo()) {
+				restoreMongo();
+			} else {
+				restore();
+			}
 		} else {
 			throw new BackupException("Unexpected base class " + job.getClass());
 		}
@@ -58,7 +76,7 @@ public class RemoteMachineCommand implements Command {
 	/**
 	 * Create and compress backup file.
 	 */
-	private void backup() throws Exception {
+	protected void backup() throws Exception {
 		logger.info("Backup for " + job.getHostname() + " (" + job.getLogicalMachineName() + ")");
 		
 		// Decide the filename
@@ -115,36 +133,203 @@ public class RemoteMachineCommand implements Command {
 	/**
 	 * Extract the backup file to remote host.
 	 */
-	private void restore() throws Exception {
+	protected void restore() throws Exception {
 		logger.info("Restore for " + job.getHostname() + " (" + job.getLogicalMachineName() + ")");
 		
-		// The backup file
-		File package_file = job.getLocalBackupFile();
-		
-		// The command to be execute in the remote host
-		String restore_command = CloudBackup.getBackupProperties().getRemoteRestoreCommand();
-		//String restore_command = "/opt/openinfinity/3.0.0/backup/stream-restore"; // FIXME: non-hardcoded
+		if (job.getLocalBackupFile() != null) {
+			// The backup file
+			File package_file = new File(
+					CloudBackup.getBackupProperties().getTemporaryDirectory(), 
+					job.getLocalBackupFile().toString());
+			
+			// The command to be execute in the remote host
+			String restore_command = CloudBackup.getBackupProperties().getRemoteRestoreCommand();
+			//String restore_command = "/opt/openinfinity/3.0.0/backup/stream-restore"; // FIXME: non-hardcoded
+	
+			// Test that the backup file exists
+			int remote_exit_status1 = runRemoteCommand("touch " + restore_command, null, "/dev/null");
+			if (remote_exit_status1 > 0) {
+				throw new BackupException(
+						"Remote restore scripts don't exist on host " + job.getHostname() + " (" + job.getLogicalMachineName() + ")");
+			}
+			
+			// Stream the backup package to the remote host, where it's extracted
+			logger.info("Streaming the package file to remote host where it's extracted");
+			int remote_exit_status2 = runRemoteCommand(restore_command,
+					package_file.getAbsolutePath(), null);
+			if (remote_exit_status2 > 0) {
+				throw new BackupException(
+						"Remote packaging command failed with return code "
+								+ remote_exit_status2 + " on host " + job.getHostname() + " (" + job.getLogicalMachineName() + ")");
+			}
+					
+			// Finally delete the local backup file
+			package_file.delete();
+			job.setLocalBackupFile(null);
+		} else {
+			logger.info("No local backup file given. Skipping restore.");
+		}
+	}
+	
+	/**
+	 * Backup MongoDB cluster as a special case. 
+	 * This is a workaround for mongodump and mongorestore limitations. 
+	 */
+	protected void backupMongo() throws Exception {
+		if ("config-1".equals(job.getLogicalMachineName())) {
+			logger.info("Mongo backup for " + job.getHostname() + " (" + job.getLogicalMachineName() + ")");
 
-		// Test that the backup file exists
-		int remote_exit_status1 = runRemoteCommand("touch " + restore_command, null, "/dev/null");
-		if (remote_exit_status1 > 0) {
-			throw new BackupException(
-					"Remote restore scripts don't exist on host " + job.getHostname() + " (" + job.getLogicalMachineName() + ")");
+			// Decide the filename
+			File package_file = new File(
+					CloudBackup.getBackupProperties().getTemporaryDirectory(), 
+					"cluster-" + job.getStorageCluster().getClusterId() + "-" + job.getLogicalMachineName() + "-backup.tar.xz");
+			logger.debug("Local filename for backup will be " + package_file);
+
+			// Decide temporary directory
+			String local_backup_dir = CloudBackup.getBackupProperties().getTemporaryDirectory() + "/" + job.getJobName();
+			String local_backup_dump_dir = local_backup_dir + "/dump"; 
+			logger.debug("Using directory " + local_backup_dir);
+			{
+				String cmd = "mkdir -p " + local_backup_dump_dir; // TODO: API instead of shell
+				int rv = executeLocal(cmd, Level.ERROR);
+				if (rv != 0) {
+					throw new BackupException("Failed to create directory " + local_backup_dump_dir);
+				}
+			}
+
+			// Get list of databases, excluding 'config' database, which is an internal one 
+			Set<String> databases = new TreeSet<String>();
+			{
+				String tmp_file = local_backup_dir + "/dbnames";
+				String tmp_script = local_backup_dir + "/dblist.sh";
+				String script_content = 
+						"#!/bin/sh\n" +
+						"echo \"db.getMongo().getDBNames().forEach(function(name) { if (name != 'config') print(name); });\" | mongo  --quiet " + job.getHostname() + ":27017 > " + tmp_file + "\n";
+				writeStringToFile(tmp_script, script_content);
+				String cmd = "/bin/sh " + tmp_script;
+				int rv = executeLocal(cmd, Level.ERROR);
+				if (rv != 0) {
+					logger.error("Command failed (" + rv + "): " + cmd);
+					throw new BackupException("Mongo backup command returned with exit value " + rv);
+				}
+				for (String db : readFileAsString(tmp_file).split("\n")) {
+					databases.add(db);
+				}
+				logger.debug("" + databases.size() + " databases found.");
+				new File(tmp_file).delete();
+				new File(tmp_script).delete();
+			}
+
+			// Iterate all databases
+			for (String db_name : databases) {
+				// Backup mongo databases using local mongodump command
+				{
+					String cmd = "mongodump" 
+							+ " --host " + job.getHostname() 
+							+ " --port 27017" // TODO: parameter
+							+ " --db " + db_name
+							+ " --out " + local_backup_dump_dir;
+					int rv = executeLocal(cmd, Level.ERROR);
+					if (rv != 0) {
+						logger.error("Command failed (" + rv + "): " + cmd);
+						throw new BackupException("Mongo backup command returned with exit value " + rv);
+					}
+				}
+			}
+			
+			// Create backup archive from the local dump
+			{
+				String cmd = "tar -cvJf " + package_file + " -C " + local_backup_dump_dir + " .";
+				int rv = executeLocal(cmd, Level.ERROR);
+				if (rv != 0) {
+					logger.error("Command failed (" + rv + "): " + cmd);
+					throw new BackupException("Mongo backup package command returned with exit value " + rv);
+				}
+			}
+			
+			// Delete local dump
+			{
+				String cmd = "rm -fR " + local_backup_dir; // TODO: API instead of shell
+				int rv = executeLocal(cmd, Level.ERROR);
+				if (rv != 0) {
+					throw new BackupException("Failed delete " + local_backup_dir);
+				}
+			}
+
+			// Let the job know the filename
+			job.setLocalBackupFile(package_file);
+	
+			// We are done
+			logger.info("Packaging completed successfully.");
+		} else {
+			logger.info("Skipping " + job.getHostname() + " (" + job.getLogicalMachineName() + ")");
 		}
+	}
+	
+	/**
+	 * Restore MongoDB cluster as a special case.
+	 * This is a workaround for mongodump and mongorestore limitations. 
+	 */
+	protected void restoreMongo() throws Exception {
+		logger.info("Mongo restore for " + job.getHostname() + " (" + job.getLogicalMachineName() + ")");
 		
-		// Stream the backup package to the remote host, where it's extracted
-		logger.info("Streaming the package file to remote host where it's extracted");
-		int remote_exit_status2 = runRemoteCommand(restore_command,
-				package_file.getAbsolutePath(), null);
-		if (remote_exit_status2 > 0) {
-			throw new BackupException(
-					"Remote packaging command failed with return code "
-							+ remote_exit_status2 + " on host " + job.getHostname() + " (" + job.getLogicalMachineName() + ")");
+		if (job.getLocalBackupFile() != null) {
+			// The backup file
+			File package_file = job.getLocalBackupFile();
+			if (package_file == null) throw new NullPointerException("package_file is null!");
+	
+			// Decide temporary directory
+			String local_backup_dir = CloudBackup.getBackupProperties().getTemporaryDirectory() + "/" + job.getJobName();
+			String local_backup_dump_dir = local_backup_dir + "/dump"; 
+			logger.debug("Using directory " + local_backup_dir);
+			{
+				String cmd = "mkdir -p " + local_backup_dump_dir; // TODO: API instead of shell
+				int rv = executeLocal(cmd, Level.ERROR);
+				if (rv != 0) {
+					throw new BackupException("Failed to create directory " + local_backup_dump_dir);
+				}
+			}
+			
+			// Extract the backup archive locally
+			{
+				String cmd = "tar -xvJf " + package_file + " -C " + local_backup_dump_dir + "";
+				int rv = executeLocal(cmd, Level.ERROR);
+				if (rv != 0) {
+					logger.error("Command failed (" + rv + "): " + cmd);
+					throw new BackupException("Mongo restore package command returned with exit value " + rv);
+				}
+			}
+			
+			
+			// Restore mongo databases using local mongorestore command
+			{
+				String cmd = "mongorestore --verbose"
+						+ " --drop" // We want a clean insert
+						+ " --host " + job.getHostname() 
+						+ " --port 27017" // TODO: parameter
+						+ " " + local_backup_dump_dir;
+				int rv = executeLocal(cmd, Level.ERROR);
+				if (rv != 0) {
+					logger.error("Command failed (" + rv + "): " + cmd);
+					throw new BackupException("Mongo backup command returned with exit value " + rv);
+				}
+			}
+
+			// Delete local dump
+			{
+				String cmd = "rm -fR " + local_backup_dir; // TODO: API instead of shell
+				int rv = executeLocal(cmd, Level.ERROR);
+				if (rv != 0) {
+					throw new BackupException("Failed delete " + local_backup_dir);
+				}
+			}
+			
+			// Finally delete the local backup file
+			package_file.delete();
+			job.setLocalBackupFile(null);
+		} else {
+			logger.info("No local backup file given. Skipping mongo restore.");
 		}
-				
-		// Finally delete the local backup file
-		package_file.delete();
-		job.setLocalBackupFile(null);
 	}
 	
 	/**
@@ -226,5 +411,45 @@ public class RemoteMachineCommand implements Command {
 		} else {
 			return null;
 		}
+	}
+
+	/**
+	 * Execute local command.
+	 * @param cmd Shell command to run 
+	 * @return Command exit value
+	 * @throws InterruptedException 
+	 */
+	private int executeLocal(String cmd, Level stderrLogLevel) throws IOException, InterruptedException {
+		logger.trace("executeLocal: " + cmd);
+		
+		// Start command
+		Process process = Runtime.getRuntime().exec(cmd);
+		
+		// Open streams
+		BufferedReader stderr = new BufferedReader(
+				new InputStreamReader(process.getErrorStream()));
+        
+		// Print stderr to log
+        String s = null;
+        while ((s = stderr.readLine()) != null) {
+        	logger.log(stderrLogLevel, s);
+        }		
+		// Close and return exit value
+		stderr.close();
+		return process.waitFor();
+	}
+
+	/**
+	 * Writes the given string to a file
+	 */
+	private void writeStringToFile(String uri, String content) throws IOException {
+		Files.write(Paths.get(uri), content.getBytes());
+	}
+	
+	/**
+	 * Read all files from file to string.
+	 */
+	private String readFileAsString(String uri) throws IOException {
+		return new String(Files.readAllBytes(Paths.get(uri)));
 	}
 }

@@ -12,6 +12,7 @@ import org.apache.log4j.Logger;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.openinfinity.cloud.application.backup.job.*;
+import org.openinfinity.cloud.service.administrator.ClusterService;
 import org.openinfinity.cloud.service.administrator.MachineService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -67,7 +68,7 @@ public class CipherCommandTest {
 
 	@Test
 	public void testCipherCommand1() throws Exception {
-		ClusterInfo cluster = new ClusterInfo(12345, 6789);
+		ClusterInfo cluster = new ClusterInfo(12345, 6789, ClusterService.CLUSTER_TYPE_BAS);
 		
 		// Cipher
 		{

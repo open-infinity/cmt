@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -107,6 +108,12 @@ abstract public class InstanceJob {
 	private String compressionMethod = "tar/xz"; // TODO: is it possible to get this from VM?
 	
 	/**
+	 * Date and time when the backup creation started.
+	 * @return
+	 */
+	private Date timestamp = null;
+	
+	/**
 	 * The default constructor.
 	 */
 	public InstanceJob(ClusterInfo target_cluster, ClusterInfo source_cluster, int machineId, ResultListener listener) {
@@ -116,6 +123,7 @@ abstract public class InstanceJob {
 			Machine machine = machineService.getMachine(machineId);
 			this.hostname = machine.getDnsName();
 			this.username = machine.getUserName();
+		} else {
 			logger.warn("machineService is null");
 		}
 		this.virtualCluster = target_cluster;
@@ -337,5 +345,13 @@ abstract public class InstanceJob {
 
 	public void setCompressionMethod(String compressionMethod) {
 		this.compressionMethod = compressionMethod;
+	}
+
+	public Date getTimestamp() {
+		return timestamp;
+	}
+
+	public void setTimestamp(Date timestamp) {
+		this.timestamp = timestamp;
 	}
 }

@@ -4,6 +4,7 @@ import pymongo
 import time
 import random
 import optparse
+from sys import exit
 from optparse import OptionParser
 
 # Parse options
@@ -18,18 +19,30 @@ parser.add_option("-p", "--port", dest="port", default='27017',
                   help="Port", metavar="PORT")
 parser.add_option("-s", "--sync", dest="sync", default='fsync',
                   help="Write concerns syncing method, either 'none', 'journal' or 'fsync', The default is 'fsync'.", metavar="SYNC")
+parser.add_option("--no-clean",
+                  action="store_false", dest="clean", default=True,
+                  help="Don't drop the test collection and database at end")                  
 (options, args) = parser.parse_args()
 
 # Connection
 wc_j = False
 wc_fsync = False
-if options.sync == 'sync': wc_j = True
-if options.sync == 'fsync': wc_fsync = True
-client = pymongo.MongoClient(options.host, int(options.port), w=options.write_concerns, j=wc_j, fsync=wc_fsync)
+if options.sync == 'none': pass
+elif options.sync == 'journal': wc_j = True
+elif options.sync == 'fsync': wc_fsync = True
+else: 
+    print("Unrecognized sync string: %s" % (options.sync))
+    exit(1)
+if wc_j != False or wc_fsync != False:
+    # This works universally
+    client = pymongo.MongoClient(options.host, int(options.port), w=options.write_concerns, j=wc_j, fsync=wc_fsync)
+else:
+    # Work-around to prevent an unneccessary warning showing up
+    client = pymongo.MongoClient(options.host, int(options.port), w=options.write_concerns)
 
 # Database and collection
-db = client['stress-test']
-collection = db['test']
+db = client['test']
+collection = db['stress']
 
 # Aggressive writes
 time0 = time.time()
@@ -65,8 +78,14 @@ for i in range(0, n):
     collection.insert(item)
 time1 = time.time()
 
+# Print statistics
 rate = n / (time1 - time0)
 print("%.0f inserts per second" % (rate))
 print("%.0f inserts per minute" % (rate*60))
 print("%.1f million inserts per day" % (rate*24*60*60 / 1000000))
+
+# Drop database
+if options.clean:
+    db.drop_collection('stress')
+    client.drop_database('test')
 

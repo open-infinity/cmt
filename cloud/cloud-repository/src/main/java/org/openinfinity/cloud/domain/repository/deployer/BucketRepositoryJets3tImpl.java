@@ -112,6 +112,19 @@ public class BucketRepositoryJets3tImpl implements BucketRepository {
 		return inputStream;
 	}
 
+	/**
+	 * Tests whether the given bucket name and key exist in the repository.
+	 */
+	public boolean has(String bucketName, String key) {
+		try {
+			simpleStorageService = new RestS3Service(new ProviderCredentialsImpl(accesskeyid, secretkey));
+			return simpleStorageService.isObjectInBucket(bucketName, key);
+		} catch (Throwable throwable) {
+			throwable.printStackTrace();
+			ExceptionUtil.throwSystemException(throwable.getMessage(), ExceptionLevel.ERROR, BucketRepository.EXCEPTION_MESSAGE_CONNECTION_FAILURE);
+			return false;
+		}
+	}
 	
 	/**
 	 * Retrieves bucked meta data based on bucket name.

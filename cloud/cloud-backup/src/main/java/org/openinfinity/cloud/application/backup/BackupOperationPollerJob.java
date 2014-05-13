@@ -68,7 +68,7 @@ public class BackupOperationPollerJob {
 						Cluster cluster = backup.getClusterService().getCluster(cluster_id);
 						if (cluster != null) {
 							logger.trace("New cluster info");
-							ClusterInfo cluster_info = new ClusterInfo(cluster_id, cluster.getInstanceId());
+							ClusterInfo cluster_info = new ClusterInfo(cluster_id, cluster.getInstanceId(), cluster.getType());
 							int count = 0;
 							logger.trace("Getting machine list");
 							Collection<Machine> machines = backup.getMachineService().getMachinesInCluster(cluster_id);
@@ -107,21 +107,30 @@ public class BackupOperationPollerJob {
 						if (source_cluster_id == -1) source_cluster_id = target_cluster_id;
 						Cluster cluster = backup.getClusterService().getCluster(target_cluster_id);
 						if (cluster != null) {
-							ClusterInfo source_cluster_info = new ClusterInfo(source_cluster_id, cluster.getInstanceId());
-							ClusterInfo target_cluster_info = new ClusterInfo(target_cluster_id, cluster.getInstanceId());
+							ClusterInfo source_cluster_info = new ClusterInfo(source_cluster_id, cluster.getInstanceId(), cluster.getType());
+							ClusterInfo target_cluster_info = new ClusterInfo(target_cluster_id, cluster.getInstanceId(), cluster.getType());
 							Collection<Machine> machines = backup.getMachineService().getMachinesInCluster(target_cluster_id);
-							JobResultSaver jrs = new JobResultSaver(op, machines.size());
-							for (Machine machine : machines) {
-								InstanceRestoreJob job = new InstanceRestoreJob(target_cluster_info, source_cluster_info, machine.getId(), jrs);
-								job.setLocalPackageDirectory(CloudBackup.getBackupProperties().getTemporaryDirectory());
-								//job.setLocalPackageDirectory("/var/tmp");
-								
-								// Trigger job instantly
-								dynamicQuartzSchedulerManager.runJob("job-" + op.getId() + "-" 
-										+ machine.getInstanceId(), "cluster-" + target_cluster_id, job);
+							if (machines != null && machines.size() > 0) {
+								JobResultSaver jrs = new JobResultSaver(op, machines.size());
+								for (Machine machine : machines) {
+									InstanceRestoreJob job = new InstanceRestoreJob(target_cluster_info, source_cluster_info, machine.getId(), jrs);
+									job.setLocalPackageDirectory(CloudBackup.getBackupProperties().getTemporaryDirectory());
+									//job.setLocalPackageDirectory("/var/tmp");
+									
+									// Trigger job instantly
+									dynamicQuartzSchedulerManager.runJob("job-" + op.getId() + "-" 
+											+ machine.getInstanceId(), "cluster-" + target_cluster_id, job);
+								}
+								logger.debug("Scheduled jobs for " + machines.size() + " machines of cluster " + target_cluster_id);
+								op.setState(BackupOperation.IN_PROGRESS);
+								backupWorkRepository.writeBackupOperation(op);
+							} else {
+								String msg = "No running machines found in target cluster " + target_cluster_id;
+								logger.debug(msg);
+								op.setState(BackupOperation.FAILED);
+								op.setDescription(msg);
+								backupWorkRepository.writeBackupOperation(op);
 							}
-							op.setState(BackupOperation.IN_PROGRESS);
-							backupWorkRepository.writeBackupOperation(op);
 						} else {
 							logger.error("Target cluster " +target_cluster_id + " not found");
 							op.setState(BackupOperation.FAILED);
@@ -136,7 +145,7 @@ public class BackupOperationPollerJob {
 						int cluster_id = op.getTargetClusterId();
 						Cluster cluster = backup.getClusterService().getCluster(cluster_id);
 						if (cluster != null) {
-							ClusterInfo cluster_info = new ClusterInfo(cluster_id, cluster.getInstanceId());
+							ClusterInfo cluster_info = new ClusterInfo(cluster_id, cluster.getInstanceId(), cluster.getType());
 							Collection<Machine> machines = backup.getMachineService().getMachinesInCluster(cluster_id);
 							JobResultSaver jrs = new JobResultSaver(op, machines.size());
 							for (Machine machine : machines) {

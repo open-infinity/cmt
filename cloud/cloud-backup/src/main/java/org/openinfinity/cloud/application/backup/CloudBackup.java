@@ -142,8 +142,7 @@ public class CloudBackup {
 					.getClusterBackupRules(cluster_id);
 
 			// Iterate all the cluster in instance
-			ClusterInfo clusterInfo = new ClusterInfo(cluster_id,
-					cluster.getInstanceId());
+			ClusterInfo clusterInfo = new ClusterInfo(cluster);
 
 			// Iterate all the machines in cluster
 			for (Machine machine : machineService.getMachinesInCluster(cluster.getId())) {

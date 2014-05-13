@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.jets3t.service.impl.rest.httpclient.RestS3Service;
 //import org.jets3t.service.impl.rest.httpclient.RestS3Service;
 //import org.jets3t.service.model.S3Object;
 import org.openinfinity.cloud.util.credentials.ProviderCredentialsImpl;
@@ -30,6 +31,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
+import com.amazonaws.AmazonServiceException;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
@@ -86,6 +88,22 @@ public class BucketRepositoryAWSImpl implements BucketRepository {
 	public InputStream load(String bucketName, String key) {
 		return simpleStorageService.getObject(bucketName, key).getObjectContent();
 	}
+
+	/**
+	 * Tests whether the given bucket name and key exist in the repository.
+	 */
+	public boolean has(String bucketName, String key) {
+		if (simpleStorageService.doesBucketExist(bucketName)) {
+			try {
+				simpleStorageService.getObjectMetadata(bucketName, key);
+				return true;
+			} catch (AmazonServiceException e) {
+				LOGGER.debug(e.getMessage());
+			}
+		}
+		return false;
+	}
+	
 
 	/**
 	 * Retrieves bucked meta data based on bucket name.

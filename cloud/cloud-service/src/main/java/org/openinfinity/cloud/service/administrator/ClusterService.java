@@ -74,6 +74,9 @@ public interface ClusterService {
 	
 	Collection<Cluster> getClusters();
 	
+	/**
+	 * Returns cluster for cluster id.
+	 */
 	Cluster getCluster(int id);
 	
 	void addCluster(Cluster cluster);
