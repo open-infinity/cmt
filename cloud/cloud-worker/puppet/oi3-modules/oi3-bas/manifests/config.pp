@@ -39,7 +39,7 @@ class oi3-bas::config {
 		require => Class["oi3-bas::install"],
 	}
 
-	file {"/opt/openinfinity/3.0.0/tomcat/conf/context.xml":
+	file {"/opt/openinfinity/3.0.0/tomcat/conf/context.xml.openinfinity_example":
 		ensure => present,
 		owner => 'oiuser',
 		group => 'oiuser',
