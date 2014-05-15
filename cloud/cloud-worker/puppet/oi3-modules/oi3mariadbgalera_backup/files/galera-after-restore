@@ -1,0 +1,10 @@
+#!/bin/sh
+
+OPENINFINITY_DIR=/opt/openinfinity/3.0.0
+BACKUP_TMP_DIR=$OPENINFINITY_DIR/backup/tmp
+
+# Restore databases from the dump
+gunzip --stdout $BACKUP_TMP_DIR/galera-all-databases-dump.gz | /usr/bin/mysql -ubackup -ptoasbackup --silent || exit 1
+
+rm -f $BACKUP_TMP_DIR/galera-all-databases-dump.gz
+
