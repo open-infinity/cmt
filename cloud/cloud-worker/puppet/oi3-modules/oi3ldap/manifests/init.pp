@@ -9,7 +9,7 @@ class oi3ldap {
   }
 
   service {"apacheds":
-    name => "apacheds-2.0.0_M15-default",
+    name => "apacheds-2.0.0_M16-default",
     ensure => "running",
     enable => true,
     require => Package["apacheds"]
