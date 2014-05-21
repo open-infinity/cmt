@@ -5,7 +5,7 @@
 # We can't use the following, because we don't want to backup cluster meta data
 # http://docs.mongodb.org/manual/tutorial/backup-sharded-cluster-with-database-dumps/
 
-source /opt/openinfinity/3.0.0/backup/common/bigdata-common
+source /opt/openinfinity/3.1.0/backup/common/bigdata-common
     
 if [ "x$BIGDATA_ROLE" = "x" ] ; then
     echo "Can't prepare node backup because this node is not part of a bigdata/nosql cluster" >/dev/stderr

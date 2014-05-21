@@ -6,7 +6,7 @@ class oi3-portal::install {
 #	package { ["oi3-bas"]:
 
 
-	file {"/opt/openinfinity/3.0.0/deploy":
+	file {"/opt/openinfinity/3.1.0/deploy":
                 ensure => directory,
                 owner => 'oiuser',
                 group => 'oiuser',
@@ -19,7 +19,7 @@ class oi3-portal::install {
 #		require => File["/opt/openinfinity/2.0.0/deploy"],
 #	}
 
-	file {"/opt/openinfinity/3.0.0/data":
+	file {"/opt/openinfinity/3.1.0/data":
 		ensure => directory,
 		owner => 'oiuser',
 		group => 'oiuser',
@@ -30,11 +30,11 @@ class oi3-portal::install {
 
 class oi3-portal::config {
 	exec {"set-privileges":
-		command => "/bin/chown -R oiuser:oiuser /opt/openinfinity/3.0.0",
+		command => "/bin/chown -R oiuser:oiuser /opt/openinfinity/3.1.0",
 		require => Class["oi3-portal::install"],
 	}
 
-	file {"/opt/openinfinity/3.0.0/tomcat/webapps/ROOT/WEB-INF/classes/portal-ext.properties":
+	file {"/opt/openinfinity/3.1.0/tomcat/webapps/ROOT/WEB-INF/classes/portal-ext.properties":
 		ensure => present,
 		owner => 'oiuser',
 		group => 'oiuser',
@@ -44,7 +44,7 @@ class oi3-portal::config {
 		notify => Service["oi-tomcat"],
 	}
 
-	file {"/opt/openinfinity/3.0.0/tomcat/conf/catalina.properties":
+	file {"/opt/openinfinity/3.1.0/tomcat/conf/catalina.properties":
                 ensure => present,
                 owner => 'oiuser',
                 group => 'oiuser',
@@ -53,7 +53,7 @@ class oi3-portal::config {
                 require => Class["oi3-portal::install"],
         }
 
-	file {"/opt/openinfinity/3.0.0/tomcat/bin/setenv.sh":
+	file {"/opt/openinfinity/3.1.0/tomcat/bin/setenv.sh":
                 ensure => present,
                 owner => 'oiuser',
                 group => 'oiuser',
@@ -62,24 +62,24 @@ class oi3-portal::config {
                 require => Class["oi3-portal::install"],
         }
 
-	file {"/opt/openinfinity/3.0.0/tomcat/conf/Catalina/localhost/ROOT.xml":
+	file {"/opt/openinfinity/3.1.0/tomcat/conf/Catalina/localhost/ROOT.xml":
 		ensure => present,
 		owner => 'oiuser',
 		group => 'oiuser',
 		mode => 0600,
 		source => "puppet:///modules/oi3-portal/ROOT.xml",
-		require => File["/opt/openinfinity/3.0.0/tomcat/conf/Catalina/localhost"],
+		require => File["/opt/openinfinity/3.1.0/tomcat/conf/Catalina/localhost"],
 	}
 
-	file {"/opt/openinfinity/3.0.0/tomcat/conf/Catalina/localhost":
+	file {"/opt/openinfinity/3.1.0/tomcat/conf/Catalina/localhost":
                 ensure => directory,
                 owner => 'oiuser',
                 group => 'oiuser',
                 mode => 0755,
-                require => File["/opt/openinfinity/3.0.0/tomcat/conf/Catalina"],
+                require => File["/opt/openinfinity/3.1.0/tomcat/conf/Catalina"],
         }
 
-	file {"/opt/openinfinity/3.0.0/tomcat/conf/Catalina":
+	file {"/opt/openinfinity/3.1.0/tomcat/conf/Catalina":
                 ensure => directory,
                 owner => 'oiuser',
                 group => 'oiuser',
@@ -87,7 +87,7 @@ class oi3-portal::config {
                 require => Class["oi3-portal::install"],
         }
 
-        file {"/opt/openinfinity/3.0.0/tomcat/conf/server.xml":
+        file {"/opt/openinfinity/3.1.0/tomcat/conf/server.xml":
                 ensure => present,
                 owner => 'oiuser',
                 group => 'oiuser',
@@ -97,7 +97,7 @@ class oi3-portal::config {
         }
 
 	# Security Vault configuration
-	file {"/opt/openinfinity/3.0.0/tomcat/conf/securityvault.properties":
+	file {"/opt/openinfinity/3.1.0/tomcat/conf/securityvault.properties":
 		ensure => present,
 		owner => 'oiuser',
 		group => 'oiuser',
@@ -106,7 +106,7 @@ class oi3-portal::config {
 		require => Class["oi3-portal::install"],
 	}
 
-	file {"/opt/openinfinity/3.0.0/tomcat/conf/hazelcast.xml":
+	file {"/opt/openinfinity/3.1.0/tomcat/conf/hazelcast.xml":
 		ensure => present,
 		owner => 'oiuser',
 		group => 'oiuser',
@@ -115,7 +115,7 @@ class oi3-portal::config {
 		require => Class["oi3-portal::install"],
 	}
 	
-        file {"/opt/openinfinity/3.0.0/tomcat/conf/context.xml":
+        file {"/opt/openinfinity/3.1.0/tomcat/conf/context.xml":
                 ensure => present,
                 owner => 'oiuser',
                 group => 'oiuser',
@@ -124,7 +124,7 @@ class oi3-portal::config {
                 require => Class["oi3-portal::install"],
         }
 
-        file {"/opt/openinfinity/3.0.0/tomcat/conf/jmxremote.password":
+        file {"/opt/openinfinity/3.1.0/tomcat/conf/jmxremote.password":
                 ensure => present,
                 owner => 'oiuser',
                 group => 'oiuser',
@@ -133,7 +133,7 @@ class oi3-portal::config {
                 require => Class["oi3-portal::install"],
         }
         
-        file {"/opt/openinfinity/3.0.0/tomcat/conf/jmxremote.access":
+        file {"/opt/openinfinity/3.1.0/tomcat/conf/jmxremote.access":
                 ensure => present,
                 owner => 'oiuser',
                 group => 'oiuser',
@@ -151,7 +151,7 @@ class oi3-portal::config {
                 require => Class["oi3-portal::install"],
         }
 	
-	file {"/opt/openinfinity/3.0.0/portal-setup-wizard.properties":
+	file {"/opt/openinfinity/3.1.0/portal-setup-wizard.properties":
 		ensure => present,
 		owner => 'oiuser',
 		group => 'oiuser',
@@ -159,7 +159,7 @@ class oi3-portal::config {
 		source => "puppet:///modules/oi3-portal/portal-setup-wizard.properties",
 		require => Class["oi3-portal::install"],
 	}
-#  file { "/opt/openinfinity/3.0.0/oi-core-libs/deps/ehcache-core-2.6.6.jar":
+#  file { "/opt/openinfinity/3.1.0/oi-core-libs/deps/ehcache-core-2.6.6.jar":
 #    ensure  => absent,
 #                require => Class["oi3-portal::install"],
 #  }

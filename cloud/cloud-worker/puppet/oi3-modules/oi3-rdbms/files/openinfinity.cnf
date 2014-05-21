@@ -1,5 +1,5 @@
 # The MySQL server
 [mysqld]
 
-datadir = /opt/openinfinity/3.0.0/rdbms/data/
+datadir = /opt/openinfinity/3.1.0/rdbms/data/
 

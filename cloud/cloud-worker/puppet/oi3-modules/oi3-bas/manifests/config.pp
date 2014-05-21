@@ -1,6 +1,6 @@
 class oi3-bas::config {
 
-	file {"/opt/openinfinity/3.0.0/tomcat/bin/setenv.sh":
+	file {"/opt/openinfinity/3.1.0/tomcat/bin/setenv.sh":
                 ensure => present,
                 owner => 'oiuser',
                 group => 'oiuser',
@@ -9,7 +9,7 @@ class oi3-bas::config {
                 require => Class["oi3-bas::install"],
         }
 
-	file {"/opt/openinfinity/3.0.0/tomcat/conf/catalina.properties":
+	file {"/opt/openinfinity/3.1.0/tomcat/conf/catalina.properties":
 		ensure => present,
 		owner => 'oiuser',
 		group => 'oiuser',
@@ -19,7 +19,7 @@ class oi3-bas::config {
 		notify => Service["oi-tomcat"],
 	}
 
-	file {"/opt/openinfinity/3.0.0/tomcat/conf/server.xml":
+	file {"/opt/openinfinity/3.1.0/tomcat/conf/server.xml":
 		ensure => present,
 		owner => 'oiuser',
 		group => 'oiuser',
@@ -30,7 +30,7 @@ class oi3-bas::config {
 	}
 
 	# Security Vault configuration
-	file {"/opt/openinfinity/3.0.0/tomcat/conf/securityvault.properties":
+	file {"/opt/openinfinity/3.1.0/tomcat/conf/securityvault.properties":
 		ensure => present,
 		owner => 'oiuser',
 		group => 'oiuser',
@@ -39,7 +39,7 @@ class oi3-bas::config {
 		require => Class["oi3-bas::install"],
 	}
 
-	file {"/opt/openinfinity/3.0.0/tomcat/conf/context.xml.openinfinity_example":
+	file {"/opt/openinfinity/3.1.0/tomcat/conf/context.xml.openinfinity_example":
 		ensure => present,
 		owner => 'oiuser',
 		group => 'oiuser',
@@ -48,7 +48,7 @@ class oi3-bas::config {
 		require => Class["oi3-bas::install"],
 	}
 
-	file {"/opt/openinfinity/3.0.0/tomcat/conf/hazelcast.xml":
+	file {"/opt/openinfinity/3.1.0/tomcat/conf/hazelcast.xml":
 		ensure => present,
 		owner => 'oiuser',
 		group => 'oiuser',
@@ -66,7 +66,7 @@ class oi3-bas::config {
                 require => Class["oi3-bas::install"],
     	}
     
-        file {"/opt/openinfinity/3.0.0/tomcat/conf/jmxremote.password":
+        file {"/opt/openinfinity/3.1.0/tomcat/conf/jmxremote.password":
                 ensure => present,
                 owner => 'oiuser',
                 group => 'oiuser',
@@ -75,7 +75,7 @@ class oi3-bas::config {
                 require => Class["oi3-bas::install"],
         }
         
-        file {"/opt/openinfinity/3.0.0/tomcat/conf/jmxremote.access":
+        file {"/opt/openinfinity/3.1.0/tomcat/conf/jmxremote.access":
                 ensure => present,
                 owner => 'oiuser',
                 group => 'oiuser',

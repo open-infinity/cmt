@@ -1,7 +1,11 @@
 #!/usr/bin/perl -w
+
+# Note: changes were based on puppet_nodes_amqchanges.pl
+# Vedran
 use strict;
 use YAML qw(Dump);
 use DBI;
+use JSON;
 
 my $hostname = shift || die "No hostname passed";
 #$hostname =~ /^(\d+)\_(\d+)\_(\d+)\_(\w+)$/ or die ("Invalid hostname: $hostname");
@@ -16,6 +20,15 @@ my ($instance, $cluster, $machine, $type) = ($1,$2,$3,$4);
 #print $machine;
 #print $type;
 
+# For extra configuration testing
+my $ajpConnectorAttributes = '';
+my $tomcatConnectorAttributes = '';
+#my $tomcatConnectorAttributes = 'useBodyEncodingForURI="true" URIEncoding="UTF-8"';
+my $extraJvmOpts = "";
+my $extraCatalinaOpts = "";
+#my $extraCatalinaOpts = "-XX:+UseParallelGC";
+
+
 my $data_source = "dbi:mysql:database=openinfinity;host=localhost";
 my $username = "openinfinity";
 my $password = "cloudtools";
@@ -27,8 +40,11 @@ my %postparameters;
 my %hm_parameters;
 my %ebsparameters;
 
+my $tomcat_monitor_role_password = "";
+
 # Query machine RAM
 # Used in HM and load balancer blocks
+# -Vedran
 
 # Query machine type
 my $sql = "select cluster_machine_type from cluster_tbl where cluster_id = $cluster";
@@ -46,16 +62,31 @@ $sth->execute() or die "Error in SQL execute: $DBI::errstr";
 my $ram = $row[0];
 $sth->finish;
 
+
+# oi3 backup test flag (this is bit a hack)
+my $oi3_backup_test = 0; {
+    my $sql = "select instance_name from instance_tbl where instance_id = $instance";
+    my $sth = $dbh->prepare($sql);
+    $sth->execute() or die "Error in SQL execute: $DBI::errstr";
+    my @row = $sth->fetchrow_array();
+    my $instanceName = $row[0];
+    $sth->finish;
+    if (index($instanceName, "[backup]") != -1) {
+        $oi3_backup_test = 1;
+        push(@class, "oi3-backup");
+    }
+}
+
 if($hostname eq "galeratesti1") {
         push(@class, "oi3-basic");
         push(@class, "oi3-mariadbgalera");
 
         %parameters = (
-                rootpass => "xxxx",
-                galeraClusterAddress => "xxxx",
-                galeraNodeAddress => "xxxx",
-                galeraNodeName => "xxxx",
-                galeraRootPassword => "xxxx"
+                rootpass => "passu",
+                galeraClusterAddress => "10.99.1.2,10.99.1.3,10.33.1.4",
+                galeraNodeAddress => "10.99.1.2",
+                galeraNodeName => "node1",
+                galeraRootPassword => "passu"
         );
 
         print Dump({
@@ -65,6 +96,161 @@ if($hostname eq "galeratesti1") {
         exit 0;
 }
 
+# SP FOR TRAINING
+#
+if($hostname eq "sp.localhost") {
+        push(@class, "oi3-basic", "oi3-ebs", "oi3-serviceplatform", "oi3-lttwatch");
+
+        %parameters = (
+            activiti_password => "toas",
+            amq_password => "toas",
+            backup_dir => "backup/55/188",
+            backup_host => "127.0.0.1",
+            backup_source_dir => "/opt/openinfinity",
+            backup_user => "toas-backup",
+            dbaddress => "127.0.0.1",
+            ebsDeviceName => "''",
+            ebsVolumeUsed => "false",
+            jvmmem => "1540",
+            jvmperm => "512",
+            liferay_db_password => "toas",
+            multicastaddress => "224.2.1.3",
+            oi_dbuser_password => "toas",
+            oi_httpuser_pwd => "toas",
+            ebsImageUsed => "true",
+            tomcat_monitor_role_pwd => "toas"
+
+
+        );
+
+        print Dump({
+                classes         => \@class,
+                parameters      => \%parameters,
+        });
+        exit 0;
+}
+
+# RDBMS FOR TRAINING
+#
+if($hostname eq "rdbms.localhost") {
+        push(@class, "oi3-basic", "oi3-ebs", "oi3-rdbms", "oi3-activiti-rdbms", "oi3-activemq-rdbms", "oi3-portal-rdbms", "oi3-oauth-rdbms");
+#        push(@class, "oi3-basic", "oi3-ebs", "oi3-rdbms", "oi3-activemq-rdbms", "oi3-portal-rdbms");
+
+        %parameters = (
+
+            activiti_password => "toas",
+            amq_password => "toas",
+            backup_dir => "backup/55/186",
+            backup_host => "127.0.0.1",
+            backup_source_dir => "/opt/openinfinity/2.0.0/backup/dumps",
+            backup_user => "toas-backup",
+            ebsDeviceName => "''",
+            ebsVolumeUsed => "false",
+            liferay_db_password => "toas",
+            mysql_password => "toas",
+            oi_httpuser_pwd => "toas",
+            ebsImageUsed => "true"
+
+        );
+
+        print Dump({
+                classes         => \@class,
+                parameters      => \%parameters,
+        });
+        exit 0;
+}
+
+# PORTAL
+
+if($hostname eq "omatrafitest1.trafi.fi") {
+        push(@class, "oi3-basic", "oi3-ebs", "oi3-portal", "oi3-lttwatch");
+
+        %parameters = (
+            activiti_password => "toas",
+            amq_password => "toas",
+            backup_dir => "backup/55/188",
+            backup_host => "131.207.105.13",
+            backup_source_dir => "/opt/openinfinity",
+            backup_user => "toas-backup",
+            dbaddress => "10.98.17.161",
+            ebsDeviceName => "''",
+            ebsVolumeUsed => "false",
+            jvmmem => "1540",
+            jvmperm => "512",
+            liferay_db_password => "toas",
+            multicastaddress => "224.2.1.3",
+            oi_dbuser_password => "toas",
+            oi_httpuser_pwd => "toas",
+            ebsImageUsed => "true",
+            tomcat_monitor_role_pwd => "toas"
+        );
+
+        print Dump({
+                classes         => \@class,
+                parameters      => \%parameters,
+        });
+        exit 0;
+}
+
+# RDBMS
+
+if($hostname eq "omatrafitestdb1.trafi.fi") {
+        push(@class, "oi3-basic", "oi3-ebs", "oi3-rdbms", "oi3-activiti-rdbms", "oi3-activemq-rdbms", "oi3-portal-rdbms");
+#        push(@class, "oi3-basic", "oi3-ebs", "oi3-rdbms", "oi3-activemq-rdbms", "oi3-portal-rdbms");
+
+        %parameters = (
+
+            activiti_password => "toas",
+            amq_password => "toas",
+            backup_dir => "backup/55/186",
+            backup_host => "131.207.105.13",
+            backup_source_dir => "/opt/openinfinity/2.0.0/backup/dumps",
+            backup_user => "toas-backup",
+            ebsDeviceName => "''",
+            ebsVolumeUsed => "false",
+            liferay_db_password => "toas",
+            mysql_password => "Ca7kANP9",
+            oi_httpuser_pwd => "toas",
+            ebsImageUsed => "true"
+
+        );
+
+        print Dump({
+                classes         => \@class,
+                parameters      => \%parameters,
+        });
+        exit 0;
+}
+
+# WMS EE
+if($hostname eq "wms.ee.amazon.instance") {
+        #push(@class, "oi3-basic", "oi3-ebs", "oi3-bas", "oi3-tomee", "oi3-rdbms");
+        push(@class, "oi3-basic", "oi3-ebs", "oi3-tomee", "oi3-rdbms");
+
+          %parameters = (
+              ebsDeviceName => "",
+              ebsVolumeUsed => "false",
+              jvmmem => "512",
+              jvmperm => "128",
+              multicastaddress => "224.2.1.3",
+              ebsImageUsed => "true",
+              ajp_connector_attributes => "",
+              tomcat_monitor_role_pwd => "toas",
+              extra_catalina_opts => "",
+          #    extra_jvm_opts => "-DappNode=localhost -Dlog4j.configuration=/opt/openinfinity/3.1.0/tomcat/logs/wms/wms_log4j.xml -Dlog4j.debug=true -Dfocus.log=true -Dnora.log=false -Dapp.server=dynamic -Dwms.core.config.dbvalidation=false -Dapp.server.jndi.remotePre=java:global/WMS10g_ear/WMSApplicationEJB -Dapp.server.jndi.localPre=java:global/WMS10g_ear/WMSApplicationEJB -Dapp.server.jndi.datasourcebase=java: -Dwms.psl.env=localdev -Dpsl.enabled=true -Dpsl.dequeuing=true -Dwms.customer=standalone",
+              extra_jvm_opts => "",
+              mysql_password => "Queek7ai"
+        );
+
+        print Dump({
+                classes         => \@class,
+                parameters      => \%parameters,
+        });
+        exit 0;
+}
+
+
+
 # HEALTH MONITORING
 #
 # Excluded:
@@ -72,9 +258,23 @@ if($hostname eq "galeratesti1") {
 # omatrafitest1.trafi.fi
 #
 # Included:
-# instance 93
-if ($instance eq "93" && $hostname ne "omatrafitestdb1.trafi.fi" && $hostname ne "omatrafitest1.trafi.fi") {
-	push(@class, "oi3-healthmonitoring");
+# All instances
+if(1) {
+        my $rdbms_hm_password = "";
+	if ($hostname ne "omatrafitestdb1.trafi.fi" && $hostname ne "omatrafitest1.trafi.fi") {
+        	if ($type eq "db") { 
+			push(@class, "oi3-healthmonitoring-rdbms");
+                        $rdbms_hm_password = getPassword('mariadb', 'healthmonitoring', $cluster);
+		}
+                elsif ($type eq "bas" || $type eq "portal" || $type eq "ee" || $type eq "service"){
+			push(@class, "oi3-healthmonitoring-bas");
+                        $tomcat_monitor_role_password = getPassword('bas', 'tomcat_monitor', $cluster);
+                }
+		else {
+			push(@class, "oi3-healthmonitoring");
+		}
+        }
+
         # Query from machine_tbl, create entris for nodelist.conf from results
         my $sql = "select machine_id,machine_dns_name,machine_private_dns_name,machine_type,machine_name from machine_tbl where machine_cluster_id = $cluster and machine_running > 0";
         my $sth = $dbh->prepare($sql);
@@ -114,6 +314,22 @@ if ($instance eq "93" && $hostname ne "omatrafitestdb1.trafi.fi" && $hostname ne
         if ($node_hostname eq "NA"){
                 die "Host name assigning failed";
         }
+
+        # Query machine type in cluster
+       	#$sql = "select cluster_machine_type from cluster_tbl where cluster_id = $cluster";
+        #$sth = $dbh->prepare($sql);
+        #$sth->execute() or die "Error in SQL execute: $DBI::errstr";
+        #my @row = $sth->fetchrow_array();
+        #my $machineType = $row[0];
+        #$sth->finish;
+
+        # Query RAM allocated to machine
+        #$sql = "select ram from machine_type_tbl where id = $machineType";
+	#$sth = $dbh->prepare($sql);
+	#$sth->execute() or die "Error in SQL execute: $DBI::errstr";
+	#@row = $sth->fetchrow_array();
+	#my $ram = $row[0];
+	#$sth->finish;
         
         # Query cloud zone
         $sql = "select cloud_zone from instance_tbl where instance_id = $instance";
@@ -133,110 +349,19 @@ if ($instance eq "93" && $hostname ne "omatrafitestdb1.trafi.fi" && $hostname ne
                 public_ip => $dns_name,
                 hostname => $node_hostname,
 		java_home => "/etc/alternatives/jre_1.7.0",
-		mail_host => "xxxx",
-		mail_from => "xxxx",
-		default_mail_recepient => "xxxx",
-		oi_collectd_root => "/opt/openinfinity/3.0.0/healthmonitoring/collectd",
-                oi_rrd_http_server_root => "/opt/openinfinity/3.0.0/healthmonitoring/rrd-http-server",
-		oi_monitoring_root => "/opt/openinfinity/3.0.0/healthmonitoring/nodechecker",
+		mail_host => "gate33.gw.tietoenator.com",
+		mail_from => "support.toas\@tieto.com",
+                default_mail_recepient => "DLSupportToas\@tieto.com",
+		oi_collectd_root => "/opt/openinfinity/3.1.0/healthmonitoring/collectd",
+                oi_rrd_http_server_root => "/opt/openinfinity/3.1.0/healthmonitoring/rrd-http-server",
+		oi_monitoring_root => "/opt/openinfinity/3.1.0/healthmonitoring/nodechecker",
                 cluster_member_data => \@datalist,
-                tomcat_monitor_role_pwd => "xxxx",
-                tomcat_jmx_port => "xxxx",
-                threshold_warn_max_jvm_committed =>, roundup($ram * .75 * .95 * 1000000 , 10),
-	);
-
+                tomcat_monitor_role_pwd => $tomcat_monitor_role_password,
+                tomcat_jmx_port => "65329",
+                threshold_warn_max_jvm_committed => roundup($ram * .75 * .95 * 1000000 , 10),
+                rdbms_healthmonitoring_pwd => $rdbms_hm_password,
+	); 
 }
-
-# PORTAL
-
-if($hostname eq "omatrafitest1.trafi.fi") {
-        push(@class, "oi3-basic", "oi3-ebs", "oi3-portal");
-
-        %parameters = (
-	    activiti_password => "xxxx",
-	    amq_password => "xxxx",
-	    backup_dir => "xxxx",
-	    backup_host => "xxxx",
-	    backup_source_dir => "xxxx",
-	    backup_user => "xxxx",
-	    dbaddress => "xxxx",
-	    ebsDeviceName => "''",
-	    ebsVolumeUsed => "false",
-	    jvmmem => "1540",
-	    jvmperm => "512",
-	    liferay_db_password => "xxxx",
-	    multicastaddress => "xxxx",
-	    oi_dbuser_password => "xxxx",
-	    oi_httpuser_pwd => "xxxx",
-	    ebsImageUsed => "true",
-	    tomcat_monitor_role_pwd => "xxxx"
-
-
-        );
-
-        print Dump({
-                classes         => \@class,
-                parameters      => \%parameters,
-        });
-        exit 0;
-}
-
-# RDBMS
-
-if($hostname eq "omatrafitestdb1.trafi.fi") {
-        push(@class, "oi3-basic", "oi3-ebs", "oi3-rdbms", "oi3-activiti-rdbms", "oi3-activemq-rdbms", "oi3-portal-rdbms");
-#        push(@class, "oi3-basic", "oi3-ebs", "oi3-rdbms", "oi3-activemq-rdbms", "oi3-portal-rdbms");
-
-        %parameters = (
-	    
-	    activiti_password => "xxxx",
-	    amq_password => "xxxx",
-	    backup_dir => "backup/55/186",
-	    backup_host => "xxxx",
-	    backup_source_dir => "/opt/openinfinity/2.0.0/backup/dumps",
-	    backup_user => "xxxxx",
-	    ebsDeviceName => "''",
-	    ebsVolumeUsed => "false",
-	    liferay_db_password => "xxxx",
-	    mysql_password => "xxxx",
-	    oi_httpuser_pwd => "xxxx",
-	    ebsImageUsed => "true"
-	   
-        );
-
-        print Dump({
-                classes         => \@class,
-                parameters      => \%parameters,
-        });
-        exit 0;
-}
-
-# WMS EE
-if($hostname eq "wms.ee.amazon.instance") {
-        push(@class, "oi3-basic", "oi3-ebs", "oi3-bas", "oi3-tomee", "oi3-rdbms");
-
-          %parameters = (
-	      ebsDeviceName => "",
-	      ebsVolumeUsed => "false",
-	      jvmmem => "512",
-	      jvmperm => "128",
-	      multicastaddress => "xxxx",
-	      ebsImageUsed => "true",
-	      tomcat_monitor_role_pwd => "xxxx",
-	      extra_catalina_opts => "",
-	  #    extra_jvm_opts => "-DappNode=localhost -Dlog4j.configuration=/opt/openinfinity/3.0.0/tomcat/logs/wms/wms_log4j.xml -Dlog4j.debug=true -Dfocus.log=true -Dnora.log=false -Dapp.server=dynamic -Dwms.core.config.dbvalidation=false -Dapp.server.jndi.remotePre=java:global/WMS10g_ear/WMSApplicationEJB -Dapp.server.jndi.localPre=java:global/WMS10g_ear/WMSApplicationEJB -Dapp.server.jndi.datasourcebase=java: -Dwms.psl.env=localdev -Dpsl.enabled=true -Dpsl.dequeuing=true -Dwms.customer=standalone",
-	      extra_jvm_opts => "",
-	      mysql_password => "xxxx"
-        );
-
-        print Dump({
-                classes         => \@class,
-                parameters      => \%parameters,
-        });
-        exit 0;
-}
-
-
 
 push(@class, "oi3-basic");
 
@@ -330,6 +455,11 @@ if($type eq "portal_lb" || $type eq "service_lb") {
 	$sql = "select cluster_id from cluster_tbl where instance_id = $instance and cluster_type=7";
 	$sth = $dbh->prepare($sql);
 	$sth->execute() or die "Error in SQL execute: $DBI::errstr";
+
+        # for testing purposes, default parameters for portal
+        if($type eq "portal") {
+           $extraCatalinaOpts = "-Djava.net.preferIPv4Stack=true -Dorg.apache.catalina.loader.WebappClassLoader.ENABLE_CLEAR_REFERENCES=false";
+        }
 	if($sth->rows == 0) {
 		%parameters = (
 			dbaddress => $db_address,
@@ -337,11 +467,16 @@ if($type eq "portal_lb" || $type eq "service_lb") {
 			backup_source_dir => "/opt/openinfinity",
 			jvmmem => $javaMem,
                         jvmperm => $javaPerm,
-			oi_httpuser_pwd => "xxxx",
-			amq_password => "xxxx",
-			activiti_password => "xxxx",
-			oi_dbuser_password => "xxxx",
-			liferay_db_password => "xxxx",
+			oi_httpuser_pwd => "toas",
+			amq_password => "toas",
+			activiti_password => "toas",
+			oi_dbuser_password => "toas",
+			liferay_db_password => "toas",
+                        tomcat_connector_attributes => $tomcatConnectorAttributes,
+                        extra_jvm_opts => $extraJvmOpts,
+                        extra_catalina_opts => $extraCatalinaOpts,
+		
+			nodeid => $machine,
 		);
 		if($type eq "portal") {
 			push(@class, "oi3-portal");
@@ -369,13 +504,16 @@ if($type eq "portal_lb" || $type eq "service_lb") {
 			identityGatewayAddress => $igaddress,
 			identityGatewayPort => "80",
 			liferayAddress => $liferayAddress,
-			amAdminUsername => "xxxx",
-			amAdminPassword => "xxxx",
+			amAdminUsername => "amadmin",
+			amAdminPassword => "admin1234",
 			multicastaddress => $multicastaddress,
 			backup_source_dir => "/opt/openinfinity",
-			liferay_db_password => "xxxx",
+			liferay_db_password => "toas",
 			jvmmem => $javaMem,
                         jvmperm => $javaPerm,
+                        tomcat_connector_attributes => $tomcatConnectorAttributes,
+                        extra_jvm_opts => $extraJvmOpts,
+                        extra_catalina_opts => $extraCatalinaOpts,
 		);
 		if($type eq "portal") {
 			push(@class, "oi3-portal-sso");
@@ -384,6 +522,7 @@ if($type eq "portal_lb" || $type eq "service_lb") {
 		}
 	}
 	#push(@class, "oibackup");
+	push(@class, "oi3-lttwatch");
 } elsif($type eq "ig") {
 	my $sql = "select cluster_id from cluster_tbl where instance_id = $instance and cluster_type=0";
         my $sth = $dbh->prepare($sql);
@@ -417,15 +556,15 @@ if($type eq "portal_lb" || $type eq "service_lb") {
 	%parameters = (
                         dbaddress => $db_address,
                         idpIPAddress => $igAddress,
-                        idpPort => "xxxx",
+                        idpPort => "80",
                         spAddress => $portalAddress,
-                        spPort => "xxxx",
+                        spPort => "80",
                         serverAddress => $igAddress,
-                        serverPort => "xxxx",
-                        dbUser => "xxxx",
-                        dbPassword => "xxxx",
-                        adminPassword => "xxxx",
-                        userAgentPassword => "xxxx",
+                        serverPort => "80",
+                        dbUser => "liferay",
+                        dbPassword => "toasliferay",
+                        adminPassword => "admin1234",
+                        userAgentPassword => "toas1234",
 			backup_source_dir => "/opt/openinfinity/",
         );
 	push(@class, "oibackup");
@@ -480,8 +619,12 @@ if($type eq "portal_lb" || $type eq "service_lb") {
 			backup_source_dir => "/opt/openinfinity",
 			jvmmem => $javaMem,
 			jvmperm => $javaPerm,
-			tomcat_monitor_role_pwd => "xxxx",
+			tomcat_monitor_role_pwd => $tomcat_monitor_role_password,
+                        tomcat_connector_attributes => $tomcatConnectorAttributes,
+                        extra_jvm_opts => $extraJvmOpts,
+                        extra_catalina_opts => $extraCatalinaOpts,
 	);
+	push(@class, "oi3-lttwatch");
 } elsif ($type eq "ee") {
 	# Query multicast address and machine type
 	my $sql = "select cluster_multicast_address,cluster_machine_type from cluster_tbl where cluster_id = $cluster";
@@ -522,8 +665,9 @@ if($type eq "portal_lb" || $type eq "service_lb") {
         my $javaPerm = jvmPerm($javaMem);
 
 	# Add Puppet modules        
-	push(@class, "oi3-bas");
+#	push(@class, "oi3-bas");
 	push(@class, "oi3-tomee");
+#	push(@class, "oi3-lttwatch");
 	#push(@class, "oibackup");
 	
 	# Set parameters
@@ -533,38 +677,59 @@ if($type eq "portal_lb" || $type eq "service_lb") {
 			backup_source_dir => "/opt/openinfinity",
 			jvmmem => $javaMem,
                         jvmperm => $javaPerm,
-			extra_catalina_opts => "",
-			extra_jvm_opts => "",
+                        ajp_connector_attributes => $ajpConnectorAttributes,
+                        tomcat_connector_attributes => $tomcatConnectorAttributes,
+                        extra_jvm_opts => $extraJvmOpts,
+                        extra_catalina_opts => $extraCatalinaOpts,
         );
 } elsif($type eq "db") {
 	push(@class, "oi3-rdbms");
-	#push(@class, "oibackup");
+	if ($oi3_backup_test) { push(@class, "oi3-rdbms-backup"); }
 	push(@class, "oi3-activiti-rdbms");
 	push(@class, "oi3-activemq-rdbms");
         push(@class, "oi3-portal-rdbms");
         push(@class, "oi3-oauth-rdbms");
 	
-	my $dbrootpass = "";
-        my $sql = "select password from password_tbl where platform = 'mariadb' and user = 'root' and cluster_id = $cluster";
+	
+        my $dbrootpass = getPassword('mariadb', 'root', $cluster);
+        #my $dbrootpass = "";
+        #my $sql = "select password from password_tbl where platform = 'mariadb' and user = 'root' and cluster_id = $cluster";
+        #my $sth = $dbh->prepare($sql);
+        #$sth->execute() or die "Error in SQL execute: $DBI::errstr";
+        #my $rows = $sth->rows;
+        #my $passFound = 0;
+        #if($rows > 0) {
+        #        my @row = $sth->fetchrow_array();
+        #        if(defined($row[0])) {
+        #                $passFound = 1;
+        #                $dbrootpass = $row[0];
+        #        }
+        #}
+        #$sth->finish;
+        #if(!$passFound) {
+        #        $dbrootpass = generatePassword(8);
+        #       $sql = "insert into password_tbl (id, cluster_id, platform, user, password) values (null, $cluster, 'mariadb', 'root', '$dbrootpass')";
+        #       $sth = $dbh->prepare($sql);
+        #        $sth->execute();
+        #        $sth->finish;
+        #}
+
+	#my $basmachinelist = "";
+	
+        my $sql = "select machine_id from machine_tbl where machine_cluster_id = (select cluster_id from cluster_tbl where instance_id=$instance and cluster_type=1) and machine_type='clustermember'";
+	
         my $sth = $dbh->prepare($sql);
         $sth->execute() or die "Error in SQL execute: $DBI::errstr";
-        my $rows = $sth->rows;
-        my $passFound = 0;
-        if($rows > 0) {
-                my @row = $sth->fetchrow_array();
-                if(defined($row[0])) {
-                        $passFound = 1;
-                        $dbrootpass = $row[0];
-                }
+        my @basmachinelist;
+        while(my @row = $sth->fetchrow_array) {
+                push(@basmachinelist,@row[0]);
+		
         }
         $sth->finish;
-        if(!$passFound) {
-                $dbrootpass = generatePassword(8);
-                $sql = "insert into password_tbl (id, cluster_id, platform, user, password) values (null, $cluster, 'mariadb', 'root', '$dbrootpass')";
-                $sth = $dbh->prepare($sql);
-                $sth->execute();
-                $sth->finish;
-        }
+	
+	my $jsonnodelist = JSON->new;
+	#print $json->objToJson(@array);	
+
 
 	# Set parameters
 	%parameters = (
@@ -576,6 +741,7 @@ if($type eq "portal_lb" || $type eq "service_lb") {
 			oi_httpuser_pwd => "toas",
 			liferay_db_password => "toas",
                         oi_dbuser_pwd => "toas",
+			basmachineidlist => encode_json(\@basmachinelist),
         );
 	
 	
@@ -590,6 +756,7 @@ if($type eq "portal_lb" || $type eq "service_lb") {
 		rsaprivatekey => $secretKey
 	);
 	push(@class, "oi3-bigdatamgmt");
+	if ($oi3_backup_test) { push(@class, "oi3-bigdatamgmt-backup"); }
 } elsif($type eq "bigdata_host" || $type eq "nosql_host") {
 	my $sql = "select machine_name from machine_tbl where machine_id = $machine";
 	my $sth = $dbh->prepare($sql);
@@ -601,6 +768,7 @@ if($type eq "portal_lb" || $type eq "service_lb") {
 		hostname => $machineName
 	);
 	push(@class, "oi3-bigdatahost");
+	if ($oi3_backup_test) { push(@class, "oi3-bigdatahost-backup"); }
 } elsif($type eq "jbossportal") {
 	push(@class, "oijavasehotspot");
 	push(@class, "oibasicjboss");
@@ -722,8 +890,8 @@ $dbh->disconnect;
 # Set backup parameters
 my %backup_parameters = (
 	# Production parameters
-	backup_host => "xxxx",
-	backup_user => "xxxx",
+	backup_host => "131.207.105.13",
+	backup_user => "toas-backup",
 	backup_dir => "backup/" . $instance . "/" . $machine,
 );
 
@@ -775,3 +943,36 @@ sub generatePassword {
    }
    return $password
 }
+
+# Tries to get password from password_tbl. 
+# If it does not exist, creates and stores it to db.
+sub getPassword($$$){
+        my $arg_platform = shift;
+	my $arg_user = shift;
+	my $arg_cluster = shift;
+	my $final_password = "";
+
+	my $sql = "select password from password_tbl where platform = '$arg_platform' and user = '$arg_user' and cluster_id = $cluster";
+	my $sth = $dbh->prepare($sql);
+	$sth->execute() or die "Error in SQL execute: $DBI::errstr";
+	
+	my $rows = $sth->rows;
+	my $passFound = 0;
+	if($rows > 0) {
+        	my @row = $sth->fetchrow_array();
+	        if(defined($row[0])) {
+        	        $passFound = 1;
+	                $final_password = $row[0];
+	        }
+	}
+	$sth->finish;
+	if(!$passFound) {
+        	$final_password = generatePassword(8);
+	        $sql = "insert into password_tbl (id, cluster_id, platform, user, password) values (null, $cluster, '$arg_platform', '$arg_user', '$final_password')";
+	        $sth = $dbh->prepare($sql);
+	        $sth->execute();
+	        $sth->finish;
+	}
+	return $final_password;
+}
+

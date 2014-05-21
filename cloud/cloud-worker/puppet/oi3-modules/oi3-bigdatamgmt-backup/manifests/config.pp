@@ -1,5 +1,5 @@
 class oi3-bigdatamgmt-backup::config {
-	file {"/opt/openinfinity/3.0.0/backup/include-dirs.d/bigdata-dirs":
+	file {"/opt/openinfinity/3.1.0/backup/include-dirs.d/bigdata-dirs":
 		ensure => present,
 		source => "puppet:///modules/oi3-bigdatamgmt-backup/bigdata-dirs",
 		owner => 'root',

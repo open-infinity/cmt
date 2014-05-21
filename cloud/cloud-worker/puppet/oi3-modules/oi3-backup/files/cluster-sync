@@ -1,6 +1,6 @@
 #!/bin/sh
 
-BACKUP_BASE_DIR=/opt/openinfinity/3.0.0/backup
+BACKUP_BASE_DIR=/opt/openinfinity/3.1.0/backup
 BACKUP_LOG=/var/log/cloud-backup-cluster-sync.log
 
 export PATH=$PATH:$BACKUP_BASE_DIR/common

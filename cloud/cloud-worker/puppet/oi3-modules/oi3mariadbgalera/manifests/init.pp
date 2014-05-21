@@ -1,6 +1,6 @@
 class oi3mariadbgalera {
 	ensure_resource('user', 'mysql', {
-		home => "/opt/openinfinity/3.0.0/rdbms/data",
+		home => "/opt/openinfinity/3.1.0/rdbms/data",
 		managehome => false,
 		system => true,
 		gid => 'mysql',
@@ -17,14 +17,14 @@ class oi3mariadbgalera {
 	package { "nc":
 		ensure => present
 	} ->
-	file {"/opt/openinfinity/3.0.0/rdbms":
+	file {"/opt/openinfinity/3.1.0/rdbms":
                 ensure => directory,
                 owner => "mysql",
                 group => "mysql",
                 mode => 0775,
-                require => file["/opt/openinfinity/3.0.0"],
+                require => file["/opt/openinfinity/3.1.0"],
         } ->
-	file {"/opt/openinfinity/3.0.0/rdbms/data":
+	file {"/opt/openinfinity/3.1.0/rdbms/data":
                 ensure => directory,
                 owner => "mysql",
                 group => "mysql",
@@ -52,7 +52,7 @@ class oi3mariadbgalera {
                 mode => 0750,
         } ->
 	exec {"create-mysql-database":
-                creates => "/opt/openinfinity/3.0.0/rdbms/data/mysql/user.frm",
+                creates => "/opt/openinfinity/3.1.0/rdbms/data/mysql/user.frm",
                 command => "/root/mysql_install_db --user=mysql --defaults-file=/etc/my.cnf",
         } 
 }

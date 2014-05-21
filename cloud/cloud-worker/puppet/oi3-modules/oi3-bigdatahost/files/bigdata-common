@@ -26,13 +26,13 @@ EOF
     fi
     rm -f /tmp/mongodb-replset-find.js
     
-    export MONGODB_LOG_DIR=/opt/openinfinity/3.0.0/bigdata/log
+    export MONGODB_LOG_DIR=/opt/openinfinity/3.1.0/bigdata/log
 else
     echo "The cluster type is '$BIGDATA_TYPE' which is not supported at moment"
 fi
 
 # Backup directories
-export BIGDATA_BASE_DIR=/opt/openinfinity/3.0.0/backup
+export BIGDATA_BASE_DIR=/opt/openinfinity/3.1.0/backup
 export BACKUP_DIR=$BIGDATA_BASE_DIR/tmp
 export BIGDATA_INCLUDE_DIRS_FILE=$BIGDATA_BASE_DIR/include-dirs.d/bigdata
 

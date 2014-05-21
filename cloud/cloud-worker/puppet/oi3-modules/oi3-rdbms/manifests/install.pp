@@ -1,32 +1,32 @@
 class oi3-rdbms::install {
 
-	file {"/opt/openinfinity/3.0.0/rdbms":
+	file {"/opt/openinfinity/3.1.0/rdbms":
 		ensure => directory,
                 owner => "mysql",
                 group => "mysql",
                 mode => 0775,
-		require => file["/opt/openinfinity/3.0.0"],
+		require => file["/opt/openinfinity/3.1.0"],
 	}
 
-#	file {"/opt/openinfinity/3.0.0/rdbms/etc":
+#	file {"/opt/openinfinity/3.1.0/rdbms/etc":
 #                ensure => directory,
 #                owner => "mysql",
 #                group => "mysql",
 #                mode => 0775,
-#                require => file["/opt/openinfinity/3.0.0/rdbms"],
+#                require => file["/opt/openinfinity/3.1.0/rdbms"],
 #        }
 
-	file {"/opt/openinfinity/3.0.0/rdbms/data":
+	file {"/opt/openinfinity/3.1.0/rdbms/data":
                 ensure => directory,
                 owner => "mysql",
                 group => "mysql",
                 mode => 0775,
-                require => file["/opt/openinfinity/3.0.0/rdbms"],
+                require => file["/opt/openinfinity/3.1.0/rdbms"],
         }	
 
 	package { "oi3-rdbms":
 		ensure => present,
-		require => file["/opt/openinfinity/3.0.0/rdbms/data"],
+		require => file["/opt/openinfinity/3.1.0/rdbms/data"],
 	}
 
 	user { "mysql":

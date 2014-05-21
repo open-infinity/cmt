@@ -1,16 +1,18 @@
 OI_HOME=/opt/openinfinity
-OI_VERSION=3.0.0
+OI_VERSION=3.1.0
 TOMCAT_CONF_PATH="$OI_HOME/$OI_VERSION/tomcat/conf"
 
 CLASS_LOADER_OPTS=-Dorg.apache.catalina.loader.WebappClassLoader.ENABLE_CLEAR_REFERENCES=false
 JVM_MEMORY_OPTS="-Xmx<%= jvmmem %>m -XX:MaxPermSize=<%= jvmperm %>m"
+
 JMX_OPTS="-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=65329 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=true -Dcom.sun.management.jmxremote.password.file=$TOMCAT_CONF_PATH/jmxremote.password -Dcom.sun.management.jmxremote.access.file=$TOMCAT_CONF_PATH/jmxremote.access"
+
 TOMEE_OPTS="-javaagent:$CATALINA_HOME/lib/openejb-javaagent.jar"
+
+SECURITY_VAULT_OPTS="-Dsecurity.vault.properties.file=/opt/openinfinity/3.1.0/tomcat/conf/securityvault.properties"
 
 EXTRA_JVM_OPS="<%= extra_jvm_opts %>"
 EXTRA_CATALINA_OPS="<%= extra_catalina_opts %>"
-
-SECURITY_VAULT_OPTS="-Dsecurity.vault.properties.file=/opt/openinfinity/3.0.0/tomcat/conf/securityvault.properties"
 
 JAVA_OPTS="$JAVA_OPTS $CLASS_LOADER_OPTS $EXTRA_JVM_OPS -Duser.timezone=EET -Dfile.encoding=UTF8 $JVM_MEMORY_OPTS  $SECURITY_VAULT_OPTS"
 CATALINA_OPTS="$CATALINA_OPTS $JMX_OPTS $TOMEE_OPTS $EXTRA_CATALINA_OPS"

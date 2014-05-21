@@ -1,7 +1,7 @@
 class oi3-activiti-rdbms::config {
 	
 	# Directory for activiti schema files
-	file { "/opt/openinfinity/3.0.0/activiti":
+	file { "/opt/openinfinity/3.1.0/activiti":
 		ensure => directory,
 		group => "root",
 		owner => "root",
@@ -9,15 +9,15 @@ class oi3-activiti-rdbms::config {
 	}
 
 	# Directory for activiti schema files
-	file { "/opt/openinfinity/3.0.0/activiti/dbschema":
+	file { "/opt/openinfinity/3.1.0/activiti/dbschema":
 		ensure => directory,
 		group => "root",
 		owner => "root",
-		require => file["/opt/openinfinity/3.0.0/activiti"],
+		require => file["/opt/openinfinity/3.1.0/activiti"],
 	}
 	
 	# Activiti schema create scripts
-	file { "/opt/openinfinity/3.0.0/activiti/dbschema/activiti.mysql.create.engine.sql":
+	file { "/opt/openinfinity/3.1.0/activiti/dbschema/activiti.mysql.create.engine.sql":
                 ensure => present,
                 source => "puppet:///modules/oi3-activiti-rdbms/activiti.mysql.create.engine.sql",
                 owner => "root",
@@ -25,7 +25,7 @@ class oi3-activiti-rdbms::config {
 	      require => Class["oi3-rdbms::service"],
                 notify => Class["oi3-activiti-rdbms::service"],
         }		
-	file { "/opt/openinfinity/3.0.0/activiti/dbschema/activiti.mysql.create.history.sql":
+	file { "/opt/openinfinity/3.1.0/activiti/dbschema/activiti.mysql.create.history.sql":
                 ensure => present,
                 source => "puppet:///modules/oi3-activiti-rdbms/activiti.mysql.create.history.sql",
                 owner => "root",
@@ -33,7 +33,7 @@ class oi3-activiti-rdbms::config {
 	      require => Class["oi3-rdbms::service"],
                 notify => Class["oi3-activiti-rdbms::service"],
         }		
-	file { "/opt/openinfinity/3.0.0/activiti/dbschema/activiti.mysql.create.identity.sql":
+	file { "/opt/openinfinity/3.1.0/activiti/dbschema/activiti.mysql.create.identity.sql":
                 ensure => present,
                 source => "puppet:///modules/oi3-activiti-rdbms/activiti.mysql.create.identity.sql",
                 owner => "root",
@@ -41,7 +41,7 @@ class oi3-activiti-rdbms::config {
 	      require => Class["oi3-rdbms::service"],
                 notify => Class["oi3-activiti-rdbms::service"],
         }		
-	file { "/opt/openinfinity/3.0.0/activiti/dbschema/activiti.mysql.add.oiuser.sql":
+	file { "/opt/openinfinity/3.1.0/activiti/dbschema/activiti.mysql.add.oiuser.sql":
                 ensure => present,
                 owner => "root",
                 group => "root",

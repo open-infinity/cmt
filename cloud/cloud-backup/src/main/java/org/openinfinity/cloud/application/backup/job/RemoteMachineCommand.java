@@ -88,7 +88,6 @@ public class RemoteMachineCommand implements Command {
 		// The command to be executed in the remote host
 		String package_command = CloudBackup.getBackupProperties().getRemoteBackupCommand();
 		if (package_command == null) throw new NullPointerException("remoteBackupCommand is null");
-		//String package_command = "/opt/openinfinity/3.0.0/backup/stream-backup"; // FIXME: non-hardcoded path
 
 		// Test that the backup file exists
 		int remote_exit_status1 = runRemoteCommand("touch " + package_command, null, "/dev/null");

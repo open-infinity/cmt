@@ -7,7 +7,7 @@ class oi3-healthmonitoring-rdbms::config {
         content => template("oi3-healthmonitoring-rdbms/oi.sh.erb"),
         require => Class["oi3-healthmonitoring-rdbms::install"],
     } 
-    file { "/opt/openinfinity/3.0.0/healthmonitoring/collectd/etc/collectd.conf":
+    file { "/opt/openinfinity/3.1.0/healthmonitoring/collectd/etc/collectd.conf":
         ensure => file,
         owner => 'oiuser',
         group => 'oiuser',
@@ -15,7 +15,7 @@ class oi3-healthmonitoring-rdbms::config {
         content => template("oi3-healthmonitoring-rdbms/collectd.conf.erb"),
         require => Class["oi3-healthmonitoring-rdbms::install"],
     } 
-    file { "/opt/openinfinity/3.0.0/healthmonitoring/nodechecker/etc/nodechecker.conf":
+    file { "/opt/openinfinity/3.1.0/healthmonitoring/nodechecker/etc/nodechecker.conf":
         ensure => file,
         owner => 'oiuser',
         group => 'oiuser',
@@ -23,7 +23,7 @@ class oi3-healthmonitoring-rdbms::config {
         content => template("oi3-healthmonitoring-rdbms/nodechecker.conf.erb"),
         require => Class["oi3-healthmonitoring-rdbms::install"],
     } 
-    file { "/opt/openinfinity/3.0.0/healthmonitoring/nodechecker/etc/nodelist.conf":
+    file { "/opt/openinfinity/3.1.0/healthmonitoring/nodechecker/etc/nodelist.conf":
         ensure => file,
         owner => 'oiuser',
         group => 'oiuser',
@@ -32,7 +32,7 @@ class oi3-healthmonitoring-rdbms::config {
         require => Class["oi3-healthmonitoring-rdbms::install"],
     }
 
-    file { "/opt/openinfinity/3.0.0/healthmonitoring/collectd/etc/collectd.d/threshold.conf":
+    file { "/opt/openinfinity/3.1.0/healthmonitoring/collectd/etc/collectd.d/threshold.conf":
         ensure => file,
         owner => 'oiuser',
         group => 'oiuser',
@@ -41,12 +41,12 @@ class oi3-healthmonitoring-rdbms::config {
         require => Class["oi3-healthmonitoring-rdbms::install"],
     }
 
-    file { "/opt/openinfinity/3.0.0/healthmonitoring/nodechecker/var/lib/notifications/inbox":
+    file { "/opt/openinfinity/3.1.0/healthmonitoring/nodechecker/var/lib/notifications/inbox":
         mode => 0777,
         require => Class["oi3-healthmonitoring-rdbms::install"],
     }
 
-    file { "/opt/openinfinity/3.0.0/healthmonitoring/nodechecker/var/lib/notifications/sent":
+    file { "/opt/openinfinity/3.1.0/healthmonitoring/nodechecker/var/lib/notifications/sent":
         mode => 0777,
         require => Class["oi3-healthmonitoring-rdbms::install"],
     }

@@ -8,7 +8,7 @@ class oi3-rdbms::config {
                require => Class["oi3-rdbms::install"],
 	}
 
-	file {"/opt/openinfinity/3.0.0/rdbms/log":
+	file {"/opt/openinfinity/3.1.0/rdbms/log":
 		ensure => directory,
 		owner => "mysql",
 		group => "mysql",
@@ -17,7 +17,7 @@ class oi3-rdbms::config {
 	}
 
 	exec {"create-mysql-database":
-               unless => "/usr/bin/test -f /opt/openinfinity/3.0.0/rdbms/data/mysql/user.frm",
+               unless => "/usr/bin/test -f /opt/openinfinity/3.1.0/rdbms/data/mysql/user.frm",
                command => "/usr/bin/mysql_install_db --user=mysql --defaults-file=/etc/my.cnf", 
                require => Class["oi3-rdbms::install"],
         }

@@ -45,7 +45,7 @@ class jetty($directory = '/opt', $user = 'jetty', $group = 'jetty') {
 class oi3jetty {
 	
 	class {'jetty':
-		directory => "/opt/openinfinity/3.0.0/",
+		directory => "/opt/openinfinity/3.1.0/",
 		user => "oiuser",
 		group => "oiuser",
 	}

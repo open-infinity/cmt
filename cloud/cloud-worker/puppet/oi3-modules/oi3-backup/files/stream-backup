@@ -5,7 +5,7 @@
 # supposed to receive the streamed output.
 #
 
-BACKUP_BASE_DIR=/opt/openinfinity/3.0.0/backup
+BACKUP_BASE_DIR=/opt/openinfinity/3.1.0/backup
 EXCLUDES_FILE=/tmp/merged-exclude-rules
 BACKUP_LOG=/var/log/cloud-backup.log
 

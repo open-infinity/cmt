@@ -15,7 +15,7 @@
 
 [ ${NETWORKING} = "no" ] && exit 0
 
-CATALINA_HOME=/opt/openinfinity/3.0.0/tomcat; export CATALINA_HOME
+CATALINA_HOME=/opt/openinfinity/3.1.0/tomcat; export CATALINA_HOME
 JAVA_HOME=/etc/alternatives/jre_openjdk/; export JAVA_HOME
 TOMCAT_OWNER=oiuser; export TOMCAT_OWNER
 

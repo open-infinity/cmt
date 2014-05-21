@@ -1,5 +1,5 @@
 class oi3-serviceplatform::config inherits oi3-bas::config {
-        File ["/opt/openinfinity/3.0.0/tomcat/bin/setenv.sh"] {
+        File ["/opt/openinfinity/3.1.0/tomcat/bin/setenv.sh"] {
                 ensure => present,
                 owner => 'oiuser',
                 group => 'oiuser',
@@ -8,7 +8,7 @@ class oi3-serviceplatform::config inherits oi3-bas::config {
                 require => Class["oi3-serviceplatform::install"],
         }
 
-        File ["/opt/openinfinity/3.0.0/tomcat/conf/catalina.properties"] {
+        File ["/opt/openinfinity/3.1.0/tomcat/conf/catalina.properties"] {
                 ensure => present,
                 owner => 'oiuser',
                 group => 'oiuser',
@@ -17,7 +17,7 @@ class oi3-serviceplatform::config inherits oi3-bas::config {
                 require => Class["oi3-serviceplatform::install"],
         }
 
-	file {"/opt/openinfinity/3.0.0/tomcat/conf/tomcat-users.xml":
+	file {"/opt/openinfinity/3.1.0/tomcat/conf/tomcat-users.xml":
 		ensure => present,
 		owner => 'oiuser',
 		group => 'oiuser',
@@ -28,7 +28,7 @@ class oi3-serviceplatform::config inherits oi3-bas::config {
 
 
 	#rights may require change
-	file {"/opt/openinfinity/3.0.0/tomcat/conf/activemq.xml":
+	file {"/opt/openinfinity/3.1.0/tomcat/conf/activemq.xml":
 		ensure => present,
 		owner => 'oiuser',
 		group => 'oiuser',
@@ -47,7 +47,7 @@ class oi3-serviceplatform::config inherits oi3-bas::config {
 
 	# activity webapp configuration override
 
-	file {"/opt/openinfinity/3.0.0/tomcat/webapps/activiti-explorer2/WEB-INF/classes/db.properties":
+	file {"/opt/openinfinity/3.1.0/tomcat/webapps/activiti-explorer2/WEB-INF/classes/db.properties":
 		ensure => present,
 		owner => 'oiuser',
 		group => 'oiuser',
@@ -56,7 +56,7 @@ class oi3-serviceplatform::config inherits oi3-bas::config {
 		require => Class["oi3-serviceplatform::install"],
 	}
 
-	file {"/opt/openinfinity/3.0.0/tomcat/webapps/activiti-rest2/WEB-INF/classes/db.properties":
+	file {"/opt/openinfinity/3.1.0/tomcat/webapps/activiti-rest2/WEB-INF/classes/db.properties":
 		ensure => present,
 		owner => 'oiuser',
 		group => 'oiuser',
@@ -65,7 +65,7 @@ class oi3-serviceplatform::config inherits oi3-bas::config {
 		require => Class["oi3-serviceplatform::install"],
 	}
 	
-	file {"/opt/openinfinity/3.0.0/tomcat/webapps/activiti-explorer2/WEB-INF/activiti-standalone-context.xml":
+	file {"/opt/openinfinity/3.1.0/tomcat/webapps/activiti-explorer2/WEB-INF/activiti-standalone-context.xml":
 		ensure => present,
 		owner => 'oiuser',
 		group => 'oiuser',
@@ -74,7 +74,7 @@ class oi3-serviceplatform::config inherits oi3-bas::config {
 		require => Class["oi3-serviceplatform::install"],
 	}
 	
-	file {"/opt/openinfinity/3.0.0/tomcat/webapps/activiti-rest2/WEB-INF/classes/activiti-context.xml":
+	file {"/opt/openinfinity/3.1.0/tomcat/webapps/activiti-rest2/WEB-INF/classes/activiti-context.xml":
 		ensure => present,
 		owner => 'oiuser',
 		group => 'oiuser',
@@ -83,7 +83,7 @@ class oi3-serviceplatform::config inherits oi3-bas::config {
 		require => Class["oi3-serviceplatform::install"],
 	}
 	
-	file {"/opt/openinfinity/3.0.0/tomcat/webapps/activiti-rest2/WEB-INF/web.xml":
+	file {"/opt/openinfinity/3.1.0/tomcat/webapps/activiti-rest2/WEB-INF/web.xml":
 		ensure => present,
 		owner => 'oiuser',
 		group => 'oiuser',
@@ -94,7 +94,7 @@ class oi3-serviceplatform::config inherits oi3-bas::config {
 
 	# activemq-web-console webapp configuration override
 
-	file {"/opt/openinfinity/3.0.0/tomcat/webapps/activemq-web-console/WEB-INF/webconsole-embedded.xml":
+	file {"/opt/openinfinity/3.1.0/tomcat/webapps/activemq-web-console/WEB-INF/webconsole-embedded.xml":
 		ensure => present,
 		owner => 'oiuser',
 		group => 'oiuser',
@@ -103,7 +103,7 @@ class oi3-serviceplatform::config inherits oi3-bas::config {
 		require => Class["oi3-serviceplatform::install"],
 	}
 
-	file {"/opt/openinfinity/3.0.0/tomcat/webapps/activemq-web-console/WEB-INF/web.xml":
+	file {"/opt/openinfinity/3.1.0/tomcat/webapps/activemq-web-console/WEB-INF/web.xml":
 		ensure => present,
 		owner => 'oiuser',
 		group => 'oiuser',
@@ -113,7 +113,7 @@ class oi3-serviceplatform::config inherits oi3-bas::config {
 	}
 
 	# oauth webapp configuration override
-	file {"/opt/openinfinity/3.0.0/tomcat/webapps/oauth/WEB-INF/classes/oauth-repository.properties":
+	file {"/opt/openinfinity/3.1.0/tomcat/webapps/oauth/WEB-INF/classes/oauth-repository.properties":
 		ensure => present,
 		owner => 'oiuser',
 		group => 'oiuser',

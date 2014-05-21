@@ -30,7 +30,7 @@ class oi3-basic::config {
 		require => User["oiuser"],
 	}
 
-	file {"/opt/openinfinity/3.0.0":
+	file {"/opt/openinfinity/3.1.0":
 		ensure => directory,
 		owner => 'oiuser',
 		group => 'oiuser',

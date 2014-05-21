@@ -1,7 +1,7 @@
 class oi3-oauth-rdbms::config {
 	
 	# Directory for oauth schema files
-	file { "/opt/openinfinity/3.0.0/oauth":
+	file { "/opt/openinfinity/3.1.0/oauth":
 		ensure => directory,
 		group => "root",
 		owner => "root",
@@ -9,15 +9,15 @@ class oi3-oauth-rdbms::config {
 	}
 
 	# Directory for oauth schema files
-	file { "/opt/openinfinity/3.0.0/oauth/dbschema":
+	file { "/opt/openinfinity/3.1.0/oauth/dbschema":
 		ensure => directory,
 		group => "root",
 		owner => "root",
-		require => file["/opt/openinfinity/3.0.0/oauth"],
+		require => file["/opt/openinfinity/3.1.0/oauth"],
 	}
 
 	# Oauth schema create scripts
-	file { "/opt/openinfinity/3.0.0/oauth/dbschema/oauth2-schema.sql":
+	file { "/opt/openinfinity/3.1.0/oauth/dbschema/oauth2-schema.sql":
                 ensure => present,
                 source => "puppet:///modules/oi3-oauth-rdbms/oauth2-schema.sql",
                 owner => "root",
