@@ -164,8 +164,8 @@ class oi3-portal-sso::config {
                 source => "puppet:///modules/oi3-portal-sso/oi-tomcat",
                 require => Class["oi3-portal-sso::install"],
         }
-
 	file {"/opt/openinfinity/3.1.0/portal-setup-wizard.properties":
+
                 ensure => present,
 			    owner => 'oiuser',
 			    group => 'oiuser',

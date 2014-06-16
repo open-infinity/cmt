@@ -6,3 +6,4 @@ class oi3-serviceplatform::service inherits oi3-bas::service {
                 require => Class["oi3-bas::config"],
         }
 }
+

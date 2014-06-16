@@ -69,7 +69,7 @@ cp -pR ../bin $TMPDIR/ROOT/
 
 # Build RPM package
 fpm -s dir -t rpm -C $TMPDIR -p $TARGETDIR -a noarch \
-	-n oi3-bigdata-mgmt --version 1.4.0 --iteration 1 \
+	-n oi3-bigdata-mgmt --version 1.4.0 --iteration 2 \
 	--description "Hadoop, HBase and MongoDB cluster up and down scaling scipts" \
 	-d "python python-paramiko" \
 	--prefix /opt/bigdata \
