@@ -1,0 +1,25 @@
+LoadPlugin threshold
+<Plugin threshold>
+    <Plugin disk>
+        Instance sda1
+        <Type disk_octets>
+            Persist false
+            DataSource write
+            WarningMax 3000
+        </Type>
+    </Plugin>
+    <Plugin df>
+        <Type df_complex_pct>
+            Persist false
+            Instance free
+            WarningMin 10
+        </Type>
+    </Plugin>
+    <Plugin "GenericJMX">
+        <Type jmx_memory>
+            Persist false
+            Instance committed
+            WarningMax <%=threshold_warn_max_jvm_committed%>
+    	</Type>
+    </Plugin>
+</Plugin>

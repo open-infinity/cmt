@@ -1,0 +1,37 @@
+div.property-table {
+    display: table;
+    width: 100%;
+}
+
+div.property-row  {
+    display: table-row;
+}
+
+div.property-header {
+    display: table-cell;
+    padding: 4pt;
+    border-top: 1px solid gray;
+    border-bottom: 1px solid gray;
+    background: lightblue;
+}
+
+div.property-key {
+    display: table-cell;
+    padding: 4pt;
+    border-top: 1px solid white;
+    border-bottom: 1px solid gray;
+}
+
+div.property-value {
+    display: table-cell;
+    padding: 4pt;
+    border-top: 1px solid white;
+    border-bottom: 1px solid gray;
+}
+
+div.property-tools {
+    display: table-cell;
+    padding: 4pt;
+    width: 1%;
+}
+

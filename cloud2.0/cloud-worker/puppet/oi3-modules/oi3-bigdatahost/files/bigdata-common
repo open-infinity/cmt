@@ -1,0 +1,44 @@
+
+# Get big data variables
+export BIGDATA_TYPE=`egrep "^type" /etc/bigdata | cut -d '=' -f 2 | tr -d ' ' | uniq`
+echo "Big data type is '$BIGDATA_TYPE'"
+export BIGDATA_ROLE=`egrep "^node-role" /etc/bigdata | cut -d '=' -f 2 | tr -d ' ' | uniq`
+echo "Big data role is '$BIGDATA_ROLE'"
+if [ "$BIGDATA_TYPE" = "mongodb" ] ; then
+    MONGO_CFG_SERVER1=`egrep "^mongo-config-servers " /etc/bigdata | cut -d '=' -f 2 | tr -d ' ' | cut -d ',' -f 1 | uniq`
+    echo "The first mongo config server is $MONGO_CFG_SERVER1"
+    MONGO_CFG_SERVER2=`egrep "^mongo-config-servers " /etc/bigdata | cut -d '=' -f 2 | tr -d ' ' | cut -d ',' -f 2 | uniq`
+    echo "The second mongo config server is $MONGO_CFG_SERVER2"
+    
+    cat >/tmp/mongodb-replset-find.js <<EOF
+    use local
+    db.system.replset.find().pretty()
+    exit
+EOF
+
+    if [ "$BIGDATA_ROLE" = "shard" ] ; then
+        MONGO_RSET_MEMBER1=$(mongo localhost:27018 < /tmp/mongodb-replset-find.js | grep "\"host\"" | cut -d ':' -f 2 | tr '\"' ' ' | tr -d ' ' | head -1)
+        echo "The first replica set member is $MONGO_RSET_MEMBER1"
+        MONGO_RSET_MEMBER2=$(mongo localhost:27018 < /tmp/mongodb-replset-find.js | grep "\"host\"" | cut -d ':' -f 2 | tr '\"' ' ' | tr -d ' ' | head -2 | tail -1)
+        echo "The first replica set member is $MONGO_RSET_MEMBER2"
+        MONGO_RSET_MEMBER3=$(mongo localhost:27018 < /tmp/mongodb-replset-find.js | grep "\"host\"" | cut -d ':' -f 2 | tr '\"' ' ' | tr -d ' ' | head -3 | tail -1)
+        echo "The first replica set member is $MONGO_RSET_MEMBER3"
+    fi
+    rm -f /tmp/mongodb-replset-find.js
+    
+    export MONGODB_LOG_DIR=/opt/openinfinity/3.1.0/bigdata/log
+else
+    echo "The cluster type is '$BIGDATA_TYPE' which is not supported at moment"
+fi
+
+# Backup directories
+export BIGDATA_BASE_DIR=/opt/openinfinity/3.1.0/backup
+export BACKUP_DIR=$BIGDATA_BASE_DIR/tmp
+export BIGDATA_INCLUDE_DIRS_FILE=$BIGDATA_BASE_DIR/include-dirs.d/bigdata
+
+# Initialize
+if [ ! -d $BACKUP_DIR ]; then
+    mkdir $BACKUP_DIR || exit 1
+fi
+echo "" > $BIGDATA_INCLUDE_DIRS_FILE
+

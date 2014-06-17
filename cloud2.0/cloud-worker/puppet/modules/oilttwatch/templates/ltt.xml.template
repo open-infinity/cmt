@@ -1,0 +1,23 @@
+<?xml version = "1.0"?>
+
+<testconfiguration defaultDispatcher="/ltthtml.jsp">
+  <testset name="Tomcat-MySQL">
+<%  if dbaddress != nil %>  
+    <test classname="com.tietoenator.pn.ltt.JDBCTest" name="MySQL">
+      <parameters>
+	<parameter name="useDataSource" value="false"/>
+        <parameter name="jdbcUrl" value="jdbc:mysql://<%=dbaddress%>:3306/INFORMATION_SCHEMA"/>
+        <parameter name="driverClass" value="com.mysql.jdbc.Driver"/>
+        <parameter name="dbUser" value="liferay"/>
+        <parameter name="dbPassword" value="toasliferay"/>
+        <parameter name="sqlQuery" value="select count(*) from TABLES"/>
+        <parameter name="desiredOutput" value=""/>
+        <parameter name="matchAsSubstring" value="false"/>
+        <parameter name="matchAllResults" value="false"/>
+      </parameters>
+    </test>
+<%  end %>  
+  </testset>
+
+</testconfiguration>
+

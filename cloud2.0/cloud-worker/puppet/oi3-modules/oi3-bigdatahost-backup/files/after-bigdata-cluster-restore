@@ -1,0 +1,27 @@
+#!/bin/sh
+
+# In case of MongoDB, the following procedure is followed:
+# http://docs.mongodb.org/manual/tutorial/restore-sharded-cluster/
+
+source /opt/openinfinity/3.1.0/backup/common/bigdata-common
+
+if [ "x$BIGDATA_ROLE" = "x" ] ; then
+    echo "Can't prepare cluster restore because this node is not part of a bigdata/nosql cluster" >/dev/stderr
+    exit 1
+elif [ "$BIGDATA_ROLE" = "config" ] ; then
+    # --------------------------------------------------------------------------
+    # 4. Restart all the mongos instances
+    # --------------------------------------------------------------------------
+    /etc/init.d/mongo-cfgsrv start || exit 1
+    /etc/init.d/mongos start || exit 1
+elif [ "$BIGDATA_ROLE" = "shard" ] ; then
+    # --------------------------------------------------------------------------
+    # 5. Restart all the mongod instances
+    # --------------------------------------------------------------------------
+    /etc/init.d/mongod start || exit 1
+else
+    # TODO: Hadoop support?
+    echo "At moment other than MongoDB bigdata restores are not supported." >/dev/stderr
+    exit 1
+fi
+

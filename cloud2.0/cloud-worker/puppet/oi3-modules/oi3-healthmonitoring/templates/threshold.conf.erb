@@ -1,0 +1,29 @@
+LoadPlugin threshold
+<Plugin threshold>
+
+    <Plugin disk>
+        Instance sda1
+        <Type disk_octets>
+            Persist false
+            DataSource write
+            WarningMax 3000
+        </Type>
+    </Plugin>
+    
+    <Plugin df>
+        <Type percent_bytes>
+            Persist false
+            Instance free
+            WarningMin 10
+        </Type>
+    </Plugin>
+    
+#    <Plugin load>
+#        <Type load>
+#            Persist false
+#            Instance relative
+#            WarningMax 1
+#        </Type>
+#    </Plugin>
+
+</Plugin>
