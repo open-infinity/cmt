@@ -1,0 +1,18 @@
+#!/bin/sh
+
+OPENINFINITY_DIR=/opt/openinfinity/3.1.0
+INCLUDE_DIRS_FILE=$OPENINFINITY_DIR/backup/include-dirs.d/galera
+BACKUP_TMP_DIR=$OPENINFINITY_DIR/backup/tmp
+
+# List databases but exclude 'mysql' database
+DATABASES=`/usr/bin/mysql -uroot -pbahPoo6p <<EOF | egrep -v "^Database\$|^mysql\$"
+show databases;
+EOF
+`
+
+# Make database dump
+echo "Making backup of `echo $DATABASES | wc -w` databases" &>/dev/stderr
+/usr/bin/mysqldump -uroot -pbahPoo6p --lock-all-tables --databases $DATABASES | gzip > $BACKUP_TMP_DIR/galera-all-databases-dump.gz || exit 1
+
+echo $BACKUP_TMP_DIR > $INCLUDE_DIRS_FILE || exit 1
+

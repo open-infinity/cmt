@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# In case of MongoDB, the following procedure is followed:
+# http://docs.mongodb.org/manual/tutorial/backup-sharded-cluster-with-database-dumps/
+
+source /opt/openinfinity/3.1.0/backup/common/bigdata-common
+
+if [ "x$BIGDATA_ROLE" = "x" ] ; then
+    echo "Can't finish node backup because this node is not part of a bigdata/nosql cluster" >/dev/stderr
+    exit 1
+elif [ "$BIGDATA_ROLE" = "config" ] ; then
+    rm -fR $BACKUP_DIR/*
+elif [ "$BIGDATA_ROLE" = "shard" ] ; then
+    rm -fR $BACKUP_DIR/*
+else
+    # TODO: Hadoop support?
+    echo "At moment other than MongoDB bigdata backups are not supported. Unexpected node type: '$BIGDATA_ROLE'." >/dev/stderr
+    exit 1
+fi
+

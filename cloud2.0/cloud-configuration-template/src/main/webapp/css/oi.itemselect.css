@@ -1,0 +1,17 @@
+.is-container{height:300px;}
+.is-panel
+.is-panel{width:200px;}
+.is-panel-title{margin: 10px 0px 8px 10px;font-size:12px;font-weight:bold}
+.is-panel-columns{margin-left:10px}
+.is-panel-columns div {font-size:12px}
+.is-panel-columns>div:first-child{float:left;width:125px;}
+.is-list-container ul{height:250px;width:200px;overflow-y:auto;float:left;list-style-type:none;margin:0;padding:0;margin-bottom:10px;}
+.is-list-container li{margin:0px 0px 3px 10px;padding:3px;width:160px;}
+/*div.is-list-container>ul>li>div:first-child{float:left;width:125px;}*/
+.is-placeholder{width:150px; border-width:0px}
+.is-item-value{text-overflow:ellipsis}
+
+
+
+
+

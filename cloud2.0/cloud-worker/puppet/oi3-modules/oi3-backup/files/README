@@ -1,0 +1,67 @@
+OPEN INFINITY BACKUP
+~~~~~~~~~~~~~~~~~~~~
+
+This directory structure follows the convention described below. There are
+three scripts, stream-backup, stream-restore and cluster-sync, that take 
+care of running scripts in the sub directories. Those two scripts are 
+executed by cloud-backup Java process in the CMT host and should not be 
+modified. Deployment-specific modifications can be made in the following 
+directories:
+
+cluster-backup-before.d
+    The scripts in this directory are run on each node before the actual 
+    backup-related scripts are run.
+
+cluster-backup-after.d
+    The scripts in this directory are run after all per-node backups are
+    finished.
+
+cluster-restore-before.d
+    The scripts in this directory are run on each node before the actual 
+    restore-related scripts are run.
+
+cluster-restore-after.d
+    The scripts in this directory are run after all per-node restores are
+    finished.
+
+node-backup-before.d
+    Files in this directory are executed before the actual backup is taken.
+    Usually these scripts prepare the directory structure for backup and
+    make needed database dumps and process shutdowns etc.
+
+node-backup-after.d
+    Files in this directory are executed after the actual backup is completed.
+    These scripts clean up everything made by the before-backup.d scripts.
+    Typically this includes deleting database dumps and starting processes.
+
+node-restore-before.d
+    Prepares the node for restoring a directory structure for backup.
+    
+node-restore-after.d
+    These scripts are executed after the backup directory is restored. 
+    Process restarts, database imports and other similar tasks should be done
+    at this phase. After all is completed possible database dumps needed by
+    the import should be deleted.
+
+common
+    Files to be included by the scripts in the directories above.
+
+include-dirs.d
+    Each of the files in this directory should contain a single string
+    identifying directory to be backed up. If there are no files in this 
+    directory, the whole /opt will be backed up. The directory strings
+    have to be absolute and without spaces or special characters.
+    It's possible that before-restore.d scripts create files in this 
+    directory.
+        
+exclude-rules.d
+    Files with exclude rules to the directories defined in the include-dirs.
+    File format should be compatible with the -X switch of tar command.
+
+If your deployment doesn't follow purely Open Infinity standard deployment
+model, but includes some legacy elements and modifications, it's better,
+that you create new scripts under the directories mentioned above,
+to make your backup cover your customizations.
+
+The final backup archives are encrypted and stored in an Amazon S3 compatible 
+storage.

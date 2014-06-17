@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+	
+	<context:component-scan base-package="org.openinfinity.cloud.service" />
+	
+	<!-- bean id = "apacheHttpClient" class = "org.apache.http.impl.client.DefaultHttpClient"/-->
+	<bean id="plainSocketFactory" class="org.apache.http.conn.scheme.PlainSocketFactory"
+		factory-method="getSocketFactory"></bean>
+
+	<bean id="schemeHttp" class="org.apache.http.conn.scheme.Scheme">
+		<constructor-arg value="http"></constructor-arg>
+		<constructor-arg ref="plainSocketFactory"></constructor-arg>
+		<constructor-arg type="int" value="80"></constructor-arg>
+	</bean>
+
+	<bean id="schemeRegistry" class="org.apache.http.conn.scheme.SchemeRegistry">
+		<property name="items">
+			<map>
+				<entry key="http" value-ref="schemeHttp"></entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="basicHttpParams" class="org.apache.http.params.BasicHttpParams"></bean>
+
+	<bean id="clientConnManager"
+		class="org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager"
+		destroy-method="shutdown">
+		<constructor-arg ref="basicHttpParams"></constructor-arg>
+		<constructor-arg ref="schemeRegistry"></constructor-arg>
+	</bean>
+	
+	<bean id="retryHandler" class="org.apache.http.impl.client.DefaultHttpRequestRetryHandler">
+		<constructor-arg index="0" value="5" /> <!-- retry count -->
+		<constructor-arg index="1" value="true" /> <!-- requestSentRetryEnabled -->
+	</bean>
+
+	<bean id="httpClient" class="org.apache.http.impl.client.DefaultHttpClient">
+		<constructor-arg ref="clientConnManager"></constructor-arg>
+		<constructor-arg ref="basicHttpParams"></constructor-arg>
+		<property name="httpRequestRetryHandler" ref="retryHandler" />
+	</bean> 
+	    	
+</beans>

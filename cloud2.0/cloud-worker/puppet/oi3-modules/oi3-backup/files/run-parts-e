@@ -1,0 +1,37 @@
+#!/bin/bash
+#
+# Debian has a good run-parts command, but Red Hat and CentOS have a
+# cheap script, that doesn't stop on error. This is a modified and simplified 
+# version of CentOS script, that makes the script fail.
+
+# don't keep going when something fails
+set -e
+
+if [ $# -lt 1 ]; then
+        echo "Usage: run-parts-e <dir>"
+        exit 1
+fi
+
+if [ ! -d $1 ]; then
+        echo "Not a directory: $1"
+        exit 1
+fi
+
+# Ignore *~ and *, scripts
+for i in $(LC_ALL=C; echo $1/*[^~,]) ; do
+        [ -d $i ] && continue
+        # Don't run *.{rpmsave,rpmorig,rpmnew,swp,cfsaved} scripts
+        [ "${i%.cfsaved}" != "${i}" ] && continue
+        [ "${i%.rpmsave}" != "${i}" ] && continue
+        [ "${i%.rpmorig}" != "${i}" ] && continue
+        [ "${i%.rpmnew}" != "${i}" ] && continue
+        [ "${i%.swp}" != "${i}" ] && continue
+        [ "${i%,v}" != "${i}" ] && continue
+
+        if [ -x $i ]; then
+                $i || exit 1
+        fi
+done
+
+exit 0
+

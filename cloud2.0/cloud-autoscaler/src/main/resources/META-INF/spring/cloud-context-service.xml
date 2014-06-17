@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+	<context:component-scan base-package="org.openinfinity.cloud.service.administrator">
+    </context:component-scan>
+    
+    <context:component-scan base-package="org.openinfinity.cloud.service.healthmonitoring">		
+    </context:component-scan>
+    
+    <context:component-scan base-package="org.openinfinity.cloud.service.scaling">		
+    </context:component-scan>
+    
+	
+	<bean id="plainSocketFactory" class="org.apache.http.conn.scheme.PlainSocketFactory"
+		factory-method="getSocketFactory"/>
+
+	<bean id="schemeHttp" class="org.apache.http.conn.scheme.Scheme">
+		<constructor-arg value="http"/>
+		<constructor-arg ref="plainSocketFactory"/>
+		<constructor-arg type="int" value="80"/>
+	</bean>
+
+	<bean id="schemeRegistry" class="org.apache.http.conn.scheme.SchemeRegistry">
+		<property name="items">
+			<map>
+				<entry key="http" value-ref="schemeHttp"/>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="basicHttpParams" class="org.apache.http.params.BasicHttpParams"/>
+
+	<bean id="clientConnManager"
+		class="org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager"
+		destroy-method="shutdown">
+		<constructor-arg ref="basicHttpParams"/>
+		<constructor-arg ref="schemeRegistry"/>
+	</bean>
+	
+	<bean id="retryHandler" class="org.apache.http.impl.client.DefaultHttpRequestRetryHandler">
+		<constructor-arg index="0" value="5" /> <!-- retry count -->
+		<constructor-arg index="1" value="true" /> <!-- requestSentRetryEnabled -->
+	</bean>
+
+	<bean id="httpClient" class="org.apache.http.impl.client.DefaultHttpClient">
+		<constructor-arg ref="clientConnManager"/>
+		<constructor-arg ref="basicHttpParams"/>
+		<property name="httpRequestRetryHandler" ref="retryHandler" />
+	</bean> 
+	    	
+</beans>

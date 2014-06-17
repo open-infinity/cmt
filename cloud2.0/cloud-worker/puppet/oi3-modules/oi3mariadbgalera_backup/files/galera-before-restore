@@ -1,0 +1,5 @@
+#!/bin/sh
+
+OPENINFINITY_DIR=/opt/openinfinity/3.1.0
+BACKUP_TMP_DIR=$OPENINFINITY_DIR/backup/tmp
+

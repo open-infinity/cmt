@@ -10,6 +10,7 @@ target/
 # ignore IDEA metadata
 *.iml
 .idea/
+*.iws
 
 # ignore generated logs
 *.log

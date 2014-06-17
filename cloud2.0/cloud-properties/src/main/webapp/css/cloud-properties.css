@@ -1,0 +1,34 @@
+div.prop-table {
+    display: table;
+    width: 100%;
+}
+
+div.prop-row  {
+    display: table-row;
+}
+
+div.prop-header {
+    display: table-cell;
+    padding: 4pt;
+    border: 1px solid black;
+    background: lightblue;
+}
+
+div.prop-key {
+    display: table-cell;
+    padding: 4pt;
+    border: 1px solid black;
+}
+
+div.prop-value {
+    display: table-cell;
+    padding: 4pt;
+    border: 1px solid black;
+}
+
+div.prop-tools {
+    display: table-cell;
+    padding: 4pt;
+    width: 1%;
+}
+

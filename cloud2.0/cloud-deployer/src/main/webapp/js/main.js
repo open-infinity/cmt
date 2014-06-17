@@ -1,0 +1,1 @@
+var djConfig="parseOnLoad: true, debugAtAllCosts: true";

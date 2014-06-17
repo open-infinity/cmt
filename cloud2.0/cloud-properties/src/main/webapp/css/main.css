@@ -1,0 +1,22 @@
+#sharedPropertyModel label.selectable {
+	background-color: #afafaf;
+	color: white;
+	padding: 3px 15px;
+	border-radius: 10px;
+}
+
+#sharedPropertyModel label.selectable:hover {
+	background-color: #3cf;
+}
+
+#sharedPropertyModel label.selected {
+	background-color: #2685A4;
+	color: white;
+	padding: 3px 15px;
+	border-radius: 10px;
+}
+
+.ui-button-bar {
+	padding-top: 10px;
+	clear: both;
+}

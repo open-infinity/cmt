@@ -1,0 +1,121 @@
+<EntityConfig xmlns="urn:sun:fm:SAML:2.0:entityconfig"
+    xmlns:fm="urn:sun:fm:SAML:2.0:entityconfig"
+    hosted="1"
+    entityID="http://<%= idpIPAddress %>:<%= idpPort %>/openam">
+
+    <IDPSSOConfig metaAlias="/openinfinity/idp">
+        <Attribute name="description">
+            <Value></Value>
+        </Attribute>
+        <Attribute name="signingCertAlias">
+            <Value>openinfinity</Value>
+        </Attribute>
+        <Attribute name="encryptionCertAlias">
+            <Value></Value>
+        </Attribute>
+        <Attribute name="basicAuthOn">
+            <Value>false</Value>
+        </Attribute>
+        <Attribute name="basicAuthUser">
+            <Value></Value>
+        </Attribute>
+        <Attribute name="basicAuthPassword">
+            <Value></Value>
+        </Attribute>
+        <Attribute name="autofedEnabled">
+            <Value>false</Value>
+        </Attribute>
+        <Attribute name="autofedAttribute">
+            <Value></Value>
+        </Attribute>
+        <Attribute name="assertionEffectiveTime">
+            <Value>600</Value>
+        </Attribute>
+        <Attribute name="idpAuthncontextMapper">
+            <Value>com.sun.identity.saml2.plugins.DefaultIDPAuthnContextMapper</Value>
+        </Attribute>
+        <Attribute name="idpAuthncontextClassrefMapping">
+            <Value>urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport|0||default</Value>
+        </Attribute>
+        <Attribute name="idpAccountMapper">
+            <Value>com.sun.identity.saml2.plugins.DefaultIDPAccountMapper</Value>
+        </Attribute>
+        <Attribute name="idpAttributeMapper">
+            <Value>org.openinfinity.sso.openam.userdata.SSOTokenAddingAttributeMapper</Value>
+        </Attribute>
+        <Attribute name="assertionIDRequestMapper">
+            <Value>com.sun.identity.saml2.plugins.DefaultAssertionIDRequestMapper</Value>
+        </Attribute>
+        <Attribute name="nameIDFormatMap">
+		   <Value>urn:oasis:names:tc:SAML:2.0:nameid-format:transient=screenName</Value>  	
+           <Value>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress=mail</Value>
+           <Value>urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName=</Value>
+           <Value>urn:oasis:names:tc:SAML:1.1:nameid-format:WindowsDomainQualifiedName=</Value>
+           <Value>urn:oasis:names:tc:SAML:2.0:nameid-format:kerberos=</Value>
+           <Value>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified=</Value>
+        </Attribute>
+        <Attribute name="idpECPSessionMapper">
+            <Value>com.sun.identity.saml2.plugins.DefaultIDPECPSessionMapper</Value>
+        </Attribute>
+        <Attribute name="attributeMap">
+			<Value>firstName=firstName</Value>
+			<Value>timeZoneId=timeZoneId</Value>
+			<Value>screenName=screenName</Value>
+			<Value>lastName=lastName</Value>
+			<Value>createDate=createDate</Value>
+			<Value>modifiedDate=modifiedDate</Value>
+			<Value>emailAddress=emailAddress</Value>
+			<Value>urn:oasis:names:tc:SAML:2.0:attrname-format:uri|urn:oasis:names:tc:SAML:2.0:profiles:attribute:DCE:groups=memberof</Value>
+			<Value>middleName=middleName</Value>
+			<Value>languageId=languageId</Value>
+			<Value>companyId=companyId</Value>
+			<Value>userId=userId</Value>
+			<Value>facebookId=facebookId</Value>
+        </Attribute>
+        <Attribute name="wantNameIDEncrypted">
+            <Value></Value>
+        </Attribute>
+        <Attribute name="wantArtifactResolveSigned">
+            <Value></Value>
+        </Attribute>
+        <Attribute name="wantLogoutRequestSigned">
+            <Value></Value>
+        </Attribute>
+        <Attribute name="wantLogoutResponseSigned">
+            <Value></Value>
+        </Attribute>
+        <Attribute name="wantMNIRequestSigned">
+            <Value></Value>
+        </Attribute>
+        <Attribute name="wantMNIResponseSigned">
+            <Value></Value>
+        </Attribute>
+        <Attribute name="cotlist">
+        </Attribute>
+        <Attribute name="discoveryBootstrappingEnabled">
+            <Value>false</Value>
+        </Attribute>
+        <Attribute name="assertionCacheEnabled">
+            <Value>false</Value>
+        </Attribute>
+        <Attribute name="assertionNotBeforeTimeSkew">
+            <Value>600</Value>
+        </Attribute>
+        <Attribute name="saeAppSecretList">
+        </Attribute>
+        <Attribute name="saeIDPUrl">
+            <Value>http://<%= idpIPAddress %>:<%= idpPort %>/openam/idpsaehandler/metaAlias/openinfinity/idp</Value>
+        </Attribute>
+        <Attribute name="AuthUrl">
+            <Value></Value>
+        </Attribute>
+       <Attribute name="appLogoutUrl">
+           <Value></Value>
+       </Attribute>
+       <Attribute name="idpSessionSyncEnabled">
+           <Value>false</Value>
+       </Attribute>
+        <Attribute name="relayStateUrlList">
+        </Attribute>
+    </IDPSSOConfig>
+</EntityConfig>

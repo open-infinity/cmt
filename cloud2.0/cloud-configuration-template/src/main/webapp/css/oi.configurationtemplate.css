@@ -1,0 +1,85 @@
+/* Main view */
+
+/* All dialogs */
+.dlg-tab-items-container{width:560px;height:300px;margin-bottom:15px;padding:10px;border-width:0px;font-family:Verdana,Arial,sans-serif;font-size:13px;font-style:normal;font-weight:bold;}
+.dlg-tab-item{height:300px;float:left;border-style:solid;border-width:1px;border-color:#C4C4C4;border-radius: 7px;}
+.dlg-arrows-img{width:150px; border-width:0px}
+.dlg-list-panel-container{width:200px;}
+.dlg-list-panel-container-title{margin: 10px 0px 8px 10px;font-size:12px;font-weight:bold}
+.dlg-list-panel-container-columns{margin-left:10px}
+.dlg-list-panel-container-columns div {font-size:12px}
+.dlg-item-list-container ul{height:250px;width:200px;overflow-y:auto;float:left;list-style-type:none;margin:0;padding:0;margin-bottom:10px;}
+.dlg-item-list-container li{margin:0px 0px 3px 10px;padding:3px;width:160px;}
+input[type="text"].dlg-error-input{border-color:red;border-radius:2px;margin-left:-1px;}
+.dlg-input-container{margin:0 0 7px 0;}
+.dlg-value-label{width: 130px;float: left;}
+/*.dlg-item-description{width: 168px;}*/
+.dlg-input{width: 168px;}
+/*input[type="text"].dlg-input{border-color:red;border-radius:2px;margin-left:-1px;}*/
+
+
+/* Template edit/create dialog */
+.dlg-edit-template-list-panel-container{width:200px;}
+#dlg-edit-template-id-value{font-weight:normal;}
+.dlg-edit-template-template-label-container{margin:0 0 20px 0;}
+.list-panel-title{margin:5px 5px 15px 10px;font-weight:bold;}
+.list-panel-columns{margin:5px 5px 0px 10px;}
+/*.list-container ul{list-style-type:none;margin:0;padding:0;margin-bottom:10px;}
+.list-container li{margin:0px 0px 3px 10px;padding:2px;width:160px;}*/
+.list-item-column{float:left;width:125px;}
+.dlg-edit-template-organization-id{float:left;width:40px;}
+.dlg-edit-template-organization-name{text-align:right;}
+/*#edit-template-fields textarea, input{padding:1px;}   */
+
+
+
+/* Element edit/create dialog */
+#dlg-element-general-tab{height:380px;}
+.dlg-element-value-label{width: 130px;margin-top:5px;float:left;}
+#dlg-element-value-id{padding-top:5px;}
+/*.dlg-element-dependee-name{float:left;width:125px;}*/
+/*#dlg-dependency-selection-container{height:300px;}*/
+.dlg-element-parameter-key-name{width:110px;float:left}
+.dlg-element-list-item-button{width:18px;margin-left:20px;display:inline-block;border-style:solid;border-width:1px;border-color:#c4c4c4;text-align:center;border-radius:15px;background-color:#EEEEEE;font-weight:bold;}
+/*#dlg-element-value-description{width:168px} */
+#dlg-list-values-container{width:200px;margin-left:150px;}
+#dlg-list-values-container li{width:175px;padding: 5px 0 5px 5px}
+#dlg-list-values-container .list-item-column{width:135px}
+.dlg-element-parameter-value-type{float:left;width:110px;}
+.dlg-element-parameter-value-value{width:110px;padding-left:15px;display:inline-block;float:left}
+#dlg-element-replicated-radio{padding-top:6px;}
+
+/*Selection widget*/
+/*dlg-item-list-container*/
+/*div.dlg-item-list-container>ul>li>div:nth-child(2){float:left;width:125px;}*/
+/*.dlg-item-selection-container{height:300px;}*/
+
+ /*dlg-module*/
+.dlg-module-parameter-input-container{width:85%;float:left}
+.dlg-key-value-space-filler{width:20px;border-width:0px}
+/*.dlg-module-list-item-button{border-radius: 10px;border-width: 2px;border-color: #C7C7C7;border-style: solid;width: 10px;height: 10px;vertical-align: middle;text-align: center;line-height: 10px;display: inline-block;padding: 1px;color: #6F6F70;font-weight: bold;}*/
+.dlg-module-list-item-delete-button{width:16px;height:16px;background-image:url(/openinfinity-theme/css/openinfinity/images/ui-icons_454545_256x240.png);background-position:-16px -192px;display:inline-block;vertical-align: middle}
+.dlg-module-new-value-button {width:16px;height:16px;background-image:url(/openinfinity-theme/css/openinfinity/images/ui-icons_454545_256x240.png);background-position:0px -192px;display:inline-block;vertical-align: middle}
+.dlg-module-new-key-button{width:16px;height:16px;background-image:url(/openinfinity-theme/css/openinfinity/images/ui-icons_454545_256x240.png);background-position:0px -192px;display:inline-block;vertical-align: middle}
+#dlg-list-keys-container{width:200px}
+#dlg-list-keys-container li{width:152px}
+#dlg-keys li {width:170px;margin:0 0 0 10px;padding:5px 0px 5px 5px;border-radius:5px;}
+#dlg-values li {width:170px;margin:0 0 0 10px;padding:5px 0px 5px 5px;border-radius:5px;}
+#dlg-keys-values-container li.dlg-element-key-value-list-item{border-width:0;background:white};
+#dlg-element-key-name{padding-left:10px;font-weight:normal;}
+input[type="text"].dlg-key-name, input[type="text"].dlg-value-type, input[type="text"].dlg-value-value{width:90%; padding:2px}
+#dlg-module-key-name{width:50px;display:inline-block;text-align:center;margin-left:28px;}
+/* TODO: Make a standalone widget for info or integrate with itemselect widget  to avoid duplication of classes*/
+/* the lines below are the same as dlg-item-list-container */
+.dlg-module-item-list-container ul{height:250px;width:200px;overflow-y:auto;float:left;list-style-type:none;margin:0;padding:0;margin-bottom:10px;}
+.dlg-module-item-list-container li{margin:0px 0px 3px 10px;padding:3px;width:160px;}
+/*END of TODO block*/
+
+/* Helper dialog for showing item information */
+#dlg-item-table th{border:1px solid #C4C4C4;padding:5px;text-align:center}
+#dlg-item-table td{border:1px solid #C4C4C4;padding:5px;}
+
+
+
+
+
