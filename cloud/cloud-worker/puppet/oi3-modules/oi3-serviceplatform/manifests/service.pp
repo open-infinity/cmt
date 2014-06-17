@@ -3,7 +3,7 @@ class oi3-serviceplatform::service inherits oi3-bas::service {
                 ensure => running,
                 hasrestart => true,
                 enable => true,
-                require => Class["oi3-bas::config"],
+                require => Class["oi3-serviceplatform::config"],
         }
 }
 

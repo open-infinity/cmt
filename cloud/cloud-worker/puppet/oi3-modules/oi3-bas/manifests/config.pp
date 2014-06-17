@@ -1,23 +1,24 @@
 class oi3-bas::config {
 
-	file {"/opt/openinfinity/3.1.0/tomcat/bin/setenv.sh":
-                ensure => present,
-                owner => 'oiuser',
-                group => 'oiuser',
-                mode => 0755,
-                content => template("oi3-bas/setenv.sh.erb"),
-                require => Class["oi3-bas::install"],
-        }
+	file { "/opt/openinfinity/3.1.0/tomcat/bin/setenv.sh":
+        ensure => present,
+        owner => 'oiuser',
+        group => 'oiuser',
+        mode => 0755,
+        content => template("oi3-bas/setenv.sh.erb"),
+        require => Class["oi3-bas::install"],
+        notify => Service["oi-tomcat"],
+    }
 
-	file {"/opt/openinfinity/3.1.0/tomcat/conf/catalina.properties":
-		ensure => present,
-		owner => 'oiuser',
-		group => 'oiuser',
-		mode => 0600,
-		source => "puppet:///modules/oi3-bas/catalina.properties",
-		require => Class["oi3-bas::install"],
-		notify => Service["oi-tomcat"],
-	}
+    file {"/opt/openinfinity/3.1.0/tomcat/conf/catalina.properties":
+        ensure => present,
+        owner => 'oiuser',
+        group => 'oiuser',
+        mode => 0600,
+        source => "puppet:///modules/oi3-bas/catalina.properties",
+        require => Class["oi3-bas::install"],
+        notify => Service["oi-tomcat"],
+    }
 
 	file {"/opt/openinfinity/3.1.0/tomcat/conf/server.xml":
 		ensure => present,
