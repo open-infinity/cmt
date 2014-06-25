@@ -4,6 +4,7 @@
 BACKUP_DIR=/opt/openinfinity/3.1.0/backup/dumps
 mkdir -p $BACKUP_DIR &>/dev/null
 
+# ApacheDS version specific directories
 APACHEDS=`cd /etc/init.d ; ls apacheds* | tail -1` || exit 1
 APACHEDS_DATADIR=var/lib/`ls /var/lib/ | grep apacheds | tail -1`/default || exit 1
 

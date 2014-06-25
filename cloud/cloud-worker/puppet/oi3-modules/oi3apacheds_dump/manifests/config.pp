@@ -1,6 +1,6 @@
 class oi3apacheds_dump::config {
 
-    # Directories
+    # Directories to be created
     $backup_directories = [
         "/opt/openinfinity/3.1.0/backup",
         "/opt/openinfinity/3.1.0/backup/dumps",
@@ -13,6 +13,7 @@ class oi3apacheds_dump::config {
 		mode => 0755,
     }
 
+    # Dump script
 	file { "/opt/openinfinity/3.1.0/backup/scripts/apacheds-dump.sh":
         ensure => present,
         owner => 'oiuser',
@@ -22,6 +23,7 @@ class oi3apacheds_dump::config {
 		require => File['/opt/openinfinity/3.1.0/backup/scripts'],
     }
 
+    # Cron file
 	file {"/etc/cron.d/apacheds-dump":
 		ensure => present,
 		owner => 'root',
