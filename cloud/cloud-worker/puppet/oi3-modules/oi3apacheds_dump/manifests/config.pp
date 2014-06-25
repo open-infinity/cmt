@@ -24,8 +24,8 @@ class oi3apacheds_dump::config {
 
 	file {"/etc/cron.d/apacheds-dump":
 		ensure => present,
-		owner => 'oiuser',
-		group => 'oiuser',
+		owner => 'root',
+		group => 'root',
 		mode => 0644,
         content => template("oi3apacheds_dump/apacheds-dump.erb"),
 	}
