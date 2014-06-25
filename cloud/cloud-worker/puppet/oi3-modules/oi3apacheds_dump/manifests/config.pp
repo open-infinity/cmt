@@ -18,7 +18,7 @@ class oi3apacheds_dump::config {
         owner => 'oiuser',
         group => 'oiuser',
         mode => 0755,
-        content => template("oi3apacheds_dump/apacheds-dump.sh"),
+		source => "puppet:///modules/oi3apacheds_dump/apacheds-dump.sh",
 		require => File['/opt/openinfinity/3.1.0/backup/scripts'],
     }
 
@@ -26,8 +26,8 @@ class oi3apacheds_dump::config {
 		ensure => present,
 		owner => 'oiuser',
 		group => 'oiuser',
-		mode => 0755,
-		source => "puppet:///modules/oi3apacheds_dump/apacheds-dump",
+		mode => 0644,
+        content => template("oi3apacheds_dump/apacheds-dump.erb"),
 	}
 	
 }
