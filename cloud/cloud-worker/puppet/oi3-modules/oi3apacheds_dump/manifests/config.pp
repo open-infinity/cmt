@@ -2,6 +2,7 @@ class oi3apacheds_dump::config {
 
     # Directories to be created
     $backup_directories = [
+        "/opt/openinfinity/3.1.0",
         "/opt/openinfinity/3.1.0/backup",
         "/opt/openinfinity/3.1.0/backup/dumps",
         "/opt/openinfinity/3.1.0/backup/scripts",
