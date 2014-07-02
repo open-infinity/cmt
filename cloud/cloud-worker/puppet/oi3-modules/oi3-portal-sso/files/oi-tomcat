@@ -20,7 +20,7 @@ JAVA_HOME=/etc/alternatives/jre_openjdk/; export JAVA_HOME
 TOMCAT_OWNER=oiuser; export TOMCAT_OWNER
 
 tomcat_pid() {
-  echo `ps aux | grep org.apache.catalina.startup.Bootstrap | grep -v grep | grep "/opt/openinfinity/" | awk '{ print $2 }'`
+  echo `ps aux | grep org.apache.catalina.startup.Bootstrap | grep -v grep | grep "$CATALINA_HOME/" | awk '{ print $2 }'`
 }
 
 
