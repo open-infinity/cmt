@@ -1,4 +1,6 @@
 class oi3-baslb {
+	$portal_addresses = parsejson($portal_addresses_array)
+
 	package { "haproxy":
 		ensure => installed
 	}
