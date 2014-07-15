@@ -56,6 +56,8 @@
 #
 # 1.4.0 2013-12-04  Cloud-backup related changes
 #
+# 1.5.0 2014-08-07  MongoDB 2.6 upgrade
+#
 
 # Update the application files
 export TMPDIR=/tmp/bigdata-fpm-ROOT
@@ -69,7 +71,7 @@ cp -pR ../bin $TMPDIR/ROOT/
 
 # Build RPM package
 fpm -s dir -t rpm -C $TMPDIR -p $TARGETDIR -a noarch \
-	-n oi3-bigdata-mgmt --version 1.4.0 --iteration 2 \
+	-n oi3-bigdata-mgmt --version 1.5.0 --iteration 1 \
 	--description "Hadoop, HBase and MongoDB cluster up and down scaling scipts" \
 	-d "python python-paramiko" \
 	--prefix /opt/bigdata \

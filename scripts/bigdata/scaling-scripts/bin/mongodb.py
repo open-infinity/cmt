@@ -222,7 +222,7 @@ class MongoNode(Node):
             # Install RPM files from the custom repository
             self.config_description = "installing RPMs"
             out.info("Installing RPM files from repository")
-            ssh.install(['mongo-10gen-server', 'mongo-10gen'])
+            ssh.install(['mongodb-org-server', 'mongodb-org'])
             self.config_description = None
 
             # Populate templates and send them to the remote server
@@ -478,7 +478,7 @@ class MongoNode(Node):
             
             # Uninstall RPMS
             out.info("Uninstalling RPM files")
-            ssh.uninstall(['mongo-10gen-server', 'mongo-10gen'])
+            ssh.uninstall(['mongodb-org-server', 'mongodb-org'])
 
             # Run the final cleanup script
             out.info("Run cleanup script")

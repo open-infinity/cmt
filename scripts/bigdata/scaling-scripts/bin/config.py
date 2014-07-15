@@ -28,13 +28,13 @@ import sys
 from os.path import join
 
 # Directories
-storage_dir = "/opt/openinfinity/3.1.0/bigdata/metadata"
+storage_dir     = "/opt/openinfinity/3.1.0/bigdata/metadata"
 bundle_root_dir = "/var/tmp/openinfinitybundle"
-template_dir = join(sys.path[0], "../templates")
-log_dir = "/opt/openinfinity/3.1.0/bigdata/log"
+template_dir    = join(sys.path[0], "../templates")
+log_dir         = "/opt/openinfinity/3.1.0/bigdata/log"
 ssh_log_logpath = "/opt/openinfinity/3.1.0/bigdata/log"
-database_dir = "/opt/openinfinity/3.1.0/bigdata/data"
-tmp_dir = "/opt/openinfinity/3.1.0/bigdata/tmp"
+database_dir    = "/opt/openinfinity/3.1.0/bigdata/data"
+tmp_dir         = "/opt/openinfinity/3.1.0/bigdata/tmp"
 
 hive_metastore_warehouse_dir = "/opt/openinfinity/3.1.0/bigdata/hive-warehouse"
 
