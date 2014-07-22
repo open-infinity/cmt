@@ -9,12 +9,21 @@
 
 class oi3mongodbmini {
 	require oi3-basic
+	include '::mongodb::globals'
 	include '::mongodb::client'
 	include '::mongodb::server'
+}
+
+class {'::mongodb::globals':
+    manage_package_repo => true,
+}
+
+class {'::mongodb::client':
 }
 
 class {'::mongodb::server':
     smallfiles => true,
     bind_ip => '0.0.0.0',
 }
+
 
