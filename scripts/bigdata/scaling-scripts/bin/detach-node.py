@@ -142,4 +142,3 @@ finally:
         print(out.to_xml())
     logging.shutdown()
 
-
