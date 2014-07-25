@@ -1,4 +1,3 @@
-
 # This is a simple plain stand-alone MongoDB installation running on the 
 # default port 27017.
 #

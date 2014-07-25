@@ -1,15 +1,15 @@
-class oi3ldap {
-  ensure_resource('package', 'java-1.7.0-openjdk', {
-	ensure => present,
+class oi3ldap inherits oi3variables {
+  ensure_resource('package', $javaPackageName, {
+    ensure => present,
   })
 
   package {"apacheds":
     ensure => present,
-    require => Package["java-1.7.0-openjdk"]
+    require => Package[$javaPackageName]
   }
 
   service {"apacheds":
-    name => "apacheds-2.0.0_M16-default",
+    name => $apachedsServiceName,
     ensure => "running",
     enable => true,
     require => Package["apacheds"]
