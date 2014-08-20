@@ -1,0 +1,9 @@
+#!/bin/sh
+
+DUMP_DIR=/opt/openinfinity/3.1.0/backup/dump
+DUMP_FILE=$DUMP_DIR/mariadb-dump_$(date +"%Y-%m-%d").gz
+
+rm $DUMP_DIR/mariadb-dump_*.gz
+
+/usr/bin/mysqldump -ubackup -ptoasbackup --all-databases --lock-all-tables | gzip > $DUMP_FILE || exit 1
+
