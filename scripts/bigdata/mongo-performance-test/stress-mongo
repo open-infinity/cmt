@@ -6,6 +6,7 @@ import random
 import optparse
 from sys import exit
 from optparse import OptionParser
+import threading
 
 # Parse options
 parser = OptionParser()
@@ -13,79 +14,170 @@ parser.add_option("-n", "--count", dest="writes", default='10000',
                   help="Number of writes", metavar="WRITES")
 parser.add_option("-w", "--write-concern-size", dest="write_concerns", default='3',
                   help="Write concerns replication size. If 0 no replication is expected.", metavar="WC")
-parser.add_option("-c", "--host", dest="host", default='localhost',
-                  help="Hostname for mongos process", metavar="HOST")
+parser.add_option("-c", "--hosts", dest="hosts", default='localhost',
+                  help="Hostname for mongos processes (separated by commas)", metavar="HOSTS")
 parser.add_option("-p", "--port", dest="port", default='27017',
-                  help="Port", metavar="PORT")
+                  help="Mongos port number (default 27017)", metavar="PORT")
+parser.add_option("-t", "--threads", dest="threads", default='3',
+                  help="Number of threads", metavar="THREADS")
 parser.add_option("-s", "--sync", dest="sync", default='fsync',
                   help="Write concerns syncing method, either 'none', 'journal' or 'fsync', The default is 'fsync'.", metavar="SYNC")
 parser.add_option("--no-clean",
                   action="store_false", dest="clean", default=True,
                   help="Don't drop the test collection and database at end")                  
+parser.add_option("-l", "--collection", dest="collection", default='stress',
+                  help="Test collection name") 
 (options, args) = parser.parse_args()
 
-# Connection
-wc_j = False
-wc_fsync = False
-if options.sync == 'none': pass
-elif options.sync == 'journal': wc_j = True
-elif options.sync == 'fsync': wc_fsync = True
-else: 
-    print("Unrecognized sync string: %s" % (options.sync))
-    exit(1)
-if wc_j != False or wc_fsync != False:
-    # This works universally
-    client = pymongo.MongoClient(options.host, int(options.port), w=options.write_concerns, j=wc_j, fsync=wc_fsync)
-else:
-    # Work-around to prevent an unneccessary warning showing up
-    client = pymongo.MongoClient(options.host, int(options.port), w=options.write_concerns)
+# Parse hosts
+mongos_hosts = options.hosts.split(',')
 
-# Database and collection
-db = client['test']
-collection = db['stress']
+class Worker(threading.Thread):
+    def __init__(self, host):
+        threading.Thread.__init__(self)
+        
+        self.host = host
+    
+        # Connection
+        wc_j = False
+        wc_fsync = False
+        if options.sync == 'none': pass
+        elif options.sync == 'journal': wc_j = True
+        elif options.sync == 'fsync': wc_fsync = True
+        else: 
+            print("Unrecognized sync string: %s" % (options.sync))
+            exit(1)
+        if wc_j != False or wc_fsync != False:
+            # This works universally
+            self.client = pymongo.MongoClient(self.host, int(options.port), w=options.write_concerns, j=wc_j, fsync=wc_fsync)
+        else:
+            # Work-around to prevent an unneccessary warning showing up
+            self.client = pymongo.MongoClient(self.host, int(options.port), w=options.write_concerns)
+            
+        # Start the thread
+        self.rlock = threading.RLock()
+        self.queue = []
+        self.start()
 
-# Aggressive writes
+    def create_database(self):
+        # Database and collection
+        db = self.client['test']
+        collection = db[options.collection]
+
+        # Enable sharding
+        try:
+            self.client.admin.command('enableSharding', 'test')
+            self.client.admin.command('shardCollection', 'test.' + options.collection, key={'Alpha': 1})
+        except pymongo.errors.OperationFailure, e:
+            print(str(e))
+
+
+    def drop_database(self):
+        # Database and collection
+        db = self.client['test']
+        collection = db[options.collection]
+        
+        # Drop database
+        if options.clean:
+            db.drop_collection(options.collection)
+            self.client.drop_database('test')
+
+    def write(self, n):
+        self.rlock.acquire()
+        self.queue.append("write:%d" % n)
+        self.rlock.release()
+    
+    def wait_until_ready(self):
+        self.rlock.acquire()
+        self.queue.append("quit:")
+        self.rlock.release()
+        self.join()
+
+    def run(self):
+        while True:
+            # Take item from the queue
+            while True:
+                self.rlock.acquire()
+                if len(self.queue) > 0:
+                    break
+                else:
+                    self.rlock.release()
+            item = self.queue.pop(0)
+            self.rlock.release()
+
+            cmd, arg = item.split(':')
+            
+            if cmd == "write":
+                self.__do_write(int(arg))
+            elif cmd == "quit":
+                return
+
+    def __do_write(self, n):                    
+        # Database and collection
+        db = self.client['test']
+        collection = db[options.collection]
+
+        # Aggressive writes
+        for i in range(0, n):
+            item = { 
+                'Alpha': random.uniform(0, 10), 
+                'Bravo': random.uniform(0, 10), 
+                'Charlie': random.uniform(0, 10), 
+                'Delta': random.uniform(0, 10), 
+                'Echo': random.uniform(0, 10), 
+                'Foxtrot': random.uniform(0, 10), 
+                'Golf': random.uniform(0, 10), 
+                'Hotel': random.uniform(0, 10), 
+                'India': random.uniform(0, 10), 
+                'Juliet': random.uniform(0, 10),
+                'Kilo': random.uniform(0, 10), 
+                'Lima': random.uniform(0, 10), 
+                'Mike': random.uniform(0, 10), 
+                'November': random.uniform(0, 10), 
+                'Oscar': random.uniform(0, 10), 
+                'Papa': random.uniform(0, 10), 
+                'Quebec': random.uniform(0, 10), 
+                'Romeo': random.uniform(0, 10), 
+                'Sierra': random.uniform(0, 10), 
+                'Tango': random.uniform(0, 10),
+                'Uniform': random.uniform(0, 10),
+                'Victor': random.uniform(0, 10),
+                'Whiskey': random.uniform(0, 10),
+                'X-ray': random.uniform(0, 10),
+                'Zulu': random.uniform(0, 10)
+            }
+            collection.insert(item)
+
+
+# Create workers
+workers = []
+for i in range(0,int(options.threads)):
+    workers.append(Worker(mongos_hosts[i % min(int(options.threads), len(mongos_hosts))]))
+
+# Create database and let things settle down in MongoDB a bit
+workers[0].create_database()
+time.sleep(1)
+
+# Write in parallel
 time0 = time.time()
-n = int(options.writes)
-for i in range(0, n):
-    item = { 
-        'Alpha': random.uniform(0, 10), 
-        'Bravo': random.uniform(0, 10), 
-        'Charlie': random.uniform(0, 10), 
-        'Delta': random.uniform(0, 10), 
-        'Echo': random.uniform(0, 10), 
-        'Foxtrot': random.uniform(0, 10), 
-        'Golf': random.uniform(0, 10), 
-        'Hotel': random.uniform(0, 10), 
-        'India': random.uniform(0, 10), 
-        'Juliet': random.uniform(0, 10),
-        'Kilo': random.uniform(0, 10), 
-        'Lima': random.uniform(0, 10), 
-        'Mike': random.uniform(0, 10), 
-        'November': random.uniform(0, 10), 
-        'Oscar': random.uniform(0, 10), 
-        'Papa': random.uniform(0, 10), 
-        'Quebec': random.uniform(0, 10), 
-        'Romeo': random.uniform(0, 10), 
-        'Sierra': random.uniform(0, 10), 
-        'Tango': random.uniform(0, 10),
-        'Uniform': random.uniform(0, 10),
-        'Victor': random.uniform(0, 10),
-        'Whiskey': random.uniform(0, 10),
-        'X-ray': random.uniform(0, 10),
-        'Zulu': random.uniform(0, 10)
-    }
-    collection.insert(item)
+worker_count = len(workers)
+n = int(options.writes) / worker_count
+for i in range(0, worker_count):
+    workers[i].write(n)
+
+# End threads
+for i in range(0, worker_count):
+    workers[i].wait_until_ready()
 time1 = time.time()
 
 # Print statistics
-rate = n / (time1 - time0)
+rate = int(options.writes) / (time1 - time0)
 print("%.0f inserts per second" % (rate))
 print("%.0f inserts per minute" % (rate*60))
 print("%.1f million inserts per day" % (rate*24*60*60 / 1000000))
 
-# Drop database
-if options.clean:
-    db.drop_collection('stress')
-    client.drop_database('test')
+# Cleanup
+workers[0].drop_database()
+
+
 
